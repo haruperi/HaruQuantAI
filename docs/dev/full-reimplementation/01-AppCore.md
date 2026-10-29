@@ -409,10 +409,10 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Backend target:** `app/core/jobs/manager.py` (retain); **test target:** `tests/core/jobs/test_manager.py` (retain). **Create / frontend:** none.
 *Current -> target / action:* both exact target files already exist; DIRECT FIT for the existing local scheduling behavior only. Do not create `app/core/grid/executor.py` just to forward `submit_job`.
 *Functional Requirements & Implementation:*
-- [ ] `JobManager.ensure_pool(self) -> ProcessPoolExecutor | ThreadPoolExecutor` -> preserve the current process/thread selection and lazy pool creation. Do not change default `use_process_pool=True`.
-- [ ] `JobManager.ensure_io_pool(self) -> ThreadPoolExecutor` -> preserve the separate existing I/O pool; no third queue.
-- [ ] `JobManager.submit_job` -> retain the complete signature in Context, including `kind='compute'`, `owner='default'`, optional `executor_kind`, and `pass_context`. Return the existing `JobRecord`.
-- [ ] `JobContext.raise_if_cancelled`, `wait_if_paused`, `check_memory_guard`, `report_progress` -> retain current worker-cooperation behavior and exception classes.
+- [X] `JobManager.ensure_pool(self) -> ProcessPoolExecutor | ThreadPoolExecutor` -> preserve the current process/thread selection and lazy pool creation. Do not change default `use_process_pool=True`.
+- [X] `JobManager.ensure_io_pool(self) -> ThreadPoolExecutor` -> preserve the separate existing I/O pool; no third queue.
+- [X] `JobManager.submit_job` -> retain the complete signature in Context, including `kind='compute'`, `owner='default'`, optional `executor_kind`, and `pass_context`. Return the existing `JobRecord`.
+- [X] `JobContext.raise_if_cancelled`, `wait_if_paused`, `check_memory_guard`, `report_progress` -> retain current worker-cooperation behavior and exception classes.
 *Acceptance:* `uv run python -m pytest tests/core/jobs/test_manager.py tests/core/host/test_resources.py -q` exits 0. Existing controlled-executor fixtures must still exercise both successful and failed futures, memory admission and lifecycle transitions.
 *Commit if changes are required:* `core: reuse canonical local compute scheduling`.
 *Limitations:* this verifies local Haru scheduling only; it provides no JMS/remote-worker equivalence.
@@ -440,10 +440,10 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Current -> target / action:* no shared scalar comparator is established by the audited tree; CREATE the named helper. Do not alter vectorized comparison blocks in this commit.
 *Types:* class `ConditionComparator`, no instance state, one `@staticmethod validate(delta: float, comparator: str) -> bool`. Supported operators are exactly `>`, `<`, `=`, `>=`, `<=`, `<>`, compared against scalar zero. Do not add `==`, `!=`, tolerance, trimming or case conversion.
 *Functional Requirements & Implementation:*
-- [ ] `ConditionComparator.validate` -> evaluate `delta > 0`, `< 0`, `== 0`, `>= 0`, `<= 0`, `!= 0` for the respective operator; preserve IEEE NaN comparison behavior. Signed zero compares equal to zero.
-- [ ] `ConditionComparator.validate` -> for every unsupported comparator raise `ValueError("Unknown comparator '<value>'")`, inserting its unchanged string value. `'!='` therefore raises `ValueError("Unknown comparator '!='")`.
-- [ ] `test_condition_truth_table()` -> parametrize all 24 cells below, using `float('nan')` for NaN, and assert Python bool results by identity.
-- [ ] `test_signed_zero_and_unknown_operator()` -> both 0.0 and -0.0 give True for `=`, False for `<>`; `'!='` and `' >'` raise the exact corresponding unknown-comparator message.
+- [X] `ConditionComparator.validate` -> evaluate `delta > 0`, `< 0`, `== 0`, `>= 0`, `<= 0`, `!= 0` for the respective operator; preserve IEEE NaN comparison behavior. Signed zero compares equal to zero.
+- [X] `ConditionComparator.validate` -> for every unsupported comparator raise `ValueError("Unknown comparator '<value>'")`, inserting its unchanged string value. `'!='` therefore raises `ValueError("Unknown comparator '!='")`.
+- [X] `test_condition_truth_table()` -> parametrize all 24 cells below, using `float('nan')` for NaN, and assert Python bool results by identity.
+- [X] `test_signed_zero_and_unknown_operator()` -> both 0.0 and -0.0 give True for `=`, False for `<>`; `'!='` and `' >'` raise the exact corresponding unknown-comparator message.
 
 | delta | `>` | `<` | `=` | `>=` | `<=` | `<>` |
 |---|---|---|---|---|---|---|
