@@ -57,7 +57,7 @@ efactor(home): migrate shell, navigation, and home presentation.
 
 ## Phase H01: getting-started navigation metadata
 
-### `AppSQXHome.navigation` - WO-H01 - READY
+### `AppHome.navigation` - WO-H01 - READY
 *Feature:* expose the observed Getting started navigation entry, without implementing its license-selected embedded page.
 *Evidence IDs:* `OBS-HOME-NAV-001` (below).
 *Dependencies:* WO-C02 (StandardResponse).
@@ -67,9 +67,9 @@ efactor(home): migrate shell, navigation, and home presentation.
 - **Backend Test Create:** `tests/workspaces/home/test_navigation.py`.
 - **Frontend:** none in this order. The complete shell and registered-route API remain blocked below.
 *Functional Requirements & Implementation:*
-- [ ] `HomeNavigation.get(self, *, request_id: str) -> StandardResponse[dict[str, JSONValue]]` -> no constructor arguments; return data exactly `{'app_code':'SQXHOME','title':'Getting started','order':0,'section':0,'icon':'home'}` with revision None. Title/order/section come from the primary registration; snake_case and icon token are Python/React metadata adaptations. Do not read a database, network or license file.
-- [ ] `test_navigation_entry()` -> request_id `'req-home'` yields `{'request_id':'req-home','data':{'app_code':'SQXHOME','title':'Getting started','order':0,'section':0,'icon':'home'},'revision':None}` through to_dict.
-- [ ] `test_navigation_is_detached()` -> mutate returned data.title to `'changed'`; a second call still returns `'Getting started'`. No global mutable descriptor is exposed.
+- [X] `HomeNavigation.get(self, *, request_id: str) -> StandardResponse[dict[str, JSONValue]]` -> no constructor arguments; return data exactly `{'app_code':'HOME','title':'Getting started','order':0,'section':0,'icon':'home'}` with revision None. Title/order/section come from the primary registration; snake_case and icon token are Python/React metadata adaptations. Do not read a database, network or license file.
+- [X] `test_navigation_entry()` -> request_id `'req-home'` yields `{'request_id':'req-home','data':{'app_code':'HOME','title':'Getting started','order':0,'section':0,'icon':'home'},'revision':None}` through to_dict.
+- [X] `test_navigation_is_detached()` -> mutate returned data.title to `'changed'`; a second call still returns `'Getting started'`. No global mutable descriptor is exposed.
 *Acceptance:* `uv run python -m pytest tests/workspaces/home/test_navigation.py -q` exits 0; exactly two tests collected.
 *Commit:* `home: expose getting-started navigation metadata`.
 *Excluded from this commit:* route choice, iframe URL, external news/version endpoints, installation, licensing and start-project actions. Those need separate contracts; metadata success cannot close them.
