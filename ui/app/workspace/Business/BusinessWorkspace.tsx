@@ -513,7 +513,7 @@ export function BusinessWorkspace() {
         <Modal title="Access Control Permissions Matrix" onClose={() => setShowPermissionsModal(false)} width={640}>
           <div className="flex flex-col gap-3">
             <div className="text-xs text-gray-400">
-              Granular role-based capability boundaries across StrategyQuant X subsystems.
+              Granular role-based capability boundaries across HaruQuantAI subsystems.
             </div>
 
             <table className="w-full text-xs font-mono border-collapse border border-gray-700">

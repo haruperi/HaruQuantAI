@@ -35,7 +35,7 @@ This package contains exactly 20 Markdown files. All 183 primary plugin modules 
 6. **Job Execution Model (WO-C13)**: Unblocked via `com.strategyquant.jobs`. Concurrency thread pools, job cancellation tokens, and progress dispatch.
 
 **Complete Migration Audits Across All 19 Phases**:
-Every phase file (`01-AppCore.md` through `19-AppSQAI.md`) now contains an explicit current-codebase migration audit table (`Current HaruQuantAI location` -> `Target proposed location` -> `Fit / action`). Much of the existing codebase (`app/host/`, `app/include/`, `app/workspace/data_manager/`, `app/workspace/code_editor/`, `app/workspace/algo_wizard/`) is qualified as **DIRECT FIT**, with UI presentation components mapped to target modular React workspaces.
+Every phase file (`01-AppCore.md` through `19-AppAI.md`) now contains an explicit current-codebase migration audit table (`Current HaruQuantAI location` -> `Target proposed location` -> `Fit / action`). Much of the existing codebase (`app/host/`, `app/include/`, `app/workspace/data_manager/`, `app/workspace/code_editor/`, `app/workspace/algo_wizard/`) is qualified as **DIRECT FIT**, with UI presentation components mapped to target modular React workspaces.
 
 ## Executor contract - applies to every assigned feature
 
@@ -107,8 +107,8 @@ A class name appearing in a diagram is not permission to invent its fields.
 - [15 AppGridTest](15-AppGridTest.md)
 - [16 AppDebugConsole](16-AppDebugConsole.md)
 - [17 AppMarketplace](17-AppMarketplace.md)
-- [18 AppSQXBusiness](18-AppSQXBusiness.md)
-- [19 AppSQAI](19-AppSQAI.md)
+- [18 AppBusiness](18-AppBusiness.md)
+- [19 AppSQAI](19-AppAI.md)
 
 ## Direct assignment order for currently specified work
 
@@ -167,8 +167,8 @@ not acceptance of these new work orders or proof of full algorithm parity.
 | AppGridTest | AppCore, AppHome |
 | AppDebugConsole | AppCore, AppHome, AppTaskManager |
 | AppMarketplace | AppCore, AppHome, AppCodeEditor |
-| AppSQXBusiness | AppCore, AppHome, AppWizard |
-| AppSQAI | AppCore, AppHome, AppWizard, AppTaskManager |
+| AppBusiness | AppCore, AppHome, AppWizard |
+| AppAI | AppCore, AppHome, AppWizard, AppTaskManager |
 
 ## Retained coverage and validation snapshot
 
@@ -193,8 +193,8 @@ Snapshot: 2026-10-29T08:08:36.320399+00:00; repository commit `f5c7d12d5715b8ebe
 | [AppGridTest](15-AppGridTest.md) | 6 | 1 |
 | [AppDebugConsole](16-AppDebugConsole.md) | 25 | 1 |
 | [AppMarketplace](17-AppMarketplace.md) | 21 | 1 |
-| [AppSQXBusiness](18-AppSQXBusiness.md) | 92 | 1 |
-| [AppSQAI](19-AppSQAI.md) | 115 | 2 |
+| [AppBusiness](18-AppBusiness.md) | 92 | 1 |
+| [AppSQAI](19-AppAI.md) | 115 | 2 |
 
 Allocation includes every primary internal top-level category: libs, plugins, web, extend, autocomplete, ctemplate, electron, python, icons, langs, AppSettings.txt and license.db. Runtime/dependency files receive capability replacements, private state is not copied, and meaningful user workflows remain acceptance obligations. Each phase retains its complete named plugin queue.
 

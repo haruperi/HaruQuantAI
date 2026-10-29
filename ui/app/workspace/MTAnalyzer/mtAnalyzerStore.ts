@@ -103,7 +103,7 @@ function generateMockTrades(preset: 'scalper' | 'trend' | 'breakout'): MTStateme
       profit: Number((profit + commission + swap).toFixed(2)),
       pips,
       magicNumber: tradeMagic,
-      comment: `[SQX-Bot #${tradeMagic}]`,
+      comment: `[Bot #${tradeMagic}]`,
     });
   }
 

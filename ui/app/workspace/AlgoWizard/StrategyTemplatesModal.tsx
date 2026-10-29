@@ -10,7 +10,7 @@ interface Props {
 export function StrategyTemplatesModal({ onClose, onSelectTemplate }: Props) {
   return (
     <Modal
-      title="Strategy Templates Library (StrategyQuant X Presets)"
+      title="Strategy Templates Library (Presets)"
       onClose={onClose}
       footer={<Button onClick={onClose}>Close</Button>}
     >

@@ -26,9 +26,7 @@ export function NewAnalysisModal({ existingNames, onClose, onCreate, }: {
         </p>
         <p>Local UI preview: the tab is kept in this session; no plugin files are created.</p>
         <p>
-          <a href="https://strategyquant.com/doc/strategyquant/results-plugins" target="_blank" rel="noreferrer">
-            Learn more about new StrategyQuant Results plugins here
-          </a>
+          Learn more about custom Results plugins in HaruQuantAI documentation.
         </p>
         <div>
           <div className="sqr-newanalysis-namelabel">Name of custom plugin tab (must be unique)</div>

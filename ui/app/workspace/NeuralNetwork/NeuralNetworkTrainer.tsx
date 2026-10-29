@@ -469,7 +469,7 @@ export function NeuralNetworkTrainer() {
         <div className="bg-surface p-4 rounded border border-border space-y-3">
           <div className="flex items-center justify-between border-b border-border pb-2">
             <div>
-              <strong className="text-sm">StrategyQuant Rule & Code Integration</strong>
+              <strong className="text-sm">Rule & Code Integration</strong>
               <p className="text-xs text-muted">
                 Export trained neural network model into executable strategy rules.
               </p>

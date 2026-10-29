@@ -180,7 +180,7 @@ def render_drawdown_heatmap(drawdown_series: list) -> dict:
   };
 
   return (
-    <Modal title="Create New StrategyQuant X Extension" onClose={onClose} width={520}>
+    <Modal title="Create New Extension" onClose={onClose} width={520}>
       <div className="flex flex-col gap-3">
         <Field label="Extension Category">
           <Select value={category} onChange={v => handleCategoryChange(v as any)}>
@@ -195,7 +195,7 @@ def render_drawdown_heatmap(drawdown_series: list) -> dict:
 
         <Field label="Language">
           <Select value={language} onChange={v => handleLanguageChange(v as any)}>
-            <option value="java">Java (StrategyQuant X standard extension runtime)</option>
+            <option value="java">Java (Standard extension runtime)</option>
             <option value="python">Python (Antigravity quantitative scripting bridge)</option>
           </Select>
         </Field>

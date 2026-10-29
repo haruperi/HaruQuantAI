@@ -247,7 +247,7 @@ export function NewTaskModal({ onClose, onAddTask, existingTasksCount }: NewTask
     : SQX_TASK_TYPES.filter(t => t.category === selectedCategory);
 
   return (
-    <Modal title="Add StrategyQuant X Workflow Task" onClose={onClose} width={820}>
+    <Modal title="Add Workflow Task" onClose={onClose} width={820}>
       <div className="flex flex-col gap-4">
         <div className="flex gap-2 border-b border-gray-700 pb-2">
           {categories.map(cat => (

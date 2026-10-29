@@ -23,7 +23,7 @@ export function SaveRecordsDialog({
     >
       <div className="sqx-form-row">
         <label>Directory</label>
-        <input className="sqx-input" value="C:\\Users\\demo\\Documents\\StrategyQuant X" readOnly />
+        <input className="sqx-input" value="C:\\Users\\demo\\Documents\\HaruQuantAI" readOnly />
         <SqxButton onClick={onClose}>Browse</SqxButton>
       </div>
       <div className="sqx-form-row">

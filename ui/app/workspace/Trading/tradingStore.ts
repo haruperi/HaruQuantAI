@@ -97,7 +97,7 @@ const initialPositions: Position[] = [
     pnlPercent: 0.34,
     openTime: '2026-09-21 08:30:15',
     magicNumber: 10101,
-    comment: 'SQX Trend Crossover',
+    comment: 'Trend Crossover',
   },
   {
     id: 'pos-2',

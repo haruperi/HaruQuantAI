@@ -270,7 +270,7 @@ export function CustomProjectsWorkspace() {
               </span>
             </h1>
             <span className="text-[10px] text-gray-400">
-              StrategyQuant X multi-stage autonomous pipeline runner and databank routing orchestrator
+              HaruQuantAI multi-stage autonomous pipeline runner and databank routing orchestrator
             </span>
           </div>
         </div>
@@ -553,7 +553,7 @@ export function CustomProjectsWorkspace() {
                 />
               </Field>
 
-              {/* Task-specific configurations based on SQX task types */}
+              {/* Task-specific configurations based on workflow task types */}
               <div className="pt-2 border-t border-[var(--line)] flex flex-col gap-2">
                 <span className="text-xs font-semibold text-gray-300">
                   {selectedTask.type} Parameters
