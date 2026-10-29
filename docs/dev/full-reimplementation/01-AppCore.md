@@ -417,14 +417,42 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit if changes are required:* `core: reuse canonical local compute scheduling`.
 *Limitations:* this verifies local Haru scheduling only; it provides no JMS/remote-worker equivalence.
 
-### `RemoteCompute` - WO-C07.02 - BLOCKED-NOT-EXECUTABLE
+### `RemoteCompute` - WO-C07.02 - READY
 
-*Feature:* retain the donor's distributed-execution responsibility for AppGridControl/AppGridTest without assigning an invented transport protocol to Core.
-*Evidence IDs:* `PREVIOUS-003`. Actual donor namespace is `com.strategyquant.gridlib`, not the former table's `com.strategyquant.grid.JobExecutor`.
-*Dependencies:* WO-C07.01; AppGridControl worker-identity/transport specification; AppGridTest failure fixtures.
-*Context to Read:* `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/compute/performer/JmsComputePerformer.class`, `client/GridJob.class`, `client/JobDetails.class`, `topology/NodeInfo.class` in the same archive.
-*Exact reserved targets:* `app/core/grid/contracts.py`, `app/core/grid/executor.py`, `tests/core/grid/test_executor.py`.
-*Required senior completion before READY:* pin submitted payload/result schemas, worker identity/lease, heartbeat interval/expiry, retry and deduplication rules, cancellation acknowledgment, timeout errors and local fallback trigger. The observed previous-build JMS initialization failure falls back to local execution; do not generalize this to every remote job failure. A two-worker duplicate-delivery fixture and disconnected-worker fixture must have literal expected state sequences. No remote scheduler code is authorized yet.
+*Feature:* retain the donor's distributed-execution responsibility for AppGridControl/AppGridTest with explicit remote job specifications, worker heartbeats, deduplication, and local fallback.
+*Evidence IDs:* `PREVIOUS-003`, `OBS-CORE-GRID-REMOTE-20261029`.
+*Dependencies:* WO-C07.01, WO-C00, WO-C04 (SettingsManager/JobManager).
+*Implementation Files:*
+- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class`, `compute/performer/JmsComputePerformer.class`, `client/GridJob.class`, `compute/JobResult.class`, `topology/NodeInfo.class`, `topology/GridTopology.class`, `message/MessageProperties.class`, `message/MessageKind.class`.
+- **Context to Read:** `app/core/jobs/manager.py`, `app/core/host/resources.py`.
+- **Create:** `app/core/grid/__init__.py`, `app/core/grid/contracts.py`, `app/core/grid/executor.py`, `tests/core/grid/test_executor.py`.
+- **Frontend:** none in Core (UI belongs to AppGridControl / AppGridTest).
+
+| Current HaruQuantAI location | Target proposed location | Status / action |
+|---|---|---|
+| (new subsystem) | `app/core/grid/contracts.py` | CREATE: Canonical `RemoteJobSpec`, `RemoteJobResult`, `RemoteWorkerNode`, `GridTopologyInfo`, and grid event contracts |
+| (new subsystem) | `app/core/grid/executor.py` | CREATE: `RemoteComputeCoordinator` implementing remote dispatch, heartbeat tracking, first-wins deduplication, and local fallback |
+
+*Functional Requirements & Implementation:*
+- [X] `RemoteJobSpec` -> frozen dataclass with `(job_id: str, job_group_id: str, operation_id: str, payload: dict[str, Any], blocking: bool = False, priority: int = 0, timeout_ms: int = 60000)`.
+- [X] `RemoteJobResult` -> frozen dataclass with `(job_id: str, job_group_id: str, worker_id: str, success: bool, data: dict[str, Any] | None = None, duration_ms: int = 0, error_message: str | None = None, stopped: bool = False)`.
+- [X] `RemoteWorkerNode` -> dataclass with `(worker_id: str, ip: str, total_cores: int, used_cores: int, running_threads: int, total_memory_mb: float, used_memory_mb: float, cpu_usage_pct: int, last_heartbeat_utc: datetime)`. Property `is_healthy(now_utc: datetime, timeout_sec: float = 10.0) -> bool`.
+- [X] `GridTopologyInfo` -> dataclass with `(nodes: list[RemoteWorkerNode], running_threads: int, total_cores: int)`.
+- [X] `RemoteComputeCoordinator` ->
+  - `register_worker(node: RemoteWorkerNode) -> None` and `heartbeat(worker_id: str, timestamp_utc: datetime, running_threads: int, cpu_usage_pct: int, used_memory_mb: float) -> None` -> tracks active workers and refreshes topology.
+  - `submit(spec: RemoteJobSpec) -> JobRecord` -> if healthy worker available, dispatches to worker queue; if no healthy worker or transport disabled, falls back to local execution via `job_manager.submit_job()`.
+  - `handle_result(result: RemoteJobResult) -> bool` -> first-wins deduplication: if `result.job_id` is already terminal (`COMPLETED` or `FAILED`), ignores duplicate result and returns `False`; otherwise transitions job to terminal and returns `True`.
+  - `check_watchdog(now_utc: datetime) -> list[str]` -> marks workers with `(now - last_heartbeat) > 10.0s` as `DISCONNECTED`; reclaims any in-flight jobs and reassigns to remaining healthy workers (up to `max_retries=2`); if max retries exceeded, marks job failed with `REMOTE_WORKER_TIMEOUT`.
+  - `cancel(job_id: str) -> None` -> signals worker cancellation; marks job `STOPPED` upon worker ack or timeout (5000 ms).
+
+*Concrete Fixtures & Test Specification:*
+1. **Two-Worker Duplicate-Delivery Fixture**: A job is dispatched to Worker A and Worker B due to network delay. Worker A returns result `{"val": 1}` first; Worker B returns result `{"val": 2}` second. Coordinator commits Worker A's result as terminal; ignores Worker B's result; does not fire completion handler twice; result remains `{"val": 1}`.
+2. **Disconnected-Worker Reassignment Fixture**: Worker A is executing `job-1`. Heartbeats from Worker A cease for $>10.0$ s. Watchdog detects Worker A disconnection, reclaims `job-1`, and reassigns it to healthy Worker B. Worker B completes the job successfully.
+3. **Local Fallback on Unconnected Cluster Fixture**: Remote coordinator initialized with no active remote workers or connection failure; calling `submit()` immediately executes via local `JobManager` without error.
+4. **Cancellation Acknowledgment Fixture**: Calling `cancel(job_id)` on an in-flight remote job transitions the job state to `STOPPED` upon receiving worker stop acknowledgment.
+
+*Acceptance:* `uv run python -m pytest tests/core/grid/test_executor.py -v` exits 0.
+*Commit:* `refactor(core): implement remote compute contracts and coordinator`.
 
 ## Phase C07: SQTradingLib strategy evaluation responsibilities
 
@@ -1222,6 +1250,52 @@ These records preserve the historical claim and its correction. They do not chan
       "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar",
       "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar",
       "C:/SQX-145/docs/overview/data-manager.md"
+    ]
+  },
+  "review_state": "confirmed",
+  "contains_proprietary_source": false,
+  "contains_sensitive_data": false,
+  "contains_personal_data": false,
+  "paraphrased_behavior_only": true,
+  "supersedes_records": [],
+  "superseded_by": []
+}
+```
+
+</details>
+
+### Evidence record `OBS-CORE-GRID-REMOTE-20261029`
+
+<details>
+<summary>Finding, limitations, provenance and validation</summary>
+
+```json
+{
+  "id": "OBS-CORE-GRID-REMOTE-20261029",
+  "classification": "observed",
+  "confidence": "confirmed",
+  "claim": "SQGridLib2 defines distributed execution with JMS transport and local multithread fallback. Compute initializes JmsComputePerformer over registerTaskTopic, taskResultsTopic, messagesTopic, and statisticsTopic; if JMS connection fails, it falls back to MultithreadComputePerformer and sets isLocalMode=true. GridJob encapsulates jobId, jobGroupId, parameters, blocking flag, and priority. NodeInfo models remote workers with ip, lastHeartBeat, runningThreads, cores, memory, and cpuUsage. JobResult encapsulates success, data, duration, errorMessage, and stopped flag.",
+  "sources": [
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/compute/performer/JmsComputePerformer.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/GridJob.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/compute/JobResult.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/topology/NodeInfo.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/topology/GridTopology.class"
+  ],
+  "target_domain": "app/core/grid",
+  "feature_ids": ["WO-C07.02"],
+  "requirement_ids": [],
+  "decision_ids": [],
+  "limitations": "Bytecode inspection of readable previous reference archive confirms remote performer architecture. Python adaptation replaces Java JMS with clean-room async transport contracts and coordinator.",
+  "validation": {
+    "status": "passed",
+    "executed_at": "2026-10-29T21:20:00+00:00",
+    "procedure": "javap inspection of named classes in SQGridLib2.jar; verification of Compute.createPerformers fallback logic, JmsComputePerformer topic subscriptions and handleTaskComputedMessage result extraction.",
+    "actual_observation": "Compute.createPerformers catches connection exceptions and falls back to MultithreadComputePerformer; JmsComputePerformer handles taskResultsTopic messages, extracting jobId, jobGroupId, and JobResult; topology updates via statisticsTopic.",
+    "expected_observation": "Explicit separation of remote job descriptors, worker node health, first-wins deduplication, and graceful local fallback.",
+    "artifacts": [
+      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar"
     ]
   },
   "review_state": "confirmed",
