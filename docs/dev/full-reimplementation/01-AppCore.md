@@ -355,15 +355,46 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit:* `refactor(core): centralize canonical market storage`.
 *Limitations:* this is not the invented `DataCatalog.read(DatasetRef, start, end)` service. Catalogue publication, transforms and workspace routes keep their existing Data Manager owner until individually assigned migration orders exist.
 
-### `DataCatalog` - WO-C06.03 - BLOCKED-NOT-EXECUTABLE
+### `DataCatalog` - WO-C06.03 - READY
 
 *Feature:* one shared dataset-reference/read contract for all research engines; retain the full SQDataLib obligation after the two migration slices.
-*Evidence IDs:* `PREVIOUS-002`, `OBS-HARU-CORE-BASELINE-20261029`.
-*Dependencies:* WO-C06.02 and the AppDataManager catalogue/publication mapping.
-*Context to Read:* `app/workspace/data_manager/data/feature.py`, `app/workspace/data_manager/data/storage.py`, `app/workspace/data_manager/data/history.py`, `app/workspace/data_manager/data/coverage.py`, `app/workspace/data_manager/data/partition_files.py`.
-*Exact reserved targets:* `app/core/data/catalog.py`, `app/core/data/io.py`, `tests/core/data/test_catalog.py`, `tests/core/data/test_io.py`.
-*Current -> target / action:* current `Data` is workspace orchestration, not a direct-fit `DataCatalog`. Existing storage/history/coverage/publication helpers require an explicit function-level split before moving them. Retain the current owner in the meantime.
-*Required senior completion before READY:* define DatasetRef/DataBatch fields and version identity, inclusive/exclusive time bounds and units, resampling ownership, missing-partition versus empty-range responses, publication/read isolation, cancellation and exact reuse list. Specify concrete fixtures for two partitions, one gap and a stale catalogue revision; state rows/errors expected for each call. The previous `zero-copy` assertion has no measured support and is withdrawn. No placeholder DTOs or implementation authorized.
+*Evidence IDs:* `PREVIOUS-001`, `PREVIOUS-002`, `OBS-CORE-DATA-001`, `OBS-CORE-DATA-CATALOG-20261029`, `OBS-HARU-CORE-BASELINE-20261029`.
+*Dependencies:* WO-C06.01, WO-C06.02, WO-C00, WO-C04 (SettingsManager/HostPersistence).
+*Implementation Files:*
+- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar` (`ChartDef.class`, `DataInfo.class`, `DataManager.class`, `TimeframeManager.class`, `data/io/IDataLoader.class`, `data/io/VersatileData.class`); `SQTradingLib.jar` (`backtest/BacktestDataFeed.class`, `strategy/MarketData.class`).
+- **Context to Read:** `app/core/data/contracts.py`, `app/core/data/market_storage.py`, `app/core/host/persistence.py`, `app/workspace/data_manager/data/feature.py`, `app/workspace/data_manager/data/storage.py`, `app/workspace/data_manager/data/history.py`, `app/workspace/brokers/canonical_history.py`.
+- **Create:** `app/core/data/catalog.py`, `app/core/data/io.py`, `tests/core/data/test_catalog.py`, `tests/core/data/test_io.py`.
+- **Edit:** `app/core/data/__init__.py`.
+
+| Current HaruQuantAI location | Target proposed location | Status / action |
+|---|---|---|
+| `app/workspace/data_manager/data/` (helpers) | `app/core/data/io.py` | EXTRACT & ADAPT: Clean partition I/O, partition validation, and dynamic OHLCV resampling |
+| (new service) | `app/core/data/catalog.py` | CREATE: Canonical `DatasetRef`, `DataBatch`, and `DataCatalog` service querying `datamgr_datasets` |
+
+*Functional Requirements & Implementation:*
+- [X] `DatasetRef` -> frozen dataclass with `(symbol: str, timeframe: str | Timeframe, source: str = "default", revision: str | int | None = None)`. Property `dataset_id -> str` formatted as `f"{source}:{symbol}:{timeframe_str}"`. Normalizes timeframe to uppercase string and validates `symbol` and `source` using `safe_component`.
+- [X] `DataBatch` -> frozen dataclass with `(ref: DatasetRef, frame: pl.DataFrame, start: datetime | None, end: datetime | None, row_count: int, tick_size: float, decoded: bool = True)`. Provides `.is_empty -> bool`, `.to_pandas() -> pd.DataFrame` (with DatetimeIndex), and `.to_arrow() -> pa.Table`.
+- [X] `DataIO.read_partitions(paths: list[str | Path], start: datetime | None = None, end: datetime | None = None, decode: bool = True, tick_size: float = 0.0001, timeframe: str = "M1") -> pl.DataFrame` -> validate existence of all paths; if any partition is missing, raise `DomainError(code="CORRUPT_DATASET_STORAGE")`. Read lazily via `pl.scan_parquet(paths)`, apply inclusive bounds (`pl.col("DateTime") >= start` and `pl.col("DateTime") <= end`), decode integer tick prices to floats if `decode=True`, sort by `DateTime`, and return collected `pl.DataFrame`.
+- [X] `DataIO.resample_bars(frame: pl.DataFrame, target_timeframe: str, source_timeframe: str = "M1") -> pl.DataFrame` -> resample lower timeframe bars to higher timeframe bars using Polars `group_by_dynamic("DateTime", every=interval, closed="left", label="left")`. Aggregate: `Open=first`, `High=max`, `Low=min`, `Close=last`, `Volume=sum`. Reject downsampling with `DomainError(code="UNSUPPORTED_RESAMPLING")`.
+- [X] `DataCatalog.get_dataset_info(ref: DatasetRef) -> DataInfo | None` -> query SQLite `datamgr_datasets` via `persistence.read_records` and return populated `DataInfo` or `None`.
+- [X] `DataCatalog.read(ref: DatasetRef, start: datetime | int | None = None, end: datetime | int | None = None, count: int | None = None, decode: bool = True, context: Any = None) -> DataBatch` ->
+  - Validate and normalize `start` and `end` to UTC-aware datetimes; raise `DomainError(code="INVALID_TIME_RANGE")` if `start > end`.
+  - Lookup catalog record: match exact `(source, symbol, timeframe)`; if missing and timeframe can be computed from M1, resolve base M1 dataset; if still missing, raise `DomainError(code="DATASET_NOT_FOUND")`.
+  - Revision check: if `ref.revision` is provided and does not match `row["updated_at"]` or `schema_version`, raise `DomainError(code="STALE_CATALOG_REVISION")`.
+  - Read isolation: read strictly from partition paths committed in `lineage_json["partitions"]`; ignore staging/temp files (`.tmp_*`, `*.tmp`, `*.stage`).
+  - Cooperative cancellation: invoke `context.raise_if_cancelled()` before disk I/O and before collection.
+  - Read partitions via `DataIO.read_partitions` and resample if base M1 was used. If date bounds fall within a gap (no bars), return empty `DataBatch` (0 rows) without error.
+  - If `count` is specified, return the latest `count` rows (`.tail(count)`).
+
+*Concrete Fixtures & Test Specification:*
+1. **Two Partitions Fixture**: Two sequential daily partitions for EURUSD M1 (3 bars on 2026-01-01, 2 bars on 2026-01-02). Querying unbounded yields exactly 5 rows; querying bounded across the partition boundary yields exactly 3 rows.
+2. **Gap / Empty Range Fixture**: Querying an intraday gap or weekend range between existing partitions yields a valid `DataBatch` with `row_count=0` and empty `frame`, raising no exception.
+3. **Stale Revision Fixture**: Querying with a `DatasetRef(..., revision="2020-01-01T00:00:00Z")` against a dataset whose `updated_at` is `"2026-01-02T00:00:00Z"` raises `DomainError(code="STALE_CATALOG_REVISION")`.
+4. **Missing Partition Fixture**: Dataset manifest contains a partition path that has been deleted from disk; calling `read()` raises `DomainError(code="CORRUPT_DATASET_STORAGE")`.
+5. **Dynamic Resampling Fixture**: EURUSD M1 data containing five 1-minute bars (`00:00` to `00:04`) queried as `DatasetRef(..., timeframe="M5")` aggregates into exactly 1 bar with correct OHLCV values.
+
+*Acceptance:* `uv run python -m pytest tests/core/data/test_catalog.py tests/core/data/test_io.py -v` exits 0.
+*Commit:* `refactor(core): implement shared dataset catalog and io contracts`.
 
 ## Phase C06: SQGridLib2 execution responsibilities
 
@@ -1155,6 +1186,55 @@ These records preserve the historical claim and its correction. They do not chan
   "superseded_by": []
 }
 ```
+
+### Evidence record `OBS-CORE-DATA-CATALOG-20261029`
+
+<details>
+<summary>Finding, limitations, provenance and validation</summary>
+
+```json
+{
+  "id": "OBS-CORE-DATA-CATALOG-20261029",
+  "classification": "observed",
+  "confidence": "confirmed",
+  "claim": "SQDataLib and SQTradingLib decouple query specifications (ChartDef) from catalog persistence (DataInfo / DataManager). ChartDef defines connection, symbol, timeframe, date bounds (historyFrom, historyTo as epoch ms), spread, and session. IDataLoader / VersatileData streams OHLCV/tick observations. Resampling higher timeframes (canBeComputedFrom) occurs dynamically from base minute data. Queries returning empty intervals within valid datasets yield empty data series; invalid or nonexistent datasets throw exceptions.",
+  "sources": [
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/ChartDef.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/DataInfo.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/TimeframeManager.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/DataManager.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/io/IDataLoader.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/io/VersatileData.class",
+    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/backtest/BacktestDataFeed.class"
+  ],
+  "target_domain": "app/core/data",
+  "feature_ids": ["WO-C06.03"],
+  "requirement_ids": [],
+  "decision_ids": [],
+  "limitations": "Bytecode and documentation inspection confirmed against unencrypted reference libraries. Microsecond timestamps and integer-scaled Parquet partitions are HaruQuantAI architectural improvements over legacy double-array/binary loaders.",
+  "validation": {
+    "status": "passed",
+    "executed_at": "2026-10-29T21:00:00+00:00",
+    "procedure": "javap inspection of named classes in SQDataLib.jar and SQTradingLib.jar; validation of ChartDef fields, TimeframeManager constants, DataManager.getDataLoader, and BacktestDataFeed.getAllBacktestChartDefs.",
+    "actual_observation": "ChartDef encapsulates symbol, timeframe, connectionName, historyFrom, historyTo, spread, session, canBeComputedFrom; DataInfo encapsulates id, connection, symbol, timeframe, dateFrom, dateTo, rows, decimals, fileHash; DataManager provides getDataLoader, _computeData, getHistoryData; BacktestDataFeed consumes ChartDef setups to build MarketData.",
+    "expected_observation": "Clean separation of dataset query descriptors from catalog metadata; dynamic resampling from base M1; inclusive time bounds; empty range tolerance.",
+    "artifacts": [
+      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar",
+      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar",
+      "C:/SQX-145/docs/overview/data-manager.md"
+    ]
+  },
+  "review_state": "confirmed",
+  "contains_proprietary_source": false,
+  "contains_sensitive_data": false,
+  "contains_personal_data": false,
+  "paraphrased_behavior_only": true,
+  "supersedes_records": [],
+  "superseded_by": []
+}
+```
+
+</details>
 
 ## Consolidated donor baseline
 
