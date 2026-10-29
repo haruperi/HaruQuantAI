@@ -124,8 +124,8 @@ efactor(home): migrate shell, navigation, and home presentation.
 - **Frontend Create:** `app/web/workspaces/home/databankDefaults.ts`.
 - **Frontend Test Create:** `app/web/tests/workspaces/home/databankDefaults.test.ts`.
 *Functional Requirements & Implementation:*
-- [ ] `DatabankDefaults.reset_value(column_type: string): '' | 0` -> exported class with static method; `'text'`, `'dateTime'`, `'filterResult'` return empty string; any other string returns numeric zero. No enum expansion, formatting or access to a results store.
-- [ ] `test('column reset values')` -> `text/dateTime/filterResult` each equal `''`; `'integer'`, `'decimal'`, `'DateTime'`, `''` each equal numeric `0`.
+- [X] `DatabankDefaults.reset_value(column_type: string): '' | 0` -> exported class with static method; `'text'`, `'dateTime'`, `'filterResult'` return empty string; any other string returns numeric zero. No enum expansion, formatting or access to a results store.
+- [X] `test('column reset values')` -> `text/dateTime/filterResult` each equal `''`; `'integer'`, `'decimal'`, `'DateTime'`, `''` each equal numeric `0`.
 *Acceptance:* `npm --prefix app/web test -- tests/workspaces/home/databankDefaults.test.ts` exits 0 and collects one test.
 *Commit:* `home: preserve databank reset-value projection`.
 
