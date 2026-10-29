@@ -6,7 +6,7 @@ from unittest.mock import Mock
 
 import httpx
 import pytest
-from app.host.events import EventBus
+from app.core.host.events import EventBus
 from app.workspace.data_manager.logs import Logs
 from fastapi import FastAPI
 from fastapi.testclient import TestClient

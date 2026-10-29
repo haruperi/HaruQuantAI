@@ -18,7 +18,7 @@ Key Capabilities:
       existing transport tests explicitly verify FR logs.
 
 Python API Usage:
-    from app.host.events import EventBus
+    from app.core.host.events import EventBus
     bus = EventBus()
     event = bus.publish("settings.changed", payload={"revision": 1})
 

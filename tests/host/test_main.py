@@ -78,7 +78,7 @@ def test_launcher_uses_validated_stored_settings(monkeypatch, port, reload):
 def test_shutdown_finishes_with_open_event_stream(monkeypatch):
     """An idle SSE client must not prevent shutdown or service cleanup."""
     from app.core.host import transport
-    from app.host.events import EventBus
+    from app.core.host.events import EventBus
 
     settings = Mock()
     monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))

@@ -5,7 +5,7 @@ from concurrent.futures import ThreadPoolExecutor
 from datetime import datetime
 
 import pytest
-from app.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
+from app.core.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
 from pydantic import ValidationError
 
 

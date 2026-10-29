@@ -10,8 +10,8 @@ from datetime import UTC, datetime
 from threading import RLock
 from typing import Any
 
+from app.core.host.events import EventBus
 from app.core.host.transport import get_global_event_bus
-from app.host.events import EventBus
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,
