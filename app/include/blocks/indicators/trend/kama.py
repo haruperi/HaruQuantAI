@@ -10,7 +10,7 @@ from typing import ClassVar, override
 import numpy as np
 from pydantic import Field
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.indicators.trend.kaufman_efficiency_ratio import (
     KaufmanEfficiencyRatio,

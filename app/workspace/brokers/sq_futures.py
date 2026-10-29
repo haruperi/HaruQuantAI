@@ -42,7 +42,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, override
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.enums import Timeframe
 
 from .base import (

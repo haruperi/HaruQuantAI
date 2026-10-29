@@ -10,7 +10,7 @@ import struct
 from datetime import UTC, datetime
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 
 logger = get_logger(__name__)
 

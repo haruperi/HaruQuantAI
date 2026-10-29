@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.host.persistence import HostPersistence
 
 logger = get_logger(__name__)

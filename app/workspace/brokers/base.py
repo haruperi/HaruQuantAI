@@ -70,7 +70,7 @@ from urllib3.util.retry import Retry
 
 import app.include.contracts as _contracts
 import app.include.enums as _enums
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.contracts import (
     AccountInfo,
     BookInfo,

@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.functions._common import (
     register_custom_function,
     resolve_pip_size,

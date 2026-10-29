@@ -20,8 +20,8 @@ import time
 from collections.abc import Callable, Sequence
 from typing import Any
 
+from app.core.host.logging import get_logger, shutdown_logging
 from app.core.host.settings import SettingsManager
-from app.host.logging import get_logger, shutdown_logging
 from app.host.persistence import HostPersistence
 from app.host.response import (
     ErrorCode,

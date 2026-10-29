@@ -23,7 +23,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.host.logging import setup_logging, shutdown_logging
+    from app.core.host.logging import setup_logging, shutdown_logging
     from scripts.ci_check import main
 
     setup_logging()
@@ -49,7 +49,7 @@ from pathlib import Path
 if __package__ in (None, ""):
     sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 
-from app.host.logging import get_logger, setup_logging, shutdown_logging
+from app.core.host.logging import get_logger, setup_logging, shutdown_logging
 
 logger = get_logger(__name__)
 

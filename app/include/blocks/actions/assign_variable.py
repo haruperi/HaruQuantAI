@@ -6,7 +6,7 @@ from typing import Any, ClassVar
 
 from pydantic import Field
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.actions.base import ORDER_NOT_DEFINED, ActionRecord
 from app.include.blocks.base import BaseBlock
 from app.include.blocks.metadata import (

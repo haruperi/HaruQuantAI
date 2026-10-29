@@ -8,7 +8,7 @@ from collections.abc import Callable, Mapping
 from typing import Any
 from uuid import uuid4
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.price import BarPrice
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._indicator_data import (

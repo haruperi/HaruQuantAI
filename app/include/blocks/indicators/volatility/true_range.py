@@ -9,7 +9,7 @@ from typing import ClassVar, override
 
 import numpy as np
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.comparisons import (
     is_lower,
 )

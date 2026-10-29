@@ -9,7 +9,7 @@ from dataclasses import asdict, dataclass, field
 from typing import Any, cast
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.host.persistence import HostPersistence
 from app.host.response import ErrorCode
 

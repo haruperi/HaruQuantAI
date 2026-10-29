@@ -14,7 +14,7 @@ import duckdb
 import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.host.persistence import HostPersistence
 from app.host.response import (
     ErrorCode,

@@ -38,7 +38,7 @@ import pandas as pd  # type: ignore[import-untyped]
 import pyarrow as pa
 import pyarrow.parquet as pq
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.contracts import (
     MarketBar,
     MarketTick,

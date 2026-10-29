@@ -11,7 +11,7 @@ from typing import Any, ClassVar, Self, override
 import numpy as np
 from pydantic import Field, model_validator
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.comparisons.is_greater import is_greater
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (

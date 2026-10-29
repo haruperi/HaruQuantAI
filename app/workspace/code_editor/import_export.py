@@ -15,7 +15,7 @@ from io import BytesIO
 from pathlib import Path
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.workspace.code_editor._common import (
     PROJECT_ROOT,
     CodeEditorError,

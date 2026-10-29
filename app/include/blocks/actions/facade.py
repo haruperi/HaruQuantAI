@@ -6,7 +6,7 @@ from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.actions.assign_variable import assign_variable
 from app.include.blocks.actions.base import ActionRecord
 from app.include.blocks.actions.custom_action import custom_action

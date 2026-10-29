@@ -121,7 +121,7 @@ Performs state updates, alerts, chart markings, or notifications.
 
 from dataclasses import dataclass
 from typing import Any
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 
 logger = get_logger(__name__)
 

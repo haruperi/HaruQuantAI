@@ -10,7 +10,7 @@ from typing import Annotated, Any, ClassVar, Literal, override
 import numpy as np
 from pydantic import Field, field_validator
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.metadata import (
     BlockSpec,

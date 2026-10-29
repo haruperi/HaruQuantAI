@@ -28,7 +28,7 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Any, override
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.host.persistence import HostPersistence
 from app.host.resources import (
     MIN_AVAILABLE_RAM_PCT,

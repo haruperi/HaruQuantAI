@@ -18,7 +18,7 @@ from collections.abc import Iterator, Mapping, Sequence
 from datetime import UTC, datetime
 from typing import Any, override
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.host.persistence import HostPersistence
 from app.host.response import ErrorCode
 

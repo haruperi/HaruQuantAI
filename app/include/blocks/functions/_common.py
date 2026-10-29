@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.series import resolve_shift_value
 
 logger = get_logger(__name__)

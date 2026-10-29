@@ -10,7 +10,7 @@ from typing import Any, ClassVar, Self, override
 import numpy as np
 from pydantic import Field, model_validator
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.comparisons import (
     changes_down,
     changes_up,

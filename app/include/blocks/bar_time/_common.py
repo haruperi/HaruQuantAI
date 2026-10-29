@@ -10,7 +10,7 @@ from typing import Any
 
 import numpy as np
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 
 __all__ = [
     "EPOCH_MINUTE_THRESHOLD",

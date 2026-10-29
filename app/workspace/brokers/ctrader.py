@@ -50,8 +50,8 @@ from typing import Any, override
 
 import pandas as pd  # type: ignore[import-untyped]
 
+from app.core.host.logging import get_logger
 from app.core.host.settings import settings
-from app.host.logging import get_logger
 from app.include import contracts as _c
 from app.include import enums as _e
 from app.workspace.data_manager.data.conversions import (

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.types.boolean import boolean_constant
 from app.include.blocks.types.boolean_variable import boolean_variable
 from app.include.blocks.types.double_variable import double_variable

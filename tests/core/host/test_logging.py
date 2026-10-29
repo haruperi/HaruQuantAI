@@ -8,7 +8,7 @@ from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from unittest.mock import patch
 
-from app.host.logging import (
+from app.core.host.logging import (
     SafeRotatingFileHandler,
     get_logger,
     setup_logging,
@@ -25,7 +25,9 @@ def test_get_logger_initializes_once_under_concurrent_access(tmp_path):
         original_setup(log_path=path, console=io.StringIO())
 
     try:
-        with patch("app.host.logging.setup_logging", side_effect=configure) as setup:
+        with patch(
+            "app.core.host.logging.setup_logging", side_effect=configure
+        ) as setup:
             with ThreadPoolExecutor(max_workers=8) as executor:
                 loggers = list(executor.map(get_logger, ["automatic"] * 32))
             assert setup.call_count == 1
@@ -40,7 +42,7 @@ def test_get_logger_preserves_explicit_configuration(tmp_path):
     path = tmp_path / "custom.log"
     setup_logging(logging.DEBUG, log_path=path, console=io.StringIO())
     try:
-        with patch("app.host.logging.setup_logging") as setup:
+        with patch("app.core.host.logging.setup_logging") as setup:
             get_logger(__name__).debug("custom configuration")
             setup.assert_not_called()
     finally:
@@ -107,7 +109,7 @@ def test_rotation_retention_and_windows_lock_recovery(tmp_path):
         handler.emit(record)
         with (
             patch.object(Path, "rename", side_effect=PermissionError),
-            patch("app.host.logging.time.sleep") as sleep,
+            patch("app.core.host.logging.time.sleep") as sleep,
         ):
             handler.emit(record)
             assert sleep.call_count == 4

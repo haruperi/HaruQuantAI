@@ -8,7 +8,7 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from typing import Any, TypeVar
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.contracts import (
     PropertyValue,
     TradeCheckResult,

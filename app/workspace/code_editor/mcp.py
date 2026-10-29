@@ -8,7 +8,7 @@ from typing import Any
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse, Response
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor.registry import registry
 

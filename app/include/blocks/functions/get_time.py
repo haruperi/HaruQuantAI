@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.base import block
 from app.include.blocks.functions._common import (
     TIME_HOUR_MULTIPLIER,

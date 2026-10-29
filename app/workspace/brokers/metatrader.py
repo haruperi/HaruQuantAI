@@ -61,7 +61,7 @@ from typing import Any, Self, override
 
 import pandas as pd  # type: ignore[import-untyped]
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 
 try:
     from app.host.persistence.mt5bridge_journal import Journal  # type: ignore[import-not-found]

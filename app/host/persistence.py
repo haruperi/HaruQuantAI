@@ -23,7 +23,7 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any, Literal
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,

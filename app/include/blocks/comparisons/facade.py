@@ -5,7 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
     DEFAULT_COUNT_PRECISION,

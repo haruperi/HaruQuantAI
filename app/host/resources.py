@@ -62,8 +62,8 @@ from typing import Any
 
 import psutil
 
+from app.core.host.logging import get_logger
 from app.core.host.settings import settings as host_settings
-from app.host.logging import get_logger
 from app.host.persistence import HostPersistence
 
 __all__ = [

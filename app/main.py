@@ -17,8 +17,8 @@ from pathlib import Path
 import uvicorn
 from fastapi import FastAPI
 
+from app.core.host.logging import get_logger, shutdown_logging
 from app.core.host.settings import SettingsManager
-from app.host.logging import get_logger, shutdown_logging
 from app.host.persistence import HostPersistence
 from app.host.session import SessionManager
 from app.host.transport import CredentialTester, install_transport

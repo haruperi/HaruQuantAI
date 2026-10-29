@@ -144,7 +144,7 @@ def setup_logging(
         path = (
             Path(log_path)
             if log_path is not None
-            else Path(__file__).resolve().parents[2] / "data" / "logs" / "app.log"
+            else Path(__file__).resolve().parents[3] / "data" / "logs" / "app.log"
         )
         file_handler = SafeRotatingFileHandler(path)
         file_handler.setFormatter(logging.Formatter(_FORMAT, _DATE_FORMAT))

@@ -39,7 +39,7 @@ from typing import Any, Final
 
 from pydantic import BaseModel, ConfigDict, Field
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 
 __all__ = ["EventBus", "HostEvent"]
 

@@ -52,7 +52,7 @@ from typing import Any, override
 
 import pandas as pd  # type: ignore[import-untyped]
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.contracts import MarketBar, SymbolInfo, SymbolPrice, SymbolSpread
 from app.include.enums import Timeframe
 from app.workspace.data_manager.data.conversions import bars_to_dataframe

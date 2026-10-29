@@ -5,7 +5,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.blocks.base import block
 from app.include.blocks.functions._common import resolve_shift_value
 from app.include.blocks.metadata import (

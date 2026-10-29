@@ -29,7 +29,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast, override
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.workspace.code_editor._common import (
     INCLUDE_DIR,
     PROJECT_ROOT,

@@ -48,7 +48,7 @@ from typing import Any, override
 import pandas as pd  # type: ignore[import-untyped]
 import requests
 
-from app.host.logging import get_logger
+from app.core.host.logging import get_logger
 from app.include.contracts import (
     MarketBar,
     MarketTick,
