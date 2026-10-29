@@ -7,8 +7,8 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
+from app.core.host.session import SessionManager, SessionPersistenceError
 from app.host.persistence import HostPersistence
-from app.host.session import SessionManager, SessionPersistenceError
 
 
 @pytest.fixture
@@ -138,7 +138,7 @@ def test_storage_failure_does_not_issue_token(authority):
 def test_lifecycle_logging_excludes_secrets(authority, monkeypatch):
     manager, clock = authority
     log = Mock()
-    monkeypatch.setattr("app.host.session.logger", log)
+    monkeypatch.setattr("app.core.host.session.logger", log)
     password_hash = manager.hash_password("private-password")
     assert manager.verify_credentials(
         "private-user",

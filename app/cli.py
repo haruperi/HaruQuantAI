@@ -21,6 +21,7 @@ from collections.abc import Callable, Sequence
 from typing import Any
 
 from app.core.host.logging import get_logger, shutdown_logging
+from app.core.host.session import SessionManager
 from app.core.host.settings import SettingsManager
 from app.host.persistence import HostPersistence
 from app.host.response import (
@@ -29,7 +30,6 @@ from app.host.response import (
     StandardError,
     StandardResponse,
 )
-from app.host.session import SessionManager
 
 logger = get_logger(__name__)
 CLI_PEER_ID = "cli"

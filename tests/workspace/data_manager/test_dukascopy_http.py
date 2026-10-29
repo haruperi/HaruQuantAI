@@ -5,8 +5,8 @@ import sqlite3
 from contextlib import closing
 
 import pytest
+from app.core.host.session import SessionManager
 from app.host.persistence import HostPersistence
-from app.host.session import SessionManager
 from app.main import create_app
 from fastapi.testclient import TestClient
 
