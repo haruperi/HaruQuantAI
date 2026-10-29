@@ -9,7 +9,8 @@ from contextlib import closing
 from unittest.mock import Mock
 
 import pytest
-from app.host import jobs, resources
+from app.core.host import resources
+from app.host import jobs
 from app.host.persistence import HostPersistence
 
 

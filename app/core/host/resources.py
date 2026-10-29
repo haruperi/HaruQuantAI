@@ -31,7 +31,7 @@ Key Capabilities:
 
 Python API Usage:
     ```python
-    from app.host.resources import calculate_worker_allocation, probe_hardware
+    from app.core.host.resources import calculate_worker_allocation, probe_hardware
 
     hw = probe_hardware()
     workers = calculate_worker_allocation(hw.cpu_count_logical)
@@ -39,7 +39,7 @@ Python API Usage:
 
 CLI Usage:
     ```bash
-    uv run python -m app.host.resources
+    uv run python -m app.core.host.resources
     ```
 """
 

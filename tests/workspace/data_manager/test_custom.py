@@ -309,8 +309,8 @@ def test_json_load_rolls_back_earlier_new_definitions_on_conflict(service, tmp_p
 
 
 def test_real_background_import_records_values_and_logs(service, tmp_path):
+    from app.core.host.resources import MemoryObservation, ResourceMonitor
     from app.host.jobs import JobManager
-    from app.host.resources import MemoryObservation, ResourceMonitor
 
     with closing(sqlite3.connect(service.gateway.database_path)) as connection:
         connection.executescript("""

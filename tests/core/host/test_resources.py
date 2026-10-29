@@ -5,7 +5,7 @@ from types import SimpleNamespace
 from unittest.mock import Mock
 
 import pytest
-from app.host import resources
+from app.core.host import resources
 
 
 def memory(available=20, *, total=100, is_available=True):

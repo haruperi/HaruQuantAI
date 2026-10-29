@@ -525,8 +525,8 @@ def test_all_eleven_basket_cli_operations(baskets, monkeypatch, tmp_path, capsys
 def test_http_update_runs_real_background_worker(
     basket_http, baskets, tmp_path, monkeypatch
 ):
+    from app.core.host.resources import MemoryObservation, ResourceMonitor
     from app.host.jobs import JobManager
-    from app.host.resources import MemoryObservation, ResourceMonitor
 
     with closing(sqlite3.connect(baskets.gateway.database_path)) as connection:
         connection.executescript("""
