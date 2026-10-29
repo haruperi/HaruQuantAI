@@ -1,7 +1,7 @@
 """OS vault boundaries fail explicitly without exposing stored values."""
 
 import pytest
-from app.host.vault import WindowsCredentialVault
+from app.core.host.vault import WindowsCredentialVault
 
 
 def test_foreign_reference_cannot_be_resolved_or_revoked():

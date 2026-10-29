@@ -31,6 +31,12 @@ from starlette.websockets import WebSocketDisconnect
 from app.core.host import resources as _res
 from app.core.host.session import Session, SessionManager, SessionPersistenceError
 from app.core.host.settings import RevisionConflictError, SettingsManager
+from app.core.host.vault import (
+    ConnectionMetadata,
+    Vault,
+    _endpoint,
+    prepare_credentials,
+)
 from app.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
 from app.host.persistence import HostPersistence
 from app.host.response import (
@@ -39,7 +45,6 @@ from app.host.response import (
     StandardError,
     StandardResponse,
 )
-from app.host.vault import ConnectionMetadata, Vault, _endpoint, prepare_credentials
 
 logger = logging.getLogger("app.access")
 

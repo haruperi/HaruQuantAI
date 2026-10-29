@@ -21,8 +21,8 @@ from app.core.host.logging import get_logger, shutdown_logging
 from app.core.host.session import SessionManager
 from app.core.host.settings import SettingsManager
 from app.core.host.transport import CredentialTester, install_transport
+from app.core.host.vault import Vault
 from app.host.persistence import HostPersistence
-from app.host.vault import Vault
 from app.workspace.data_manager.data.partition_files import recover_catalog_publications
 from app.workspace.data_manager.logs import Logs
 
@@ -78,7 +78,7 @@ def create_app(
             logger.info("Backend shutdown completed")
 
     application = FastAPI(title="HaruQuantAI Backend", lifespan=lifespan)
-    from app.host.vault import WindowsCredentialVault
+    from app.core.host.vault import WindowsCredentialVault
     from app.workspace.data_manager.sources.connections import build_provider_testers
 
     application.state.vault = vault if vault is not None else WindowsCredentialVault()
