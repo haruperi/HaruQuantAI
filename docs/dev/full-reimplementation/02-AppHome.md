@@ -106,8 +106,8 @@ efactor(home): migrate shell, navigation, and home presentation.
 - **Frontend Create:** `app/web/shell/themeProjection.ts`.
 - **Frontend Test Create:** `app/web/tests/shell/themeProjection.test.ts`.
 *Functional Requirements & Implementation:*
-- [ ] `ThemeProjection.for_home(skin_name: string): 'dark' | 'light'` -> exported class with static method; exact name `'Dark skin'` returns `'dark'`; every other string returns `'light'`. No case folding, trim, DOM write or localStorage.
-- [ ] `test('home theme name projection')` -> inputs `'Dark skin'`, `'Light skin'`, `'dark skin'`, `''` return `'dark'`, `'light'`, `'light'`, `'light'` respectively.
+- [X] `ThemeProjection.for_home(skin_name: string): 'dark' | 'light'` -> exported class with static method; exact name `'Dark skin'` returns `'dark'`; every other string returns `'light'`. No case folding, trim, DOM write or localStorage.
+- [X] `test('home theme name projection')` -> inputs `'Dark skin'`, `'Light skin'`, `'dark skin'`, `''` return `'dark'`, `'light'`, `'light'`, `'light'` respectively.
 *Acceptance:* `npm --prefix app/web test -- tests/shell/themeProjection.test.ts` exits 0 and collects one test.
 *Commit:* `home: define observed home theme projection`.
 *Excluded:* a full theme token set, stylesheets and persistence. These require a separate complete visual/persistence work order.
