@@ -346,11 +346,11 @@ These orders replace the former summary table. `READY` authorizes only the expli
 | `app/include/market_storage.py` | `app/core/data/market_storage.py` | MOVE every function/constant unchanged; old path becomes a bridge |
 
 *Functional Requirements & Implementation:*
-- [ ] `safe_component(value: str) -> str` -> preserve the existing pattern/validation and exact `ValueError('Use a safe alphanumeric source or symbol')`; `'EURUSD'` passes and `'../EURUSD'` fails.
-- [ ] `encode_frame(frame: pd.DataFrame, timeframe: str, tick_size: float) -> pa.Table` -> retain integer price conversion, rounding tolerance, volume bounds and metadata. Do not substitute float prices or change timestamp units.
-- [ ] `TICK_SCHEMA` -> retain ordered fields `DateTime: timestamp[us, UTC]`, `Bid: int64`, `Ask: int64`, `Flags: uint16`. `M1_SCHEMA` -> retain `DateTime`, `Open`, `High`, `Low`, `Close`, `Volume` with timestamp[us, UTC], four int64 prices and uint64 volume.
-- [ ] `catalog_paths(row: dict[str, Any]) -> list[str]` and `scan_catalog(row: dict[str, Any], *, decode: bool = False) -> pl.LazyFrame` -> preserve existing partition selection, units/decoding and errors.
-- [ ] `test_canonical_storage_module_identity()` -> assert old/new `encode_frame`, `scan_catalog`, `TICK_SCHEMA`, `M1_SCHEMA` are identical, and assert the exact field/type sequences above.
+- [X] `safe_component(value: str) -> str` -> preserve the existing pattern/validation and exact `ValueError('Use a safe alphanumeric source or symbol')`; `'EURUSD'` passes and `'../EURUSD'` fails.
+- [X] `encode_frame(frame: pd.DataFrame, timeframe: str, tick_size: float) -> pa.Table` -> retain integer price conversion, rounding tolerance, volume bounds and metadata. Do not substitute float prices or change timestamp units.
+- [X] `TICK_SCHEMA` -> retain ordered fields `DateTime: timestamp[us, UTC]`, `Bid: int64`, `Ask: int64`, `Flags: uint16`. `M1_SCHEMA` -> retain `DateTime`, `Open`, `High`, `Low`, `Close`, `Volume` with timestamp[us, UTC], four int64 prices and uint64 volume.
+- [X] `catalog_paths(row: dict[str, Any]) -> list[str]` and `scan_catalog(row: dict[str, Any], *, decode: bool = False) -> pl.LazyFrame` -> preserve existing partition selection, units/decoding and errors.
+- [X] `test_canonical_storage_module_identity()` -> assert old/new `encode_frame`, `scan_catalog`, `TICK_SCHEMA`, `M1_SCHEMA` are identical, and assert the exact field/type sequences above.
 *Acceptance:* `uv run python -m pytest tests/core/data/test_storage_imports.py tests/workspace/data_manager/test_sources.py tests/workspace/data_manager/test_file_imports.py -q` exits 0. Reuse the current source/import storage fixtures without changing expected values.
 *Commit:* `refactor(core): centralize canonical market storage`.
 *Limitations:* this is not the invented `DataCatalog.read(DatasetRef, start, end)` service. Catalogue publication, transforms and workspace routes keep their existing Data Manager owner until individually assigned migration orders exist.
