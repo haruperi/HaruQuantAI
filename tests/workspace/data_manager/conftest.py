@@ -59,7 +59,7 @@ def temp_db(tmp_path):
 @pytest.fixture
 def recorded_history(temp_db, tmp_path):
     """Import known uploaded prices through the real publication pipeline."""
-    from app.host.jobs import JobContext
+    from app.core.jobs.manager import JobContext
     from app.workspace.data_manager.logs import Logs
     from app.workspace.data_manager.sources.files import import_files
 

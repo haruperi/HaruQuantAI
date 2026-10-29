@@ -12,7 +12,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
-    from app.host.jobs import JobContext, JobManager
+    from app.core.jobs.manager import JobContext, JobManager
 
 from app.core.host.persistence import HostPersistence
 from app.core.lib.responses import (

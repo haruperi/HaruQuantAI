@@ -40,7 +40,7 @@ from app.core.lib.responses import (
 )
 
 if TYPE_CHECKING:
-    from app.host.jobs import JobContext, JobManager
+    from app.core.jobs.manager import JobContext, JobManager
     from app.workspace.data_manager.logs import Logs
 
 from ._helpers import (

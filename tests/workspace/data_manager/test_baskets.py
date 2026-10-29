@@ -440,7 +440,7 @@ def test_basket_http_atomic_bulk_edit_and_protection(basket_http, baskets):
 
 
 def test_basket_http_jobs_and_get_cannot_cancel(basket_http, baskets):
-    from app.host.jobs import JobRecord
+    from app.core.jobs.manager import JobRecord
 
     identifier = baskets.add("A")["data"]["id"]
     assert baskets.edit_stocks("A", "AAPL")["success"]
@@ -526,7 +526,7 @@ def test_http_update_runs_real_background_worker(
     basket_http, baskets, tmp_path, monkeypatch
 ):
     from app.core.host.resources import MemoryObservation, ResourceMonitor
-    from app.host.jobs import JobManager
+    from app.core.jobs.manager import JobManager
 
     with closing(sqlite3.connect(baskets.gateway.database_path)) as connection:
         connection.executescript("""

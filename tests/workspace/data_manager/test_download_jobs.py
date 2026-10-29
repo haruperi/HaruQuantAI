@@ -10,7 +10,7 @@ from app.core.host.events import EventBus
 from app.core.host.persistence import HostPersistence
 from app.core.host.resources import MemoryObservation, ResourceMonitor
 from app.core.host.transport import register_transport_exception_handlers
-from app.host.jobs import JobManager
+from app.core.jobs.manager import JobManager
 from app.include.contracts import BridgeError
 from app.workspace import data_manager as http
 from app.workspace.data_manager.logs import Logs

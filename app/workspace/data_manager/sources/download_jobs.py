@@ -11,8 +11,8 @@ from typing import Any, cast
 from fastapi import APIRouter, Request
 
 from app.core.host.transport import TransportError
+from app.core.jobs.manager import JobContext, JobManager
 from app.core.lib.responses import ErrorCode
-from app.host.jobs import JobContext, JobManager
 from app.include.market_storage import safe_component
 from app.workspace.data_manager.data.storage import require_data
 

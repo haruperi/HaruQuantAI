@@ -1,7 +1,7 @@
 """Clock clones publish their own prices and preserve source data."""
 
 import pandas as pd
-from app.host.jobs import JobContext
+from app.core.jobs.manager import JobContext
 from app.workspace.data_manager.data.review import DatasetReview
 from app.workspace.data_manager.data.transforms import clone_to_timezone
 from app.workspace.data_manager.logs import Logs

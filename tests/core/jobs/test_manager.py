@@ -11,7 +11,7 @@ from unittest.mock import Mock
 import pytest
 from app.core.host import resources
 from app.core.host.persistence import HostPersistence
-from app.host import jobs
+from app.core.jobs import manager as jobs
 
 
 class ControlledExecutor:

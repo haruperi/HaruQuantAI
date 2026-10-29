@@ -107,7 +107,7 @@ def _basket_record(service: Baskets, identifier: int) -> dict[str, Any]:
 
 
 def _basket_jobs(request: Request, *, create: bool = False) -> Any:
-    from app.host.jobs import JobManager
+    from app.core.jobs.manager import JobManager
 
     with _BASKET_JOB_LOCK:
         jobs = getattr(request.app.state, "basket_jobs", None)

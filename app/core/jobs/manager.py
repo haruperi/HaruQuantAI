@@ -7,8 +7,8 @@ Lifecycle records and transition events use the injected HostPersistence gateway
 Startup reconciliation marks orphan RUNNING jobs INTERRUPTED.
 
 Example: manager = JobManager(); record = manager.submit_job(run_sample_compute_task)
-Always call manager.shutdown() after workers finish. Run `python -m app.host.jobs`
-for a short lifecycle demonstration.
+Always call manager.shutdown() after workers finish.
+Run python -m app.core.jobs.manager for a short lifecycle demonstration.
 """
 
 from __future__ import annotations
