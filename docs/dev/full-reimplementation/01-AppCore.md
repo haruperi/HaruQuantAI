@@ -568,10 +568,10 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Backend / test targets:** those same three files (RETAIN). **Create / frontend:** none.
 *Current -> target / action:* historical `app/host/persistence.py` -> existing `app/core/host/persistence.py`; migration already exists. Do not restore `app/host`.
 *Functional Requirements & Implementation:*
-- [ ] `HostPersistence.__init__(self, database_path: str | Path = _DEFAULT_PATH, *, timeout: float = 5.0) -> None` -> retain `_DEFAULT_PATH = Path(__file__).resolve().parents[3] / 'data/database/haruquantai.db'`; do not move or rewrite the personal database as part of namespace migration.
-- [ ] `HostPersistence.transaction(self) -> Generator[HostPersistence]` -> retain connection reuse and rollback-on-exception behavior.
-- [ ] `HostPersistence.create_records`, `read_records`, `update_record`, `delete_record` -> preserve the complete signatures from Context, record filters, cursor/offset bounds, allow-listed identifiers and current success/error dictionaries. These older dictionaries use `StandardResponse.success/failure`; do not replace them with the WO-C02 instance envelope during a move.
-- [ ] `HostPersistence.ensure_code_editor_schema`, `ensure_custom_data_schema`, `ensure_datasets_schema`, `ensure_broker_cost_schema` -> retain current idempotent schema behavior and return values.
+- [X] `HostPersistence.__init__(self, database_path: str | Path = _DEFAULT_PATH, *, timeout: float = 5.0) -> None` -> retain `_DEFAULT_PATH = Path(__file__).resolve().parents[3] / 'data/database/haruquantai.db'`; do not move or rewrite the personal database as part of namespace migration.
+- [X] `HostPersistence.transaction(self) -> Generator[HostPersistence]` -> retain connection reuse and rollback-on-exception behavior.
+- [X] `HostPersistence.create_records`, `read_records`, `update_record`, `delete_record` -> preserve the complete signatures from Context, record filters, cursor/offset bounds, allow-listed identifiers and current success/error dictionaries. These older dictionaries use `StandardResponse.success/failure`; do not replace them with the WO-C02 instance envelope during a move.
+- [X] `HostPersistence.ensure_code_editor_schema`, `ensure_custom_data_schema`, `ensure_datasets_schema`, `ensure_broker_cost_schema` -> retain current idempotent schema behavior and return values.
 *Test fixtures / expected observations:* run the named existing temporary-database tests without relaxing assertions; rollback leaves pre-transaction rows unchanged, pagination retains its current stable ordering and invalid operations retain their existing error codes/messages.
 *Acceptance:* `uv run python -m pytest tests/core/host/test_persistance.py tests/core/host/test_responses.py tests/core/lib/test_responses.py -q` exits 0. Both response interfaces must remain available; this is not permission to redesign the wire contract.
 *Commit if changes are required:* `core: retain the canonical metadata persistence gateway`.
@@ -599,10 +599,10 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Edit:** `app/include/generators.py` into the specified temporary bridge. **Frontend:** none.
 *Current -> target / action:* `app/include/generators.py` -> `app/core/generators.py`, MOVE all current bodies/overloads unchanged.
 *Functional Requirements & Implementation:*
-- [ ] `RandomGenerator.__init__(self, seed: int | None = None) -> None`, `seed`, `new_instance`, `next_double`, `next_int`, `next_long`, `next_gaussian`, `probability`, `next_bool`, `get_random` -> preserve complete existing signatures/defaults and source behavior. Do not replace Python's generator or promise Java seed equivalence.
-- [ ] `RandomGenerator.clone(self, seed: int | None = None) -> RandomGenerator` -> retain copied RNG state when seed is omitted and independent seeded state when supplied.
-- [ ] `test_generator_move_preserves_state()` -> old/new RandomGenerator are identical; `RandomGenerator(0).next_double()` equals 0.8444218515250481. After drawing once from `original=RandomGenerator(0)`, clone it; ten subsequent `next_double()` values from each are equal. Drawing from one instance must not advance the other.
-- [ ] `test_explicit_clone_seed()` -> `RandomGenerator(7).clone(0).next_double()` equals 0.8444218515250481, regardless of draws already made from the original.
+- [X] `RandomGenerator.__init__(self, seed: int | None = None) -> None`, `seed`, `new_instance`, `next_double`, `next_int`, `next_long`, `next_gaussian`, `probability`, `next_bool`, `get_random` -> preserve complete existing signatures/defaults and source behavior. Do not replace Python's generator or promise Java seed equivalence.
+- [X] `RandomGenerator.clone(self, seed: int | None = None) -> RandomGenerator` -> retain copied RNG state when seed is omitted and independent seeded state when supplied.
+- [X] `test_generator_move_preserves_state()` -> old/new RandomGenerator are identical; `RandomGenerator(0).next_double()` equals 0.8444218515250481. After drawing once from `original=RandomGenerator(0)`, clone it; ten subsequent `next_double()` values from each are equal. Drawing from one instance must not advance the other.
+- [X] `test_explicit_clone_seed()` -> `RandomGenerator(7).clone(0).next_double()` equals 0.8444218515250481, regardless of draws already made from the original.
 *Acceptance:* `uv run python -m pytest tests/core/lib/test_generators.py tests/include/what_if/test_scenarios.py -q` exits 0. New test file collects exactly two tests.
 *Commit:* `refactor(core): centralize the existing deterministic RNG wrapper`.
 *Limitations:* seed reproducibility applies to the retained Python runtime behavior; no donor RNG sequence parity established.
