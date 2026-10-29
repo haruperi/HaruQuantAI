@@ -322,11 +322,11 @@ These orders replace the former summary table. `READY` authorizes only the expli
 | `app/include/contracts.py` | `app/core/data/contracts.py` | MOVE unchanged except `.enums` import becomes `app.core.enums` |
 
 *Functional Requirements & Implementation:*
-- [ ] `Timeframe.to_seconds(self) -> int`, `to_minutes(self) -> int`, `from_string`, `resolve` -> retain every existing value, alias, fallback and error. `PERIOD_M1.to_seconds()` is 60, `PERIOD_H1.to_seconds()` is 3600 and `PERIOD_D1.to_seconds()` is 86400.
-- [ ] `MarketBar.is_bullish/is_bearish/is_doji/range/body/volume`, `MarketTick.spread/mid` -> move their current calculations unchanged. Do not introduce replacement `Bar`, `Tick` or `Instrument` classes.
-- [ ] `ChartDef.to_dict/from_dict/clone`, `DataInfo.to_dict/from_dict/from_row/to_chart_def`, `TradingSession.to_dict/from_dict/is_within_session` -> preserve all fields, serialization keys, defaults and timezone behavior from the named Context file.
-- [ ] `AccountInfo`, `SymbolInfo`, `OrderInfo`, `PositionInfo`, `DealInfo`, `TradeRequest`, `TradeResult`, `TradeCheckResult`, `TradingBackend` -> retain their complete source definitions in this one canonical module; do not split these types in this migration.
-- [ ] `test_canonical_type_identity()` -> assert old/new `MarketBar`, `MarketTick`, `ChartDef`, `DataInfo`, `SymbolInfo`, `TradeRequest`, `TradingSession`, `Timeframe`, `OrderType` are identical; assert the three exact timeframe second values above.
+- [X] `Timeframe.to_seconds(self) -> int`, `to_minutes(self) -> int`, `from_string`, `resolve` -> retain every existing value, alias, fallback and error. `PERIOD_M1.to_seconds()` is 60, `PERIOD_H1.to_seconds()` is 3600 and `PERIOD_D1.to_seconds()` is 86400.
+- [X] `MarketBar.is_bullish/is_bearish/is_doji/range/body/volume`, `MarketTick.spread/mid` -> move their current calculations unchanged. Do not introduce replacement `Bar`, `Tick` or `Instrument` classes.
+- [X] `ChartDef.to_dict/from_dict/clone`, `DataInfo.to_dict/from_dict/from_row/to_chart_def`, `TradingSession.to_dict/from_dict/is_within_session` -> preserve all fields, serialization keys, defaults and timezone behavior from the named Context file.
+- [X] `AccountInfo`, `SymbolInfo`, `OrderInfo`, `PositionInfo`, `DealInfo`, `TradeRequest`, `TradeResult`, `TradeCheckResult`, `TradingBackend` -> retain their complete source definitions in this one canonical module; do not split these types in this migration.
+- [X] `test_canonical_type_identity()` -> assert old/new `MarketBar`, `MarketTick`, `ChartDef`, `DataInfo`, `SymbolInfo`, `TradeRequest`, `TradingSession`, `Timeframe`, `OrderType` are identical; assert the three exact timeframe second values above.
 *Acceptance:* `uv run python -m pytest tests/core/data/test_contract_imports.py tests/workspace/brokers/test_symbol_contracts.py tests/include/blocks -q` exits 0. No serialized key or enum value changes are permitted.
 *Commit:* `refactor(core): centralize existing domain records and enums`.
 *Limitations:* reusable type migration does not establish historical SQX timestamp equivalence, full strategy-document contracts or dataset-catalogue API completeness.
