@@ -36,6 +36,7 @@ repos:
         stages: [pre-commit]
 
       - id: check-added-large-files
+        entry: python -m pre_commit_hooks.check_added_large_files
         args: ["--maxkb=25000"]
         stages: [pre-commit]
 
