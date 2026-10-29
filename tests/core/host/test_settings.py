@@ -7,13 +7,13 @@ from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
 
 import pytest
-from app.host.persistence import HostPersistence
-from app.host.settings import (
+from app.core.host.settings import (
     RevisionConflictError,
     SettingsDataError,
     SettingsManager,
     SettingsPersistenceError,
 )
+from app.host.persistence import HostPersistence
 
 
 @pytest.fixture
@@ -66,14 +66,17 @@ def row(gateway, scope, key):
 
 
 def test_singleton_and_manager_are_lazy():
-    module = importlib.import_module("app.host.settings")
+    module = importlib.import_module("app.core.host.settings")
     with patch.object(
         module, "HostPersistence", side_effect=AssertionError("eager access")
     ):
         manager = SettingsManager()
         assert manager._loaded is False
         assert manager._persistence is None
-        assert importlib.import_module("app.host.settings").settings is module.settings
+        assert (
+            importlib.import_module("app.core.host.settings").settings
+            is module.settings
+        )
 
 
 def test_scoped_attribute_access_stored_only_projection_and_detachment(gateway):

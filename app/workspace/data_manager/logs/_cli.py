@@ -9,13 +9,13 @@ from typing import Any
 
 import httpx
 
+from app.core.host.settings import SettingsManager
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,
     StandardError,
     StandardResponse,
 )
-from app.host.settings import SettingsManager
 
 _MAX_PAGE = 1000
 

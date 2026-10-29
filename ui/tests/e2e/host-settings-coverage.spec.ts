@@ -33,7 +33,7 @@ import os
 sys.path.insert(0, sys.argv[1])
 from app.host.persistence import HostPersistence
 HostPersistence.DEFAULT_DB_PATH = Path(sys.argv[2])
-from app.host.settings import SettingsManager
+from app.core.host.settings import SettingsManager
 from app.host.session import hash_password
 from app.host.bootstrap import AppHost
 from app.main import create_app

@@ -28,6 +28,7 @@ from starlette.concurrency import run_in_threadpool
 from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.websockets import WebSocketDisconnect
 
+from app.core.host.settings import RevisionConflictError, SettingsManager
 from app.host import resources as _res
 from app.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
 from app.host.persistence import HostPersistence
@@ -38,7 +39,6 @@ from app.host.response import (
     StandardResponse,
 )
 from app.host.session import Session, SessionManager, SessionPersistenceError
-from app.host.settings import RevisionConflictError, SettingsManager
 from app.host.vault import ConnectionMetadata, Vault, _endpoint, prepare_credentials
 
 logger = logging.getLogger("app.access")

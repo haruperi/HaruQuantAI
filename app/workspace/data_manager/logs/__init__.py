@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import httpx
 
-from app.host.settings import SettingsManager
+from app.core.host.settings import SettingsManager
 
 from ._cli import (
     register_log_commands,

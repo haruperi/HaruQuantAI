@@ -62,9 +62,9 @@ from typing import Any
 
 import psutil
 
+from app.core.host.settings import settings as host_settings
 from app.host.logging import get_logger
 from app.host.persistence import HostPersistence
-from app.host.settings import settings as host_settings
 
 __all__ = [
     "MemoryWatchdog",

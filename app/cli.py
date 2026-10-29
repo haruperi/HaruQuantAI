@@ -20,6 +20,7 @@ import time
 from collections.abc import Callable, Sequence
 from typing import Any
 
+from app.core.host.settings import SettingsManager
 from app.host.logging import get_logger, shutdown_logging
 from app.host.persistence import HostPersistence
 from app.host.response import (
@@ -29,7 +30,6 @@ from app.host.response import (
     StandardResponse,
 )
 from app.host.session import SessionManager
-from app.host.settings import SettingsManager
 
 logger = get_logger(__name__)
 CLI_PEER_ID = "cli"
