@@ -86,10 +86,10 @@ efactor(home): migrate shell, navigation, and home presentation.
 - **Frontend Create:** `app/web/workspaces/home/notesPreview.ts`.
 - **Frontend Test Create:** `app/web/tests/workspaces/home/notesPreview.test.ts`.
 *Functional Requirements & Implementation:*
-- [ ] `NotesPreview.from_text(note_text: string | null, empty_label: string = 'Empty'): string` -> exported class with one static method. Null means no first text node: replace it with empty_label. An existing empty string remains empty. If selected string has more than 32 UTF-16 code units return its first 32 code units plus literal `'...'`; otherwise return it unchanged. Use JavaScript length/slice semantics, not Unicode code-point counting, ellipsis character or HTML parsing.
-- [ ] `test('notes null and empty')` -> null/default gives `'Empty'`; null/custom `'Vacant'` gives `'Vacant'`; `''` gives `''`.
-- [ ] `test('notes 32 code-unit boundary')` -> `'x'.repeat(32)` stays unchanged; `'x'.repeat(33)` gives 32 x characters plus three dots.
-- [ ] `test('notes retains donor UTF16 slicing')` -> `'a'.repeat(31)+'\ud83d\ude00'` gives `'a'.repeat(31)+'\ud83d...'`. Do not silently repair the surrogate in this pure description helper.
+- [X] `NotesPreview.from_text(note_text: string | null, empty_label: string = 'Empty'): string` -> exported class with one static method. Null means no first text node: replace it with empty_label. An existing empty string remains empty. If selected string has more than 32 UTF-16 code units return its first 32 code units plus literal `'...'`; otherwise return it unchanged. Use JavaScript length/slice semantics, not Unicode code-point counting, ellipsis character or HTML parsing.
+- [X] `test('notes null and empty')` -> null/default gives `'Empty'`; null/custom `'Vacant'` gives `'Vacant'`; `''` gives `''`.
+- [X] `test('notes 32 code-unit boundary')` -> `'x'.repeat(32)` stays unchanged; `'x'.repeat(33)` gives 32 x characters plus three dots.
+- [X] `test('notes retains donor UTF16 slicing')` -> `'a'.repeat(31)+'\ud83d\ude00'` gives `'a'.repeat(31)+'\ud83d...'`. Do not silently repair the surrogate in this pure description helper.
 *Acceptance:* `npm --prefix app/web test -- tests/workspaces/home/notesPreview.test.ts` exits 0 and collects three tests.
 *Commit:* `home: preserve notes preview boundaries`.
 *Blocked companion:* full rich-text storage/serialization must separately specify safe rendering, schema and Unicode transport behavior; this helper does not authorize a notes save endpoint.
