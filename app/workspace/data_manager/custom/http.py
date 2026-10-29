@@ -12,7 +12,7 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 
 from app.core.host.transport import TransportError
-from app.host.response import ErrorCode
+from app.core.lib.responses import ErrorCode
 
 from .feature import CustomData
 

@@ -8,7 +8,7 @@ from threading import RLock
 from typing import Any
 
 from app.core.host.persistence import HostPersistence
-from app.host.response import (
+from app.core.lib.responses import (
     ErrorCode,
     ResponseMetadata,
     StandardError,

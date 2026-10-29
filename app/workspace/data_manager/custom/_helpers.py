@@ -17,7 +17,7 @@ from typing import Any, cast
 import httpx
 
 from app.core.host.persistence import HostPersistence
-from app.host.response import ErrorCode
+from app.core.lib.responses import ErrorCode
 
 _DEFINITIONS = "datamgr_custom"
 _OBSERVATIONS = "datamgr_custom_values"

@@ -12,7 +12,7 @@ from typing import Any
 
 from app.core.host.events import EventBus
 from app.core.host.transport import get_global_event_bus
-from app.host.response import (
+from app.core.lib.responses import (
     ErrorCode,
     ResponseMetadata,
     StandardError,

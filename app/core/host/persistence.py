@@ -24,7 +24,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from app.core.host.logging import get_logger
-from app.host.response import (
+from app.core.lib.responses import (
     ErrorCode,
     ResponseMetadata,
     StandardError,

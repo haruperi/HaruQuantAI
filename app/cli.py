@@ -24,7 +24,7 @@ from app.core.host.logging import get_logger, shutdown_logging
 from app.core.host.persistence import HostPersistence
 from app.core.host.session import SessionManager
 from app.core.host.settings import SettingsManager
-from app.host.response import (
+from app.core.lib.responses import (
     ErrorCode,
     ResponseMetadata,
     StandardError,

@@ -39,7 +39,7 @@ from app.core.host.vault import (
     _endpoint,
     prepare_credentials,
 )
-from app.host.response import (
+from app.core.lib.responses import (
     ErrorCode,
     ResponseMetadata,
     StandardError,

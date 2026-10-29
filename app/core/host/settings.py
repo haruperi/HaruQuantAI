@@ -20,7 +20,7 @@ from typing import Any, override
 
 from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence
-from app.host.response import ErrorCode
+from app.core.lib.responses import ErrorCode
 
 __all__ = [
     "RevisionConflictError",

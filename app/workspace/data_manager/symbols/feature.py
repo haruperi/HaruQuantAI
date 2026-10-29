@@ -19,7 +19,7 @@ from typing import Any
 
 from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence, RecordFilter
-from app.host.response import ErrorCode
+from app.core.lib.responses import ErrorCode
 from app.include.contracts import BridgeError, SymbolInfo
 
 from ._helpers import (

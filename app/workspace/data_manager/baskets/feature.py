@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from app.host.jobs import JobContext, JobManager
 
 from app.core.host.persistence import HostPersistence
-from app.host.response import (
+from app.core.lib.responses import (
     ErrorCode,
     ResponseMetadata,
     StandardError,
