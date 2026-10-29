@@ -630,10 +630,10 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Backend / test targets:** `app/core/jobs/manager.py`, `tests/core/jobs/test_manager.py` (RETAIN). **Create / frontend:** none.
 *Current -> target / action:* historical `app/host/jobs.py` -> existing `app/core/jobs/manager.py`; preserve that completed move. Do not create another manager under `app/core/grid`.
 *Functional Requirements & Implementation:*
-- [ ] `JobRecord.to_dict(self) -> dict[str, Any]` and `JobState` -> retain existing persisted keys and uppercase state values. Do not introduce lowercase aliases during migration.
-- [ ] `JobManager.submit_job`, `get_job`, `list_jobs`, `get_job_events`, `wait_for_job` -> preserve the current callable-based API, full signatures and metadata persistence; do not replace it with an unimplemented operation-ID dispatcher.
-- [ ] `JobManager.cancel_job`, `pause_job`, `resume_job`, `resume_paused_jobs`, `reconcile_orphan_jobs` -> retain current state transition/return/error behavior and event publication.
-- [ ] `JobManager.shutdown(self, *, wait: bool = True, cancel_futures: bool = False) -> None` -> retain existing executor shutdown and scratch cleanup policy.
+- [X] `JobRecord.to_dict(self) -> dict[str, Any]` and `JobState` -> retain existing persisted keys and uppercase state values. Do not introduce lowercase aliases during migration.
+- [X] `JobManager.submit_job`, `get_job`, `list_jobs`, `get_job_events`, `wait_for_job` -> preserve the current callable-based API, full signatures and metadata persistence; do not replace it with an unimplemented operation-ID dispatcher.
+- [X] `JobManager.cancel_job`, `pause_job`, `resume_job`, `resume_paused_jobs`, `reconcile_orphan_jobs` -> retain current state transition/return/error behavior and event publication.
+- [X] `JobManager.shutdown(self, *, wait: bool = True, cancel_futures: bool = False) -> None` -> retain existing executor shutdown and scratch cleanup policy.
 *Acceptance:* `uv run python -m pytest tests/core/jobs/test_manager.py -q` exits 0, preserving all existing concurrency/recovery fixtures. This does not independently establish SQX thread scheduling equivalence.
 *Commit if changes are required:* `core: retain canonical background job lifecycle`.
 
@@ -660,11 +660,11 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Backend / test targets:** `app/core/host/transport.py`, `tests/core/host/test_transport.py` (RETAIN). **Create / frontend:** none.
 *Current -> target / action:* old `app/host/transport.py` -> existing `app/core/host/transport.py`; retain it rather than adding competing `host/app.py` or `host/errors.py` adapters.
 *Functional Requirements & Implementation:*
-- [ ] `create_transport_router(*, prefix: str = '/api/v1') -> APIRouter` -> preserve existing endpoint paths/methods, session guards, payload validation and status codes in Context.
-- [ ] `install_transport(application: FastAPI) -> None` and `register_transport_exception_handlers(app: FastAPI) -> None` -> retain existing middleware/exception mapping and event transports.
-- [ ] `create_host_app(*, extra_routers: Sequence[APIRouter] | None = None, **kw: Any) -> FastAPI` -> retain existing host-only factory; application composition stays in `app/main.py`.
-- [ ] `TransportMiddleware`, `_sse`, `_ws` -> preserve existing response/request-ID handling, replay/cursor behavior and disconnect cleanup. Do not convert every response to the new instance envelope; the static compatibility builders remain required by current callers.
-- [ ] `TransportCLI.run(argv: Sequence[str] | None = None) -> int` -> retain its current behavior; user-facing application CLI dispatch remains in `app/cli.py`.
+- [X] `create_transport_router(*, prefix: str = '/api/v1') -> APIRouter` -> preserve existing endpoint paths/methods, session guards, payload validation and status codes in Context.
+- [X] `install_transport(application: FastAPI) -> None` and `register_transport_exception_handlers(app: FastAPI) -> None` -> retain existing middleware/exception mapping and event transports.
+- [X] `create_host_app(*, extra_routers: Sequence[APIRouter] | None = None, **kw: Any) -> FastAPI` -> retain existing host-only factory; application composition stays in `app/main.py`.
+- [X] `TransportMiddleware`, `_sse`, `_ws` -> preserve existing response/request-ID handling, replay/cursor behavior and disconnect cleanup. Do not convert every response to the new instance envelope; the static compatibility builders remain required by current callers.
+- [X] `TransportCLI.run(argv: Sequence[str] | None = None) -> int` -> retain its current behavior; user-facing application CLI dispatch remains in `app/cli.py`.
 *Acceptance:* `uv run python -m pytest tests/core/host/test_transport.py tests/core/host/test_session.py tests/core/host/test_events.py tests/core/host/test_vault.py -q` exits 0, retaining current unauthorized, invalid-body, replay and disconnect fixtures.
 *Commit if changes are required:* `core: retain canonical host transport services`.
 *Limitations:* no UI rewrite, donor servlet protocol parity or remote grid transport is established by these checks.
@@ -711,11 +711,11 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Backend / test targets:** those same five exact files (RETAIN current behavior); edit import paths only when their explicitly assigned workspace migrations land. **Create / frontend:** none in this slice.
 *Current -> target / action:* `app/main.py` -> same file; `app/cli.py` -> same file. Both are direct reuse, not a reason to introduce `cli_main` or change launcher return types.
 *Functional Requirements & Implementation:*
-- [ ] `app.main.create_app(persistence: HostPersistence | None = None, *, vault: Vault | None = None, connection_testers: Mapping[str, CredentialTester] | None = None) -> FastAPI` -> preserve dependency injection, lifespan initialization/shutdown and existing router composition.
-- [ ] `app.main.main(argv: Sequence[str] | None = None) -> None` -> preserve argument parsing, configured bind validation, Uvicorn startup and logging shutdown; do not change it to return int.
-- [ ] `app.cli.main(argv: Sequence[str] | None = None) -> int` -> preserve registered workspace command dispatch and handler exit codes. The existing `example-domain` mocked handler returns 7 and main must return 7 without writing output.
-- [ ] `app.cli.login`, `logout`, `health` -> preserve their current signatures and safe response serialization. Importing/using the CLI must not start a web server or open a browser.
-- [ ] `[project.scripts]` -> retain `haruquantai = 'app.main:main'` and `'app.cli' = 'app.cli:main'`; do not add a second CLI framework.
+- [X] `app.main.create_app(persistence: HostPersistence | None = None, *, vault: Vault | None = None, connection_testers: Mapping[str, CredentialTester] | None = None) -> FastAPI` -> preserve dependency injection, lifespan initialization/shutdown and existing router composition.
+- [X] `app.main.main(argv: Sequence[str] | None = None) -> None` -> preserve argument parsing, configured bind validation, Uvicorn startup and logging shutdown; do not change it to return int.
+- [X] `app.cli.main(argv: Sequence[str] | None = None) -> int` -> preserve registered workspace command dispatch and handler exit codes. The existing `example-domain` mocked handler returns 7 and main must return 7 without writing output.
+- [X] `app.cli.login`, `logout`, `health` -> preserve their current signatures and safe response serialization. Importing/using the CLI must not start a web server or open a browser.
+- [X] `[project.scripts]` -> retain `haruquantai = 'app.main:main'` and `'app.cli' = 'app.cli:main'`; do not add a second CLI framework.
 *Acceptance:* `uv run python -m pytest tests/host/test_main.py tests/host/test_cli.py -q` exits 0; `uv run python -m app.cli --help` and `uv run python -m app.main --help` each exit 0 without starting a server. Do not use a real credential/login operation for acceptance.
 *Commit if changes are required:* `core: preserve application and headless entrypoint contracts`.
 *Limitations:* current factory/router verification does not prove the migrated React production build is served; that integration is retained below.
@@ -786,10 +786,10 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - **Context to Read / targets:** `pyproject.toml`, `uv.lock`, `app/web/package.json`, `app/web/package-lock.json` (RETAIN). **Production functions / frontend components to create:** none.
 *Current -> target / action:* existing Python manifests remain at repository root; Vite/React manifests remain under `app/web`. No Electron/JVM/compiler/classloader runtime is introduced.
 *Verification operations (no new function/class):*
-- [ ] `uv lock --check` -> confirm the committed Python lock matches the manifest; do not regenerate dependency versions to silence an error.
-- [ ] `uv run python -c "import sys, fastapi, polars, duckdb, pyarrow, numpy; assert sys.version_info >= (3, 14)"` -> confirm actual imports/interpreter, not just listed dependencies.
-- [ ] `npm --prefix app/web run typecheck` and `npm --prefix app/web run build` -> confirm the isolated frontend uses the existing lockfile stack. These commands must not add Electron.
-- [ ] `uv run python -m pytest tests/core tests/host -q` -> confirm the retained host/error/response/program/job contracts together, after any assigned migration commits.
+- [X] `uv lock --check` -> confirm the committed Python lock matches the manifest; do not regenerate dependency versions to silence an error.
+- [X] `uv run python -c "import sys, fastapi, polars, duckdb, pyarrow, numpy; assert sys.version_info >= (3, 14)"` -> confirm actual imports/interpreter, not just listed dependencies.
+- [X] `npm --prefix app/web run typecheck` and `npm --prefix app/web run build` -> confirm the isolated frontend uses the existing lockfile stack. These commands must not add Electron.
+- [X] `uv run python -m pytest tests/core tests/host -q` -> confirm the retained host/error/response/program/job contracts together, after any assigned migration commits.
 *Acceptance:* every command above exits 0; record the actual interpreter/package versions and execution time in the owning implementation review. An unexecuted command remains pending. A dependency manifest alone does not mean runtime verification passed.
 *Commit if manifest changes are independently required by an assigned feature:* include them in that feature's commit with its exact package justification. This verification order authorizes no speculative package addition or automatic upgrade.
 *Limitations:* dependency validation does not establish algorithms, UI completeness or donor parity. Blocked engine obligations above remain open until their complete orders are authored and independently checked.
