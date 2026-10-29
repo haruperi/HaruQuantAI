@@ -31,7 +31,7 @@ from typing import TYPE_CHECKING, Any
 
 import httpx
 
-from app.host.persistence import HostPersistence, RecordFilter
+from app.core.host.persistence import HostPersistence, RecordFilter
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,

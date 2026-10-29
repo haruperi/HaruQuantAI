@@ -5,7 +5,7 @@ import sqlite3
 from contextlib import closing
 
 import pytest
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.brokers import Brokers
 
 

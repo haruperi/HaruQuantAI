@@ -14,7 +14,7 @@ from typing import TYPE_CHECKING, Any
 if TYPE_CHECKING:
     from app.host.jobs import JobContext, JobManager
 
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,

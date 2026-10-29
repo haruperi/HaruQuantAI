@@ -11,7 +11,7 @@ from typing import Any, cast
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 from app.core.host.logging import get_logger
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.host.response import ErrorCode
 from app.include.contracts import SessionWindow, TradingHoliday, TradingSession
 

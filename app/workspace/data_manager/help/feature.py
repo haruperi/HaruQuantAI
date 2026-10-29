@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from threading import RLock
 from typing import Any
 
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,

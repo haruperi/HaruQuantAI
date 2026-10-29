@@ -29,6 +29,7 @@ from starlette.types import ASGIApp, Receive, Scope, Send
 from starlette.websockets import WebSocketDisconnect
 
 from app.core.host import resources as _res
+from app.core.host.persistence import HostPersistence
 from app.core.host.session import Session, SessionManager, SessionPersistenceError
 from app.core.host.settings import RevisionConflictError, SettingsManager
 from app.core.host.vault import (
@@ -38,7 +39,6 @@ from app.core.host.vault import (
     prepare_credentials,
 )
 from app.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
-from app.host.persistence import HostPersistence
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,

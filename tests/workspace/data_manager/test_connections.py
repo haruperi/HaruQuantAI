@@ -6,8 +6,8 @@ import sqlite3
 from contextlib import closing
 from unittest.mock import AsyncMock, Mock, patch
 
+from app.core.host.persistence import HostPersistence
 from app.core.host.transport import ServletConnection
-from app.host.persistence import HostPersistence
 from app.workspace.data_manager.sources.connections import (
     test_provider_access as provider_access,
 )

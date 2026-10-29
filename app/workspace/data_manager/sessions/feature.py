@@ -15,7 +15,7 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,

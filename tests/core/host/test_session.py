@@ -7,8 +7,8 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import Mock
 
 import pytest
+from app.core.host.persistence import HostPersistence
 from app.core.host.session import SessionManager, SessionPersistenceError
-from app.host.persistence import HostPersistence
 
 
 @pytest.fixture

@@ -11,7 +11,7 @@ import duckdb
 import pyarrow as pa
 import pyarrow.compute as pc
 
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.include.enums import Timeframe
 from app.include.market_storage import catalog_paths
 

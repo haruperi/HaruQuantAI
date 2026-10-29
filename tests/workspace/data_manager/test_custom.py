@@ -9,8 +9,8 @@ from contextlib import closing
 from unittest.mock import Mock, patch
 
 import pytest
+from app.core.host.persistence import HostPersistence
 from app.host.events import EventBus
-from app.host.persistence import HostPersistence
 from app.workspace.data_manager.custom import CustomData
 from app.workspace.data_manager.logs import Logs
 

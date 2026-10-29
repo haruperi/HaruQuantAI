@@ -64,7 +64,7 @@ import pandas as pd  # type: ignore[import-untyped]
 from app.core.host.logging import get_logger
 
 try:
-    from app.host.persistence.mt5bridge_journal import Journal  # type: ignore[import-not-found]
+    from app.core.host.persistence.mt5bridge_journal import Journal  # type: ignore[import-not-found]
 except ImportError:
 
     class Journal:  # type: ignore[no-redef]

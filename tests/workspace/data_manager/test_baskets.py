@@ -7,7 +7,7 @@ from unittest.mock import Mock
 
 import pandas as pd
 import pytest
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.baskets import Baskets
 
 

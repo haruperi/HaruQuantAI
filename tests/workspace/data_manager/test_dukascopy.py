@@ -5,7 +5,7 @@ import sqlite3
 import pandas as pd  # type: ignore[import-untyped]
 import pyarrow.parquet as pq  # type: ignore[import-untyped]
 import pytest
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.sources import (
     M1_SCHEMA,
     TICK_SCHEMA,

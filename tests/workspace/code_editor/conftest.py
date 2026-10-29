@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import polars as pl
 import pytest
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.workspace.code_editor import _storage, http
 from app.workspace.code_editor.import_export import ImportExport
 from app.workspace.code_editor.indicator_tester import IndicatorTester

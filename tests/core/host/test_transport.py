@@ -9,9 +9,9 @@ from unittest.mock import AsyncMock, Mock
 
 import httpx
 import pytest
+from app.core.host.persistence import HostPersistence
 from app.core.host.session import SessionManager
 from app.core.host.transport import ServletConnection, TransportError
-from app.host.persistence import HostPersistence
 from app.main import create_app
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect

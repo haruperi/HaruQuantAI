@@ -160,7 +160,7 @@ def check_include_facade() -> list[str]:
 
 def check_persistence_isolation() -> list[str]:
     """Check `sqlite3` and connection helpers remain exclusively in `persistence.py`."""
-    allowed = "app/host/persistence.py"
+    allowed = "app/core/host/persistence.py"
     forbidden_funcs = {"resolved_db_path", "_get_connection"}
     violations: list[str] = []
     for rel, path in _iter_app_python_files():

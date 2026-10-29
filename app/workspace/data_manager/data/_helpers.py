@@ -6,7 +6,7 @@ from collections.abc import Mapping
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 
 logger = get_logger(__name__)
 persistence = HostPersistence()

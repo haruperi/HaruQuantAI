@@ -15,7 +15,7 @@ if TYPE_CHECKING:
     from .feature import Symbols
 
 from app.core.host.logging import get_logger
-from app.host.persistence import HostPersistence, SQLiteValue
+from app.core.host.persistence import HostPersistence, SQLiteValue
 from app.host.response import (
     ErrorCode,
     ResponseMetadata,

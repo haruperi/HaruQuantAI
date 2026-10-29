@@ -7,7 +7,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch
 
 import pytest
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.sessions import (
     Sessions,
     SessionWindow,

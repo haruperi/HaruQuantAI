@@ -15,7 +15,7 @@ from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 
 
 def canonical_target(stage: Path) -> Path:

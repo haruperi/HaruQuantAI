@@ -7,13 +7,13 @@ from concurrent.futures import ThreadPoolExecutor
 from unittest.mock import patch
 
 import pytest
+from app.core.host.persistence import HostPersistence
 from app.core.host.settings import (
     RevisionConflictError,
     SettingsDataError,
     SettingsManager,
     SettingsPersistenceError,
 )
-from app.host.persistence import HostPersistence
 
 
 @pytest.fixture

@@ -10,7 +10,7 @@ from app.workspace.data_manager.sources import run_dukascopy_command
 
 @pytest.fixture(autouse=True)
 def isolated_service(tmp_path, monkeypatch):
-    from app.host.persistence import HostPersistence
+    from app.core.host.persistence import HostPersistence
     from app.workspace.data_manager import sources
     from app.workspace.data_manager.sources import Dukascopy
 

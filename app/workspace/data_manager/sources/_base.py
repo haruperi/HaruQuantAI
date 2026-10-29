@@ -11,7 +11,7 @@ from typing import Any, cast, override
 
 import pandas as pd  # type: ignore[import-untyped]
 
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.include.contracts import BridgeError
 from app.include.market_storage import price_columns, safe_component
 from app.workspace.data_manager.data.coverage import (

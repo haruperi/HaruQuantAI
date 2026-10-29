@@ -4,11 +4,10 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock, Mock
 
 import pytest
+from app import cli
 from app.include.contracts import SymbolInfo, SymbolPrice, SymbolTrade
 from app.workspace.data_manager import symbols as symbols_module
 from app.workspace.data_manager.symbols import Symbols
-
-from app import cli
 
 
 @pytest.fixture
@@ -152,7 +151,7 @@ def test_http_update_returns_confirmed_rows(symbol_http, temp_db, mt5):
 
 
 def test_storage_failure_rolls_back_the_batch(temp_db, mt5, monkeypatch):
-    from app.host.persistence import HostPersistence
+    from app.core.host.persistence import HostPersistence
 
     service = Symbols(temp_db)
     for name in ("EURUSD", "GBPUSD"):
@@ -206,7 +205,7 @@ def test_full_import_rechecks_empty_catalog_after_fetch(temp_db, mt5):
 def test_full_import_batches_over_1000_and_rolls_back(
     temp_db, mt5, monkeypatch, fail_second_batch
 ):
-    from app.host.persistence import HostPersistence
+    from app.core.host.persistence import HostPersistence
 
     service = Symbols(temp_db)
     mt5[0].symbol.SymbolsGet.return_value = [f"SYMBOL{i:04d}" for i in range(1001)]

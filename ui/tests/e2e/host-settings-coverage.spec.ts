@@ -31,7 +31,7 @@ from pathlib import Path
 import os
 (Path(sys.argv[2]).parent / "pid.txt").write_text(str(os.getpid()))
 sys.path.insert(0, sys.argv[1])
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 HostPersistence.DEFAULT_DB_PATH = Path(sys.argv[2])
 from app.core.host.settings import SettingsManager
 from app.core.host.session import hash_password
@@ -178,7 +178,7 @@ uvicorn.run(create_app(config=runtime.config, runtime=runtime), host='127.0.0.1'
     const verify = spawnSync(python, ['-c', `import sys
 from pathlib import Path
 sys.path.insert(0, sys.argv[1])
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 import json
 HostPersistence.DEFAULT_DB_PATH = Path(sys.argv[2])
 rows = HostPersistence.read_records('host_settings')

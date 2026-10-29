@@ -8,7 +8,7 @@ from pathlib import Path
 import pandas as pd
 import pyarrow.parquet as pq
 import pytest
-from app.host.persistence import HostPersistence
+from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.data.storage import publish_frame
 from app.workspace.data_manager.sources import PROVIDERS, Sources, capabilities
 
