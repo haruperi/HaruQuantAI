@@ -25,6 +25,36 @@ classDiagram
 - **Outputs / Downstream Role:** verified metadata and presentation helpers first; shared shell/project workflows only after their blocked contracts are resolved.
 - **Commit boundary:** one ready order below is one commit. Do not bundle blocked features with a helper commit.
 
+## Current-code migration audit and execution order
+
+*Evidence:* OBS-HARU-HOM-REUSE-20261029. This audit establishes exact migration mapping from existing shell, navigation, and home presentation components (ui/app/host/, ui/app/workspace/Home/, ui/app/components/) into target app/web/shell/, app/web/common/, and app/web/workspaces/home/ namespaces.
+
+### Work order HOM-M01: migrate existing desktop shell, navigation, and home workspace
+
+*Feature:* Relocate the current React application shell, navigation state, host modals, and home workspace into the standardized target directory structure.
+*Context to Read:* this order; every current source/test row below; ui/package.json; ui/tsconfig.json.
+*Implementation Files:* exact MOVE/ADAPT targets in the table; update relative imports.
+
+| Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
+|---|---|---|
+| ui/app/host/App.tsx | app/web/shell/App.tsx | REORGANIZE (UI): Desktop app layout, header bar, active workspace view router, and modal host |
+| ui/app/host/branding.ts | app/web/shell/branding.ts | DIRECT FIT: Application branding, titles, and product metadata |
+| ui/app/host/navigation.ts | app/web/shell/navigation.ts | ADAPT: Top navigation bar and sidebar catalog matching SQX workspace routes |
+| ui/app/host/navigationState.ts | app/web/shell/navigationState.ts | DIRECT FIT: Tab and active workspace navigation state machine |
+| ui/app/host/HostConnection.tsx | app/web/shell/HostConnection.tsx | DIRECT FIT: Server connection status indicator |
+| ui/app/host/HostConnectionModal.tsx | app/web/shell/HostConnectionModal.tsx | DIRECT FIT: Host connection settings dialog |
+| ui/app/host/HostSettingsModal.tsx | app/web/shell/HostSettingsModal.tsx | DIRECT FIT: Global system settings dialog |
+| ui/app/components/HelpTooltip.tsx | app/web/common/components/HelpTooltip.tsx | DIRECT FIT: Contextual help and documentation popover |
+| ui/app/components/ui.tsx | app/web/common/components/ui.tsx | DIRECT FIT: Core UI button, input, toggle, select, and modal components |
+| ui/app/workspace/Home/HomeScreen.tsx | app/web/workspaces/home/HomeScreen.tsx | DIRECT FIT: Getting started screen, quick actions, and recent projects list |
+| ui/app/workspace/Home/HomeScreen.css | app/web/workspaces/home/HomeScreen.css | DIRECT FIT: Styling for home screen |
+| ui/app/workspace/Home/homeClient.ts | app/web/workspaces/home/homeClient.ts | ADAPT: REST client for system status and getting-started tutorials |
+| ui/app/workspace/Home/homeContent.json | app/web/workspaces/home/homeContent.json | DIRECT FIT: Getting started guides and tutorial resources |
+| ui/tests/unit/workspace/Home/ | app/web/tests/workspaces/home/ | MOVE: Home workspace unit tests |
+
+*Commit:*
+efactor(home): migrate shell, navigation, and home presentation.
+
 ## Phase H01: getting-started navigation metadata
 
 ### `AppSQXHome.navigation` - WO-H01 - READY

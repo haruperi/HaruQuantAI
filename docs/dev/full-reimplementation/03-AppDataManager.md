@@ -25,6 +25,43 @@ Every checkbox in a ready task names its exact symbol. One ready feature task is
 All target names/signatures/error codes below are normative Python/React adaptations. Only the observations in named evidence records are SQX facts. StandardResponse is `StandardResponse[T](request_id: str, data: T, revision: int | None = None)` from `app/core/lib/responses.py`. DomainError is keyword-only `DomainError(*, code: str, message: str, details: dict[str, JSONValue] | None = None)` from `app/core/lib/errors.py`.
 
 
+## Current-code migration audit and execution order
+
+*Evidence:* OBS-HARU-DM-REUSE-20261029. HaruQuantAI already possesses a comprehensive implementation of the Market Data Engine (app/workspace/data_manager/ and app/workspace/brokers/ comprising 93 production files) and its interactive UI (ui/app/workspace/DataManager/ and ui/app/plugins/data_source/). This audit establishes the definitive migration mapping to app/workspaces/data_manager/, app/workspaces/data_sources/, and app/web/workspaces/data_manager/.
+
+### Work order DM-M01: harmonize and migrate existing Data Manager and Brokers
+
+*Feature:* Migrate existing Data Manager backend modules, broker connectors, and React panels into the target workspace structure as verified direct-fit components.
+*Context to Read:* this order; every current source/test row below; app/workspace/data_manager/__init__.py.
+*Implementation Files:* exact MOVE/ADAPT targets in the table; preserve all existing contracts and tests.
+
+| Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
+|---|---|---|
+| app/workspace/data_manager/data/ | app/workspaces/data_manager/data/ | DIRECT FIT: Historical bar/tick reader, writer, time-gap fillers, and partition file manager |
+| app/workspace/data_manager/instruments/ | app/workspaces/data_manager/instruments/ | DIRECT FIT: Instrument specification repository, pip/point metrics, margin and tick sizing |
+| app/workspace/data_manager/sessions/ | app/workspaces/data_manager/sessions/ | DIRECT FIT: Trading session definitions, holiday calendars, and exchange schedule filters |
+| app/workspace/data_manager/baskets/ | app/workspaces/data_manager/baskets/ | DIRECT FIT: Symbol basket groupings and batch download scheduler |
+| app/workspace/data_manager/sources/ | app/workspaces/data_manager/sources/ | DIRECT FIT: Data source connectors and feed orchestration |
+| app/workspace/data_manager/symbols/ | app/workspaces/data_manager/symbols/ | DIRECT FIT: Master symbol registry and metadata catalog |
+| app/workspace/data_manager/custom_data/ | app/workspaces/data_manager/custom_data/ | DIRECT FIT: Macroeconomic, COT, and custom series importer |
+| app/workspace/data_manager/logs/ | app/workspaces/data_manager/logs/ | DIRECT FIT: Download, import, and data validation audit logger |
+| app/workspace/brokers/ | app/workspaces/data_sources/ | DIRECT FIT: Broker connectors (MetaTrader 5, cTrader, Dukascopy, Darwinex, Yahoo, Binance) |
+| ui/app/workspace/DataManager/DataManager.tsx | app/web/workspaces/data_manager/DataManager.tsx | DIRECT FIT: Main Data Manager workspace container and layout |
+| ui/app/workspace/DataManager/DataManagerChart.tsx | app/web/workspaces/data_manager/DataManagerChart.tsx | DIRECT FIT: Candlestick/tick history viewer and zoomable chart canvas |
+| ui/app/workspace/DataManager/DataManagerDock.tsx | app/web/workspaces/data_manager/DataManagerDock.tsx | DIRECT FIT: Dockable panels container |
+| ui/app/workspace/DataManager/DataManagerHome.tsx | app/web/workspaces/data_manager/DataManagerHome.tsx | DIRECT FIT: Data overview, storage statistics, and active instrument summary |
+| ui/app/workspace/DataManager/DataManagerPanels.tsx | app/web/workspaces/data_manager/DataManagerPanels.tsx | DIRECT FIT: Tabbed panel selector for instruments, sessions, baskets, and sources |
+| ui/app/workspace/DataManager/panels/* | app/web/workspaces/data_manager/panels/* | DIRECT FIT: Granular editor tabs (InstrumentsPanel, SessionsPanel, SourcesPanel, BasketsPanel) |
+| ui/app/workspace/DataManager/dataManagerWorkspaceClient.ts | app/web/workspaces/data_manager/dataManagerWorkspaceClient.ts | ADAPT: REST client for data manager queries and commands |
+| ui/app/workspace/DataManager/dataManagerLogClient.ts | app/web/workspaces/data_manager/dataManagerLogClient.ts | ADAPT: WebSocket client for real-time streaming download/import progress |
+| ui/app/plugins/data_source/* | app/web/workspaces/data_manager/plugins/* | ADAPT: Provider-specific connection and credential forms |
+| tests/workspace/data_manager/ | tests/workspaces/data_manager/ | MOVE: Complete data manager backend test suite |
+| tests/workspace/brokers/ | tests/workspaces/data_sources/ | MOVE: Broker and data source connector test suite |
+| tests/examples/test_brokers.py | tests/workspaces/data_sources/test_brokers_example.py | MOVE: Broker example integration tests |
+
+*Commit:* refactor(data-manager): migrate data manager and broker workspaces.
+
+
 ### Phase 3.1: Instrument clone defaults — `DataManagerInstruments`
 
 *Feature:* produce exactly the clone dialog's initial values from current selection and broker catalogue.

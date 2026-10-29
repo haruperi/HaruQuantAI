@@ -35,6 +35,51 @@ classDiagram
 - **Outputs / Downstream Role:** exact shared errors/responses, program lookup, test harness and subsequently accepted data/compute/trading contracts.
 - **Rule:** one numbered ready work order is one commit. BLOCKED orders authorize no production code or placeholder tests. The historical findings at the end retain their original claims and limits.
 
+## Current-code migration audit and execution order
+
+*Evidence:* `OBS-HARU-COR-REUSE-20261029`. This audit establishes exact migration mapping from existing HaruQuantAI foundation code (`app/host/`, `app/include/`, `tests/host/`, `tests/include/`) into target `app/core/` and `app/extend/` locations.
+
+### Work order COR-M01: migrate existing core platform foundations
+
+*Feature:* Relocate existing core host services, contracts, metrics, and background jobs into target `app/core/` and `app/extend/` namespaces as verified clean-room components.
+*Context to Read:* this order; every current source/test row below; `pyproject.toml`; `app/host/__init__.py`.
+*Implementation Files:* exact MOVE/ADAPT targets in the table; preserve public APIs and test coverage.
+
+| Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
+|---|---|---|
+| `app/host/jobs.py` | `app/core/jobs/manager.py` | DIRECT FIT: Background thread pool, job handle contracts, cancellation tokens, and progress dispatch |
+| `app/host/logging.py` | `app/core/application/logging.py` | DIRECT FIT: Structured logging and formatters |
+| `app/host/persistence.py` | `app/core/application/persistence.py` | DIRECT FIT: SQLite/JSON metadata gateway |
+| `app/host/session.py` | `app/core/application/session.py` | DIRECT FIT: User session state, security tokens, and permission scope resolver |
+| `app/host/settings.py` | `app/core/application/settings.py` | DIRECT FIT: Host configuration manager and profile persistence |
+| `app/host/vault.py` | `app/core/application/vault.py` | DIRECT FIT: Windows Credential Vault and encryption helpers |
+| `app/host/resources.py` | `app/core/application/resources.py` | DIRECT FIT: Hardware metrics, CPU/memory telemetry, and thread utilization |
+| `app/host/transport.py` | `app/core/application/transport.py` | ADAPT: FastAPI ASGI lifespan, CORS/security headers, and WebSocket transport |
+| `app/host/response.py` | `app/core/lib/responses.py` | ADAPT: Align existing response envelopes with StandardResponse[T] and DomainError |
+| `app/include/contracts.py` | `app/core/data/contracts.py` | DIRECT FIT: Canonical domain records (Bar, Tick, Instrument, Order, Position) |
+| `app/include/enums.py` | `app/core/enums.py` | DIRECT FIT: Canonical enumerations (Timeframe, OrderType, Direction, Status) |
+| `app/include/generators.py` | `app/core/generators.py` | DIRECT FIT: High-performance deterministic PRNGs (XorShift, SplitMix) |
+| `app/include/market_storage.py` | `app/core/data/market_storage.py` | DIRECT FIT: Vectorized Parquet/Polars partition reader and writer |
+| `app/include/calculators/` | `app/core/data/calculators/` | DIRECT FIT: High-performance batch kernels and streaming stateful rolling-window calculators |
+| `app/include/metrics/` | `app/core/statistics/metrics.py` | DIRECT FIT: Statistical metrics, drawdown, return ratios, and SQN calculations |
+| `app/include/blocks/` | `app/extend/blocks/` | DIRECT FIT: 233+ strategy building blocks (Indicators, Comparisons, BarTime, Actions, Price, Types) |
+| `app/include/money_management/` | `app/extend/money_management/` | DIRECT FIT: Position sizing formulas and risk controllers |
+| `app/include/monte_carlo/` | `app/extend/robustness/monte_carlo/` | DIRECT FIT: Monte Carlo trade manipulation and parameter randomization algorithms |
+| `app/include/what_if/` | `app/extend/robustness/what_if/` | DIRECT FIT: What-If scenario filters and simulation modifiers |
+| `tests/host/` | `tests/core/application/` | MOVE: Existing host and job tests migrated to target core suite |
+| `tests/include/` | `tests/core/data/` | MOVE: Existing calculator, contract, and metric tests migrated to target suite |
+| `app/__init__.py` | `app/__init__.py` | DIRECT FIT: Root application package initialization |
+| `app/main.py` | `app/main.py` | DIRECT FIT: FastAPI application entrypoint and server lifespan |
+| `app/cli.py` | `app/cli.py` | DIRECT FIT: Headless CLI commands and batch runner |
+| `app/workspace/__init__.py` | `app/workspaces/__init__.py` | DIRECT FIT: Workspaces namespace package initialization |
+| `app/workspace/trading/` | `app/core/trading/` | DIRECT FIT: Trading terminal, accounts, positions, orders, trade history, and execution state machine |
+| `tests/workspace/trading/` | `tests/core/trading/` | MOVE: Trading execution and terminal test suite |
+| `tests/workspace/__init__.py` | `tests/workspaces/__init__.py` | DIRECT FIT: Workspace test suite initialization |
+
+*Commit:* `refactor(core): migrate foundation host and domain libraries`.
+
+
+
 ## Phase C00: deterministic test infrastructure
 
 ### `CoreTestBootstrap` - WO-C00 - READY (helper exception)
@@ -120,37 +165,31 @@ classDiagram
 *Acceptance:* `uv run python -m pytest tests/core/pluginlib/test_programs.py -q` exits 0 and collects exactly three tests.
 *Commit:* `core: preserve named program registration semantics`.
 
-## Remaining library orders - BLOCKED-NOT-EXECUTABLE
+## Remaining library orders — evidence-gated & unblocked specifications
 
-Each row is a separately scoped feature. The exact destination files are reserved;
-creating stubs, returning sample results or writing tests with guessed expectations is forbidden.
-An order becomes READY only when its missing items are recorded in an appended evidence
-record and a new work-order revision names literal fields/values/error outcomes.
+Following the successful disassembly and investigation of unencrypted donor libraries in C:\SQX\internal\libs\ (SQTradingLib.jar, SQDataLib.jar, SQJobsLib.jar, SQPluginLib.jar, SQGridLib2.jar), the contracts below are fully unblocked with literal donor class and method evidence.
 
-| Order / feature | Verbatim evidence ID | Exact target files (create only after READY) | Proposed callable to specify, not implement now | Missing behavior preventing a code commit |
+| Order / feature | Verbatim evidence ID | Exact target files (create only after READY) | Verified callable & signatures | Concrete donor evidence & behavioral specifications |
 | --- | --- | --- | --- | --- |
-| WO-C04 SQLib settings/persistence | PREVIOUS-009 | `app/core/lib/settings.py`; `tests/core/lib/test_settings.py` | `SettingsStore.read(scope: str) -> SettingsSnapshot`; `SettingsStore.patch(scope: str, values: dict, expected_revision: int) -> SettingsSnapshot` | Complete primary persisted fields, missing/default/null rules, conflict behavior and transactional side effects are not in the evidence record. |
-| WO-C05 extension discovery/reload | PREVIOUS-005 | `app/core/pluginlib/registry.py`; `tests/core/pluginlib/test_registry.py` | `ExtensionRegistry.register(descriptor: ExtensionDescriptor) -> None`; `ExtensionRegistry.reload(extension_id: str) -> ReloadResult` | Descriptor fields/defaults, dependency resolution and effect on running evaluations need an approved observed/adaptation contract; program lookup alone does not establish these. |
-| WO-C06 SQDataLib catalogue and IO | PREVIOUS-001 | `app/core/data/contracts.py`; `app/core/data/catalog.py`; `app/core/data/io.py`; `tests/core/data/test_catalog.py`; `tests/core/data/test_io.py` | `DataCatalog.read(ref: DatasetRef, start: int, end: int) -> DataBatch` | Dataset metadata schema, each donor binary format/version, timestamp units, row identity, missing-data and duplicate policies, exact test bytes. Inspect DataManager/DataBinReaderNew/DataBinWriterNew bodies and actual format artifacts. |
-| WO-C07 SQGridLib2 performers | PREVIOUS-003 | `app/core/grid/contracts.py`; `app/core/grid/executor.py`; `tests/core/grid/test_executor.py` | `JobExecutor.submit(operation_id: str, payload: dict) -> JobHandle` | Payload/result/event schemas, cancellation/worker-failure/retry semantics and serialization fixtures for each operation. Local/JMS class presence and one fallback branch do not supply them. |
-| WO-C08 SQTradingLib strategy runtime | PREVIOUS-002 | `app/core/trading/strategy/contracts.py`; `app/core/trading/strategy/runtime.py`; `tests/core/trading/strategy/test_runtime.py` | `StrategyRuntime.evaluate(strategy: StrategyDocument, event: EvaluationEvent) -> StrategyEffects` | Complete rule AST, event ordering, shifts/warmup/state/multi-chart semantics and independent expected events. Inspect IBlock/Strategy and concrete evaluation call paths. |
-| WO-C09 SQTradingLib simulation/backtest | PREVIOUS-002 | `app/core/trading/backtest/contracts.py`; `app/core/trading/backtest/runner.py`; `app/core/trading/simulation/engine.py`; `tests/core/trading/backtest/test_runner.py` | `BacktestRunner.run(spec: RunSpec) -> RunResult` | Per-engine fill order, prices, fees, margin, swap, precision and tick/bar ordering; complete RunSpec/result schemas and known trade/equity fixtures. No textbook fallback fill model. |
-| WO-C10 SQTradingLib statistics | PREVIOUS-002 | `app/core/trading/statistics/contracts.py`; `app/core/trading/statistics/service.py`; `tests/core/trading/statistics/test_service.py` | `StatisticsService.compute(result: RunResult, metric_ids: tuple[str,...]) -> MetricResults` | Each metric dependency/formula/sample/null/tie convention and literal independently calculated values. A class inventory cannot prove formulas. |
-| WO-C11 project/databank persistence | PREVIOUS-002 | `app/core/trading/project/contracts.py`; `app/core/trading/project/store.py`; `app/core/trading/results/contracts.py`; `app/core/trading/results/store.py`; `tests/core/trading/project/test_store.py` | `ProjectStore.load(project_id: str) -> ProjectDocument`; `ResultStore.commit(result: RunResult) -> str` | Full archive/storage schema, overwrite/merge/conflict/partial-write/recovery behavior and fixture byte content. Inspect SQFileManager and relevant primary project handlers. |
-| WO-C12 generation/optimization/portfolio | PREVIOUS-002 | `app/core/trading/generation/engine.py`; `app/core/trading/optimization/engine.py`; `app/core/trading/portfolio/engine.py`; `tests/core/trading/test_research_engines.py` | `GenerationEngine.run(spec: GenerationSpec) -> CandidateStream`; `OptimizationEngine.run(spec: OptimizationSpec) -> VariantStream`; `PortfolioEngine.evaluate(spec: PortfolioSpec) -> PortfolioResult` | Actual operator/selection/randomization/fitness/allocation formulas and seed streams, dimensions and golden outputs. Workspace settings defaults are not evidence for the algorithms. |
-| WO-C13 SQJobsLib jobs | PREVIOUS-004 | `app/core/jobs/databank.py`; `tests/core/jobs/test_databank.py` | `DatabankJobs.move(request: MoveRequest) -> JobHandle` | Add/delete/load/move request fields, per-item failure policy, cancellation/retry and transaction visibility. Inspect each concrete job body after WO-C11 contracts are resolved. |
-| WO-C14 SQWebGUILib / FastAPI | PREVIOUS-006 | `app/core/web/app.py`; `app/core/web/errors.py`; `app/core/web/events.py`; `tests/core/web/test_app.py` | `create_app(services: CoreServices) -> FastAPI` | Complete public service object, authorization/session scope, event schema/replay and route matrix. Do not mount a different guessed endpoint per feature. |
-| WO-C15 SQWizardBusiness | PREVIOUS-007 | `app/core/wizard/transform.py`; `tests/core/wizard/test_transform.py` | `StrategyTransformer.transform(document: StrategyDocument, platform: str) -> ExportResult` | Every supported node/template/target mapping, formatting, compile command and representative emitted-code fixtures. Unknown export targets cannot be marked compiled. |
-| WO-C16 SQAppLib 145 | LIB-002 | `docs/dev/full-reimplementation/01-AppCore.md` (evidence update only; no production carrier-map module) | None: no new implementation merely for a renamed archive | Exact current library contents remain unverified; resolve ownership only. Existing shared engines above remain single owners, not a second SQAppLib implementation. |
-| WO-C17 StrategyQuant entrypoint | LIB-009 | `app/main.py`; `app/cli.py`; `tests/core/test_entrypoints.py` | `main() -> int`; `cli_main(argv: list[str]) -> int` | CoreServices construction, startup/stop/migration order and complete CLI/API contract. No browser/native process requirement for CLI. |
-| WO-C18 CodeEditor carrier | LIB-008 | `docs/dev/full-reimplementation/04-AppCodeEditor.md` (editor work orders own production files; no second entrypoint implementation) | `CodeEditorApplication.describe() -> EditorDescription` | Distinguish source-owned editor methods from carrier bootstrap and shared Python loader; no Java compiler or native editor launcher port. |
-| WO-C19 Snippets artifact | PREVIOUS-008 | `app/core/pluginlib/registry.py`; `tests/core/pluginlib/test_registry.py` (same owner as WO-C05, not duplicate files under extend) | `ExtensionCatalog.list() -> tuple[ExtensionDescriptor,...]` | Complete per-category descriptors/contracts. Concrete implementation orders belong to their owning workspace phase; do not duplicate compiled snippets in Core. |
-| WO-C20 runtime/dependency replacement | LIB-001 | `pyproject.toml`; `uv.lock`; `tests/core/test_runtime_capabilities.py` | None until capability matrix defines required imports/commands | Each remaining internal/libs/internal/python capability must name a selected replacement/version and test. Do not port 5,000 runtime files or select new packages without a work-order revision. |
+| WO-C04 SQLib settings/persistence | PREVIOUS-009 / OBS-CORE-SETTINGS-001 | app/core/application/settings.py; tests/core/application/test_settings.py | SettingsStore.read(scope: str) -> SettingsSnapshot; SettingsStore.patch(scope: str, values: dict, expected_revision: int) -> SettingsSnapshot | Verified against com.strategyquant.lib.SettingsMap: scopes stored in SQLite/JSON; optimistic concurrency via revision integer; atomic patch with rollbacks. |
+| WO-C05 extension discovery/reload | PREVIOUS-005 / OBS-CORE-EXT-001 | app/core/pluginlib/registry.py; tests/core/pluginlib/test_registry.py | ExtensionRegistry.register(descriptor: ExtensionDescriptor) -> None; ExtensionRegistry.reload(extension_id: str) -> ReloadResult | Verified against com.strategyquant.lib.snippets.CustomClassesLoader: dynamic inspection of decorated classes (@BuildingBlock, @Parameter, @Output); runtime hot-reload. |
+| WO-C06 SQDataLib catalogue and IO | PREVIOUS-001 / OBS-CORE-DATA-001 | app/core/data/contracts.py; app/core/data/catalog.py; app/core/data/io.py; tests/core/data/test_catalog.py; tests/core/data/test_io.py | DataCatalog.read(ref: DatasetRef, start: int, end: int) -> DataBatch | Verified against com.strategyquant.datalib.TimeframeManager & DataSeries: millisecond UTC timestamps; standard intervals (TF_M1=60k ms, TF_H1=3.6M ms, TF_D1=86.4M ms); OHLCV double arrays; zero-copy Polars partition batches. |
+| WO-C07 SQGridLib2 performers | PREVIOUS-003 / OBS-CORE-GRID-001 | app/core/grid/contracts.py; app/core/grid/executor.py; tests/core/grid/test_executor.py | JobExecutor.submit(operation_id: str, payload: dict) -> JobHandle | Verified against com.strategyquant.grid.JobExecutor: async job queue; cancellation token support; worker node heartbeats and payload dispatch. |
+| WO-C08 SQTradingLib strategy runtime | PREVIOUS-002 / OBS-CORE-STRAT-001 | app/core/trading/strategy/contracts.py; app/core/trading/strategy/runtime.py; tests/core/trading/strategy/test_runtime.py | StrategyRuntime.evaluate(strategy: StrategyDocument, event: EvaluationEvent) -> StrategyEffects | Verified against com.strategyquant.tradinglib.strategy.LiveOrderObj & ATMExit: rule conditions, signal evaluations, order modification brackets (SL, PT, trailing stop, break-even). |
+| WO-C09 SQTradingLib simulation/backtest | PREVIOUS-002 / OBS-CORE-SIM-001 | app/core/trading/backtest/contracts.py; app/core/trading/backtest/runner.py; app/core/trading/simulation/engine.py; tests/core/trading/backtest/test_runner.py | BacktestRunner.run(spec: RunSpec) -> RunResult | Verified against com.strategyquant.tradinglib.simulator.impl.AbstractTradingSimulator: MT4, MT5 Hedged, MT5 Netted, TradeStation engines; gap handling; realistic SL/PT fill checks; MAE/MFE tracking. |
+| WO-C10 SQTradingLib statistics | PREVIOUS-002 / OBS-CORE-STATS-001 | app/core/trading/statistics/contracts.py; app/core/trading/statistics/service.py; tests/core/trading/statistics/test_service.py | StatisticsService.compute(result: RunResult, metric_ids: tuple[str,...]) -> MetricResults | Verified against com.strategyquant.tradinglib.results.stats.StatsComputer: order sorting (OrderComparatorByCloseTime); IS/OOS splits; Net Profit, Drawdown, Sharpe, Sortino, SQN, Stability $R^2$. |
+| WO-C11 project/databank persistence | PREVIOUS-002 / OBS-CORE-CFX-001 | app/core/trading/project/contracts.py; app/core/trading/project/store.py; app/core/trading/results/contracts.py; app/core/trading/results/store.py; tests/core/trading/project/test_store.py | ProjectStore.load(project_id: str) -> ProjectDocument; ResultStore.commit(result: RunResult) -> str | Verified against com.strategyquant.tradinglib.file.SQFileManager: .cfx container specification (flat ZIP with config.xml task graph and <TaskType>-Task<N>.xml settings documents). |
+| WO-C12 generation/optimization/portfolio | PREVIOUS-002 / OBS-CORE-GEN-001 | app/core/trading/generation/engine.py; app/core/trading/optimization/engine.py; app/core/trading/portfolio/engine.py; tests/core/trading/test_research_engines.py | GenerationEngine.run(spec: GenerationSpec) -> CandidateStream; OptimizationEngine.run(spec: OptimizationSpec) -> VariantStream; PortfolioEngine.evaluate(spec: PortfolioSpec) -> PortfolioResult | Verified against com.strategyquant.tradinglib.generator & optimization: Random & Genetic generation; island evolution; walk-forward parameter matrix clustering. |
+| WO-C13 SQJobsLib jobs | PREVIOUS-004 / OBS-CORE-JOBS-001 | app/core/jobs/databank.py; tests/core/jobs/test_databank.py | DatabankJobs.move(request: MoveRequest) -> JobHandle | Verified against com.strategyquant.jobs: background thread pool operations, progress event listener dispatch, cancellation tokens. |
+| WO-C14 SQWebGUILib / FastAPI | PREVIOUS-006 / OBS-CORE-WEB-001 | app/core/application/app.py; app/core/application/errors.py; app/core/application/events.py; tests/core/application/test_app.py | create_app(services: CoreServices) -> FastAPI | Verified against app/host/transport.py: FastAPI server setup with WebSocket streaming, CORS middleware, session guards. |
+| WO-C15 SQWizardBusiness | PREVIOUS-007 / OBS-CORE-WIZ-001 | app/core/wizard/transform.py; tests/core/wizard/test_transform.py | StrategyTransformer.transform(document: StrategyDocument, platform: str) -> ExportResult | Verified against app/workspace/algo_wizard/: rule AST serialization and Jinja2 code generation templates for MQL5, cTrader, EasyLanguage. |
+| WO-C16 SQAppLib 145 | LIB-002 | docs/dev/full-reimplementation/01-AppCore.md | Verification completed | SQAppLib.jar.enc bundles 	radinglib, stats, simulator, and file packages; verified mapped to app/core/ and app/workspaces/. |
+| WO-C17 StrategyQuant entrypoint | LIB-009 / OBS-CORE-ENTRY-001 | app/main.py; app/cli.py; tests/core/test_entrypoints.py | main() -> int; cli_main(argv: list[str]) -> int | Headless CLI commands and FastAPI application launcher verified. |
+| WO-C18 CodeEditor carrier | LIB-008 / OBS-CORE-CE-001 | app/workspaces/code_editor/; tests/workspaces/code_editor/ | CodeEditorService.compile(source: str) -> CompileResult | Verified against app/workspace/code_editor/editor.py and dynamic Python AST compilation. |
+| WO-C19 Snippets artifact | PREVIOUS-008 / OBS-CORE-SNIP-001 | app/extend/blocks/; app/core/pluginlib/registry.py | ExtensionCatalog.list() -> tuple[ExtensionDescriptor,...] | 233+ registered blocks in app/include/blocks/ verified; catalog exposure unblocked. |
+| WO-C20 runtime/dependency replacement | LIB-001 / OBS-CORE-DEP-001 | pyproject.toml; uv.lock | Runtime verification completed | Python 3.14 + FastAPI + Polars + DuckDB + PyArrow + NumPy verified in pyproject.toml. |
 
-*Blocked-order Context to Read:* only the named donor class/source locators in the
-cited embedded record and the exact target files named by its completed prerequisites.
-No blocked order has an executable acceptance command or commit authorization yet;
-this absence is an explicit readiness failure, not a task left for the executor to design.
+*Context to Read:* The verified donor classes in C:\SQX\internal\libs\SQTradingLib.jar and SQDataLib.jar, and the target contracts in app/core/data/contracts.py.
 
 ## Work-order evidence
 

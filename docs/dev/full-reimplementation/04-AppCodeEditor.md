@@ -21,6 +21,33 @@ Every checkbox in a ready task names its exact symbol. One ready feature task is
 All target names/signatures/error codes below are normative Python/React adaptations. Only the observations in named evidence records are SQX facts. StandardResponse is `StandardResponse[T](request_id: str, data: T, revision: int | None = None)` from `app/core/lib/responses.py`. DomainError is keyword-only `DomainError(*, code: str, message: str, details: dict[str, JSONValue] | None = None)` from `app/core/lib/errors.py`.
 
 
+## Current-code migration audit and execution order
+
+*Evidence:* OBS-HARU-CE-REUSE-20261029. HaruQuantAI possesses an existing, fully functional Code Editor engine (app/workspace/code_editor/ comprising 14 production files) and its interactive React workspace (ui/app/workspace/CodeEditor/). This audit defines the exact relocation to app/workspaces/code_editor/ and app/web/workspaces/code_editor/.
+
+### Work order CE-M01: migrate existing Code Editor workspace and testing services
+
+*Feature:* Relocate existing Code Editor backend routes, dynamic compiler, indicator tester, and React workspace into the standardized workspace structure.
+*Context to Read:* this order; every current source/test row below; app/workspace/code_editor/__init__.py.
+*Implementation Files:* exact MOVE/ADAPT targets in the table; preserve all existing contracts and tests.
+
+| Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
+|---|---|---|
+| app/workspace/code_editor/editor.py | app/workspaces/code_editor/editor.py | DIRECT FIT: Buffer management, file tree, syntax checking, and code navigation |
+| app/workspace/code_editor/indicator_tester.py | app/workspaces/code_editor/indicator_tester.py | DIRECT FIT: Indicator test execution against historical bar data |
+| app/workspace/code_editor/registry.py | app/workspaces/code_editor/registry.py | DIRECT FIT: Dynamic snippet compilation, importlib registration, and reload |
+| app/workspace/code_editor/templates.py | app/workspaces/code_editor/templates.py | DIRECT FIT: Boilerplate code generation for indicators, building blocks, and metrics |
+| app/workspace/code_editor/import_export.py | app/workspaces/code_editor/import_export.py | DIRECT FIT: Snippet archive packaging and export (.zip / .sqb) |
+| app/workspace/code_editor/mcp.py | app/workspaces/code_editor/mcp.py | DIRECT FIT: Model Context Protocol (MCP) server endpoints for external AI tools |
+| app/workspace/code_editor/routes.py | app/workspaces/code_editor/routes.py | DIRECT FIT: FastAPI endpoints for editor operations and file persistence |
+| ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx | app/web/workspaces/code_editor/CodeEditorWorkspace.tsx | DIRECT FIT: Split-pane code editor layout (file browser, Monaco editor, test results) |
+| ui/app/workspace/CodeEditor/codeEditorClient.ts | app/web/workspaces/code_editor/codeEditorClient.ts | ADAPT: REST client for editor actions, compilation, and test execution |
+| tests/workspace/code_editor/ | tests/workspaces/code_editor/ | MOVE: Code editor and indicator tester test suite |
+
+*Commit:*
+efactor(code-editor): migrate code editor workspace and services.
+
+
 ### Phase 4.1: Indicator test-row presentation — `CodeEditorIndicatorTester`
 
 *Feature:* generate parameter labels and result row classes without implementing indicator comparison calculations.

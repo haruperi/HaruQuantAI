@@ -23,6 +23,36 @@ Every checkbox in a ready task names its exact symbol. One ready feature task is
 All target names/signatures/error codes below are normative Python/React adaptations. Only the observations in named evidence records are SQX facts. StandardResponse is `StandardResponse[T](request_id: str, data: T, revision: int | None = None)` from `app/core/lib/responses.py`. DomainError is keyword-only `DomainError(*, code: str, message: str, details: dict[str, JSONValue] | None = None)` from `app/core/lib/errors.py`.
 
 
+## Current-code migration audit and execution order
+
+*Evidence:* OBS-HARU-WIZ-REUSE-20261029. HaruQuantAI possesses an existing, richly developed AlgoWizard visual rule engine (ui/app/workspace/AlgoWizard/ comprising 32 UI files and backend documents model). This audit defines the exact relocation to app/workspaces/algo_wizard/ and app/web/workspaces/algo_wizard/.
+
+### Work order WIZ-M01: migrate existing AlgoWizard visual strategy builder
+
+*Feature:* Relocate existing AlgoWizard rule models, visual block editors, and export templates into the standardized workspace structure.
+*Context to Read:* this order; every current source/test row below; ui/app/workspace/AlgoWizard/README.md.
+*Implementation Files:* exact MOVE/ADAPT targets in the table; preserve all existing contracts and tests.
+
+| Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
+|---|---|---|
+| app/workspace/algo_wizard/documents.py | app/workspaces/algo_wizard/documents.py | DIRECT FIT: Strategy document model, IF-THEN rules, condition trees, and action blocks |
+| app/workspace/algo_wizard/library.py | app/workspaces/algo_wizard/library.py | DIRECT FIT: Strategy block registry, building block templates, and category grouping |
+| app/workspace/algo_wizard/validation.py | app/workspaces/algo_wizard/validation.py | DIRECT FIT: Strategy rule integrity validation and parameter bound checks |
+| app/workspace/algo_wizard/export/ | app/workspaces/algo_wizard/export/ | ADAPT: Jinja2 strategy code generators for MQL5, cTrader, EasyLanguage, and Python |
+| ui/app/workspace/AlgoWizard/AlgoWizardHome.tsx | app/web/workspaces/algo_wizard/AlgoWizardHome.tsx | DIRECT FIT: Strategy overview and rule group dashboard |
+| ui/app/workspace/AlgoWizard/AlgoWizardEditor.tsx | app/web/workspaces/algo_wizard/AlgoWizardEditor.tsx | DIRECT FIT: Visual IF-THEN condition builder and drag-and-drop rule layout |
+| ui/app/workspace/AlgoWizard/AlgoWizardControls.tsx | app/web/workspaces/algo_wizard/AlgoWizardControls.tsx | DIRECT FIT: Strategy manipulation toolbar (Add Rule, Negate, Duplicate, Delete) |
+| ui/app/workspace/AlgoWizard/AlgoWizardBlockEditor.tsx | app/web/workspaces/algo_wizard/AlgoWizardBlockEditor.tsx | DIRECT FIT: Block parameter configuration dialog and output picker |
+| ui/app/workspace/AlgoWizard/AlgoWizardAI.tsx | app/web/workspaces/algo_wizard/AlgoWizardAI.tsx | DIRECT FIT: Natural language AI strategy prompt interface |
+| ui/app/workspace/AlgoWizard/AlgoWizardResources.tsx | app/web/workspaces/algo_wizard/AlgoWizardResources.tsx | DIRECT FIT: Chart and custom block resource binding panel |
+| ui/app/workspace/AlgoWizard/algoWizardModel.ts | app/web/workspaces/algo_wizard/algoWizardModel.ts | ADAPT: Client-side rule graph state model and serialization |
+| ui/app/workspace/AlgoWizard/algoWizardFixtures.ts | app/web/tests/workspaces/algo_wizard/fixtures/algoWizardFixtures.ts | TEST-ONLY MOVE: Strategy rule tree fixtures |
+| tests/workspace/algo_wizard/ | tests/workspaces/algo_wizard/ | MOVE: AlgoWizard backend rule validation test suite |
+
+*Commit:*
+efactor(wizard): migrate algowizard workspace and rule models.
+
+
 ### Phase 5.1: Strategy-name rules — `AppWizard`
 
 *Feature:* sanitize suggested strategy names and generate collision-free display names using the observed naming convention.

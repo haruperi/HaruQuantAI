@@ -31,9 +31,9 @@ batch calculations and existing behavior during an incremental migration.
 
 | Current location/behavior | Required change |
 | --- | --- |
-| pp/include/indicators/ contains 73 exported indicator families | Move canonical definitions; migrate to single-class validated parameters |
+| app/include/indicators/ contains 73 exported indicator families | Move canonical definitions; migrate to single-class validated parameters |
 | Indicator calculate() signatures differ; tester inspects signatures | Adopt one canonical indicator interface; migrate all callers and consumers directly across the board |
-| pp/include/functions.py is 813 lines | Package by independently editable function blocks; extract shared helpers and migrate callers directly |
+| app/include/functions.py is 813 lines | Package by independently editable function blocks; extract shared helpers and migrate callers directly |
 | `actions/annotations.py` and `actions/logging.py` group several blocks | Separate independently editable action implementations |
 | `price.py`, `bar_time.py`, `comparisons.py`, `types.py` mix utilities and blocks | Inventory ownership; extract selectable blocks while preserving utility APIs |
 | `app/workspace/code_editor/registry.py` owns registry and metric/sizing bases | Move shared contracts/registration out of the workspace layer |
@@ -124,8 +124,8 @@ import. The loader stages and validates them like class blocks. Ordinary helpers
 are not discovered implicitly. Configurable/stateful blocks use the class form;
 indicators always use the agreed single-class form.
 
-Move BaseMetric to its reporting-extension owner (pp/include/metrics/) and BasePositionSizer to the
-block-library owner (pp/include/blocks/money_management/). Update all importers directly across the
+Move BaseMetric to its reporting-extension owner (app/include/metrics/) and BasePositionSizer to the
+block-library owner (app/include/blocks/money_management/). Update all importers directly across the
 board with no compatibility aliases or shims. Do not turn reporting or MCP extensions into strategy blocks
 merely to reuse a registry.
 
@@ -280,7 +280,7 @@ schemas exclude metadata/private state and reject invalid configuration.
 
 ### Phase 2: canonical package migration and consumer updates
 
-- Introduce pp/include/blocks/; move a representative vertical slice first.
+- Introduce app/include/blocks/; move a representative vertical slice first.
 - Update all consumers, importers, registry integrations, and tests directly to
   canonical paths across the board (no compatibility aliases, import shims, or legacy facades).
 - Exclude internal modules from public catalog registration; Compile All validates

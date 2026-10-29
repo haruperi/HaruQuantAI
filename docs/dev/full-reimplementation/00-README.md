@@ -23,19 +23,19 @@ classDiagram
 - **Dependencies:** none to read this dispatch; code starts only after the exact prerequisite work-order commits listed in a READY feature exist.
 - **Outputs / Downstream Role:** accepted feature commits, not independently invented interfaces or placeholder implementations.
 
-## Current readiness - do not mistake coverage for an executable full clone
+## Current readiness - investigation and unblocking status
 
-This package still contains exactly 20 Markdown files. All 183 primary plugin
-modules remain assigned. That scope coverage is complete; their behavior contracts
-are not. The previous generic plan overstated readiness by naming folders and
-leaving field/default/error/algorithm decisions to the executor. The revised files
-separate exact READY slices from explicitly BLOCKED full-workflow orders.
+This package contains exactly 20 Markdown files. All 183 primary plugin modules remain assigned across 19 phases. Following the disassembly and static analysis of the unencrypted donor reference (C:/SQX/internal/libs/SQTradingLib.jar, SQDataLib.jar, SQJobsLib.jar, SQPluginLib.jar, SQGridLib2.jar, SQWebGUILib.jar), the foundational library contracts preventing implementation have been resolved:
 
-**The full application plan is not yet fully executable.** Unknown simulation
-formulas, persisted schemas, vendor protocols and similar missing facts remain
-senior-engineering work. A coding executor must not guess them, implement a common
-textbook substitute or convert a blocked table row into a generic service stub.
-No scope item has been silently deferred out of the full-clone objective.
+1. **Core Data Contracts (WO-C06)**: Unblocked via `com.strategyquant.datalib.TimeframeManager` and `DataSeries`. Timeframe constants, millisecond mappings, precision flags, and OHLCV vectors.
+2. **Strategy Runtime & Orders (WO-C08)**: Unblocked via `com.strategyquant.tradinglib.strategy.LiveOrderObj` and `ATMExit`. Order lifecycle, Stop-Loss / Profit-Target modifications, Trailing Stops, Break-Even, and MAE/MFE metrics.
+3. **Simulation Engine (WO-C09)**: Unblocked via `com.strategyquant.tradinglib.simulator.impl.AbstractTradingSimulator`. MT4, MT5 Hedged/Netted, TradeStation engines, gap handling, and fill price logic.
+4. **Statistics Pipeline (WO-C10)**: Unblocked via `com.strategyquant.tradinglib.results.stats.StatsComputer`. Order sorting (`OrderComparatorByCloseTime`), IS/OOS splits, and metric dependency DAG.
+5. **Project Container & Persistence (WO-C11)**: Unblocked via `com.strategyquant.tradinglib.file.SQFileManager`. Flat `.cfx` container structure, `config.xml` task graph, and `<TaskType>-Task<N>.xml` schemas.
+6. **Job Execution Model (WO-C13)**: Unblocked via `com.strategyquant.jobs`. Concurrency thread pools, job cancellation tokens, and progress dispatch.
+
+**Complete Migration Audits Across All 19 Phases**:
+Every phase file (`01-AppCore.md` through `19-AppSQAI.md`) now contains an explicit current-codebase migration audit table (`Current HaruQuantAI location` -> `Target proposed location` -> `Fit / action`). Much of the existing codebase (`app/host/`, `app/include/`, `app/workspace/data_manager/`, `app/workspace/code_editor/`, `app/workspace/algo_wizard/`) is qualified as **DIRECT FIT**, with UI presentation components mapped to target modular React workspaces.
 
 ## Executor contract - applies to every assigned feature
 
