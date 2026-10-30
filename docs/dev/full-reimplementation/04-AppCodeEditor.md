@@ -123,7 +123,7 @@ These orders split the historical full-feature orders below. SPECIFIED means a b
 | --- | --- | --- |
 | `WO-CE-CLIENT-DEFAULTS` (Phase 4.2) | COMPLETE | Preserve omitted, null and explicit indicator parameters across the existing client boundary; no backend changes |
 | `WO-CE-TESTER-REQUEST-LIFECYCLE` (Phase 4.3) | COMPLETE | Ignore stale or unmounted tester requests; follows 4.2 |
-| `WO-CE-PACK-UI-CONTRACT` (Phase 4.4) | SPECIFIED | Make existing import/export controls reflect the current Python package API; no new archive format or import destination |
+| `WO-CE-PACK-UI-CONTRACT` (Phase 4.4) | COMPLETE | Make existing import/export controls reflect the current Python package API; no new archive format or import destination |
 | `WO-CE-TYPED-WORKSPACE-CONTRACTS` | NEEDS-SPEC | Type existing service results and errors, audit host persistence/lifecycle ownership, preserve compatibility before adding commands |
 | `WO-CE-COMMAND-GAPS` | NEEDS-SPEC | Save As, reload, catalogues, template export, import repair, compilation lifecycle and extension reload; exact operation map in audit |
 | `WO-CE-INDICATOR-SUITE` | NEEDS-SPEC | Batch XML/config mapping, reference-file comparison, row selection, status/errors and cancellation; preserve single-indicator history tester |
@@ -182,17 +182,29 @@ These orders split the historical full-feature orders below. SPECIFIED means a b
 
 ### Phase 4.4: Existing package UI contract — `WO-CE-PACK-UI-CONTRACT`
 
-**Status:** SPECIFIED; implementation pending. This bounded repair supports the current Python `.zip`/`.sxp` package API, not Java source-package interchange. *Context to Read:* this order; `app/web/workspaces/code_editor/ImportExportModal.tsx`; `CodeEditorWorkspace.tsx` (modal props only); `codeEditorClient.ts`; `app/workspace/code_editor/import_export.py`; `app/web/tests/e2e/code-editor-regressions.spec.ts`; donor `internal/plugins/CodeEditorImportExport/ImportExportService.js` and `ImportExport/ExtensionManager.java`.
+**Status:** COMPLETE; verified 2026-10-30. This bounded repair supports the current Python `.zip`/`.sxp` package API, not Java source-package interchange. *Context to Read:* this order; `app/web/workspaces/code_editor/ImportExportModal.tsx`; `CodeEditorWorkspace.tsx` (modal props only); `codeEditorClient.ts`; `app/workspace/code_editor/import_export.py`; `app/web/tests/e2e/code-editor-regressions.spec.ts`; donor `internal/plugins/CodeEditorImportExport/ImportExportService.js` and `ImportExport/ExtensionManager.java`.
 
 *Allowed implementation/test paths:* `app/web/workspaces/code_editor/ImportExportModal.tsx`; `app/web/tests/e2e/code-editor-regressions.spec.ts`. Existing `exportPack`, `inspectPack`, and `importPack` client signatures stay unchanged.
 
-- [ ] `ImportExportModal.handleExport`: use only nonempty `openFiles`; if none are supplied, disable export and show an explanation. Do not substitute an indicator directory where the backend requires existing `.py` files. Export remains disk-based; state this beside the control so unsaved buffers are not implied to be included.
-- [ ] Remove the source/metadata inclusion checkboxes: the current API always packages source and a manifest, and storing checkbox booleans as metadata does not implement inclusion behavior. Keep actual pack name/description metadata.
-- [ ] Replace the editable target-directory control with text explaining that archive-relative paths determine destinations within the authorized snippet roots. No destination argument is supported by the current API.
-- [ ] Preserve conflict mapping: `merge` -> `skip`, `overwrite` -> `overwrite`, `rename` -> `rename` for every preview record. Invalidate the preview when its archive input changes; do not allow importing an uninspected archive using another archive's conflict decisions.
-- [ ] Browser acceptance: no-open-files export sends no request; export of two open paths sends those exact paths and name/description; changing archive invalidates preview; three conflict options send exact rule maps; inspection/import/export rejection is visible; completion callback refreshes navigator only on successful import. Add accessible labels as needed to operate changed controls.
+- [x] `ImportExportModal.handleExport`: use only nonempty `openFiles`; if none are supplied, disable export and show an explanation. Do not substitute an indicator directory where the backend requires existing `.py` files. Export remains disk-based; state this beside the control so unsaved buffers are not implied to be included.
+- [x] Remove the source/metadata inclusion checkboxes: the current API always packages source and a manifest, and storing checkbox booleans as metadata does not implement inclusion behavior. Keep actual pack name/description metadata.
+- [x] Replace the editable target-directory control with text explaining that archive-relative paths determine destinations within the authorized snippet roots. No destination argument is supported by the current API.
+- [x] Preserve conflict mapping: `merge` -> `skip`, `overwrite` -> `overwrite`, `rename` -> `rename` for every preview record. Invalidate the preview when its archive input changes; do not allow importing an uninspected archive using another archive's conflict decisions.
+- [x] Browser acceptance: no-open-files export sends no request; export of two open paths sends those exact paths and name/description; changing archive invalidates preview; three conflict options send exact rule maps; inspection/import/export rejection is visible; completion callback refreshes navigator only on successful import. Add accessible labels as needed to operate changed controls.
 
 *Acceptance:* `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts`; `npm --prefix app/web run typecheck`; package test/build under the owner plan. No backend mutation or archive extraction is performed by the intercepted browser test. Proposed commit: `fix(code-editor): align package controls with supported operations`.
+
+**Completion evidence — 2026-10-30:** Approved Phase 4.4 plan, iteration 1, executed against HEAD `7474daf6`. Export now requires open files and sends their exact paths with name/description metadata; the modal explains saved-disk export and removes nonfunctional inclusion/destination controls. Accessible labels identify the supported fields. Archive changes invalidate the preview and inspection identity; obsolete inspection success/failure cannot restore another archive's preview. Import requires a nonempty current successful inspection and uses its captured archive path, retaining merge/overwrite/rename rule mapping. Eleven browser regressions verify these controls, exact request payloads, all conflict rules, empty previews, stale inspection responses, visible operation failures, and navigator refresh only after successful import. The no-open-files export regression failed before the fix. No backend/client signature, archive-format, persistence or dependency change was made.
+
+| Verification command | Result |
+| --- | --- |
+| `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts` | Exit 0; 28 browser tests passed, including eleven new package cases |
+| `npm --prefix app/web run typecheck` | Exit 0 |
+| `npm --prefix app/web run test` | Exit 0; 714 tests passed across 124 files |
+| `npm --prefix app/web run build` | Exit 0; existing data-manager mixed import and bundle-size warnings remain |
+| `git diff --check` | Exit 0 |
+
+Browser tests intercept package requests; they do not extract archives, mutate application storage or establish donor Java package compatibility. Full import sessions and backend package hardening remain separate work orders.
 
 ## Phase 04.9: Full workspace feature orders — evidence-gated contracts
 

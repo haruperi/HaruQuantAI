@@ -487,3 +487,209 @@ test('closing the tester with pending defaults and a run leaves a reopened teste
   await expect(modal.getByText('654.00000', { exact: true })).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
+
+type PackageResponseWindow = Window & { packageResponsesConsumed: number };
+
+function packageModal(page: Page) {
+  return page.locator('div.fixed.inset-0').filter({
+    has: page.getByRole('heading', { name: 'Import / Export Extension Pack', exact: true }),
+  });
+}
+
+async function pendingPackage(page: Page, files = [
+  'app/include/blocks/indicators/custom/first.py',
+  'app/include/blocks/indicators/custom/second.py',
+]) {
+  await mockEditor(page);
+  await page.addInitScript(() => {
+    const state = window as PackageResponseWindow;
+    state.packageResponsesConsumed = 0;
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (String(args[0]).includes('/import-export/')) {
+        const originalJson = response.json.bind(response);
+        response.json = async () => {
+          try {
+            return await originalJson();
+          } finally {
+            state.packageResponsesConsumed++;
+          }
+        };
+      }
+      return response;
+    };
+  });
+  let navigatorRequests = 0;
+  const inspections: Route[] = [];
+  const imports: Route[] = [];
+  const exports: Route[] = [];
+  await page.route('**/code-editor/init', (route) => route.fulfill({ json: {
+    status: 'success', data: {
+      status: 'ready', active_file: files[0] ?? null, layout: {},
+      open_tabs: files.map((path) => ({
+        file_path: path, title: path.split('/').pop(), content: 'value = 1', is_dirty: false, mode: 'python',
+      })),
+    },
+  } }));
+  await page.route('**/code-editor/navigator', (route) => {
+    navigatorRequests++;
+    return route.fulfill({ json: { status: 'success', data: {
+      id: 'app/include', name: 'snippets', type: 'directory',
+      children: files.map((path) => ({ id: path, path, name: path.split('/').pop(), type: 'file' })),
+    } } });
+  });
+  await page.route('**/code-editor/import-export/inspect', (route) => { inspections.push(route); });
+  await page.route('**/code-editor/import-export/import', (route) => { imports.push(route); });
+  await page.route('**/code-editor/import-export/export', (route) => { exports.push(route); });
+  await page.goto('/codeeditor');
+  const editor = page.getByRole('textbox', { name: 'Source code editor', exact: true });
+  if (files.length) await expect(editor).toHaveText('value = 1');
+  else await expect(editor).toBeVisible();
+  return { files, inspections, imports, exports, get navigatorRequests() { return navigatorRequests; } };
+}
+
+async function consumePackageResponse(page: Page, route: Route, data: unknown, error = false) {
+  const before = await page.evaluate(() => (window as PackageResponseWindow).packageResponsesConsumed);
+  await route.fulfill({
+    status: error ? 422 : 200,
+    json: error
+      ? { status: 'error', error: { code: 'validation', message: String(data) } }
+      : { status: 'success', data },
+  });
+  await expect.poll(() => page.evaluate(() => (window as PackageResponseWindow).packageResponsesConsumed)).toBeGreaterThan(before);
+}
+
+const packagePreview = [
+  { filename: 'app/include/blocks/indicators/custom/existing.py', file_size: 24, exists_locally: true },
+  { filename: 'app/include/blocks/indicators/custom/new.py', file_size: 32, exists_locally: false },
+];
+
+test('package export without open files is disabled and sends no request', async ({ page }) => {
+  const mock = await pendingPackage(page, []);
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  const modal = packageModal(page);
+  await expect(modal.getByRole('button', { name: 'Export Pack', exact: true })).toBeDisabled();
+  await expect(modal.getByText('Open a Python snippet to export.', { exact: true })).toBeVisible();
+  expect(mock.exports).toHaveLength(0);
+});
+
+test('package export sends exact open disk paths and supported metadata', async ({ page }) => {
+  const mock = await pendingPackage(page);
+  await page.getByRole('textbox', { name: 'Source code editor', exact: true }).fill('unsaved = 2');
+  await page.getByRole('button', { name: 'Export', exact: true }).click();
+  const modal = packageModal(page);
+  await expect(modal.getByRole('checkbox')).toHaveCount(0);
+  await expect(modal.getByLabel('Target Directory', { exact: true })).toHaveCount(0);
+  await expect(modal.getByText(/Export uses saved files on disk/)).toBeVisible();
+  await expect(modal.getByText(/Archive-relative paths determine import destinations/)).toBeVisible();
+  await modal.getByLabel('Pack Name', { exact: true }).fill('Research Pack');
+  await modal.getByLabel('Description', { exact: true }).fill('Two Python snippets');
+  await modal.getByLabel('Output File', { exact: true }).fill('app/include/research.zip');
+  await modal.getByRole('button', { name: 'Export Pack', exact: true }).click();
+  await expect.poll(() => mock.exports.length).toBe(1);
+  expect(mock.exports[0].request().postDataJSON()).toEqual({
+    file_paths: mock.files, archive_path: 'app/include/research.zip',
+    metadata: { name: 'Research Pack', description: 'Two Python snippets' },
+  });
+  await consumePackageResponse(page, mock.exports[0], {
+    status: 'exported', file_count: 2, archive_path: 'app/include/research.zip', files: mock.files,
+  });
+  await expect(modal.getByText('Successfully exported 2 file(s) to app/include/research.zip', { exact: true })).toBeVisible();
+});
+
+for (const [option, rule] of [
+  ['Merge with existing files (Keep existing files)', 'skip'],
+  ['Overwrite existing files (Replace existing with pack contents)', 'overwrite'],
+  ['Import with rename (Save duplicates with _imported suffix)', 'rename'],
+] as const) {
+  test(`package import maps ${rule} for every preview entry and refreshes on success`, async ({ page }) => {
+    const mock = await pendingPackage(page);
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    const modal = packageModal(page);
+    await modal.getByLabel('Select Pack File', { exact: true }).fill('app/include/source.zip');
+    await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
+    await expect.poll(() => mock.inspections.length).toBe(1);
+    expect(mock.inspections[0].request().postDataJSON()).toEqual({ archive_path: 'app/include/source.zip' });
+    await consumePackageResponse(page, mock.inspections[0], packagePreview);
+    await expect(modal.getByText(packagePreview[0].filename, { exact: true })).toBeVisible();
+    await modal.getByRole('radio', { name: option, exact: true }).check();
+    const before = mock.navigatorRequests;
+    await modal.getByRole('button', { name: 'Import Pack', exact: true }).click();
+    await expect.poll(() => mock.imports.length).toBe(1);
+    expect(mock.imports[0].request().postDataJSON()).toEqual({
+      archive_path: 'app/include/source.zip',
+      resolution_rules: Object.fromEntries(packagePreview.map((entry) => [entry.filename, rule])),
+    });
+    await consumePackageResponse(page, mock.imports[0], {
+      status: 'completed', extracted_count: 1, skipped_count: 1, extracted: [packagePreview[1].filename], skipped: [packagePreview[0].filename],
+    });
+    await expect(modal.getByText('Import complete: 1 extracted, 1 skipped.', { exact: true })).toBeVisible();
+    await expect.poll(() => mock.navigatorRequests).toBe(before + 1);
+  });
+}
+
+test('package archive changes clear an existing preview and an empty reinspection cannot import', async ({ page }) => {
+  const mock = await pendingPackage(page);
+  await page.getByRole('button', { name: 'Import', exact: true }).click();
+  const modal = packageModal(page);
+  await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
+  await expect.poll(() => mock.inspections.length).toBe(1);
+  await consumePackageResponse(page, mock.inspections[0], packagePreview);
+  await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeEnabled();
+  await modal.getByLabel('Select Pack File', { exact: true }).fill('app/include/empty.zip');
+  await expect(modal.getByText(packagePreview[0].filename, { exact: true })).toHaveCount(0);
+  await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeDisabled();
+  await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
+  await expect.poll(() => mock.inspections.length).toBe(2);
+  await consumePackageResponse(page, mock.inspections[1], []);
+  await expect(modal.getByText('Archive is empty or does not contain snippets.', { exact: true })).toBeVisible();
+  await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeDisabled();
+  expect(mock.imports).toHaveLength(0);
+});
+
+for (const outcome of ['success', 'failure'] as const) {
+  test(`package inspection ignores stale ${outcome} after the archive changes`, async ({ page }) => {
+    const mock = await pendingPackage(page);
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    const modal = packageModal(page);
+    await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
+    await expect.poll(() => mock.inspections.length).toBe(1);
+    await modal.getByLabel('Select Pack File', { exact: true }).fill('app/include/current.zip');
+    await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
+    await expect.poll(() => mock.inspections.length).toBe(2);
+    const current = [{ filename: 'app/include/current.py', file_size: 12, exists_locally: false }];
+    await consumePackageResponse(page, mock.inspections[1], current);
+    await expect(modal.getByText(current[0].filename, { exact: true })).toBeVisible();
+    await consumePackageResponse(page, mock.inspections[0], outcome === 'success' ? packagePreview : 'obsolete inspection', outcome === 'failure');
+    await expect(modal.getByText(current[0].filename, { exact: true })).toBeVisible();
+    await expect(modal.getByText(packagePreview[0].filename, { exact: true })).toHaveCount(0);
+    await expect(modal.getByText('Error: obsolete inspection', { exact: true })).toHaveCount(0);
+    await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeEnabled();
+  });
+}
+
+for (const operation of ['inspect', 'export', 'import'] as const) {
+  test(`package ${operation} failures are visible and do not refresh the navigator`, async ({ page }) => {
+    const mock = await pendingPackage(page);
+    await page.getByRole('button', { name: 'Import', exact: true }).click();
+    const modal = packageModal(page);
+    if (operation === 'import') {
+      await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
+      await expect.poll(() => mock.inspections.length).toBe(1);
+      await consumePackageResponse(page, mock.inspections[0], packagePreview);
+      await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeEnabled();
+    }
+    const before = mock.navigatorRequests;
+    const button = operation === 'inspect' ? 'Inspect' : operation === 'export' ? 'Export Pack' : 'Import Pack';
+    await modal.getByRole('button', { name: button, exact: true }).click();
+    const requests = operation === 'inspect' ? mock.inspections : operation === 'export' ? mock.exports : mock.imports;
+    await expect.poll(() => requests.length).toBe(1);
+    await consumePackageResponse(page, requests[0], `${operation} rejected`, true);
+    await expect(modal.getByText(`Error: ${operation} rejected`, { exact: true })).toBeVisible();
+    expect(mock.navigatorRequests).toBe(before);
+    if (operation === 'inspect') {
+      await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeDisabled();
+    }
+  });
+}

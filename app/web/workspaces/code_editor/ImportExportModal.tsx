@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Archive,
   CheckCircle2,
@@ -25,8 +25,6 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
   const [description, setDescription] = useState<string>(
     'Custom indicator and strategy extension pack including snippets.'
   );
-  const [includeSources, setIncludeSources] = useState<boolean>(true);
-  const [includeMetadata, setIncludeMetadata] = useState<boolean>(true);
   const [outputFilePath, setOutputFilePath] = useState<string>('app/include/my_pack.zip');
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
@@ -34,22 +32,34 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
   // Import state
   const [importFilePath, setImportFilePath] = useState<string>('app/include/my_pack.zip');
   const [importOption, setImportOption] = useState<'merge' | 'overwrite' | 'rename'>('overwrite');
-  const [targetDirectory, setTargetDirectory] = useState<string>('app/include/');
   const [isInspecting, setIsInspecting] = useState<boolean>(false);
   const [isImporting, setIsImporting] = useState<boolean>(false);
   const [importPreview, setImportPreview] = useState<ImportedFileRecord[]>([]);
   const [importMessage, setImportMessage] = useState<string | null>(null);
+  const [inspectedArchive, setInspectedArchive] = useState<string | null>(null);
+  const inspectionRevision = useRef(0);
+  const canImport = importPreview.length > 0 &&
+    inspectedArchive === importFilePath.trim() && !isInspecting && !isImporting;
+
+  useEffect(() => () => { inspectionRevision.current++; }, []);
+
+  const handleArchiveChange = (path: string) => {
+    inspectionRevision.current++;
+    setImportFilePath(path);
+    setImportPreview([]);
+    setInspectedArchive(null);
+    setImportMessage(null);
+    setIsInspecting(false);
+  };
 
   const handleExport = async () => {
+    if (!openFiles.length || isExporting) return;
     setIsExporting(true);
     setExportMessage(null);
     try {
-      const filesToExport = openFiles.length > 0 ? openFiles : ['app/include/blocks/indicators/'];
-      const res = await client.exportPack(filesToExport, outputFilePath, {
+      const res = await client.exportPack(openFiles, outputFilePath, {
         name: packName,
         description,
-        includeSources,
-        includeMetadata,
       });
       setExportMessage(`Successfully exported ${res.file_count} file(s) to ${res.archive_path}`);
     } catch (err: unknown) {
@@ -61,24 +71,32 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
   };
 
   const handleInspect = async () => {
-    if (!importFilePath.trim()) return;
+    const archive = importFilePath.trim();
+    if (!archive || isInspecting || isImporting) return;
+    const revision = ++inspectionRevision.current;
     setIsInspecting(true);
     setImportMessage(null);
+    setImportPreview([]);
+    setInspectedArchive(null);
     try {
-      const files = await client.inspectPack(importFilePath.trim());
+      const files = await client.inspectPack(archive);
+      if (revision !== inspectionRevision.current) return;
       setImportPreview(files);
+      setInspectedArchive(archive);
       if (files.length === 0) {
         setImportMessage('Archive is empty or does not contain snippets.');
       }
     } catch (err: unknown) {
+      if (revision !== inspectionRevision.current) return;
       const msg = err instanceof Error ? err.message : 'Inspection failed';
       setImportMessage(`Error: ${msg}`);
     } finally {
-      setIsInspecting(false);
+      if (revision === inspectionRevision.current) setIsInspecting(false);
     }
   };
 
   const handleImport = async () => {
+    if (!canImport || inspectedArchive === null) return;
     setIsImporting(true);
     setImportMessage(null);
     try {
@@ -86,7 +104,7 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
       importPreview.forEach(file => {
         resolutionRules[file.filename] = importOption === 'merge' ? 'skip' : importOption;
       });
-      const res = await client.importPack(importFilePath.trim(), resolutionRules);
+      const res = await client.importPack(inspectedArchive, resolutionRules);
       setImportMessage(
         `Import complete: ${res.extracted_count} extracted, ${res.skipped_count} skipped.`
       );
@@ -113,7 +131,7 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
                 Import / Export Extension Pack
               </h2>
               <p className="text-xs text-slate-400">
-                Package and share your indicators, strategies, snippets and other resources.
+                Package and share your Python snippets.
               </p>
             </div>
           </div>
@@ -136,13 +154,14 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
                 </div>
                 <div>
                   <h3 className="text-sm font-semibold text-slate-200">Export Pack</h3>
-                  <p className="text-[11px] text-slate-400">Create a distributable pack from your project files and settings.</p>
+                  <p className="text-[11px] text-slate-400">Create a distributable pack from your open Python snippets.</p>
                 </div>
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Pack Name</label>
+                <label htmlFor="pack-name" className="block text-xs font-medium text-slate-300 mb-1">Pack Name</label>
                 <input
+                  id="pack-name"
                   type="text"
                   value={packName}
                   onChange={e => setPackName(e.target.value)}
@@ -151,8 +170,9 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Description</label>
+                <label htmlFor="pack-description" className="block text-xs font-medium text-slate-300 mb-1">Description</label>
                 <textarea
+                  id="pack-description"
                   rows={3}
                   value={description}
                   onChange={e => setDescription(e.target.value)}
@@ -160,31 +180,19 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
                 />
               </div>
 
-              <div className="space-y-2 pt-1">
-                <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={includeSources}
-                    onChange={e => setIncludeSources(e.target.checked)}
-                    className="rounded bg-slate-800 border-slate-700 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
-                  />
-                  <span>Include Source Files (indicators, strategies, etc.)</span>
-                </label>
-                <label className="flex items-center gap-2 text-xs text-slate-300 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={includeMetadata}
-                    onChange={e => setIncludeMetadata(e.target.checked)}
-                    className="rounded bg-slate-800 border-slate-700 text-blue-600 focus:ring-blue-500 w-3.5 h-3.5"
-                  />
-                  <span>Include Metadata (manifest.json, configuration, and dependencies)</span>
-                </label>
-              </div>
+              <p className="text-xs text-slate-400">
+                Export uses saved files on disk. Save changes before exporting; unsaved buffers are not included.
+                Each pack includes the source files and a manifest with its name and description.
+              </p>
+              {!openFiles.length && (
+                <p className="text-xs text-amber-300">Open a Python snippet to export.</p>
+              )}
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Output File</label>
+                <label htmlFor="pack-output" className="block text-xs font-medium text-slate-300 mb-1">Output File</label>
                 <div className="relative">
                   <input
+                    id="pack-output"
                     type="text"
                     value={outputFilePath}
                     onChange={e => setOutputFilePath(e.target.value)}
@@ -204,7 +212,7 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
             <div className="pt-4 flex items-center justify-end gap-2 border-t border-slate-800/80">
               <button
                 onClick={handleExport}
-                disabled={isExporting}
+                disabled={isExporting || !openFiles.length}
                 className="px-4 py-1.5 text-xs font-medium bg-blue-600 hover:bg-blue-500 text-white rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
                 <Upload className="w-3.5 h-3.5" />
@@ -227,20 +235,22 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
               </div>
 
               <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Select Pack File</label>
+                <label htmlFor="pack-import" className="block text-xs font-medium text-slate-300 mb-1">Select Pack File</label>
                 <div className="flex items-center gap-2">
                   <input
+                    id="pack-import"
                     type="text"
                     value={importFilePath}
-                    onChange={e => setImportFilePath(e.target.value)}
+                    onChange={e => handleArchiveChange(e.target.value)}
+                    disabled={isImporting}
                     className="flex-1 px-3 py-1.5 text-xs bg-slate-900 border border-slate-700 rounded-lg text-slate-200 font-mono"
                   />
                   <button
                     onClick={handleInspect}
-                    disabled={isInspecting}
+                    disabled={isInspecting || isImporting || !importFilePath.trim()}
                     className="px-3 py-1.5 text-xs bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors border border-slate-700"
                   >
-                    {isInspecting ? '...' : 'Inspect'}
+                    {isInspecting ? 'Inspecting...' : 'Inspect'}
                   </button>
                 </div>
               </div>
@@ -281,15 +291,10 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
                 </div>
               </div>
 
-              <div>
-                <label className="block text-xs font-medium text-slate-300 mb-1">Target Directory</label>
-                <input
-                  type="text"
-                  value={targetDirectory}
-                  onChange={e => setTargetDirectory(e.target.value)}
-                  className="w-full px-3 py-1.5 text-xs bg-slate-900 border border-slate-700 rounded-lg text-slate-200 font-mono"
-                />
-              </div>
+              <p className="text-xs text-slate-400">
+                Archive-relative paths determine import destinations within the authorized snippet roots.
+                Inspect the selected archive before importing.
+              </p>
 
               {/* Package contents preview */}
               {importPreview.length > 0 && (
@@ -327,7 +332,7 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
             <div className="pt-4 flex items-center justify-end gap-2 border-t border-slate-800/80">
               <button
                 onClick={handleImport}
-                disabled={isImporting || importPreview.length === 0}
+                disabled={!canImport}
                 className="px-4 py-1.5 text-xs font-medium bg-emerald-600 hover:bg-emerald-500 text-white rounded-lg flex items-center gap-1.5 transition-colors disabled:opacity-50"
               >
                 <Download className="w-3.5 h-3.5" />
