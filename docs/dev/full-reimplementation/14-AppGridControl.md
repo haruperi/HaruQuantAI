@@ -45,11 +45,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `npm --prefix app/web test -- tests/workspaces/grid_control/jobPresentation.test.ts` exits 0, two tests.
 *Commit:* `grid-control: preserve job labels and refresh predicate`.
 
-## Phase 14.2: complete workspace contribution - BLOCKED-NOT-EXECUTABLE
+## Phase 14.2: complete workspace contribution - READY
 
 All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppGridControl` - I-AppGridControl - BLOCKED-NOT-EXECUTABLE
+### `AppGridControl` - I-AppGridControl - READY
 
 *Feature:* complete AppGridControl workflow.
 *Evidence IDs:* `OBS145-AppGridControl-SCOPE-001` establishes source presence only; `OBS145-AppGridControl-HELPER-001` establishes only the separately scoped helper.
@@ -69,7 +69,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 
 *Source reassessment (2026-10-30):* [AppGridControl source record](research/workspaces-09-19-source-review.md#appgridcontrol) identifies 1 matching readable Java files and 1 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `ServletGridControl` - I-ServletGridControl - BLOCKED-NOT-EXECUTABLE
+### `ServletGridControl` - I-ServletGridControl - READY
 
 *Feature:* complete ServletGridControl workflow.
 *Evidence IDs:* `OBS145-AppGridControl-SCOPE-001` establishes source presence only; `OBS145-AppGridControl-HELPER-001` establishes only the separately scoped helper.

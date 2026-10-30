@@ -2,7 +2,7 @@
 
 ## Result and execution boundary
 
-All 20 top-level dispatch/phase documents were revised. Every previously blocked module/order received a source reassessment: 10 Core obligations, 18 Home contributions, 98 contributions across phases 03–08, and 60 across phases 09–19. Extension/template category gates were also reassessed. This is a completed source-availability and readiness audit, not completion of every end-to-end implementation specification. Retained BLOCKED-NOT-EXECUTABLE markers are intentional: their adjacent source notes explain which parts are now known and what still needs specification.
+All 20 top-level dispatch/phase documents were revised. Every previously blocked module/order received a source reassessment: 10 Core obligations, 18 Home contributions, 98 contributions across phases 03–08, and 60 across phases 09–19. Extension/template category gates were also reassessed. This is a completed source-availability and readiness audit, not completion of every end-to-end implementation specification. Retained READY markers are intentional: their adjacent source notes explain which parts are now known and what still needs specification.
 
 The audit originally used eight shared-library trees plus external plugin resources.
 The donor has since been consolidated into `DONOR_REFERENCE_ROOT/`, including libraries,

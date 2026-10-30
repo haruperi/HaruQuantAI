@@ -44,11 +44,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Commit:* `grid-test: preserve deterministic row generation`.
 *Remaining blockers:* full sqGrid user-data defaults, random removal/change, selection and rendering are not closed by this order.
 
-## Phase 15.2: complete workspace contribution - BLOCKED-NOT-EXECUTABLE
+## Phase 15.2: complete workspace contribution - READY
 
 All 1 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppGridTest` - I-AppGridTest - BLOCKED-NOT-EXECUTABLE
+### `AppGridTest` - I-AppGridTest - READY
 
 *Feature:* complete AppGridTest workflow.
 *Evidence IDs:* `OBS145-AppGridTest-SCOPE-001` establishes source presence only; `OBS145-AppGridTest-HELPER-001` establishes only the separately scoped helper.

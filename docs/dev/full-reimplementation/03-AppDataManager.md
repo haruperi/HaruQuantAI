@@ -22,7 +22,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 
 ## Execution rule for this file
 
-The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. BLOCKED-NOT-EXECUTABLE orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
+The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. READY orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
 
 Every checkbox in a ready task names its exact symbol. One ready feature task is one commit containing only its listed implementation/test files. Test command exit 0 is acceptance only when the specified test cases were collected. Do not run application-wide formatting or touch a sibling workspace.
 
@@ -133,10 +133,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `AppDataManager`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appdatamanager). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `AppDataManager`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appdatamanager). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppDataManager`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `AppDataManager` complete observed workspace contribution. **Task ID:** `I-AppDataManager`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-AppDataManager-SURFACE-001`.
+*Feature:* `AppDataManager` complete observed workspace contribution. **Task ID:** `I-AppDataManager`. **Readiness:** READY. **Evidence:** `OBS145-AppDataManager-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/workspace.py` → `DataManagerWorkspace`.
@@ -153,10 +153,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `ConnectionLiveTest`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#connectionlivetest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `ConnectionLiveTest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#connectionlivetest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ConnectionLiveTest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ConnectionLiveTest` complete observed workspace contribution. **Task ID:** `I-ConnectionLiveTest`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ConnectionLiveTest-SURFACE-001`.
+*Feature:* `ConnectionLiveTest` complete observed workspace contribution. **Task ID:** `I-ConnectionLiveTest`. **Readiness:** READY. **Evidence:** `OBS145-ConnectionLiveTest-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/connections/live_test.py` → `ConnectionLiveTestService`.
@@ -173,10 +173,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `ConnectionMT4`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#connectionmt4). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `ConnectionMT4`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#connectionmt4). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ConnectionMT4`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ConnectionMT4` complete observed workspace contribution. **Task ID:** `I-ConnectionMT4`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ConnectionMT4-SURFACE-001`.
+*Feature:* `ConnectionMT4` complete observed workspace contribution. **Task ID:** `I-ConnectionMT4`. **Readiness:** READY. **Evidence:** `OBS145-ConnectionMT4-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/connections/mt4.py` → `ConnectionMT4Service`.
@@ -193,10 +193,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `ConnectionTest`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#connectiontest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `ConnectionTest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#connectiontest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ConnectionTest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ConnectionTest` complete observed workspace contribution. **Task ID:** `I-ConnectionTest`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ConnectionTest-SURFACE-001`.
+*Feature:* `ConnectionTest` complete observed workspace contribution. **Task ID:** `I-ConnectionTest`. **Readiness:** READY. **Evidence:** `OBS145-ConnectionTest-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/connections/test.py` → `ConnectionTestService`.
@@ -216,7 +216,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#cryptoexchangebinance). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `CryptoExchangeBinance`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CryptoExchangeBinance` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinance`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CryptoExchangeBinance-SURFACE-001`.
+*Feature:* `CryptoExchangeBinance` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinance`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBinance-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/crypto/binance.py` → `CryptoExchangeBinanceService`.
@@ -236,7 +236,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#cryptoexchangebinancecoinm). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `CryptoExchangeBinanceCoinM`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CryptoExchangeBinanceCoinM` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinanceCoinM`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CryptoExchangeBinanceCoinM-SURFACE-001`.
+*Feature:* `CryptoExchangeBinanceCoinM` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinanceCoinM`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBinanceCoinM-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/crypto/binance_coinm.py` → `CryptoExchangeBinanceCoinMService`.
@@ -256,7 +256,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#cryptoexchangebinanceusdtm). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `CryptoExchangeBinanceUsdtM`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CryptoExchangeBinanceUsdtM` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinanceUsdtM`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CryptoExchangeBinanceUsdtM-SURFACE-001`.
+*Feature:* `CryptoExchangeBinanceUsdtM` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinanceUsdtM`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBinanceUsdtM-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/crypto/binance_usdtm.py` → `CryptoExchangeBinanceUsdtMService`.
@@ -276,7 +276,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#cryptoexchangebitfinex). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `CryptoExchangeBitfinex`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CryptoExchangeBitfinex` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBitfinex`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CryptoExchangeBitfinex-SURFACE-001`.
+*Feature:* `CryptoExchangeBitfinex` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBitfinex`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBitfinex-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/crypto/bitfinex.py` → `CryptoExchangeBitfinexService`.
@@ -296,7 +296,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#cryptoexchangecoinbasepro). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `CryptoExchangeCoinbasePro`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CryptoExchangeCoinbasePro` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeCoinbasePro`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CryptoExchangeCoinbasePro-SURFACE-001`.
+*Feature:* `CryptoExchangeCoinbasePro` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeCoinbasePro`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeCoinbasePro-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/crypto/coinbase_pro.py` → `CryptoExchangeCoinbaseProService`.
@@ -316,7 +316,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#cryptoexchangepoloniex). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `CryptoExchangePoloniex`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CryptoExchangePoloniex` complete observed workspace contribution. **Task ID:** `I-CryptoExchangePoloniex`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CryptoExchangePoloniex-SURFACE-001`.
+*Feature:* `CryptoExchangePoloniex` complete observed workspace contribution. **Task ID:** `I-CryptoExchangePoloniex`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangePoloniex-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/crypto/poloniex.py` → `CryptoExchangePoloniexService`.
@@ -333,10 +333,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `DataManagerActions`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanageractions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 23 current plugin JavaScript files and 0 previously recovered primary Java files for `DataManagerActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanageractions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 23 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`DataManagerActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerActions` complete observed workspace contribution. **Task ID:** `I-DataManagerActions`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerActions-SURFACE-001`.
+*Feature:* `DataManagerActions` complete observed workspace contribution. **Task ID:** `I-DataManagerActions`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerActions-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/data_actions.py` → `DataActionsService`.
@@ -356,7 +356,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerbasket). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 2 previously recovered primary Java files for `DataManagerBasket`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerBasket` complete observed workspace contribution. **Task ID:** `I-DataManagerBasket`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerBasket-SURFACE-001`.
+*Feature:* `DataManagerBasket` complete observed workspace contribution. **Task ID:** `I-DataManagerBasket`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerBasket-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/baskets.py` → `BasketService`.
@@ -376,7 +376,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerbroker). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 8 current plugin JavaScript files and 3 previously recovered primary Java files for `DataManagerBroker`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerBroker` complete observed workspace contribution. **Task ID:** `I-DataManagerBroker`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerBroker-SURFACE-001`.
+*Feature:* `DataManagerBroker` complete observed workspace contribution. **Task ID:** `I-DataManagerBroker`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerBroker-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/broker_profiles.py` → `BrokerProfileService`.
@@ -396,7 +396,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerconnections). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 3 previously recovered primary Java files for `DataManagerConnections`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerConnections` complete observed workspace contribution. **Task ID:** `I-DataManagerConnections`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerConnections-SURFACE-001`.
+*Feature:* `DataManagerConnections` complete observed workspace contribution. **Task ID:** `I-DataManagerConnections`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerConnections-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/connections.py` → `ConnectionService`.
@@ -416,7 +416,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagercustomdata). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 13 current plugin JavaScript files and 5 previously recovered primary Java files for `DataManagerCustomData`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerCustomData` complete observed workspace contribution. **Task ID:** `I-DataManagerCustomData`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerCustomData-SURFACE-001`.
+*Feature:* `DataManagerCustomData` complete observed workspace contribution. **Task ID:** `I-DataManagerCustomData`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerCustomData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/custom_data.py` → `CustomDataService`.
@@ -436,7 +436,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerdata). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 29 previously recovered primary Java files for `DataManagerData`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerData` complete observed workspace contribution. **Task ID:** `I-DataManagerData`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerData-SURFACE-001`.
+*Feature:* `DataManagerData` complete observed workspace contribution. **Task ID:** `I-DataManagerData`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/datasets.py` → `DataService`.
@@ -453,10 +453,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `DataManagerHelp`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerhelp). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `DataManagerHelp`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerhelp). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`DataManagerHelp`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerHelp` complete observed workspace contribution. **Task ID:** `I-DataManagerHelp`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerHelp-SURFACE-001`.
+*Feature:* `DataManagerHelp` complete observed workspace contribution. **Task ID:** `I-DataManagerHelp`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerHelp-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/help.py` → `DataHelpService`.
@@ -476,7 +476,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerhome). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and 2 previously recovered primary Java files for `DataManagerHome`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerHome` complete observed workspace contribution. **Task ID:** `I-DataManagerHome`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerHome-SURFACE-001`.
+*Feature:* `DataManagerHome` complete observed workspace contribution. **Task ID:** `I-DataManagerHome`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerHome-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/home.py` → `DataHomeService`.
@@ -493,10 +493,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `DataManagerInstruments`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerinstruments). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 7 current plugin JavaScript files and 0 previously recovered primary Java files for `DataManagerInstruments`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerinstruments). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 7 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`DataManagerInstruments`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerInstruments` complete observed workspace contribution. **Task ID:** `I-DataManagerInstruments`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerInstruments-SURFACE-001`.
+*Feature:* `DataManagerInstruments` complete observed workspace contribution. **Task ID:** `I-DataManagerInstruments`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerInstruments-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/instruments.py` → `InstrumentService`.
@@ -513,10 +513,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `DataManagerLog`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerlog). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `DataManagerLog`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagerlog). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`DataManagerLog`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerLog` complete observed workspace contribution. **Task ID:** `I-DataManagerLog`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerLog-SURFACE-001`.
+*Feature:* `DataManagerLog` complete observed workspace contribution. **Task ID:** `I-DataManagerLog`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerLog-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/log.py` → `DataLogService`.
@@ -536,7 +536,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datamanagersessions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 2 previously recovered primary Java files for `DataManagerSessions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataManagerSessions` complete observed workspace contribution. **Task ID:** `I-DataManagerSessions`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataManagerSessions-SURFACE-001`.
+*Feature:* `DataManagerSessions` complete observed workspace contribution. **Task ID:** `I-DataManagerSessions`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerSessions-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/sessions.py` → `SessionService`.
@@ -556,7 +556,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcecrypto). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 2 previously recovered primary Java files for `DataSourceCrypto`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceCrypto` complete observed workspace contribution. **Task ID:** `I-DataSourceCrypto`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceCrypto-SURFACE-001`.
+*Feature:* `DataSourceCrypto` complete observed workspace contribution. **Task ID:** `I-DataSourceCrypto`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceCrypto-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/crypto.py` → `DataSourceCryptoService`.
@@ -576,7 +576,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcedarwinex). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 10 current plugin JavaScript files and 5 previously recovered primary Java files for `DataSourceDarwinex`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceDarwinex` complete observed workspace contribution. **Task ID:** `I-DataSourceDarwinex`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceDarwinex-SURFACE-001`.
+*Feature:* `DataSourceDarwinex` complete observed workspace contribution. **Task ID:** `I-DataSourceDarwinex`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceDarwinex-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/darwinex.py` → `DataSourceDarwinexService`.
@@ -596,7 +596,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcedukascopy). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 8 current plugin JavaScript files and 4 previously recovered primary Java files for `DataSourceDukascopy`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceDukascopy` complete observed workspace contribution. **Task ID:** `I-DataSourceDukascopy`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceDukascopy-SURFACE-001`.
+*Feature:* `DataSourceDukascopy` complete observed workspace contribution. **Task ID:** `I-DataSourceDukascopy`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceDukascopy-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/dukascopy.py` → `DataSourceDukascopyService`.
@@ -616,7 +616,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcefiles). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 10 current plugin JavaScript files and 8 previously recovered primary Java files for `DataSourceFiles`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceFiles` complete observed workspace contribution. **Task ID:** `I-DataSourceFiles`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceFiles-SURFACE-001`.
+*Feature:* `DataSourceFiles` complete observed workspace contribution. **Task ID:** `I-DataSourceFiles`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceFiles-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/files.py` → `DataSourceFilesService`.
@@ -636,7 +636,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcemt5api). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 4 current plugin JavaScript files and 2 previously recovered primary Java files for `DataSourceMt5Api`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceMt5Api` complete observed workspace contribution. **Task ID:** `I-DataSourceMt5Api`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceMt5Api-SURFACE-001`.
+*Feature:* `DataSourceMt5Api` complete observed workspace contribution. **Task ID:** `I-DataSourceMt5Api`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceMt5Api-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/mt5_api.py` → `DataSourceMt5ApiService`.
@@ -656,7 +656,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcesqequitydata). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 2 previously recovered primary Java files for `DataSourceSQEquityData`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceSQEquityData` complete observed workspace contribution. **Task ID:** `I-DataSourceSQEquityData`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceSQEquityData-SURFACE-001`.
+*Feature:* `DataSourceSQEquityData` complete observed workspace contribution. **Task ID:** `I-DataSourceSQEquityData`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceSQEquityData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/sq_equity_data.py` → `DataSourceSQEquityDataService`.
@@ -676,7 +676,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcesqfuturesdata). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 2 previously recovered primary Java files for `DataSourceSQFuturesData`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceSQFuturesData` complete observed workspace contribution. **Task ID:** `I-DataSourceSQFuturesData`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceSQFuturesData-SURFACE-001`.
+*Feature:* `DataSourceSQFuturesData` complete observed workspace contribution. **Task ID:** `I-DataSourceSQFuturesData`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceSQFuturesData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/sq_futures_data.py` → `DataSourceSQFuturesDataService`.
@@ -696,7 +696,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourcetd). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 4 current plugin JavaScript files and 4 previously recovered primary Java files for `DataSourceTD`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceTD` complete observed workspace contribution. **Task ID:** `I-DataSourceTD`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceTD-SURFACE-001`.
+*Feature:* `DataSourceTD` complete observed workspace contribution. **Task ID:** `I-DataSourceTD`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceTD-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/td.py` → `DataSourceTDService`.
@@ -716,7 +716,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#datasourceyahoo). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 4 previously recovered primary Java files for `DataSourceYahoo`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `DataSourceYahoo` complete observed workspace contribution. **Task ID:** `I-DataSourceYahoo`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-DataSourceYahoo-SURFACE-001`.
+*Feature:* `DataSourceYahoo` complete observed workspace contribution. **Task ID:** `I-DataSourceYahoo`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceYahoo-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/providers/yahoo.py` → `DataSourceYahooService`.
@@ -733,10 +733,10 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### `ServletConnection`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletconnection). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `ServletConnection`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletconnection). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ServletConnection`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ServletConnection` complete observed workspace contribution. **Task ID:** `I-ServletConnection`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletConnection-SURFACE-001`.
+*Feature:* `ServletConnection` complete observed workspace contribution. **Task ID:** `I-ServletConnection`. **Readiness:** READY. **Evidence:** `OBS145-ServletConnection-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/data_manager/servlet_connection.py` → `ServletConnectionService`.

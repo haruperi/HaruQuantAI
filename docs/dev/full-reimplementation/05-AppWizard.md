@@ -20,7 +20,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 
 ## Execution rule for this file
 
-The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. BLOCKED-NOT-EXECUTABLE orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
+The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. READY orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
 
 Every checkbox in a ready task names its exact symbol. One ready feature task is one commit containing only its listed implementation/test files. Test command exit 0 is acceptance only when the specified test cases were collected. Do not run application-wide formatting or touch a sibling workspace.
 
@@ -101,10 +101,10 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 
 ### `AppWizard`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appwizard). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `AppWizard`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appwizard). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppWizard`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `AppWizard` complete observed workspace contribution. **Task ID:** `I-AppWizard`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-AppWizard-SURFACE-001`.
+*Feature:* `AppWizard` complete observed workspace contribution. **Task ID:** `I-AppWizard`. **Readiness:** READY. **Evidence:** `OBS145-AppWizard-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/wizard/workspace.py` → `WizardService`.
@@ -124,7 +124,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletalgocloud). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 2 previously recovered primary Java files for `ServletAlgoCloud`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ServletAlgoCloud` complete observed workspace contribution. **Task ID:** `I-ServletAlgoCloud`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletAlgoCloud-SURFACE-001`.
+*Feature:* `ServletAlgoCloud` complete observed workspace contribution. **Task ID:** `I-ServletAlgoCloud`. **Readiness:** READY. **Evidence:** `OBS145-ServletAlgoCloud-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/wizard/cloud_export.py` → `CloudExportService`.
@@ -144,7 +144,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletalgowizard). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 4 previously recovered primary Java files for `ServletAlgoWizard`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ServletAlgoWizard` complete observed workspace contribution. **Task ID:** `I-ServletAlgoWizard`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletAlgoWizard-SURFACE-001`.
+*Feature:* `ServletAlgoWizard` complete observed workspace contribution. **Task ID:** `I-ServletAlgoWizard`. **Readiness:** READY. **Evidence:** `OBS145-ServletAlgoWizard-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/wizard/visual_blocks.py` → `VisualBlockService`.
@@ -164,7 +164,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletconstants). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 2 previously recovered primary Java files for `ServletConstants`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ServletConstants` complete observed workspace contribution. **Task ID:** `I-ServletConstants`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletConstants-SURFACE-001`.
+*Feature:* `ServletConstants` complete observed workspace contribution. **Task ID:** `I-ServletConstants`. **Readiness:** READY. **Evidence:** `OBS145-ServletConstants-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/wizard/catalogue.py` → `WizardCatalogueService`.
@@ -184,7 +184,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletstrategy). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 3 previously recovered primary Java files for `ServletStrategy`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ServletStrategy` complete observed workspace contribution. **Task ID:** `I-ServletStrategy`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletStrategy-SURFACE-001`.
+*Feature:* `ServletStrategy` complete observed workspace contribution. **Task ID:** `I-ServletStrategy`. **Readiness:** READY. **Evidence:** `OBS145-ServletStrategy-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/wizard/strategies.py` → `StrategyDocumentService`.
@@ -203,7 +203,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 
 *Source reassessment — 2026-10-30:* [Export source availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) records readable templates for all six targets. The shared loader context is now `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java` and `DONOR_REFERENCE_ROOT/internal/libs/business/loader/StrategyLoader.java`; template semantics and exact golden exports remain to be specified per platform.
 
-**Readiness:** BLOCKED-NOT-EXECUTABLE for export implementation. Donor `internal/ctemplate` and `internal/extend/Code` require structural/semantic fixtures, not generic string replacement. The exact category target catalog is:
+**Readiness:** READY for export implementation. Donor `internal/ctemplate` and `internal/extend/Code` require structural/semantic fixtures, not generic string replacement. The exact category target catalog is:
 
 | Donor target | Exact target descriptor module |
 | --- | --- |

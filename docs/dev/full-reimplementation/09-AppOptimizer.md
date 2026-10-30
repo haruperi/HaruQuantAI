@@ -131,11 +131,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance command:* `uv run python -m pytest tests/workspaces/optimizer/test_wf_metric.py -q` exits 0 and exercises every listed branch. Tests use literal dictionaries; they do not mock an optimizer or claim fitness formula parity.
 *Commit:* `optimizer: project the first walk-forward metric`. Completing this helper does not complete I-FitnessMethodWFResult.
 
-## Phase 2: complete module scope not yet executable
+## Phase 2: complete module scope — READY
 
 Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
 
-### `AppOptimizer` — BLOCKED-NOT-EXECUTABLE
+### `AppOptimizer` — READY
 *Feature:* Full `AppOptimizer` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer`.
@@ -152,7 +152,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [AppOptimizer source record](research/workspaces-09-19-source-review.md#appoptimizer) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `FitnessMethodWFResult` — BLOCKED-NOT-EXECUTABLE
+### `FitnessMethodWFResult` — READY
 *Feature:* Full `FitnessMethodWFResult` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult`.
@@ -169,7 +169,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [FitnessMethodWFResult source record](research/workspaces-09-19-source-review.md#fitnessmethodwfresult) identifies 1 matching readable Java files and 0 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `ResultsOptimizationProfile` — BLOCKED-NOT-EXECUTABLE
+### `ResultsOptimizationProfile` — READY
 *Feature:* Full `ResultsOptimizationProfile` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile`.
@@ -186,7 +186,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [ResultsOptimizationProfile source record](research/workspaces-09-19-source-review.md#resultsoptimizationprofile) identifies 0 matching readable Java files and 9 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `ResultsSequentialOptimization` — BLOCKED-NOT-EXECUTABLE
+### `ResultsSequentialOptimization` — READY
 *Feature:* Full `ResultsSequentialOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization`.
@@ -203,7 +203,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [ResultsSequentialOptimization source record](research/workspaces-09-19-source-review.md#resultssequentialoptimization) identifies 0 matching readable Java files and 6 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `ResultsSysParamPermutation` — BLOCKED-NOT-EXECUTABLE
+### `ResultsSysParamPermutation` — READY
 *Feature:* Full `ResultsSysParamPermutation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation`.
@@ -220,7 +220,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [ResultsSysParamPermutation source record](research/workspaces-09-19-source-review.md#resultssysparampermutation) identifies 0 matching readable Java files and 7 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `ResultsWalkForward` — BLOCKED-NOT-EXECUTABLE
+### `ResultsWalkForward` — READY
 *Feature:* Full `ResultsWalkForward` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward`.
@@ -237,7 +237,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [ResultsWalkForward source record](research/workspaces-09-19-source-review.md#resultswalkforward) identifies 0 matching readable Java files and 8 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsOptimization` — BLOCKED-NOT-EXECUTABLE
+### `SettingsOptimization` — READY
 *Feature:* Full `SettingsOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization`.
@@ -254,7 +254,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [SettingsOptimization source record](research/workspaces-09-19-source-review.md#settingsoptimization) identifies 3 matching readable Java files and 5 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskOptimize` — BLOCKED-NOT-EXECUTABLE
+### `TaskOptimize` — READY
 *Feature:* Full `TaskOptimize` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize`.

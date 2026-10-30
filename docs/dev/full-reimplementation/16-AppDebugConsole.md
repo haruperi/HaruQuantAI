@@ -51,11 +51,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `npm --prefix app/web test -- tests/workspaces/debug_console/buffer.test.ts` exits 0, four tests.
 *Commit:* `debug-console: preserve observed log-buffer transitions`.
 
-## Phase 16.2: complete workspace contribution - BLOCKED-NOT-EXECUTABLE
+## Phase 16.2: complete workspace contribution - READY
 
 All 1 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppDebugConsole` - I-AppDebugConsole - BLOCKED-NOT-EXECUTABLE
+### `AppDebugConsole` - I-AppDebugConsole - READY
 
 *Feature:* complete AppDebugConsole workflow.
 *Evidence IDs:* `OBS145-AppDebugConsole-SCOPE-001` establishes source presence only; `OBS145-AppDebugConsole-HELPER-001` establishes only the separately scoped helper.

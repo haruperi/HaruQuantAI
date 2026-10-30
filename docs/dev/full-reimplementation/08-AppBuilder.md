@@ -178,13 +178,13 @@ The donor's `condGridInstance` is a runtime widget reference and is deliberately
 *Done command:* `uv run python -m pytest tests/workspaces/builder/test_genetic_defaults.py -q` -> exit `0`; exact-value, fresh-instance, frozen-instance and two invalid-type cases pass.
 *Commit:* `feat(builder): define observed genetic option defaults`. Only the two CREATE files belong in this commit.
 
-## Phase 2: complete module scope not yet executable
+## Phase 2: complete module scope — READY
 
 Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
 
-### `AppBuilder` — BLOCKED-NOT-EXECUTABLE
+### `AppBuilder` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appbuilder). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `AppBuilder`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appbuilder). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppBuilder`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `AppBuilder` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -199,9 +199,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `AppBuilder`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `FitnessMethodStrategyResult` — BLOCKED-NOT-EXECUTABLE
+### `FitnessMethodStrategyResult` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#fitnessmethodstrategyresult). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `FitnessMethodStrategyResult`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#fitnessmethodstrategyresult). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`FitnessMethodStrategyResult`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `FitnessMethodStrategyResult` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -216,9 +216,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `FitnessMethodStrategyResult`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ServletBuilder` — BLOCKED-NOT-EXECUTABLE
+### `ServletBuilder` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletbuilder). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `ServletBuilder`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletbuilder). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ServletBuilder`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ServletBuilder` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -233,9 +233,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ServletBuilder`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsBlocks` — BLOCKED-NOT-EXECUTABLE
+### `SettingsBlocks` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsblocks). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 4 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsBlocks`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsblocks). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 4 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsBlocks`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsBlocks` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -250,9 +250,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsBlocks`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsGeneticOptions` — BLOCKED-NOT-EXECUTABLE
+### `SettingsGeneticOptions` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsgeneticoptions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsGeneticOptions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsgeneticoptions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsGeneticOptions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsGeneticOptions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -267,9 +267,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsGeneticOptions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsPartsToImprove` — BLOCKED-NOT-EXECUTABLE
+### `SettingsPartsToImprove` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingspartstoimprove). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsPartsToImprove`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingspartstoimprove). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsPartsToImprove`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsPartsToImprove` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -284,9 +284,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsPartsToImprove`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsRankings` — BLOCKED-NOT-EXECUTABLE
+### `SettingsRankings` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsrankings). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsRankings`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsrankings). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsRankings`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsRankings` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -301,9 +301,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsRankings`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsWhatToBuild` — BLOCKED-NOT-EXECUTABLE
+### `SettingsWhatToBuild` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattobuild). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 21 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsWhatToBuild`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattobuild). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 21 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsWhatToBuild`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsWhatToBuild` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -318,7 +318,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsWhatToBuild`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `TaskBuild` — BLOCKED-NOT-EXECUTABLE
+### `TaskBuild` — READY
 
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#taskbuild). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 4 current plugin JavaScript files and 7 previously recovered primary Java files for `TaskBuild`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
@@ -335,7 +335,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `TaskBuild`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-## Phase 3: concrete extension definition work orders — BLOCKED-NOT-EXECUTABLE
+## Phase 3: concrete extension definition work orders — READY
 *Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. WO-BLD-FULL-POSITION below releases the named CloseSize definition; all other Formulas definitions retain individual contract gates. Source file counts do not establish completion or parity.
 
 

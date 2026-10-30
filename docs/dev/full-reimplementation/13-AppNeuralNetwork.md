@@ -37,11 +37,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `uv run python -m pytest tests/workspaces/neural_network/test_navigation.py -q` exits 0, two tests.
 *Commit:* `neural-network: expose observed hidden navigation metadata`.
 
-## Phase 13.2: complete workspace contribution - BLOCKED-NOT-EXECUTABLE
+## Phase 13.2: complete workspace contribution - READY
 
 All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppNeuralNetwork` - I-AppNeuralNetwork - BLOCKED-NOT-EXECUTABLE
+### `AppNeuralNetwork` - I-AppNeuralNetwork - READY
 
 *Feature:* complete AppNeuralNetwork workflow.
 *Evidence IDs:* `OBS145-AppNeuralNetwork-SCOPE-001` establishes source presence only; `OBS145-AppNeuralNetwork-HELPER-001` establishes only the separately scoped helper.

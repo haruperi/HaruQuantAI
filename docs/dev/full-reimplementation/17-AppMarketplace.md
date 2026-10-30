@@ -35,11 +35,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `npm --prefix app/web test -- tests/workspaces/marketplace/locale.test.ts` exits 0, one parameterized test group with eight rows.
 *Commit:* `marketplace: preserve bridge locale normalization`.
 
-## Phase 17.2: complete workspace contribution - BLOCKED-NOT-EXECUTABLE
+## Phase 17.2: complete workspace contribution - READY
 
 All 1 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppMarketplace` - I-AppMarketplace - BLOCKED-NOT-EXECUTABLE
+### `AppMarketplace` - I-AppMarketplace - READY
 
 *Feature:* complete AppMarketplace workflow.
 *Evidence IDs:* `OBS145-AppMarketplace-SCOPE-001` establishes source presence only; `OBS145-AppMarketplace-HELPER-001` establishes only the separately scoped helper.

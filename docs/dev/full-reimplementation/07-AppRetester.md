@@ -125,13 +125,13 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 *Done command:* `uv run python -m pytest tests/workspaces/retester/test_value_source.py -q` -> exit `0`; seven mapping rows and two invalid rows pass.
 *Commit:* `feat(retester): normalize legacy value-source flags`. Only the two CREATE files belong in this commit.
 
-## Phase 2: complete module scope not yet executable
+## Phase 2: complete module scope — READY
 
 Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
 
-### `AppRetester` — BLOCKED-NOT-EXECUTABLE
+### `AppRetester` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appretester). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `AppRetester`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appretester). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppRetester`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `AppRetester` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -146,9 +146,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `AppRetester`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckMonteCarloManipulation` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckMonteCarloManipulation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarlomanipulation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckMonteCarloManipulation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarlomanipulation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckMonteCarloManipulation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckMonteCarloManipulation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -163,9 +163,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckMonteCarloManipulation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckMonteCarloRetest` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckMonteCarloRetest` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarloretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckMonteCarloRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarloretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckMonteCarloRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckMonteCarloRetest` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -180,9 +180,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckMonteCarloRetest`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckOptProfileSysParamPermutation` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckOptProfileSysParamPermutation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckoptprofilesysparampermutation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckOptProfileSysParamPermutation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckoptprofilesysparampermutation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckOptProfileSysParamPermutation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckOptProfileSysParamPermutation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -197,9 +197,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckOptProfileSysParamPermutation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckRetestOnAdditionalMarkets` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckRetestOnAdditionalMarkets` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestonadditionalmarkets). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckRetestOnAdditionalMarkets`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestonadditionalmarkets). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckRetestOnAdditionalMarkets`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckRetestOnAdditionalMarkets` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -214,9 +214,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckRetestOnAdditionalMarkets`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckRetestWithHigherPrecision` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckRetestWithHigherPrecision` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestwithhigherprecision). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckRetestWithHigherPrecision`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestwithhigherprecision). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckRetestWithHigherPrecision`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckRetestWithHigherPrecision` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -231,9 +231,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckRetestWithHigherPrecision`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckSequentialOptimization` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckSequentialOptimization` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosschecksequentialoptimization). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckSequentialOptimization`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosschecksequentialoptimization). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckSequentialOptimization`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckSequentialOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -248,9 +248,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckSequentialOptimization`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckWalkForwardMatrix` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckWalkForwardMatrix` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardmatrix). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckWalkForwardMatrix`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardmatrix). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckWalkForwardMatrix`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckWalkForwardMatrix` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -265,9 +265,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckWalkForwardMatrix`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckWalkForwardOptimization` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckWalkForwardOptimization` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardoptimization). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckWalkForwardOptimization`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardoptimization). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckWalkForwardOptimization`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckWalkForwardOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -282,9 +282,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckWalkForwardOptimization`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CrossCheckWhatIf` — BLOCKED-NOT-EXECUTABLE
+### `CrossCheckWhatIf` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwhatif). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `CrossCheckWhatIf`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwhatif). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckWhatIf`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CrossCheckWhatIf` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -299,9 +299,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckWhatIf`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsRobustnessTests` — BLOCKED-NOT-EXECUTABLE
+### `ResultsRobustnessTests` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsrobustnesstests). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 8 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsRobustnessTests`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsrobustnesstests). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 8 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsRobustnessTests`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsRobustnessTests` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -316,9 +316,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsRobustnessTests`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsAutoRetestData` — BLOCKED-NOT-EXECUTABLE
+### `SettingsAutoRetestData` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsautoretestdata). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsAutoRetestData`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsautoretestdata). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsAutoRetestData`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsAutoRetestData` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -333,9 +333,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsAutoRetestData`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsCrossChecks` — BLOCKED-NOT-EXECUTABLE
+### `SettingsCrossChecks` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingscrosschecks). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 7 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsCrossChecks`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingscrosschecks). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 7 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsCrossChecks`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsCrossChecks` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -350,9 +350,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsCrossChecks`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SettingsWhatToRetest` — BLOCKED-NOT-EXECUTABLE
+### `SettingsWhatToRetest` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattoretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `SettingsWhatToRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattoretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsWhatToRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SettingsWhatToRetest` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -367,7 +367,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsWhatToRetest`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `TaskRetest` — BLOCKED-NOT-EXECUTABLE
+### `TaskRetest` — READY
 
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#taskretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 2 previously recovered primary Java files for `TaskRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
@@ -384,7 +384,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `TaskRetest`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-## Phase 3: concrete extension definition work orders — BLOCKED-NOT-EXECUTABLE
+## Phase 3: concrete extension definition work orders — READY
 *Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. Existing RET-003 and RET-004 already release bounded WhatIf reuse and RandomlySkipTrades; exclude those slices from the blanket gate. Source file counts do not establish completion or parity.
 
 

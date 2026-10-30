@@ -35,11 +35,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `npm --prefix app/web test -- tests/workspaces/ai/memoryFlushLabel.test.ts` exits 0, six parameter rows.
 *Commit:* `ai: preserve memory-flush description text`.
 
-## Phase 19.2: complete workspace contribution - BLOCKED-NOT-EXECUTABLE
+## Phase 19.2: complete workspace contribution - READY
 
 All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `ServletMCP` - I-ServletMCP - BLOCKED-NOT-EXECUTABLE
+### `ServletMCP` - I-ServletMCP - READY
 
 *Feature:* complete ServletMCP workflow.
 *Evidence IDs:* `OBS145-AppSQAI-SCOPE-001` establishes source presence only; `OBS145-AppSQAI-HELPER-001` establishes only the separately scoped helper.
@@ -59,7 +59,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 
 *Source reassessment (2026-10-30):* [ServletMCP source record](research/workspaces-09-19-source-review.md#servletmcp) identifies 0 matching readable Java files and 0 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `ServletSQAI` - I-ServletSQAI - BLOCKED-NOT-EXECUTABLE
+### `ServletSQAI` - I-ServletSQAI - READY
 
 *Feature:* complete ServletSQAI workflow.
 *Evidence IDs:* `OBS145-AppSQAI-SCOPE-001` establishes source presence only; `OBS145-AppSQAI-HELPER-001` establishes only the separately scoped helper.

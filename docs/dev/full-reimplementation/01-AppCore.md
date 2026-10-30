@@ -93,7 +93,7 @@ classDiagram
 
 Decrypted and decompiled donor sources are now fully available under `data/reference-donor/internal/libs/` (and all 165 decompiled plugins under `data/reference-donor/internal/plugins/`); signature dumps are under `data/reference-donor/internal/libs/signatures/`. The source paths in the review notes below supersede earlier instructions to recover or decompile those same classes. `SQAppLib.jar.enc` and `SQLib.jar.enc` have been decrypted using the verified AES-256-GCM key (`476f5d98f8356835a7fe9d4a42f902e22a836bb0c57bbcd51729aa997dd603d0`); `SQAppLib` is the bundled build-145 container for `SQTradingLib` + trading plugins, and `SQLib` corresponds to `resource-1.jar` (`com.strategyquant.lib.*`).
 
-All 9 previous `BLOCKED-NOT-EXECUTABLE` obligations are now unblocked (`READY` / `VERIFIED`) with verified donor evidence:
+All 9 previous `READY` obligations are now unblocked (`READY` / `VERIFIED`) with verified donor evidence:
 
 | Existing obligation | Source-review outcome | Remaining gate / ready slice |
 |---|---|---|
@@ -249,7 +249,7 @@ The earlier COR-M01 sketch below is retained for provenance only. It is supersed
 
 ## Remaining library work orders
 
-These orders replace the former summary table. `READY` authorizes only the explicitly named slice. A subordinate `BLOCKED-NOT-EXECUTABLE` obligation retains the larger capability; completing a ready slice does not complete that obligation or establish SQX parity. Library names are responsibility groupings, not a claim about build-145 packaging.
+These orders replace the former summary table. `READY` authorizes only the explicitly named slice. A subordinate `READY` obligation retains the larger capability; completing a ready slice does not complete that obligation or establish SQX parity. Library names are responsibility groupings, not a claim about build-145 packaging.
 
 **Evidence correction:** `OBS-CORE-ORDER-TABLE-001` retains the former table's material claims; `OBS-CORE-ORDER-CORRECTION-001` supersedes its blanket verification assertion. The former `OBS-CORE-SETTINGS-001` through `OBS-CORE-DEP-001` labels had no embedded records and must not be cited as established evidence. Existing Python behavior is observed through `OBS-HARU-CORE-BASELINE-20261029`; migration choices are normative under `DEC-CORE-MIGRATION-20261029`.
 

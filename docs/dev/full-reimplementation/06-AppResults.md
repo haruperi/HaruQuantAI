@@ -236,13 +236,13 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 *Done command:* `uv run python -m pytest tests/workspaces/results/test_overview_template_policy.py -q` -> exit `0`, four parameterized selection rows and two invalid rows pass. No HTTP server or donor process is started.
 *Commit:* `feat(results): add overview template selection policy`. Only the two CREATE files belong in this commit.
 
-## Phase 2: complete module scope not yet executable
+## Phase 2: complete module scope — READY
 
 Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
 
-### `AppResults` — BLOCKED-NOT-EXECUTABLE
+### `AppResults` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appresults). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `AppResults`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appresults). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppResults`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `AppResults` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -257,9 +257,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `AppResults`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CustomDatabankActions` — BLOCKED-NOT-EXECUTABLE
+### `CustomDatabankActions` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customdatabankactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 0 previously recovered primary Java files for `CustomDatabankActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customdatabankactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CustomDatabankActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CustomDatabankActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -274,9 +274,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CustomDatabankActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `CustomResultsPluginActions` — BLOCKED-NOT-EXECUTABLE
+### `CustomResultsPluginActions` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customresultspluginactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `CustomResultsPluginActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customresultspluginactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CustomResultsPluginActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `CustomResultsPluginActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -291,9 +291,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CustomResultsPluginActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `DatabankFilterByCorrelation` — BLOCKED-NOT-EXECUTABLE
+### `DatabankFilterByCorrelation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankfilterbycorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `DatabankFilterByCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankfilterbycorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`DatabankFilterByCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `DatabankFilterByCorrelation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -308,7 +308,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `DatabankFilterByCorrelation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `DatabankRename` — BLOCKED-NOT-EXECUTABLE
+### `DatabankRename` — READY
 
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankrename). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 2 previously recovered primary Java files for `DatabankRename`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
@@ -325,9 +325,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `DatabankRename`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `EquityChartBenchmark` — BLOCKED-NOT-EXECUTABLE
+### `EquityChartBenchmark` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartbenchmark). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartBenchmark`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartbenchmark). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartBenchmark`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `EquityChartBenchmark` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -342,9 +342,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartBenchmark`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `EquityChartDailyChart` — BLOCKED-NOT-EXECUTABLE
+### `EquityChartDailyChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdailychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartDailyChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdailychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartDailyChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `EquityChartDailyChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -359,9 +359,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartDailyChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `EquityChartDrawdown` — BLOCKED-NOT-EXECUTABLE
+### `EquityChartDrawdown` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdrawdown). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartDrawdown`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdrawdown). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartDrawdown`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `EquityChartDrawdown` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -376,9 +376,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartDrawdown`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `EquityChartVolatility` — BLOCKED-NOT-EXECUTABLE
+### `EquityChartVolatility` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolatility). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartVolatility`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolatility). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartVolatility`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `EquityChartVolatility` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -393,9 +393,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartVolatility`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `EquityChartVolume` — BLOCKED-NOT-EXECUTABLE
+### `EquityChartVolume` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolume). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartVolume`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolume). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartVolume`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `EquityChartVolume` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -410,9 +410,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartVolume`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `LoaderSQ3` — BLOCKED-NOT-EXECUTABLE
+### `LoaderSQ3` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `LoaderSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`LoaderSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `LoaderSQ3` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -427,7 +427,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `LoaderSQ3`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `LoaderSQ4` — BLOCKED-NOT-EXECUTABLE
+### `LoaderSQ4` — READY
 
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq4). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `LoaderSQ4`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
@@ -444,9 +444,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `LoaderSQ4`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsChart` — BLOCKED-NOT-EXECUTABLE
+### `ResultsChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultschart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultschart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -461,7 +461,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsDatabankActions` — BLOCKED-NOT-EXECUTABLE
+### `ResultsDatabankActions` — READY
 
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 63 current plugin JavaScript files and 2 previously recovered primary Java files for `ResultsDatabankActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
@@ -478,9 +478,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsDatabankActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsDatabankViews` — BLOCKED-NOT-EXECUTABLE
+### `ResultsDatabankViews` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsDatabankViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsDatabankViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsDatabankViews` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -495,9 +495,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsDatabankViews`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsEquityChart` — BLOCKED-NOT-EXECUTABLE
+### `ResultsEquityChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsequitychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsEquityChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsequitychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsEquityChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsEquityChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -512,9 +512,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsEquityChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsExplore` — BLOCKED-NOT-EXECUTABLE
+### `ResultsExplore` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsexplore). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsExplore`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsexplore). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsExplore`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsExplore` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -529,7 +529,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsExplore`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsOverview` — BLOCKED-NOT-EXECUTABLE
+### `ResultsOverview` — READY
 
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsoverview). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 2 previously recovered primary Java files for `ResultsOverview`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
@@ -546,9 +546,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsOverview`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsPlugins` — BLOCKED-NOT-EXECUTABLE
+### `ResultsPlugins` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsplugins). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsPlugins`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsplugins). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsPlugins`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsPlugins` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -563,9 +563,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPlugins`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsPortfolioCorrelation` — BLOCKED-NOT-EXECUTABLE
+### `ResultsPortfolioCorrelation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsportfoliocorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsPortfolioCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsportfoliocorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsPortfolioCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsPortfolioCorrelation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -580,9 +580,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPortfolioCorrelation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsProfileChart` — BLOCKED-NOT-EXECUTABLE
+### `ResultsProfileChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsprofilechart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsProfileChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsprofilechart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsProfileChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsProfileChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -597,9 +597,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsProfileChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsReport` — BLOCKED-NOT-EXECUTABLE
+### `ResultsReport` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsreport). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsReport`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsreport). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsReport`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsReport` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -614,9 +614,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsReport`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsSourceCode` — BLOCKED-NOT-EXECUTABLE
+### `ResultsSourceCode` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultssourcecode). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsSourceCode`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultssourcecode). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsSourceCode`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsSourceCode` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -631,9 +631,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSourceCode`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsSPOverview` — BLOCKED-NOT-EXECUTABLE
+### `ResultsSPOverview` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsspoverview). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 11 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsSPOverview`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsspoverview). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 11 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsSPOverview`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsSPOverview` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -648,9 +648,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSPOverview`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsStockpicker` — BLOCKED-NOT-EXECUTABLE
+### `ResultsStockpicker` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstockpicker). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsStockpicker`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstockpicker). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsStockpicker`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsStockpicker` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -665,9 +665,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsStockpicker`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsStrategyConfig` — BLOCKED-NOT-EXECUTABLE
+### `ResultsStrategyConfig` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstrategyconfig). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsStrategyConfig`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstrategyconfig). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsStrategyConfig`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsStrategyConfig` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -682,9 +682,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsStrategyConfig`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsTradeAnalysis` — BLOCKED-NOT-EXECUTABLE
+### `ResultsTradeAnalysis` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradeanalysis). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsTradeAnalysis`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradeanalysis). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsTradeAnalysis`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsTradeAnalysis` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -699,9 +699,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradeAnalysis`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsTradeList` — BLOCKED-NOT-EXECUTABLE
+### `ResultsTradeList` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelist). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsTradeList`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelist). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsTradeList`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsTradeList` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -716,9 +716,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradeList`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ResultsTradelistViews` — BLOCKED-NOT-EXECUTABLE
+### `ResultsTradelistViews` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelistviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsTradelistViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelistviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsTradelistViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ResultsTradelistViews` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -733,9 +733,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradelistViews`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SaverHTML` — BLOCKED-NOT-EXECUTABLE
+### `SaverHTML` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverhtml). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverHTML`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverhtml). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverHTML`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SaverHTML` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -750,9 +750,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverHTML`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SaverPDF` — BLOCKED-NOT-EXECUTABLE
+### `SaverPDF` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverpdf). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverPDF`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverpdf). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverPDF`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SaverPDF` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -767,9 +767,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverPDF`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SaverSQ3` — BLOCKED-NOT-EXECUTABLE
+### `SaverSQ3` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saversq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saversq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SaverSQ3` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -784,9 +784,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverSQ3`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `SaverStrategyTrades` — BLOCKED-NOT-EXECUTABLE
+### `SaverStrategyTrades` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverstrategytrades). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverStrategyTrades`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverstrategytrades). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverStrategyTrades`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `SaverStrategyTrades` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -801,9 +801,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverStrategyTrades`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-### `ServletRenameTool` — BLOCKED-NOT-EXECUTABLE
+### `ServletRenameTool` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletrenametool). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `ServletRenameTool`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletrenametool). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ServletRenameTool`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 *Feature:* Full `ServletRenameTool` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
@@ -818,7 +818,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ServletRenameTool`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
-## Phase 3: concrete extension definition work orders — BLOCKED-NOT-EXECUTABLE
+## Phase 3: concrete extension definition work orders — READY
 *Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. Source file counts do not establish completion or parity.
 
 

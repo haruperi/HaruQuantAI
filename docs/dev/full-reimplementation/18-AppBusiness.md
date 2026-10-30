@@ -44,11 +44,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `uv run python -m pytest tests/workspaces/business/test_build_defaults.py -q` exits 0, two tests.
 *Commit:* `business: preserve fixed-size build attributes`.
 
-## Phase 18.2: complete workspace contribution - BLOCKED-NOT-EXECUTABLE
+## Phase 18.2: complete workspace contribution - READY
 
 All 1 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppSQXBusiness` - I-AppSQXBusiness - BLOCKED-NOT-EXECUTABLE
+### `AppSQXBusiness` - I-AppSQXBusiness - READY
 
 *Feature:* complete AppSQXBusiness workflow.
 *Evidence IDs:* `OBS145-AppSQXBusiness-SCOPE-001` establishes source presence only; `OBS145-AppSQXBusiness-HELPER-001` establishes only the separately scoped helper.

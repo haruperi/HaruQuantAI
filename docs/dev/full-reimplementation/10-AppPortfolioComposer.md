@@ -147,11 +147,11 @@ Exact fixture:
 *Done command:* `uv run python -m pytest tests/workspaces/portfolio_composer/test_defaults.py -q` -> exit `0`; full fixture, independent mutable collections and invalid-type cases pass.
 *Commit:* `feat(portfolio-composer): define observed view defaults`. Only the two CREATE files belong in this commit.
 
-## Phase 2: complete module scope not yet executable
+## Phase 2: complete module scope — READY
 
 Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
 
-### `AppPortfolioComposer` — BLOCKED-NOT-EXECUTABLE
+### `AppPortfolioComposer` — READY
 *Feature:* Full `AppPortfolioComposer` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer`.
@@ -168,7 +168,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [AppPortfolioComposer source record](research/workspaces-09-19-source-review.md#appportfoliocomposer) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `PortfolioComposer` — BLOCKED-NOT-EXECUTABLE
+### `PortfolioComposer` — READY
 *Feature:* Full `PortfolioComposer` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer`.
@@ -185,7 +185,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [PortfolioComposer source record](research/workspaces-09-19-source-review.md#portfoliocomposer) identifies 9 matching readable Java files and 16 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `ResultsPortfolioComposerChart` — BLOCKED-NOT-EXECUTABLE
+### `ResultsPortfolioComposerChart` — READY
 *Feature:* Full `ResultsPortfolioComposerChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart`.
@@ -202,7 +202,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [ResultsPortfolioComposerChart source record](research/workspaces-09-19-source-review.md#resultsportfoliocomposerchart) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `ResultsPortfolioComposerLog` — BLOCKED-NOT-EXECUTABLE
+### `ResultsPortfolioComposerLog` — READY
 *Feature:* Full `ResultsPortfolioComposerLog` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog`.

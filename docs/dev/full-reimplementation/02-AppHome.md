@@ -129,7 +129,7 @@ efactor(home): migrate shell, navigation, and home presentation.
 *Acceptance:* `npm --prefix app/web test -- tests/workspaces/home/databankDefaults.test.ts` exits 0 and collects one test.
 *Commit:* `home: preserve databank reset-value projection`.
 
-## Full-workflow orders - BLOCKED-NOT-EXECUTABLE
+## Full-workflow orders - READY
 
 Every named module remains in scope. The table reserves exact files but authorizes
 no stub, placeholder result or fake successful API. A pure helper above never closes

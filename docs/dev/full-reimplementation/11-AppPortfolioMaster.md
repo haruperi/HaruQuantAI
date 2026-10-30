@@ -110,11 +110,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Done command:* `uv run python -m pytest tests/workspaces/portfolio_master/test_fitness_target.py -q` -> exit `0`; equal/different/re-enabled and two type-error cases pass.
 *Commit:* `feat(portfolio-master): define fitness target-field state`. Only the two CREATE files belong in this commit.
 
-## Phase 2: complete module scope not yet executable
+## Phase 2: complete module scope — READY
 
 Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
 
-### `AppPortfolioMaster` — BLOCKED-NOT-EXECUTABLE
+### `AppPortfolioMaster` — READY
 *Feature:* Full `AppPortfolioMaster` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`.
@@ -131,7 +131,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [AppPortfolioMaster source record](research/workspaces-09-19-source-review.md#appportfoliomaster) identifies 1 matching readable Java files and 1 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `FitnessMethodExistingPortfolio` — BLOCKED-NOT-EXECUTABLE
+### `FitnessMethodExistingPortfolio` — READY
 *Feature:* Full `FitnessMethodExistingPortfolio` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio`.
@@ -148,7 +148,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Source reassessment (2026-10-30):* [FitnessMethodExistingPortfolio source record](research/workspaces-09-19-source-review.md#fitnessmethodexistingportfolio) identifies 2 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-## Phase 3: concrete extension definition work orders — BLOCKED-NOT-EXECUTABLE
+## Phase 3: concrete extension definition work orders — READY
 
 ### `PortfolioMasterFitness`
 

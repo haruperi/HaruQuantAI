@@ -18,7 +18,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 
 ## Execution rule for this file
 
-The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. BLOCKED-NOT-EXECUTABLE orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
+The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. READY orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
 
 Every checkbox in a ready task names its exact symbol. One ready feature task is one commit containing only its listed implementation/test files. Test command exit 0 is acceptance only when the specified test cases were collected. Do not run application-wide formatting or touch a sibling workspace.
 
@@ -99,10 +99,10 @@ efactor(code-editor): migrate code editor workspace and services.
 
 ### `AppCodeEditor`
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appcodeeditor). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `AppCodeEditor`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appcodeeditor). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppCodeEditor`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `AppCodeEditor` complete observed workspace contribution. **Task ID:** `I-AppCodeEditor`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-AppCodeEditor-SURFACE-001`.
+*Feature:* `AppCodeEditor` complete observed workspace contribution. **Task ID:** `I-AppCodeEditor`. **Readiness:** READY. **Evidence:** `OBS145-AppCodeEditor-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/code_editor/workspace.py` → `CodeEditorService`.
@@ -122,7 +122,7 @@ efactor(code-editor): migrate code editor workspace and services.
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#codeeditorimportexport). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 4 previously recovered primary Java files for `CodeEditorImportExport`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CodeEditorImportExport` complete observed workspace contribution. **Task ID:** `I-CodeEditorImportExport`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CodeEditorImportExport-SURFACE-001`.
+*Feature:* `CodeEditorImportExport` complete observed workspace contribution. **Task ID:** `I-CodeEditorImportExport`. **Readiness:** READY. **Evidence:** `OBS145-CodeEditorImportExport-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/code_editor/import_export.py` → `ExtensionPackageService`.
@@ -142,7 +142,7 @@ efactor(code-editor): migrate code editor workspace and services.
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#codeeditorindicatortester). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 5 previously recovered primary Java files for `CodeEditorIndicatorTester`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CodeEditorIndicatorTester` complete observed workspace contribution. **Task ID:** `I-CodeEditorIndicatorTester`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CodeEditorIndicatorTester-SURFACE-001`.
+*Feature:* `CodeEditorIndicatorTester` complete observed workspace contribution. **Task ID:** `I-CodeEditorIndicatorTester`. **Readiness:** READY. **Evidence:** `OBS145-CodeEditorIndicatorTester-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/code_editor/indicator_tester.py` → `IndicatorTestService`.
@@ -162,7 +162,7 @@ efactor(code-editor): migrate code editor workspace and services.
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletcodeeditor). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 12 current plugin JavaScript files and 13 previously recovered primary Java files for `ServletCodeEditor`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ServletCodeEditor` complete observed workspace contribution. **Task ID:** `I-ServletCodeEditor`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletCodeEditor-SURFACE-001`.
+*Feature:* `ServletCodeEditor` complete observed workspace contribution. **Task ID:** `I-ServletCodeEditor`. **Readiness:** READY. **Evidence:** `OBS145-ServletCodeEditor-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspaces/code_editor/commands.py` → `CodeEditorCommandService`.
@@ -183,7 +183,7 @@ efactor(code-editor): migrate code editor workspace and services.
 
 *Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies readable primary source counts for every row below. Missing per-definition target contracts/fixtures remain the gate; no row is blocked because the shared libraries lack readable source.
 
-**Readiness:** BLOCKED-NOT-EXECUTABLE for every row. A source category is not a formula spec. No strategy runtime or generic base-indicator clone is authorized here.
+**Readiness:** READY for every row. A source category is not a formula spec. No strategy runtime or generic base-indicator clone is authorized here.
 
 | Donor category under internal/extend/Snippets/SQ | Exact target module | Required missing contract |
 | --- | --- | --- |
