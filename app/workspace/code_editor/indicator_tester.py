@@ -1,14 +1,54 @@
-"""Historical indicator test sessions, chart series and durable configurations."""
+"""Indicator tester editor contracts and workflows.
+
+Description:
+    Runs synchronous historical calculations and persists typed test configurations.
+    Diagnostic variants preserve differences, non-finite gaps and execution failures.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
+Key Capabilities:
+    - FR-code-editor-indicator-run: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-tester-edit-indy-params: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-tester-indicator-tester: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-tester-indicator-tester-error: Observe the associated
+      workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-tester-init: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-tester-load-test-config: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-tester-new-indy-test: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-tester-save-test-config: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor.indicator_tester
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
+"""
 
 from __future__ import annotations
 
+import logging
 import math
 import time
 from collections.abc import Callable, Mapping
-from typing import Any
 from uuid import uuid4
 
-from app.core.host.logging import get_logger
+from pydantic import TypeAdapter
+
+from app.core.lib.errors import JSONValue
+from app.core.lib.responses import ErrorCode
+from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.price import BarPrice
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._indicator_data import (
@@ -19,8 +59,20 @@ from app.workspace.code_editor._indicator_data import (
 )
 from app.workspace.code_editor._indicator_resolver import resolve_indicator
 from app.workspace.code_editor._storage import StateStore
+from app.workspace.code_editor.results import (
+    Candle,
+    IndicatorConfig,
+    IndicatorDiagnostic,
+    IndicatorResult,
+    IndicatorRow,
+    LoadedTest,
+    PlotPoint,
+    PlotSeries,
+    SavedTest,
+    validate_result,
+)
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class IndicatorTester:
@@ -31,21 +83,23 @@ class IndicatorTester:
         store: StateStore | None = None,
         history_loader: Callable[..., tuple[BarPrice, list[int]]] | None = None,
     ) -> None:
+        logger.debug("FR-code-editor-indicator-tester-init: invoked")
         self._store = store or StateStore()
         self._history_loader = history_loader or (
             lambda symbol, timeframe, count: historical_bars(
                 self._store.gateway, symbol, timeframe, count
             )
         )
-        self._tests: dict[str, dict[str, Any]] = {}
-        self._error_logs: dict[str, list[dict[str, Any]]] = {}
+        self._tests: dict[str, IndicatorConfig] = {}
+        self._error_logs: dict[str, list[IndicatorDiagnostic]] = {}
 
     def new_indy_test(
         self, indicator_name: str, symbol: str = "EURUSD", timeframe: str = "H1"
-    ) -> dict[str, Any]:
+    ) -> IndicatorConfig:
         """FR-CODEEDITOR-INDTEST-NEW: Derive defaults from the selected class."""
+        logger.debug("FR-code-editor-indicator-tester-new-indy-test: invoked")
         cls = self._resolve_indicator_class(indicator_name)
-        config: dict[str, Any] = {
+        config: IndicatorConfig = {
             "test_id": str(uuid4()),
             "indicator_name": indicator_name,
             "symbol": symbol,
@@ -56,9 +110,9 @@ class IndicatorTester:
             "created_at": time.time(),
         }
         self._tests[config["test_id"]] = config
-        return dict(config)
+        return config.copy()
 
-    def _resolve_indicator_class(self, indicator_name: str) -> Any:
+    def _resolve_indicator_class(self, indicator_name: str) -> type[BaseIndicator]:
         """Resolve the current declared class in the unified indicator library."""
         return resolve_indicator(indicator_name)
 
@@ -67,16 +121,17 @@ class IndicatorTester:
         indicator_name: str,
         symbol: str = "EURUSD",
         timeframe: str = "H1",
-        params: Mapping[str, Any] | None = None,
+        params: Mapping[str, JSONValue] | None = None,
         bars_to_reserve: int = 50,
         bar_count: int = 150,
         reference_values: list[float] | None = None,
         test_id: str | None = None,
-    ) -> dict[str, Any]:
+    ) -> IndicatorResult:
         """FR-CODEEDITOR-INDTEST-RUN: Execute on Data Manager history and report gaps."""
+        logger.debug("FR-code-editor-indicator-tester-indicator-tester: invoked")
         identifier = test_id or str(uuid4())
-        errors: list[dict[str, Any]] = []
-        result: dict[str, Any] = {
+        errors: list[IndicatorDiagnostic] = []
+        result: dict[str, object] = {
             "test_id": identifier,
             "status": "failed",
             "symbol": symbol,
@@ -93,7 +148,7 @@ class IndicatorTester:
                 raise CodeEditorError("Reserve and display bar counts are out of range")
             cls = self._resolve_indicator_class(indicator_name)
             effective = indicator_defaults(cls) if params is None else dict(params)
-            config = {
+            config: IndicatorConfig = {
                 "test_id": identifier,
                 "indicator_name": indicator_name,
                 "symbol": symbol,
@@ -116,20 +171,24 @@ class IndicatorTester:
                 name: getattr(bars, name + "_series")().values[start:]
                 for name in ("open", "high", "low", "close", "volume")
             }
-            candles = [
+            candles: list[Candle] = [
                 {
                     "time": stamp,
-                    **{name: float(values[i]) for name, values in ohlcv.items()},
+                    "open": float(ohlcv["open"][i]),
+                    "high": float(ohlcv["high"][i]),
+                    "low": float(ohlcv["low"][i]),
+                    "close": float(ohlcv["close"][i]),
+                    "volume": float(ohlcv["volume"][i]),
                 }
                 for i, stamp in enumerate(stamps)
             ]
-            plots: list[dict[str, Any]] = []
+            plots: list[PlotSeries] = []
             category = str(getattr(cls, "category", "")).lower()
             separate = any(
                 word in category for word in ("momentum", "volume", "oscillator")
             ) or cls.__name__ in {"RSI", "MACD", "Stochastic", "ATR", "CCI", "ADX"}
             for name, values in outputs.items():
-                points: list[dict[str, Any]] = []
+                points: list[PlotPoint] = []
                 for index, value in enumerate(values[start:]):
                     if not math.isfinite(float(value)):
                         errors.append(
@@ -151,13 +210,18 @@ class IndicatorTester:
                 )
                 plots.append({"name": name, "pane": pane, "data": points})
             primary = plots[0]["data"]
-            table = []
+            table: list[IndicatorRow] = []
             for index, candle in enumerate(candles):
                 row_values = {
                     plot["name"]: plot["data"][index].get("value") for plot in plots
                 }
-                row = {
-                    **candle,
+                row: IndicatorRow = {
+                    "time": candle["time"],
+                    "open": candle["open"],
+                    "high": candle["high"],
+                    "low": candle["low"],
+                    "close": candle["close"],
+                    "volume": candle["volume"],
                     "indicator_val": primary[index].get("value"),
                     "outputs": row_values,
                 }
@@ -165,18 +229,20 @@ class IndicatorTester:
                     reference = float(reference_values[index])
                     if not math.isfinite(reference):
                         raise CodeEditorError("Reference values must be finite")
-                    difference = (
-                        abs(row["indicator_val"] - reference)
-                        if row["indicator_val"] is not None
-                        else None
-                    )
-                    row.update(reference_val=reference, diff=difference)
-                    if difference is not None and difference > 0.0001:
+                    actual = row["indicator_val"]
+                    difference = abs(actual - reference) if actual is not None else None
+                    row["reference_val"] = reference
+                    row["diff"] = difference
+                    if (
+                        actual is not None
+                        and difference is not None
+                        and difference > 0.0001
+                    ):
                         errors.append(
                             {
                                 "bar": index,
                                 "time": candle["time"],
-                                "calc": row["indicator_val"],
+                                "calc": actual,
                                 "ref": reference,
                                 "diff": difference,
                             }
@@ -193,16 +259,25 @@ class IndicatorTester:
                 data_source="historical",
             )
         except Exception as exc:
-            logger.exception("Indicator test failed: %s", indicator_name)
-            errors.append({"bar": 0, "type": type(exc).__name__, "message": str(exc)})
-            result.update(error=str(exc), discrepancies=errors)
+            logger.warning(
+                "FR-code-editor-indicator-run: failed category=%s", type(exc).__name__
+            )
+            message = (
+                str(exc)
+                if isinstance(exc, CodeEditorError)
+                else "Indicator calculation failed"
+            )
+            errors.append({"bar": 0, "type": type(exc).__name__, "message": message})
+            result.update(error=message, discrepancies=errors)
         self._error_logs[identifier] = errors
-        return result
+        logger.info("FR-code-editor-indicator-run: completed")
+        return validate_result(TypeAdapter(IndicatorResult), result)
 
     def edit_indy_params(
-        self, test_id: str, params: Mapping[str, Any]
-    ) -> dict[str, Any]:
+        self, test_id: str, params: Mapping[str, JSONValue]
+    ) -> IndicatorResult:
         """FR-CODEEDITOR-INDTEST-PARAMS: Reuse the session's history and identity."""
+        logger.debug("FR-code-editor-indicator-tester-edit-indy-params: invoked")
         if test_id not in self._tests:
             raise CodeEditorError(f"Unknown indicator test: {test_id}")
         cfg = self._tests[test_id]
@@ -219,28 +294,37 @@ class IndicatorTester:
 
     def indicator_tester_error(
         self, test_id: str | None = None
-    ) -> list[dict[str, Any]]:
+    ) -> list[IndicatorDiagnostic]:
         """FR-CODEEDITOR-INDTEST-ERROR: Return non-finite values and exceptions."""
+        logger.debug("FR-code-editor-indicator-tester-indicator-tester-error: invoked")
         return (
             self._error_logs.get(test_id, [])
             if test_id
             else [error for errors in self._error_logs.values() for error in errors]
         )
 
-    def save_test_config(self, test_id: str, name: str) -> dict[str, Any]:
+    def save_test_config(self, test_id: str, name: str) -> SavedTest:
         """FR-CODEEDITOR-INDTEST-SAVE: Persist the complete setup through SQLite."""
+        logger.debug("FR-code-editor-indicator-tester-save-test-config: invoked")
         if test_id not in self._tests or not name.strip():
             raise CodeEditorError(
                 "Choose an existing test and a nonempty configuration name"
             )
-        config = {**self._tests[test_id], "saved_name": name}
+        config = self._tests[test_id].copy()
+        config["saved_name"] = name
         self._store.write("indicator:" + test_id, config)
         return {"status": "saved", "config_id": test_id, "config": config}
 
-    def load_test_config(self, config_id: str) -> dict[str, Any]:
+    def load_test_config(self, config_id: str) -> LoadedTest:
         """FR-CODEEDITOR-INDTEST-LOAD: Restore a saved test after process restart."""
-        config = self._store.read("indicator:" + config_id)
-        if config is None:
+        logger.debug("FR-code-editor-indicator-tester-load-test-config: invoked")
+        raw = self._store.read("indicator:" + config_id)
+        if raw is None:
             raise CodeEditorError(f"Test config '{config_id}' not found")
+        config = validate_result(TypeAdapter(IndicatorConfig), raw)
+        if config["test_id"] != config_id:
+            raise CodeEditorError(
+                "Invalid editor stored state", code=ErrorCode.INTERNAL
+            )
         self._tests[config_id] = config
         return {"status": "loaded", "config": config}

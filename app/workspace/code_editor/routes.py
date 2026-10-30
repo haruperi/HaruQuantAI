@@ -1,35 +1,83 @@
-"""CodeEditor — Workspace Operations, Navigation, and Code Compilation Service.
+"""Routes editor contracts and workflows.
 
+Description:
+    Coordinates typed navigation, file commands, search and synchronous compilation.
+    Existing generators and registry own their implementations; no jobs are created.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
 Key Capabilities:
-- FR-CODEEDITOR-MENU: Return editor action menus and toolbar configurations [CodeEditor.menu()]
-- FR-CODEEDITOR-MAINTABS: List open document tabs and active states [CodeEditor.maintabs()]
-- FR-CODEEDITOR-EDITORS: Inspect active editor files with unsaved indicators [CodeEditor.editors()]
-- FR-CODEEDITOR-NAVIGATOR: Build hierarchical file tree of snippets [CodeEditor.navigator()]
-- FR-CODEEDITOR-RIGHTTABS: Return right panel configuration (Navigator/Editors) [CodeEditor.righttabs()]
-- FR-CODEEDITOR-BOTTOMTABS: Return bottom panel configuration (Logs/Search) [CodeEditor.bottomtabs()]
-- FR-CODEEDITOR-LOGPANE: Read compilation diagnostic and syntax logs [CodeEditor.logpane()]
-- FR-CODEEDITOR-SEARCHPANE: Read find-in-files search results [CodeEditor.searchpane()]
-- FR-CODEEDITOR-NEW-FILE: Create new code file on disk [CodeEditor.new_file()]
-- FR-CODEEDITOR-NEW-DIR: Create new directory in snippet workspace [CodeEditor.new_dir()]
-- FR-CODEEDITOR-CREATE-NEW: Generate snippet from one of 12 templates [CodeEditor.create_new()]
-- FR-CODEEDITOR-CLONE: Duplicate existing code file with unique name [CodeEditor.clone()]
-- FR-CODEEDITOR-RENAME: Rename source file or directory [CodeEditor.rename_file()]
-- FR-CODEEDITOR-DELETE: Safely delete file from workspace [CodeEditor.delete_file()]
-- FR-CODEEDITOR-FIND: Search for text/regex across project files [CodeEditor.find_in_files()]
-- FR-CODEEDITOR-COMPILE: Validate syntax and dynamically reload snippet [CodeEditor.compile_file()]
-- FR-CODEEDITOR-COMPILE-ALL: Batch validate and reload all snippets [CodeEditor.compile_all()]
+    - FR-code-editor-routes: Observe the associated workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-bottomtabs: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-clone: Observe the associated workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-compile-all: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-compile-file: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-create-new: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-delete-file: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-editors: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-find-in-files: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-init: Observe the associated workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-logpane: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-maintabs: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-menu: Observe the associated workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-navigator: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-new-dir: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-new-file: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-rename-file: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-righttabs: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-searchpane: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-routes-visit-: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor.routes
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
 """
 
 from __future__ import annotations
 
 import ast
+import logging
 import re
 import shutil
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, cast, override
+from typing import override
 
-from app.core.host.logging import get_logger
 from app.workspace.code_editor._common import (
     INCLUDE_DIR,
     PROJECT_ROOT,
@@ -42,22 +90,39 @@ from app.workspace.code_editor._common import (
 from app.workspace.code_editor._template_generators import _to_pascal_case
 from app.workspace.code_editor.editor import AppCodeEditor
 from app.workspace.code_editor.registry import registry, unresolved_symbols
+from app.workspace.code_editor.results import (
+    CompileAllResult,
+    CompileResult,
+    CreatedSnippet,
+    DeleteResult,
+    DirectoryResult,
+    EditorSummary,
+    Menu,
+    NavigatorItem,
+    PanelTabs,
+    RenameResult,
+    SaveResult,
+    SearchMatch,
+    Tab,
+)
 from app.workspace.code_editor.templates import render_template
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class CodeEditor:
     """Service handling code editor actions, file navigation, and snippet validation."""
 
     def __init__(self, editor: AppCodeEditor | None = None) -> None:
+        logger.debug("FR-code-editor-routes-init: invoked")
         self.editor = editor or AppCodeEditor()
-        self._log_history: list[dict[str, Any]] = []
-        self._search_history: list[dict[str, Any]] = []
-        logger.info("Initialized CodeEditor service.")
+        self._log_history: list[CompileResult] = []
+        self._search_history: list[SearchMatch] = []
+        logger.info("FR-code-editor-routes: operation")
 
-    def menu(self) -> dict[str, Any]:
+    def menu(self) -> Menu:
         """FR-CODEEDITOR-MENU: Display code editor main menu and action toolbar."""
+        logger.debug("FR-code-editor-routes-menu: invoked")
         return {
             "toolbar": [
                 {
@@ -79,13 +144,15 @@ class CodeEditor:
             ]
         }
 
-    def maintabs(self) -> list[dict[str, Any]]:
+    def maintabs(self) -> list[Tab]:
         """FR-CODEEDITOR-MAINTABS: Manage open editor document tabs."""
+        logger.debug("FR-code-editor-routes-maintabs: invoked")
         state = self.editor.init_workspace()
-        return cast("list[dict[str, Any]]", state.get("open_tabs", []))
+        return state["open_tabs"]
 
-    def editors(self) -> list[dict[str, Any]]:
+    def editors(self) -> list[EditorSummary]:
         """FR-CODEEDITOR-EDITORS: List open editor files with dirty indicators."""
+        logger.debug("FR-code-editor-routes-editors: invoked")
         return [
             {
                 "file_path": tab["file_path"],
@@ -95,13 +162,14 @@ class CodeEditor:
             for tab in self.maintabs()
         ]
 
-    def navigator(self, root_dir: str | None = None) -> dict[str, Any]:
+    def navigator(self, root_dir: str | None = None) -> NavigatorItem:
         """FR-CODEEDITOR-NAVIGATOR: Build hierarchical file tree of snippet repository."""
+        logger.debug("FR-code-editor-routes-navigator: invoked")
         target_root = resolve_safe_path(root_dir) if root_dir else INCLUDE_DIR
         target_root.mkdir(parents=True, exist_ok=True)
 
-        def _build_tree(folder: Path) -> dict[str, Any]:
-            children = []
+        def _build_tree(folder: Path) -> NavigatorItem:
+            children: list[NavigatorItem] = []
             for item in sorted(
                 folder.iterdir(), key=lambda p: (not p.is_dir(), p.name.lower())
             ):
@@ -130,52 +198,57 @@ class CodeEditor:
             }
 
         tree = _build_tree(target_root)
-        logger.info(
-            f"Built navigator file tree rooted at {tree.get('name', 'snippets')}."
-        )
+        logger.info("FR-code-editor-routes: operation")
         return tree
 
-    def righttabs(self) -> dict[str, Any]:
+    def righttabs(self) -> PanelTabs:
         """FR-CODEEDITOR-RIGHTTABS: Return right panel tabs configuration."""
+        logger.debug("FR-code-editor-routes-righttabs: invoked")
         return {
             "active_tab": "navigator",
             "tabs": ["navigator", "open_editors"],
         }
 
-    def bottomtabs(self) -> dict[str, Any]:
+    def bottomtabs(self) -> PanelTabs:
         """FR-CODEEDITOR-BOTTOMTABS: Return bottom panel tabs configuration."""
+        logger.debug("FR-code-editor-routes-bottomtabs: invoked")
         return {
             "active_tab": "log",
             "tabs": ["log", "search"],
         }
 
-    def logpane(self) -> list[dict[str, Any]]:
+    def logpane(self) -> list[CompileResult]:
         """FR-CODEEDITOR-LOGPANE: Return compilation and error logs."""
+        logger.debug("FR-code-editor-routes-logpane: invoked")
         return self._log_history
 
-    def searchpane(self) -> list[dict[str, Any]]:
+    def searchpane(self) -> list[SearchMatch]:
         """FR-CODEEDITOR-SEARCHPANE: Return find-in-files search results."""
+        logger.debug("FR-code-editor-routes-searchpane: invoked")
         return self._search_history
 
-    def new_file(self, file_path: str, content: str = "") -> dict[str, Any]:
+    def new_file(self, file_path: str, content: str = "") -> SaveResult:
         """FR-CODEEDITOR-NEW-FILE: Create a new source file."""
+        logger.debug("FR-code-editor-routes-new-file: invoked")
         resolved = resolve_safe_path(file_path)
         if resolved.exists():
             raise CodeEditorError(f"File already exists: {file_path}")
         return self.editor.save_file(str(resolved), content)
 
-    def new_dir(self, dir_path: str) -> dict[str, Any]:
+    def new_dir(self, dir_path: str) -> DirectoryResult:
         """FR-CODEEDITOR-NEW-DIR: Create a new directory."""
+        logger.debug("FR-code-editor-routes-new-dir: invoked")
         resolved = writable_snippet_path(dir_path)
         resolved.mkdir(parents=True, exist_ok=True)
         rel_p = resolved.relative_to(PROJECT_ROOT).as_posix()
-        logger.info("Created new directory: %s", rel_p)
+        logger.info("FR-code-editor-routes: operation")
         return {"status": "created", "dir_path": rel_p}
 
     def create_new(
         self, template_type: str, name: str, category: str = "custom"
-    ) -> dict[str, Any]:
+    ) -> CreatedSnippet:
         """FR-CODEEDITOR-CREATE-NEW: Generate a new snippet from one of 12 templates."""
+        logger.debug("FR-code-editor-routes-create-new: invoked")
         content, rel_path = render_template(template_type, name, category=category)
         resolved = resolve_safe_path(rel_path)
         if resolved.exists():
@@ -185,7 +258,7 @@ class CodeEditor:
 
         saved = self.editor.save_file(str(resolved), content)
         tab_info = self.editor.open_file_tab(str(resolved))
-        logger.info("Created new snippet '%s' from template '%s'.", name, template_type)
+        logger.info("FR-code-editor-routes: operation")
         return {
             "status": "created",
             "template_type": template_type,
@@ -194,8 +267,9 @@ class CodeEditor:
             "tab": tab_info["tab"],
         }
 
-    def clone(self, source_path: str, target_path: str) -> dict[str, Any]:
+    def clone(self, source_path: str, target_path: str) -> SaveResult:
         """FR-CODEEDITOR-CLONE: Duplicate an existing file."""
+        logger.debug("FR-code-editor-routes-clone: invoked")
         src_res = resolve_safe_path(source_path)
         tgt_res = writable_snippet_path(target_path)
         if not src_res.exists():
@@ -218,12 +292,14 @@ class CodeEditor:
                 class Rename(ast.NodeTransformer):
                     @override
                     def visit_ClassDef(self, node: ast.ClassDef) -> ast.AST:
+                        logger.debug("FR-code-editor-routes-visit-ClassDef: invoked")
                         if node.name == old_name:
                             node.name = new_name
                         return self.generic_visit(node)
 
                     @override
                     def visit_Name(self, node: ast.Name) -> ast.AST:
+                        logger.debug("FR-code-editor-routes-visit-Name: invoked")
                         if node.id == old_name:
                             node.id = new_name
                         return node
@@ -231,8 +307,9 @@ class CodeEditor:
                 content = ast.unparse(Rename().visit(tree)) + "\n"
         return self.editor.save_file(str(tgt_res), content)
 
-    def rename_file(self, old_path: str, new_path: str) -> dict[str, Any]:
+    def rename_file(self, old_path: str, new_path: str) -> RenameResult:
         """FR-CODEEDITOR-RENAME: Rename a file or directory."""
+        logger.debug("FR-code-editor-routes-rename-file: invoked")
         old_res = writable_snippet_path(old_path)
         new_res = writable_snippet_path(new_path)
         if not old_res.exists():
@@ -249,11 +326,12 @@ class CodeEditor:
         new_p = new_res.relative_to(PROJECT_ROOT).as_posix()
         self.editor.remap_tabs(old_p, new_p)
         registry.unregister(str(old_res))
-        logger.info("Renamed %s -> %s", old_path, new_path)
+        logger.info("FR-code-editor-routes: operation")
         return {"status": "renamed", "old_path": old_p, "new_path": new_p}
 
-    def delete_file(self, file_path: str) -> dict[str, Any]:
+    def delete_file(self, file_path: str) -> DeleteResult:
         """FR-CODEEDITOR-DELETE: Safely remove file or folder."""
+        logger.debug("FR-code-editor-routes-delete-file: invoked")
         resolved = writable_snippet_path(file_path)
         if not resolved.exists():
             raise CodeEditorError(f"Target does not exist: {file_path}")
@@ -267,7 +345,7 @@ class CodeEditor:
             resolved.unlink()
         self.editor.remap_tabs(rel_p, None)
         registry.unregister(str(resolved))
-        logger.info("Deleted %s", file_path)
+        logger.info("FR-code-editor-routes: operation")
         return {"status": "deleted", "file_path": rel_p}
 
     def find_in_files(
@@ -278,8 +356,9 @@ class CodeEditor:
         regex: bool = False,
         whole_word: bool = False,
         search_dir: str | None = None,
-    ) -> list[dict[str, Any]]:
+    ) -> list[SearchMatch]:
         """FR-CODEEDITOR-FIND: Search for text or patterns across snippets."""
+        logger.debug("FR-code-editor-routes-find-in-files: invoked")
         root = resolve_safe_path(search_dir) if search_dir else INCLUDE_DIR
         flags = 0 if case_sensitive else re.IGNORECASE
         pattern_str = query
@@ -289,7 +368,7 @@ class CodeEditor:
             pattern_str = rf"\b{pattern_str}\b"
 
         matcher = re.compile(pattern_str, flags)
-        matches: list[dict[str, Any]] = []
+        matches: list[SearchMatch] = []
 
         if root.exists():
             for p in root.rglob("*.py"):
@@ -307,23 +386,22 @@ class CodeEditor:
                                 }
                             )
                 except Exception as exc:
-                    logger.debug("Could not read %s: %s", p, exc)
+                    logger.debug("FR-code-editor-routes: operation")
 
         self._search_history = matches
-        logger.info(f"Find in files for '{query}' found {len(matches)} match(es).")
+        logger.info("FR-code-editor-routes: operation")
         return matches
 
-    def compile_file(
-        self, file_path: str, content: str | None = None
-    ) -> dict[str, Any]:
+    def compile_file(self, file_path: str, content: str | None = None) -> CompileResult:
         """FR-CODEEDITOR-COMPILE: Validate syntax and dynamically reload module."""
+        logger.debug("FR-code-editor-routes-compile-file: invoked")
         resolved = resolve_safe_path(file_path)
         code_str = (
             content if content is not None else resolved.read_text(encoding="utf-8")
         )
         diagnostics = validate_python_syntax(code_str)
 
-        log_entry: dict[str, Any] = {
+        log_entry: CompileResult = {
             "file": resolved.relative_to(PROJECT_ROOT).as_posix(),
             "timestamp": datetime.now(UTC).isoformat(),
             "success": len(diagnostics) == 0,
@@ -344,19 +422,20 @@ class CodeEditor:
                     {
                         "line": 1,
                         "column": 1,
-                        "message": f"Runtime import failed: {err}",
+                        "message": str(err)
+                        if isinstance(err, CodeEditorError)
+                        else "Runtime import failed",
                         "severity": "error",
                     }
                 )
 
         self._log_history.insert(0, log_entry)
-        logger.info(
-            f"Compiled {file_path}. Valid: {log_entry['success']}, Errors: {len(log_entry['errors'])}"
-        )
+        logger.info("FR-code-editor-routes: operation")
         return log_entry
 
-    def compile_all(self) -> dict[str, Any]:
+    def compile_all(self) -> CompileAllResult:
         """FR-CODEEDITOR-COMPILE-ALL: Batch validate all snippet files."""
+        logger.debug("FR-code-editor-routes-compile-all: invoked")
         results = []
         for path in list(registry.blocks):
             if not Path(path).exists():
@@ -367,9 +446,7 @@ class CodeEditor:
                     results.append(self.compile_file(str(p)))
 
         success_count = sum(1 for r in results if r["success"])
-        logger.info(
-            f"Compile All completed. {success_count}/{len(results)} snippets valid."
-        )
+        logger.info("FR-code-editor-routes: operation")
         return {
             "status": "completed",
             "total_files": len(results),

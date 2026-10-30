@@ -1,11 +1,26 @@
-"""Resolve declared indicator classes within the unified include library."""
+"""Indicator resolver editor contracts and workflows.
+
+Description:
+    Resolves canonical or compiled indicator classes only within authorized roots.
+    Dynamic introspection stays behind the class-resolution boundary.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
+Key Capabilities:
+    - FR-code-editor-indicator-resolver-resolve-indicator: Observe the associated
+      workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor._indicator_resolver
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
+"""
 
 from __future__ import annotations
 
 import ast
 import inspect
+import logging
 from pathlib import Path
-from typing import Any
 
 from app.include.blocks.indicators.base import BaseIndicator
 from app.workspace.code_editor._common import (
@@ -16,6 +31,9 @@ from app.workspace.code_editor._common import (
     resolve_safe_path,
 )
 from app.workspace.code_editor.registry import registry
+
+logger = logging.getLogger(__name__)
+
 
 INDICATOR_ROOTS: tuple[Path, ...] = (INCLUDE_DIR / "blocks" / "indicators",)
 
@@ -74,7 +92,7 @@ def _safe_indicator_path(path: Path) -> Path:
     raise CodeEditorError(f"Indicator file not found: {path}")
 
 
-def _classes(path: Path) -> dict[str, type[Any]]:
+def _classes(path: Path) -> dict[str, type[BaseIndicator]]:
     cached = registry.blocks.get(str(path))
     if cached is None:
         module = dynamic_import_from_path(path)
@@ -90,8 +108,9 @@ def _classes(path: Path) -> dict[str, type[Any]]:
     }
 
 
-def resolve_indicator(name: str) -> type[Any]:
+def resolve_indicator(name: str) -> type[BaseIndicator]:
     """Prefer live compiled classes; never execute imports outside indicator roots."""
+    logger.debug("FR-code-editor-indicator-resolver-resolve-indicator: invoked")
     clean = name.replace("\\", "/").strip()
     if clean.endswith(".py") or "/" in clean:
         raw = Path(clean)

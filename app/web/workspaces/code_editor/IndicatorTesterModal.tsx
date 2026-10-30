@@ -355,7 +355,7 @@ export function IndicatorTesterModal({ onClose, indicatorName }: IndicatorTester
                                 {row.indicator_val?.toFixed(5) ?? 'NaN'}
                               </td>
                               <td className="py-1.5 px-3 text-slate-400">
-                                {row.diff !== undefined ? `${row.diff.toFixed(5)}` : '—'}
+                                {row.diff != null ? `${row.diff.toFixed(5)}` : '—'}
                               </td>
                               <td className="py-1.5 px-3">
                                 <span className="inline-flex items-center gap-1 text-[10px] text-emerald-400">

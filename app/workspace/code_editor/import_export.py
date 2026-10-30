@@ -1,30 +1,55 @@
-"""CodeEditorImportExport — Snippet Extension Packager and Importer.
+"""Import export editor contracts and workflows.
 
+Description:
+    Exports saved Python sources and imports preflighted archives. Host storage
+    ownership is unchanged; archive-format compatibility is not expanded.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
 Key Capabilities:
-- FR-CODEEDITOR-EXPORT: Bundle snippets and metadata into zip packages [ImportExport.export()]
-- FR-CODEEDITOR-IMPORTED: Inspect package contents and detect conflicts [ImportExport.imported_files()]
-- FR-CODEEDITOR-OVERWRITE: Extract package applying overwrite and skip policies [ImportExport.overwrite_confirm()]
+    - FR-code-editor-import-export: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-import-export-export: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-import-export-imported-files: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-import-export-overwrite-confirm: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor.import_export
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
 """
 
 from __future__ import annotations
 
 import json
+import logging
 import zipfile
 from collections.abc import Mapping, Sequence
 from io import BytesIO
 from pathlib import Path
-from typing import Any
 
-from app.core.host.logging import get_logger
+from app.core.lib.errors import JSONValue
 from app.workspace.code_editor._common import (
     PROJECT_ROOT,
     CodeEditorError,
     writable_snippet_path,
 )
 from app.workspace.code_editor._storage import atomic_write_batch
+from app.workspace.code_editor.requests import ExportPackRequest, ImportPackRequest
+from app.workspace.code_editor.results import (
+    ArchiveEntry,
+    ExportResult,
+    ImportResult,
+    PackageManifest,
+)
 from app.workspace.code_editor.routes import CodeEditor
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class ImportExport:
@@ -34,9 +59,17 @@ class ImportExport:
         self,
         file_paths: Sequence[str],
         archive_path: Path | str,
-        metadata: Mapping[str, Any] | None = None,
-    ) -> dict[str, Any]:
+        metadata: Mapping[str, JSONValue] | None = None,
+    ) -> ExportResult:
         """FR-CODEEDITOR-EXPORT: Export snippets and manifest into a zip archive."""
+        logger.debug("FR-code-editor-import-export-export: invoked")
+        ExportPackRequest.model_validate(
+            {
+                "file_paths": list(file_paths),
+                "archive_path": str(archive_path),
+                "metadata": None if metadata is None else dict(metadata),
+            }
+        )
         dest_archive = Path(archive_path).resolve()
         if dest_archive.suffix.lower() not in {".zip", ".sxp"}:
             raise CodeEditorError("Choose a .zip or .sxp archive destination")
@@ -48,7 +81,7 @@ class ImportExport:
         ):
             raise CodeEditorError("Select existing Python snippet files to export")
 
-        manifest: dict[str, Any] = {
+        manifest: PackageManifest = {
             "version": "1.0",
             "metadata": dict(metadata or {}),
             "files": [],
@@ -64,9 +97,7 @@ class ImportExport:
             zf.writestr("manifest.json", json.dumps(manifest, indent=2))
         atomic_write_batch({dest_archive: buffer.getvalue()})
 
-        logger.info(
-            f"Exported {len(manifest['files'])} snippet(s) to archive: {dest_archive.name}"
-        )
+        logger.info("FR-code-editor-import-export: operation")
         return {
             "status": "exported",
             "archive_path": str(dest_archive),
@@ -74,13 +105,14 @@ class ImportExport:
             "files": manifest["files"],
         }
 
-    def imported_files(self, archive_path: Path | str) -> list[dict[str, Any]]:
+    def imported_files(self, archive_path: Path | str) -> list[ArchiveEntry]:
         """FR-CODEEDITOR-IMPORTED: Preview files inside an archive and identify collisions."""
+        logger.debug("FR-code-editor-import-export-imported-files: invoked")
         src_archive = Path(archive_path).resolve()
         if not src_archive.exists():
             raise CodeEditorError(f"Archive not found: {archive_path}")
 
-        records: list[dict[str, Any]] = []
+        records: list[ArchiveEntry] = []
         with zipfile.ZipFile(src_archive, "r") as zf:
             for item in zf.infolist():
                 if item.filename == "manifest.json" or item.is_dir():
@@ -99,22 +131,29 @@ class ImportExport:
                     }
                 )
 
-        logger.info(
-            f"Inspected archive {src_archive.name}: found {len(records)} entry(ies)."
-        )
+        logger.info("FR-code-editor-import-export: operation")
         return records
 
     def overwrite_confirm(
         self,
         archive_path: Path | str,
         resolution_rules: Mapping[str, str] | None = None,
-    ) -> dict[str, Any]:
+    ) -> ImportResult:
         """FR-CODEEDITOR-OVERWRITE: Extract files honoring resolution rules (overwrite/skip/rename)."""
+        logger.debug("FR-code-editor-import-export-overwrite-confirm: invoked")
         src_archive = Path(archive_path).resolve()
         if not src_archive.exists():
             raise CodeEditorError(f"Archive not found: {archive_path}")
 
-        rules = dict(resolution_rules or {})
+        request = ImportPackRequest.model_validate(
+            {
+                "archive_path": str(archive_path),
+                "resolution_rules": None
+                if resolution_rules is None
+                else dict(resolution_rules),
+            }
+        )
+        rules = request.resolution_rules or {}
         extracted: list[str] = []
         skipped: list[str] = []
 
@@ -157,9 +196,7 @@ class ImportExport:
         compiler = CodeEditor()
         reload_results = [compiler.compile_file(str(path)) for path in pending]
 
-        logger.info(
-            f"Extracted {len(extracted)} file(s), skipped {len(skipped)} from {src_archive.name}."
-        )
+        logger.info("FR-code-editor-import-export: operation")
         return {
             "status": "completed",
             "extracted_count": len(extracted),

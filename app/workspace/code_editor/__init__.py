@@ -1,12 +1,18 @@
-"""AppCodeEditor workspace package for HaruQuantAI.
+"""Init editor contracts and workflows.
 
-Reimplementation of StrategyQuant X's CodeEditor module, featuring:
-- Document session manager and multi-tab code editor
-- 12 snippet boilerplate code generators
-- Workspace file navigator, clone, rename, delete, and search
-- AST syntax validation and dynamic module hot-reloading
-- Interactive Indicator Tester with Lightweight Charts candlestick & plot series
-- Extension package import/export (.zip with manifest)
+Description:
+    Exports the retained editor services and router; HTTP owns request execution. No
+    workspace logging handlers or workers are installed here.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
+Key Capabilities:
+    - FR-code-editor-http-operation: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
 """
 
 from app.workspace.code_editor._common import (

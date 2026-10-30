@@ -490,6 +490,31 @@ test('closing the tester with pending defaults and a run leaves a reopened teste
 
 type PackageResponseWindow = Window & { packageResponsesConsumed: number };
 
+test('a missing indicator value and null reference difference render without crashing', async ({ page }) => {
+  await mockEditor(page);
+  const result = indicatorResult(123);
+  result.indicator_plots = [{ time: result.table_rows[0].time }];
+  result.table_rows[0].indicator_val = null;
+  result.table_rows[0].reference_val = 1;
+  result.table_rows[0].diff = null;
+  result.discrepancies = [{
+    bar: 0, time: result.table_rows[0].time, series: 'value',
+    type: 'NonFiniteValue', message: 'Indicator returned NaN or infinity',
+  }];
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  await page.route('**/code-editor/indicator-test/run', (route) => route.fulfill({
+    json: { status: 'success', data: result },
+  }));
+  await page.goto('/codeeditor');
+  await page.getByRole('button', { name: 'Test Indicator', exact: true }).click();
+  const row = testerModal(page).getByRole('row').filter({ has: page.getByRole('cell', { name: 'NaN', exact: true }) });
+  await expect(row).toBeVisible();
+  await expect(row.getByRole('cell', { name: '—', exact: true })).toBeVisible();
+  await expect(testerModal(page).getByRole('button', { name: 'Run Test', exact: true })).toBeEnabled();
+  expect(pageErrors).toEqual([]);
+});
+
 function packageModal(page: Page) {
   return page.locator('div.fixed.inset-0').filter({
     has: page.getByRole('heading', { name: 'Import / Export Extension Pack', exact: true }),

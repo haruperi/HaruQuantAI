@@ -1,19 +1,53 @@
-"""AppCodeEditor — Code Workspace Host and Document Session Manager.
+"""Editor editor contracts and workflows.
 
+Description:
+    Restores validated document sessions and performs typed buffer, save and session
+    operations. Corrupt stored snapshots are rejected before publication.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
 Key Capabilities:
-- FR-CODEEDITOR-INIT: Initialize dockable editor layout and document tabs [AppCodeEditor.init_workspace()]
-- FR-CODEEDITOR-OPEN-TAB: Open file in an editor tab with dirty tracking [AppCodeEditor.open_file_tab()]
-- FR-CODEEDITOR-CLOSE-TAB: Close tab with unsaved change protection [AppCodeEditor.close_file_tab()]
-- FR-CODEEDITOR-SAVE: Save file content atomically and update diagnostics [AppCodeEditor.save_file()]
-- FR-CODEEDITOR-SAVE-ALL: Atomically save all open dirty tabs [AppCodeEditor.save_all_files()]
+    - FR-code-editor-editor: Observe the associated workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-close-file-tab: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-init: Observe the associated workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-init-workspace: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-open-file-tab: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-remap-tabs: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-save-all-files: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-save-file: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-editor-sync-session: Observe the associated workflow; fixed-label
+      logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-session-restore: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor.editor
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
 """
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping, Sequence
-from typing import Any
 
-from app.core.host.logging import get_logger
+from pydantic import TypeAdapter
+
+from app.core.lib.responses import ErrorCode
 from app.workspace.code_editor._common import (
     PROJECT_ROOT,
     CodeEditorError,
@@ -23,24 +57,37 @@ from app.workspace.code_editor._common import (
     writable_snippet_path,
 )
 from app.workspace.code_editor._storage import StateStore, atomic_write_batch
+from app.workspace.code_editor.requests import SaveAllRequest, SessionRequest
+from app.workspace.code_editor.results import (
+    CloseTabResult,
+    OpenTabResult,
+    SaveAllResult,
+    SavedFile,
+    SaveResult,
+    WorkspaceInfo,
+    WorkspaceState,
+    validate_result,
+)
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 
 
 class AppCodeEditor:
     """Manages open document sessions, tabs, and file content persistence."""
 
     def __init__(self, store: StateStore | None = None) -> None:
+        logger.debug("FR-code-editor-editor-init: invoked")
         self._tabs: dict[str, EditorTab] = {}
         self._active_file: str | None = None
         self._store = store or StateStore()
         self._restored = False
-        logger.info("Initialized AppCodeEditor document workspace.")
+        logger.info("FR-code-editor-editor: operation")
 
-    def init_workspace(self) -> dict[str, Any]:
+    def init_workspace(self) -> WorkspaceInfo:
         """FR-CODEEDITOR-INIT: Initialize workspace state and panel configuration."""
+        logger.debug("FR-code-editor-editor-init-workspace: invoked")
         self._restore()
-        logger.info("Initializing code editor workspace panels and tabs.")
+        logger.info("FR-code-editor-editor: operation")
         return {
             "status": "ready",
             "active_file": self._active_file,
@@ -52,8 +99,9 @@ class AppCodeEditor:
             },
         }
 
-    def open_file_tab(self, file_path: str, *, mode: str = "python") -> dict[str, Any]:
+    def open_file_tab(self, file_path: str, *, mode: str = "python") -> OpenTabResult:
         """FR-CODEEDITOR-OPEN-TAB: Open file in tab, reading content from disk."""
+        logger.debug("FR-code-editor-editor-open-file-tab: invoked")
         self._restore()
         resolved = resolve_safe_path(file_path)
         rel_path = resolved.relative_to(PROJECT_ROOT).as_posix()
@@ -61,7 +109,7 @@ class AppCodeEditor:
         if rel_path in self._tabs:
             self._active_file = rel_path
             self._persist()
-            logger.info("Switched to already open tab: %s", rel_path)
+            logger.info("FR-code-editor-editor: operation")
             return {
                 "status": "switched",
                 "tab": self._tabs[rel_path].to_dict(),
@@ -70,7 +118,7 @@ class AppCodeEditor:
 
         if not resolved.exists():
             msg = f"Cannot open file. Path does not exist: {file_path}"
-            logger.error(msg)
+            logger.error("FR-code-editor-editor: operation")
             raise CodeEditorError(msg)
 
         content = resolved.read_text(encoding="utf-8")
@@ -84,26 +132,27 @@ class AppCodeEditor:
         self._tabs[rel_path] = tab
         self._active_file = rel_path
         self._persist()
-        logger.info("Opened new editor tab for: %s", rel_path)
+        logger.info("FR-code-editor-editor: operation")
         return {
             "status": "opened",
             "tab": tab.to_dict(),
             "active_file": self._active_file,
         }
 
-    def close_file_tab(self, file_path: str, *, force: bool = False) -> dict[str, Any]:
+    def close_file_tab(self, file_path: str, *, force: bool = False) -> CloseTabResult:
         """FR-CODEEDITOR-CLOSE-TAB: Close open tab, checking for unsaved changes."""
+        logger.debug("FR-code-editor-editor-close-file-tab: invoked")
         self._restore()
         resolved = resolve_safe_path(file_path)
         rel_path = resolved.relative_to(PROJECT_ROOT).as_posix()
 
         if rel_path not in self._tabs:
-            logger.warning("Attempted to close non-open tab: %s", rel_path)
+            logger.warning("FR-code-editor-editor: operation")
             return {"status": "not_open", "active_file": self._active_file}
 
         tab = self._tabs[rel_path]
         if tab.is_dirty and not force:
-            logger.warning("Refusing to close dirty tab without force: %s", rel_path)
+            logger.warning("FR-code-editor-editor: operation")
             return {
                 "status": "unsaved_changes",
                 "file_path": rel_path,
@@ -115,15 +164,16 @@ class AppCodeEditor:
             self._active_file = next(iter(self._tabs.keys()), None)
 
         self._persist()
-        logger.info(f"Closed tab: {rel_path}. New active file: {self._active_file}")
+        logger.info("FR-code-editor-editor: operation")
         return {
             "status": "closed",
             "closed_file": rel_path,
             "active_file": self._active_file,
         }
 
-    def save_file(self, file_path: str, content: str) -> dict[str, Any]:
+    def save_file(self, file_path: str, content: str) -> SaveResult:
         """FR-CODEEDITOR-SAVE: Save file content to disk and return diagnostics."""
+        logger.debug("FR-code-editor-editor-save-file: invoked")
         self._restore()
         resolved = writable_snippet_path(file_path)
         atomic_write_batch({resolved: content.encode("utf-8")})
@@ -139,9 +189,7 @@ class AppCodeEditor:
             tab.is_dirty = False
 
         self._persist()
-        logger.info(
-            f"Saved file {rel_path} ({len(content)} chars). Diagnostics: {len(diagnostics)}"
-        )
+        logger.info("FR-code-editor-editor: operation")
         return {
             "status": "saved",
             "file_path": rel_path,
@@ -151,12 +199,19 @@ class AppCodeEditor:
 
     def save_all_files(
         self, files: Sequence[Mapping[str, str]] | None = None
-    ) -> dict[str, Any]:
+    ) -> SaveAllResult:
         """FR-CODEEDITOR-SAVE-ALL: Atomically save multiple dirty files."""
+        logger.debug("FR-code-editor-editor-save-all-files: invoked")
+        parsed = SaveAllRequest.model_validate(
+            {"files": None if files is None else list(files)}
+        )
         self._restore()
         records = (
-            list(files)
-            if files is not None
+            [
+                {"file_path": item.file_path, "content": item.content}
+                for item in parsed.files
+            ]
+            if parsed.files is not None
             else [
                 {"file_path": path, "content": tab.content}
                 for path, tab in self._tabs.items()
@@ -170,7 +225,7 @@ class AppCodeEditor:
                 raise CodeEditorError("Duplicate destination in Save All")
             pending[path] = item["content"].encode("utf-8")
         atomic_write_batch(pending)
-        saved_records = []
+        saved_records: list[SavedFile] = []
         for path, content in pending.items():
             relative = path.relative_to(PROJECT_ROOT).as_posix()
             text = content.decode("utf-8")
@@ -186,7 +241,7 @@ class AppCodeEditor:
                 }
             )
         self._persist()
-        logger.info("Saved batch of %s documents", len(saved_records))
+        logger.info("FR-code-editor-editor: operation")
         return {
             "status": "saved_all",
             "count": len(saved_records),
@@ -194,12 +249,21 @@ class AppCodeEditor:
         }
 
     def sync_session(
-        self, tabs: Sequence[Mapping[str, Any]], active_file: str | None
-    ) -> dict[str, Any]:
+        self, tabs: Sequence[Mapping[str, object]], active_file: str | None
+    ) -> WorkspaceInfo:
         """FR-CODEEDITOR-SESSION: Persist dirty buffers and the active document."""
+        logger.debug("FR-code-editor-editor-sync-session: invoked")
+        parsed = SessionRequest.model_validate(
+            {"tabs": list(tabs), "active_file": active_file}
+        )
         self._restore()
         updated = {}
-        for item in tabs:
+        for record in parsed.tabs:
+            item = {
+                "file_path": record.file_path,
+                "content": record.content,
+                "mode": record.mode,
+            }
             path = resolve_safe_path(item["file_path"])
             relative = path.relative_to(PROJECT_ROOT).as_posix()
             tab = EditorTab(
@@ -222,12 +286,27 @@ class AppCodeEditor:
     def _restore(self) -> None:
         if self._restored:
             return
-        state = self._store.read("workspace") or {}
-        self._tabs = {
-            item["file_path"]: EditorTab(**item) for item in state.get("open_tabs", [])
-        }
-        self._active_file = state.get("active_file")
+        raw = self._store.read("workspace")
+        if raw is None:
+            self._restored = True
+            return
+        state = validate_result(TypeAdapter(WorkspaceState), raw)
+        restored = {}
+        for item in state["open_tabs"]:
+            resolve_safe_path(item["file_path"])
+            if item["file_path"] in restored:
+                raise CodeEditorError(
+                    "Invalid editor stored state", code=ErrorCode.INTERNAL
+                )
+            restored[item["file_path"]] = EditorTab(**item)
+        if state["active_file"] is not None and state["active_file"] not in restored:
+            raise CodeEditorError(
+                "Invalid editor stored state", code=ErrorCode.INTERNAL
+            )
+        self._tabs = restored
+        self._active_file = state["active_file"]
         self._restored = True
+        logger.info("FR-code-editor-session-restore: completed")
 
     def _persist(self) -> None:
         self._store.write(
@@ -240,6 +319,7 @@ class AppCodeEditor:
 
     def remap_tabs(self, old_path: str, new_path: str | None) -> None:
         """FR-CODEEDITOR-REMAP: Preserve buffers when paths move or are deleted."""
+        logger.debug("FR-code-editor-editor-remap-tabs: invoked")
         self._restore()
         for path in list(self._tabs):
             if path == old_path or path.startswith(old_path + "/"):

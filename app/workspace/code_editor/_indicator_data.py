@@ -1,24 +1,55 @@
-"""Read real Data Manager history and adapt indicator calculation contracts."""
+"""Indicator data editor contracts and workflows.
+
+Description:
+    Reads isolated or host-owned historical datasets and adapts canonical indicator
+    outputs. Non-finite series are preserved for explicit downstream gap diagnostics.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
+Key Capabilities:
+    - FR-code-editor-indicator-data-calculate-indicator: Observe the associated
+      workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-data-historical-bars: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-data-indicator-defaults: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-indicator-data-output-series: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor._indicator_data
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
+"""
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping
 from itertools import pairwise
-from typing import Any
+from typing import cast
 
 import numpy as np
 
+from app.core.host.persistence import HostPersistence
+from app.core.lib.errors import JSONValue, copy_json
+from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.price import BarPrice
 from app.include.blocks.series import BarData
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.data_manager.data.review import DatasetReview
 from app.workspace.data_manager.data.storage import require_data
 
+logger = logging.getLogger(__name__)
+
 
 def historical_bars(
-    gateway: Any, symbol: str, timeframe: str, count: int
+    gateway: HostPersistence, symbol: str, timeframe: str, count: int
 ) -> tuple[BarPrice, list[int]]:
     """Read the latest requested bars from one matching stored dataset."""
+    logger.debug("FR-code-editor-indicator-data-historical-bars: invoked")
     rows = require_data(
         gateway.read_records(
             "datamgr_datasets",
@@ -72,22 +103,24 @@ def historical_bars(
     ), timestamps
 
 
-def indicator_defaults(cls: Any) -> dict[str, Any]:
+def indicator_defaults(cls: type[BaseIndicator]) -> dict[str, JSONValue]:
     """Read configuration defaults from the canonical indicator model."""
+    logger.debug("FR-code-editor-indicator-data-indicator-defaults: invoked")
     return {
-        name: field.default
+        name: copy_json(cast("JSONValue", field.default))
         for name, field in cls.model_fields.items()
         if not field.is_required()
     }
 
 
 def calculate_indicator(
-    cls: Any,
+    cls: type[BaseIndicator],
     bars: BarPrice | BarData,
-    params: Mapping[str, Any],
+    params: Mapping[str, JSONValue],
     timestamps: list[int] | None = None,
-) -> Any:
+) -> object:
     """Instantiate validated configuration and execute the canonical contract once."""
+    logger.debug("FR-code-editor-indicator-data-calculate-indicator: invoked")
     context = (
         bars
         if isinstance(bars, BarData)
@@ -103,11 +136,14 @@ def calculate_indicator(
     try:
         return cls(**params).calculate(context)
     except Exception as exc:
-        raise CodeEditorError(f"Indicator calculation failed: {exc}") from exc
+        raise CodeEditorError("Indicator calculation failed") from exc
 
 
-def output_series(result: Any, count: int) -> dict[str, np.ndarray[Any, Any]]:
+def output_series(
+    result: object, count: int
+) -> dict[str, np.typing.NDArray[np.float64]]:
     """Normalize scalar and multi-output indicators without fabricating values."""
+    logger.debug("FR-code-editor-indicator-data-output-series: invoked")
     outputs = result if isinstance(result, dict) else {"value": result}
     series = {}
     for name, value in outputs.items():

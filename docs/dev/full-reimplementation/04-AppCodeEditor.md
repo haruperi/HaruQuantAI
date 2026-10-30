@@ -124,7 +124,7 @@ These orders split the historical full-feature orders below. SPECIFIED means a b
 | `WO-CE-CLIENT-DEFAULTS` (Phase 4.2) | COMPLETE | Preserve omitted, null and explicit indicator parameters across the existing client boundary; no backend changes |
 | `WO-CE-TESTER-REQUEST-LIFECYCLE` (Phase 4.3) | COMPLETE | Ignore stale or unmounted tester requests; follows 4.2 |
 | `WO-CE-PACK-UI-CONTRACT` (Phase 4.4) | COMPLETE | Make existing import/export controls reflect the current Python package API; no new archive format or import destination |
-| `WO-CE-TYPED-WORKSPACE-CONTRACTS` | NEEDS-SPEC | Type existing service results and errors, audit host persistence/lifecycle ownership, preserve compatibility before adding commands |
+| `WO-CE-TYPED-WORKSPACE-CONTRACTS` | COMPLETE | Type existing service results and errors, audit host persistence/lifecycle ownership, preserve compatibility before adding commands |
 | `WO-CE-COMMAND-GAPS` | NEEDS-SPEC | Save As, reload, catalogues, template export, import repair, compilation lifecycle and extension reload; exact operation map in audit |
 | `WO-CE-INDICATOR-SUITE` | NEEDS-SPEC | Batch XML/config mapping, reference-file comparison, row selection, status/errors and cancellation; preserve single-indicator history tester |
 | `WO-CE-IMPORT-SESSION` | NEEDS-SPEC | Per-conflict overwrite/skip/always/cancel, protected files and typed progress; current batch rules are only partial coverage |
@@ -205,6 +205,33 @@ These orders split the historical full-feature orders below. SPECIFIED means a b
 | `git diff --check` | Exit 0 |
 
 Browser tests intercept package requests; they do not extract archives, mutate application storage or establish donor Java package compatibility. Full import sessions and backend package hardening remain separate work orders.
+
+### Phase 4.5: Typed workspace contracts — `WO-CE-TYPED-WORKSPACE-CONTRACTS`
+
+**Status:** COMPLETE; verified 2026-10-30 against source HEAD `517a1c91`. Implementation plan iteration 1 and its bounded iteration 2 were explicitly approved with `APPROVED: EXECUTE`. Owner authorized the implementation commit after walkthrough review.
+
+- [x] `requests.py`: explicit inputs for current operations, nested Save All/session records, finite JSON and existing window/conflict rules. Extra session fields, empty buffers, current defaults, null/default parameter semantics and compatibility imports from `http.py` remain supported.
+- [x] `results.py`: named dictionary-compatible service/state/diagnostic records; all current editor HTTP success operations declare schemas. Unknown result fields fail validation rather than disappearing; absent optional fields remain absent. Frontend types reflect saved configs, compilation/package results and all diagnostic variants.
+- [x] `errors.py:CodeEditorError`: retains message-first construction and adds explicit domain/host categories. Invalid requests use the host validation envelope; malformed results, corrupt state and unexpected failures return safe internal errors. Expected validation remains HTTP 422; host unavailable/internal categories retain the host's current HTTP 503 mapping.
+- [x] `_storage.py:StateStore`, `editor.py:AppCodeEditor._restore`, `indicator_tester.py:IndicatorTester.load_test_config`: validate finite stored JSON and domain records before publishing restored state. Corrupt state is not deleted/reset/rewritten. Schema installation, transactions and keys remain with existing host capabilities; no new SQL, migration, worker, job or event channel was introduced.
+- [x] Package Python modules have the required documentation sections and typed signatures. Workspace logging uses standard named loggers without installing handlers/listeners; fixed requirement labels and success/failure records exclude payloads, queries and raw unexpected exceptions. The feature/ownership record is `app/workspace/code_editor/README.md`.
+- [x] Approved iteration 2 repairs `IndicatorTesterModal.tsx` to render a null reference difference as an em dash. The new browser regression reproduced the prior crash and now passes. This is a display repair, not a comparator change.
+
+| Exact verification command | Result |
+| --- | --- |
+| `uv run python -m pytest tests/workspace/code_editor -q --no-cov` | Exit 0; 127 tests passed |
+| `uv run mypy --strict app/workspace/code_editor` | Exit 0; all 17 production modules passed |
+| `uv run ruff check app/workspace/code_editor tests/workspace/code_editor` | Exit 0 |
+| `uv run ruff format --check app/workspace/code_editor tests/workspace/code_editor` | Exit 0 |
+| `uv run python -m pytest tests/workspace/code_editor --cov=app.workspace.code_editor --cov-branch --cov-report=term-missing --cov-fail-under=80 -q` | Exit 0; 127 tests passed; 86.86% branch-aware package coverage |
+| `npm --prefix app/web test -- tests/workspace/code_editor/codeEditorClient.test.ts` | Exit 0; 17 client tests passed |
+| `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts` | Exit 0; 29 browser tests passed |
+| `npm --prefix app/web run typecheck` | Exit 0 |
+| `npm --prefix app/web run test` | Exit 0; 716 tests passed across 124 files |
+| `npm --prefix app/web run build` | Exit 0; existing data-manager mixed import and bundle-size warnings remain |
+| `git diff --check` | Exit 0 |
+
+Backend tests use isolated temporary host stores/history. Browser requests are intercepted; coverage above is scoped to the editor package and does not establish the repository-wide coverage floor or full donor runtime parity. Asynchronous jobs/events, remaining editor commands, batch suites, distribution, calibration and extension reconciliation retain their separate work orders.
 
 ## Phase 04.9: Full workspace feature orders — evidence-gated contracts
 

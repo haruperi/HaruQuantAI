@@ -5,6 +5,71 @@ from app.main import create_app
 from fastapi.testclient import TestClient
 
 
+@pytest.mark.parametrize(
+    "endpoint,payload",
+    [
+        ("file/save-all", {"files": [{"file_path": "missing.py"}]}),
+        ("session", {"tabs": [{"file_path": "missing.py"}]}),
+        (
+            "import-export/import",
+            {"archive_path": "absent.zip", "resolution_rules": {"a.py": "invalid"}},
+        ),
+        ("indicator-test/run", {"indicator_name": "SMA", "bar_count": 0}),
+    ],
+)
+def test_invalid_nested_requests_use_host_error_envelope(client, endpoint, payload):
+    response = client.post("/api/v1/code-editor/" + endpoint, json=payload)
+    assert response.status_code == 422
+    body = response.json()
+    assert body["status"] == "error"
+    assert body["error"]["code"] == "validation"
+    assert body["error"]["message"] == "Invalid editor request"
+
+
+def test_unexpected_and_malformed_results_are_safe_host_errors(
+    client, monkeypatch, caplog
+):
+    from app.workspace.code_editor import http
+
+    def fail():
+        raise RuntimeError("credential-marker")
+
+    monkeypatch.setattr(http._code_editor.editor, "init_workspace", fail)
+    response = client.get("/api/v1/code-editor/init")
+    assert response.status_code == 503
+    assert response.json()["error"]["code"] == "internal"
+    assert "credential-marker" not in response.text
+    assert "credential-marker" not in caplog.text
+    monkeypatch.setattr(
+        http._code_editor.editor, "init_workspace", lambda: {"surprise": True}
+    )
+    response = client.get("/api/v1/code-editor/init")
+    assert response.status_code == 503
+    assert response.json()["error"]["message"] == "Invalid editor result"
+
+
+def test_extra_session_fields_and_empty_save_all_are_compatible(client):
+    response = client.post(
+        "/api/v1/code-editor/session",
+        json={"tabs": [], "active_file": None, "layout": {}},
+    )
+    assert response.status_code == 200
+    assert response.json()["data"]["open_tabs"] == []
+    response = client.post("/api/v1/code-editor/file/save-all", json={"files": []})
+    assert response.json()["data"] == {"status": "saved_all", "count": 0, "files": []}
+
+
+def test_every_editor_http_operation_declares_a_success_contract():
+    from app.workspace.code_editor.http import router
+    from fastapi.routing import APIRoute
+
+    routes = [route for route in router.routes if isinstance(route, APIRoute)]
+    assert len(routes) >= 30
+    for route in routes:
+        if not route.path.endswith("/mcp"):
+            assert route.response_model is not None, route.path
+
+
 @pytest.fixture
 def client():
     app = create_app()

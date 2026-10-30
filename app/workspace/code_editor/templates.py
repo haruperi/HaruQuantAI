@@ -1,15 +1,30 @@
-"""Snippet templates catalog and code generators for AppCodeEditor.
+"""Templates editor contracts and workflows.
 
+Description:
+    Lists and renders existing Python templates without changing generated computation
+    or publication paths.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
 Key Capabilities:
-- Catalog of all 12 StrategyQuant X snippet template definitions.
-- Generates clean Python boilerplate conforming to HaruQuantAI architecture.
-- Maps template types to canonical output paths in app/include/.
+    - FR-code-editor-templates-get-template: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-templates-list-templates: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-templates-render-template: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor.templates
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
 """
 
 from __future__ import annotations
 
+import logging
 from dataclasses import dataclass
-from typing import Any
 
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._template_generators import (
@@ -27,6 +42,11 @@ from app.workspace.code_editor._template_generators import (
     _gen_what_if,
     _to_snake_case,
 )
+from app.workspace.code_editor.results import (
+    TemplateInfo,
+)
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True)
@@ -169,8 +189,9 @@ _GENERATORS = {
 }
 
 
-def list_templates() -> list[dict[str, Any]]:
+def list_templates() -> list[TemplateInfo]:
     """Return catalog of all available snippet templates."""
+    logger.debug("FR-code-editor-templates-list-templates: invoked")
     return [
         {
             "template_id": t.template_id,
@@ -186,6 +207,7 @@ def list_templates() -> list[dict[str, Any]]:
 
 def get_template(template_id: str) -> SnippetTemplate:
     """Retrieve template definition by ID."""
+    logger.debug("FR-code-editor-templates-get-template: invoked")
     if template_id not in _TEMPLATES:
         raise CodeEditorError(f"Unknown template ID: '{template_id}'.")
     return _TEMPLATES[template_id]
@@ -204,6 +226,7 @@ def render_template(
     Returns:
         Tuple of (rendered_code, relative_file_path).
     """
+    logger.debug("FR-code-editor-templates-render-template: invoked")
     if not name.isidentifier() or name.startswith("_"):
         raise CodeEditorError("Snippet name must be a public Python identifier")
     tmpl = get_template(template_id)

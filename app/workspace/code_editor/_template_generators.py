@@ -1,4 +1,19 @@
-"""Python boilerplate generators for the editor template catalog."""
+"""Template generators editor contracts and workflows.
+
+Description:
+    Generates source strings for the existing twelve Python template families. Public
+    template workflows log through templates.py; generated source behavior is preserved.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
+Key Capabilities:
+    - FR-code-editor-templates-render-template: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor._template_generators
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
+"""
 
 from __future__ import annotations
 

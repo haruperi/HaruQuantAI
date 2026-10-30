@@ -1,11 +1,42 @@
 import { describe, expect, it, vi } from 'vitest';
-import { createCodeEditorClient } from '../../../workspaces/code_editor/codeEditorClient';
+import { createCodeEditorClient, type IndicatorConfigDto, type IndicatorTestResultDto } from '../../../workspaces/code_editor/codeEditorClient';
 
 function mockResponse(data: unknown) {
   return () => Promise.resolve(new Response(JSON.stringify({ status: 'success', data })));
 }
 
 describe('codeEditorClient', () => {
+  it('retains typed diagnostic variants and nullable reference differences', async () => {
+    const result: IndicatorTestResultDto = {
+      test_id: 'diagnostics', status: 'success', symbol: 'EURUSD', timeframe: 'H1',
+      bars_calculated: 1, candlesticks: [], indicator_plots: [{ time: 1 }],
+      table_rows: [{ time: 1, open: 1, high: 2, low: 0, close: 1, indicator_val: null, diff: null }],
+      discrepancies: [
+        { bar: 0, time: 1, calc: 2, ref: 1, diff: 1 },
+        { bar: 0, time: 1, series: 'value', type: 'NonFiniteValue', message: 'gap' },
+        { bar: 0, type: 'CodeEditorError', message: 'execution failed' },
+      ],
+    };
+    const fetchFn = vi.fn().mockImplementation(mockResponse(result));
+    const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
+    expect(await client.runIndicatorTest({ indicatorName: 'SMA' })).toEqual(result);
+  });
+
+  it('retains complete saved and loaded indicator configurations', async () => {
+    const config: IndicatorConfigDto = {
+      test_id: 'saved', indicator_name: 'MACD', symbol: 'EURUSD', timeframe: 'H1',
+      params: { fast_period: 12, slow_period: 26 }, bars_to_reserve: 0,
+      bar_count: 2, reference_values: null, saved_name: 'Review',
+    };
+    const saved = { status: 'saved' as const, config_id: config.test_id, config };
+    const loaded = { status: 'loaded' as const, config };
+    const fetchFn = vi.fn().mockImplementationOnce(mockResponse(saved)).mockImplementationOnce(mockResponse(loaded));
+    const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
+    expect(await client.saveTestConfig('saved', 'Review')).toEqual(saved);
+    expect(await client.loadTestConfig('saved')).toEqual(loaded);
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/indicator-test/load?config_id=saved', expect.objectContaining({ method: 'GET' }));
+  });
+
   it('calls initWorkspace with correct GET endpoint', async () => {
     const fetchFn = vi.fn().mockImplementation(
       mockResponse({

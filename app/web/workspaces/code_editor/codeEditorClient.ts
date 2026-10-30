@@ -55,6 +55,7 @@ export interface CompileResultDto {
   success: boolean;
   errors: SyntaxDiagnosticDto[];
   module_reloaded?: boolean;
+  registered_classes?: string[];
 }
 
 export interface SnippetTemplateDto {
@@ -89,15 +90,77 @@ export interface IndicatorTableRow {
   indicator_val: number | null;
   outputs?: Record<string, number | null>;
   reference_val?: number;
-  diff?: number;
+  diff?: number | null;
 }
 
-export interface IndicatorTestDiscrepancy {
+export interface IndicatorDifference {
   bar: number;
   time: number;
   calc: number;
   ref: number;
   diff: number;
+}
+
+export interface IndicatorGapDiagnostic {
+  bar: number;
+  time: number;
+  series: string;
+  type: 'NonFiniteValue';
+  message: string;
+}
+
+export interface IndicatorExecutionDiagnostic {
+  bar: number;
+  type: string;
+  message: string;
+}
+
+export type IndicatorTestDiscrepancy =
+  | IndicatorDifference
+  | IndicatorGapDiagnostic
+  | IndicatorExecutionDiagnostic;
+
+export interface IndicatorConfigDto {
+  test_id: string;
+  indicator_name: string;
+  symbol: string;
+  timeframe: string;
+  params: Record<string, unknown>;
+  bars_to_reserve: number;
+  bar_count: number;
+  created_at?: number;
+  reference_values?: number[] | null;
+  saved_name?: string;
+}
+
+export interface SavedTestConfigDto {
+  status: 'saved';
+  config_id: string;
+  config: IndicatorConfigDto;
+}
+
+export interface LoadedTestConfigDto {
+  status: 'loaded';
+  config: IndicatorConfigDto;
+}
+
+export interface SavedFileDto {
+  file_path: string;
+  diagnostics: SyntaxDiagnosticDto[];
+}
+
+export interface SaveFileResultDto extends SavedFileDto {
+  status: 'saved';
+  bytes_written: number;
+}
+
+export interface ImportPackResultDto {
+  status: 'completed';
+  extracted_count: number;
+  skipped_count: number;
+  extracted: string[];
+  skipped: string[];
+  reload_results: CompileResultDto[];
 }
 
 export interface IndicatorTestResultDto {
@@ -135,10 +198,10 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
     async syncSession(tabs: EditorTabDto[], activeFile: string | null): Promise<WorkspaceInitDto> {
       return client.post('/session', { tabs, active_file: activeFile });
     },
-    async saveTestConfig(testId: string, name: string): Promise<{ config_id: string }> {
+    async saveTestConfig(testId: string, name: string): Promise<SavedTestConfigDto> {
       return client.post('/indicator-test/save', { test_id: testId, name });
     },
-    async loadTestConfig(configId: string): Promise<{ config: Record<string, unknown> }> {
+    async loadTestConfig(configId: string): Promise<LoadedTestConfigDto> {
       return client.get(`/indicator-test/load?config_id=${encodeURIComponent(configId)}`);
     },
     async initWorkspace(): Promise<WorkspaceInitDto> {
@@ -162,15 +225,15 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       return client.post('/tabs/close', { file_path: filePath, force });
     },
 
-    async saveFile(filePath: string, content: string): Promise<{ status: string; file_path: string; diagnostics: SyntaxDiagnosticDto[] }> {
+    async saveFile(filePath: string, content: string): Promise<SaveFileResultDto> {
       return client.post('/file/save', { file_path: filePath, content });
     },
 
-    async saveAllFiles(files?: Array<{ file_path: string; content: string }>): Promise<{ status: string; count: number; files: unknown[] }> {
+    async saveAllFiles(files?: Array<{ file_path: string; content: string }>): Promise<{ status: string; count: number; files: SavedFileDto[] }> {
       return client.post('/file/save-all', { files });
     },
 
-    async newFile(filePath: string, content = ''): Promise<{ status: string; file_path: string }> {
+    async newFile(filePath: string, content = ''): Promise<SaveFileResultDto> {
       return client.post('/file/new', { file_path: filePath, content });
     },
 
@@ -178,7 +241,7 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       return client.post('/file/new-dir', { dir_path: dirPath });
     },
 
-    async cloneFile(sourcePath: string, targetPath: string): Promise<{ status: string; file_path: string }> {
+    async cloneFile(sourcePath: string, targetPath: string): Promise<SaveFileResultDto> {
       return client.post('/file/clone', { source_path: sourcePath, target_path: targetPath });
     },
 
@@ -186,7 +249,7 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       return client.post('/file/rename', { old_path: oldPath, new_path: newPath });
     },
 
-    async deleteFile(filePath: string): Promise<{ status: string; file_path: string }> {
+    async deleteFile(filePath: string): Promise<SaveFileResultDto> {
       return client.post('/file/delete', { file_path: filePath });
     },
 
@@ -242,7 +305,7 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
     async importPack(
       archivePath: string,
       resolutionRules?: Record<string, string>
-    ): Promise<{ status: string; extracted_count: number; skipped_count: number; extracted: string[]; skipped: string[] }> {
+    ): Promise<ImportPackResultDto> {
       return client.post('/import-export/import', { archive_path: archivePath, resolution_rules: resolutionRules });
     },
 
@@ -266,7 +329,7 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       });
     },
 
-    async newIndicatorTest(indicatorName: string, symbol = 'EURUSD', timeframe = 'H1'): Promise<Record<string, unknown>> {
+    async newIndicatorTest(indicatorName: string, symbol = 'EURUSD', timeframe = 'H1'): Promise<IndicatorConfigDto> {
       return client.post('/indicator-test/new', { indicator_name: indicatorName, symbol, timeframe });
     },
 

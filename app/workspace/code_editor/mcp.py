@@ -1,24 +1,54 @@
-"""Stateless MCP JSON-RPC bridge for compiled custom AI tools."""
+"""Mcp editor contracts and workflows.
+
+Description:
+    Adapts finite JSON-RPC requests to compiled extension tools while retaining MCP
+    response behavior. Unexpected tool errors do not expose raw exception text.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
+Key Capabilities:
+    - FR-code-editor-mcp: Observe the associated workflow; fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-mcp-dispatch-mcp: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor.mcp
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
+"""
 
 from __future__ import annotations
 
 import json
-from typing import Any
+import logging
+from typing import cast
 
 from fastapi import APIRouter
 from fastapi.responses import JSONResponse, Response
 
-from app.core.host.logging import get_logger
+from app.core.lib.errors import JSONValue, copy_json
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor.registry import registry
 
-logger = get_logger(__name__)
+logger = logging.getLogger(__name__)
 router = APIRouter()
 
 
 @router.post("/mcp")
-def dispatch_mcp(message: dict[str, Any]) -> Response:
+def dispatch_mcp(message: dict[str, JSONValue]) -> Response:
     """FR-CODEEDITOR-AI-MCP: Expose compiled tools to stateless MCP clients."""
+    logger.debug("FR-code-editor-mcp-dispatch-mcp: invoked")
+    try:
+        copy_json(message)
+    except ValueError:
+        logger.warning("FR-code-editor-mcp-request: rejected JSON")
+        return JSONResponse(
+            {
+                "jsonrpc": "2.0",
+                "id": None,
+                "error": {"code": -32600, "message": "Invalid JSON-RPC request"},
+            }
+        )
     identifier = message.get("id")
     method = message.get("method")
     if message.get("jsonrpc") != "2.0" or not isinstance(method, str):
@@ -31,7 +61,7 @@ def dispatch_mcp(message: dict[str, Any]) -> Response:
         )
     if "id" not in message:
         return Response(status_code=202)
-    result: dict[str, Any]
+    result: dict[str, JSONValue]
     if method == "initialize":
         result = {
             "protocolVersion": "2025-03-26",
@@ -69,7 +99,10 @@ def dispatch_mcp(message: dict[str, Any]) -> Response:
                 }
             )
         try:
-            output = registry.call_tool(params["name"], params.get("arguments", {}))
+            output = registry.call_tool(
+                cast("str", params["name"]),
+                cast("dict[str, JSONValue]", params.get("arguments", {})),
+            )
             result = {
                 "content": [{"type": "text", "text": json.dumps(output)}],
                 "isError": False,
@@ -77,8 +110,11 @@ def dispatch_mcp(message: dict[str, Any]) -> Response:
         except CodeEditorError as exc:
             result = {"content": [{"type": "text", "text": str(exc)}], "isError": True}
         except Exception as exc:
-            logger.exception("Custom MCP tool failed: %s", params["name"])
-            result = {"content": [{"type": "text", "text": str(exc)}], "isError": True}
+            logger.warning("FR-code-editor-mcp: operation")
+            result = {
+                "content": [{"type": "text", "text": "Extension tool failed"}],
+                "isError": True,
+            }
     else:
         return JSONResponse(
             {

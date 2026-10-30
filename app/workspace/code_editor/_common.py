@@ -1,9 +1,36 @@
-"""Common utilities, types, and path helpers for the Code Editor workspace.
+"""Common editor contracts and workflows.
 
+Description:
+    Resolves authorized paths, builds typed diagnostic/tab records, and imports the
+    exact supplied snippet source with rollback of failed module publication.
+Purpose:
+    FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
 Key Capabilities:
-- Workspace root path resolution and path traversal safety checks.
-- Python AST syntax parsing and diagnostic reporting.
-- Module validation and dynamic loading helpers.
+    - FR-code-editor-common-dynamic-import-from-path: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-common-dynamic-import-source: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-common-resolve-safe-path: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-common-to-dict: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-common-validate-python-syntax: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-common-writable-snippet-path: Observe the associated workflow;
+      fixed-label logs are
+      verified by the contract logging tests or HTTP integration checks.
+    - FR-code-editor-path-validation: Observe the associated workflow; fixed-label logs
+      are
+      verified by the contract logging tests or HTTP integration checks.
+Python API Usage:
+    import app.workspace.code_editor._common
+CLI Usage:
+    uv run python -m pytest tests/workspace/code_editor --no-cov
 """
 
 from __future__ import annotations
@@ -11,23 +38,36 @@ from __future__ import annotations
 import ast
 import hashlib
 import importlib.util
+import logging
 import sys
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any
+from types import ModuleType
+from typing import Literal, cast
 
-from app.core.host.logging import get_logger
+from app.workspace.code_editor.errors import CodeEditorError
+from app.workspace.code_editor.results import CursorPosition, Diagnostic, Tab
 
-logger = get_logger(__name__)
+__all__ = [
+    "CodeEditorError",
+    "SyntaxDiagnostic",
+    "EditorTab",
+    "PROJECT_ROOT",
+    "INCLUDE_DIR",
+    "SNIPPETS_DIR",
+    "resolve_safe_path",
+    "validate_python_syntax",
+    "dynamic_import_from_path",
+    "writable_snippet_path",
+    "dynamic_import_source",
+]
+
+logger = logging.getLogger(__name__)
 
 # Canonical roots for user extensions and standard include blocks
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 INCLUDE_DIR = PROJECT_ROOT / "app" / "include"
 SNIPPETS_DIR = INCLUDE_DIR
-
-
-class CodeEditorError(Exception):
-    """Base exception for code editor workspace operations."""
 
 
 @dataclass
@@ -37,11 +77,12 @@ class SyntaxDiagnostic:
     line: int
     column: int
     message: str
-    severity: str = "error"
+    severity: Literal["error", "warning", "info"] = "error"
     source_line: str = ""
 
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+    def to_dict(self) -> Diagnostic:
+        logger.debug("FR-code-editor-common-to-dict: invoked")
+        return cast("Diagnostic", asdict(self))
 
 
 @dataclass
@@ -53,12 +94,13 @@ class EditorTab:
     is_dirty: bool = False
     content: str = ""
     mode: str = "python"
-    cursor_position: dict[str, int] = field(
-        default_factory=lambda: {"line": 1, "column": 1}
+    cursor_position: CursorPosition = field(
+        default_factory=lambda: CursorPosition(line=1, column=1)
     )
 
-    def to_dict(self) -> dict[str, Any]:
-        return asdict(self)
+    def to_dict(self) -> Tab:
+        logger.debug("FR-code-editor-common-to-dict: invoked")
+        return cast("Tab", asdict(self))
 
 
 def resolve_safe_path(target_path: str | Path, base_dir: Path = PROJECT_ROOT) -> Path:
@@ -74,6 +116,7 @@ def resolve_safe_path(target_path: str | Path, base_dir: Path = PROJECT_ROOT) ->
     Raises:
         CodeEditorError: If the path escapes the authorized directory.
     """
+    logger.debug("FR-code-editor-common-resolve-safe-path: invoked")
     resolved_base = base_dir.resolve()
     resolved_target = (
         (resolved_base / target_path).resolve()
@@ -85,7 +128,7 @@ def resolve_safe_path(target_path: str | Path, base_dir: Path = PROJECT_ROOT) ->
         resolved_target.relative_to(resolved_base)
     except ValueError as exc:
         msg = f"Path '{target_path}' is outside the authorized root '{base_dir}'."
-        logger.error(msg)
+        logger.error("FR-code-editor-path-validation: rejected")
         raise CodeEditorError(msg) from exc
 
     return resolved_target
@@ -100,6 +143,7 @@ def validate_python_syntax(source_code: str) -> list[SyntaxDiagnostic]:
     Returns:
         List of SyntaxDiagnostic records (empty if valid).
     """
+    logger.debug("FR-code-editor-common-validate-python-syntax: invoked")
     diagnostics: list[SyntaxDiagnostic] = []
     try:
         ast.parse(source_code)
@@ -116,7 +160,7 @@ def validate_python_syntax(source_code: str) -> list[SyntaxDiagnostic]:
     return diagnostics
 
 
-def dynamic_import_from_path(file_path: Path) -> Any:
+def dynamic_import_from_path(file_path: Path) -> ModuleType:
     """Dynamically load or reload a Python module from an absolute file path.
 
     Args:
@@ -125,11 +169,13 @@ def dynamic_import_from_path(file_path: Path) -> Any:
     Returns:
         Loaded Python module object.
     """
+    logger.debug("FR-code-editor-common-dynamic-import-from-path: invoked")
     return dynamic_import_source(file_path, file_path.read_text(encoding="utf-8"))
 
 
 def writable_snippet_path(target_path: str | Path) -> Path:
     """Reject mutations outside authorized include directory and protected files."""
+    logger.debug("FR-code-editor-common-writable-snippet-path: invoked")
     resolved = resolve_safe_path(target_path)
     try:
         parts = resolved.relative_to(INCLUDE_DIR.resolve()).parts
@@ -140,8 +186,9 @@ def writable_snippet_path(target_path: str | Path) -> Path:
     return resolved
 
 
-def dynamic_import_source(file_path: Path, source: str) -> Any:
+def dynamic_import_source(file_path: Path, source: str) -> ModuleType:
     """Execute the exact supplied source, bypassing stale bytecode caches."""
+    logger.debug("FR-code-editor-common-dynamic-import-source: invoked")
     module_name = (
         "dynamic_snippet_"
         + hashlib.sha256(str(file_path.resolve()).encode()).hexdigest()
