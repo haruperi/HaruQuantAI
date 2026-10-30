@@ -1,4 +1,5 @@
 # AppBusiness - feature work orders
+> **Status: CLOSED / COMPLETED (2026-10-30)**: Phase 18.1 (`FixedSizeBuildProjection`), Phase 18.2 (`AppSQXBusiness` service and models), and `MIG-AppSQXBusiness` presentation are fully implemented and verified.
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -43,9 +44,9 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - **Frontend:** none for this projection; editor/persistence workflows remain blocked.
 *Types:* frozen/slotted `FixedSizeBuildSettings(enabled:bool,name:str,lots:str,platform:str)` with no field defaults. All fields are mandatory when settings exists; the caller contract must validate untyped input separately. Output is a new dict[str,str] for the LockedToFixedSize node's attributes.
 *Functional Requirements & Implementation:*
-- [ ] `FixedSizeBuildProjection.attributes(settings: FixedSizeBuildSettings | None) -> dict[str,str]` -> exported static method. None gives exactly `{'use':'false','name':'-fixedSize','lots':'0.01','platform':'mql4'}`. Present settings gives use true/false as lowercase strings and unchanged name/lots/platform. Do not parse lots, clamp values, replace blank names or choose another platform.
-- [ ] `test('absent settings defaults')` -> exact default dictionary above; mutate returned dictionary and call again to prove no shared mutation.
-- [ ] `test('provided attributes remain literal')` -> enabledTrue,name ' custom ',lots '0.20',platform 'mql5' yields use 'true', name ' custom ',lots '0.20',platform 'mql5'.
+- [x] `FixedSizeBuildProjection.attributes(settings: FixedSizeBuildSettings | None) -> dict[str,str]` -> exported static method. None gives exactly `{'use':'false','name':'-fixedSize','lots':'0.01','platform':'mql4'}`. Present settings gives use true/false as lowercase strings and unchanged name/lots/platform. Do not parse lots, clamp values, replace blank names or choose another platform.
+- [x] `test('absent settings defaults')` -> exact default dictionary above; mutate returned dictionary and call again to prove no shared mutation.
+- [x] `test('provided attributes remain literal')` -> enabledTrue,name ' custom ',lots '0.20',platform 'mql5' yields use 'true', name ' custom ',lots '0.20',platform 'mql5'.
 *Acceptance:* `uv run python -m pytest tests/workspace/business/test_build_defaults.py -q` exits 0, two tests.
 *Commit:* `business: preserve fixed-size build attributes`.
 
@@ -53,7 +54,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 
 All 1 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppSQXBusiness` - I-AppSQXBusiness - READY
+### `AppSQXBusiness` - I-AppSQXBusiness - COMPLETED
 
 *Feature:* complete AppSQXBusiness workflow.
 *Evidence IDs:* `OBS145-AppSQXBusiness-SCOPE-001` establishes source presence only; `OBS145-AppSQXBusiness-HELPER-001` establishes only the separately scoped helper.
