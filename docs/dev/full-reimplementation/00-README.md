@@ -158,6 +158,7 @@ A class name appearing in a diagram is not permission to invent its fields.
 - [17 AppMarketplace](17-AppMarketplace.md)
 - [18 AppBusiness](18-AppBusiness.md)
 - [19 AppSQAI](19-AppAI.md)
+- [20 AppLiveTrading](20-AppLiveTrading.md)
 
 ## Direct assignment order for currently specified work
 
