@@ -250,7 +250,7 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       indicatorName: string;
       symbol?: string;
       timeframe?: string;
-      params?: Record<string, unknown>;
+      params?: Record<string, unknown> | null;
       barsToReserve?: number;
       barCount?: number;
       referenceValues?: number[];
@@ -259,7 +259,7 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
         indicator_name: params.indicatorName,
         symbol: params.symbol ?? 'EURUSD',
         timeframe: params.timeframe ?? 'H1',
-        params: params.params ?? { period: 14 },
+        params: params.params ?? null,
         bars_to_reserve: params.barsToReserve ?? 50,
         bar_count: params.barCount ?? 150,
         reference_values: params.referenceValues,

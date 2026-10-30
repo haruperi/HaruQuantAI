@@ -18,6 +18,8 @@ classDiagram
 
 ## Source reassessment authority — 2026-10-30
 
+**Current completion authority:** [Code Editor completion audit](research/code-editor-completion-audit.md), recorded against HEAD `bf6db55e92d70d8cabedd1871ed8c42b45a672f8`, supersedes the generic readiness labels and proposed replacement-file assumptions in this document. Donor root is `data/reference-donor`. Phase 4.1 is complete; remaining workspace and extension work is not complete. The audit maps all 43 commands dispatched by the three donor servlets and inventories 751 Java source files in the 11 owned extension categories. Counts are inventory evidence, not executable-definition or parity counts.
+
 The [workspace source review](research/workspaces-03-08-source-review.md) adds exact readable context to every blocked complete-contribution order in this file. Its source paths supplement the old Context to Read lists. Shared libraries are available locally; plugin bodies, UI consumers, templates and per-definition fixtures remain separate evidence. A complete-contribution order retains its status until its exact target contract and acceptance cases are specified. New bounded READY suborders below supersede only their named portion.
 
 ## Execution rule for this file
@@ -30,6 +32,8 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 
 ## Current-code migration audit and execution order
+
+**CE-M01 status: migrated implementation present; current backend baseline verified.** The 14 Python modules and migrated React workspace exist at the target locations. `uv run python -m pytest tests/workspace/code_editor -q --no-cov` passed all 77 tests during the 2026-10-30 audit. Browser migration evidence remains in the preservation record linked above; browser tests were inspected but not rerun in this documentation stage. This establishes retained implementation coverage, not complete donor feature parity. The current source editor uses CodeMirror, not Monaco. Reuse these implementations rather than recreating the historical paths below.
 
 *Evidence:* OBS-HARU-CE-REUSE-20261029. HaruQuantAI possesses an existing, fully functional Code Editor engine (app/workspace/code_editor/ comprising 14 production files) and its interactive React workspace (ui/app/workspace/CodeEditor/). This audit defines the exact relocation to app/workspace/code_editor/ and app/web/workspaces/code_editor/.
 
@@ -53,13 +57,13 @@ All target names/signatures/error codes below are normative Python/React adaptat
 | tests/workspace/code_editor/ | tests/workspace/code_editor/ | MOVE: Code editor and indicator tester test suite |
 
 *Commit:*
-efactor(code-editor): migrate code editor workspace and services.
+`refactor(code-editor): migrate code editor workspace and services` (historical proposal; no new migration commit is authorized).
 
 
 ### Phase 4.1: Indicator test-row presentation — `CodeEditorIndicatorTester`
 
 *Feature:* generate parameter labels and result row classes without implementing indicator comparison calculations.
-**Task ID:** `WO-CE-INDICATOR-PRESENTATION`. **Readiness:** READY-AFTER-FRONTEND-TEST-BOOTSTRAP. **Evidence:** `OBS145-INDICATOR-PRESENTATION-001`. **One commit:** `feat(code-editor): implement indicator test row presentation`.
+**Task ID:** `WO-CE-INDICATOR-PRESENTATION`. **Status:** COMPLETE. **Evidence:** `OBS145-INDICATOR-PRESENTATION-001`. **Implementation commit:** `31fc0d35` — `feat(code-editor): implement indicator test row presentation`.
 
 *Context to Read:* `app/web/package.json`, `app/web/vitest.config.ts`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`, `DONOR_REFERENCE_ROOT/internal/web/common` (resource folder; originally named `libs.js` is not present) (valueFilled only). No server model or repository file is additional context.
 
@@ -111,23 +115,94 @@ efactor(code-editor): migrate code editor workspace and services.
 
 These results cover the Phase 4.1 helper slice only. Indicator computation, import and configuration persistence retain the gates documented below.
 
+## Remaining implementation sequence
+
+These orders split the historical full-feature orders below. SPECIFIED means a bounded target contract is written; it still needs an implementation plan and owner approval before source edits. NEEDS-SPEC means the named contract must be completed first. No full-feature order is released by an inventory count or a passing baseline suite.
+
+| Order | Status | Scope and dependency |
+| --- | --- | --- |
+| `WO-CE-CLIENT-DEFAULTS` (Phase 4.2) | COMPLETE | Preserve omitted, null and explicit indicator parameters across the existing client boundary; no backend changes |
+| `WO-CE-TESTER-REQUEST-LIFECYCLE` (Phase 4.3) | SPECIFIED | Ignore stale or unmounted tester requests; follows 4.2 |
+| `WO-CE-PACK-UI-CONTRACT` (Phase 4.4) | SPECIFIED | Make existing import/export controls reflect the current Python package API; no new archive format or import destination |
+| `WO-CE-TYPED-WORKSPACE-CONTRACTS` | NEEDS-SPEC | Type existing service results and errors, audit host persistence/lifecycle ownership, preserve compatibility before adding commands |
+| `WO-CE-COMMAND-GAPS` | NEEDS-SPEC | Save As, reload, catalogues, template export, import repair, compilation lifecycle and extension reload; exact operation map in audit |
+| `WO-CE-INDICATOR-SUITE` | NEEDS-SPEC | Batch XML/config mapping, reference-file comparison, row selection, status/errors and cancellation; preserve single-indicator history tester |
+| `WO-CE-IMPORT-SESSION` | NEEDS-SPEC | Per-conflict overwrite/skip/always/cancel, protected files and typed progress; current batch rules are only partial coverage |
+| `WO-CE-TEST-DISTRIBUTION` | NEEDS-SPEC | Offline archive fixtures and host-owned transport policy before any provider download |
+| `WO-CE-CALIBRATION` | NEEDS-SPEC | Engine/project capabilities, algorithm and fixtures for newly inventoried `indyTester/calibrate` |
+| `WO-CE-EXTENSION-COHORTS` | NEEDS-SPEC | Per-definition reconciliation against existing Python owners, descriptors and independent numerical/state fixtures |
+| `WO-CE-WORKSPACE-ACCEPTANCE` | NEEDS-SPEC | Integrated UI/backend checks and requirement logging/coverage evidence after constituent orders pass |
+
+### Phase 4.2: Preserve selected-indicator defaults — `WO-CE-CLIENT-DEFAULTS`
+
+**Status:** COMPLETE; verified 2026-10-30. **Donor evidence:** parameter defaults are indicator-specific in `internal/libs/tradinglib/indicatorTester/IndicatorInfo.java`. **Target authority:** existing `IndicatorTestRunRequest.params = None` and `IndicatorTester.indicator_tester` derive defaults only for null parameters. This is an explicit Python client adaptation, not a donor wire-format claim.
+
+*Context to Read:* this order; `app/web/workspaces/code_editor/codeEditorClient.ts`; `app/web/tests/workspace/code_editor/codeEditorClient.test.ts`; `app/workspace/code_editor/http.py` (`IndicatorTestRunRequest`); `app/workspace/code_editor/indicator_tester.py` (`indicator_tester`); `app/workspace/code_editor/_indicator_data.py` (`indicator_defaults`); the donor `IndicatorInfo.java` named above. All donor paths are relative to `data/reference-donor`.
+
+*Allowed implementation/test paths:* `app/web/workspaces/code_editor/codeEditorClient.ts`; `app/web/tests/workspace/code_editor/codeEditorClient.test.ts`. Update this document's status only after verified completion under the implementation plan.
+
+- [x] `createCodeEditorClient().runIndicatorTest`: change input `params` to `Record<string, unknown> | null` (still optional). Send `params: null` for omitted or null input; preserve an explicit object, including `{}`. Remove the invented `{ period: 14 }` fallback.
+- [x] Preserve endpoint `/indicator-test/run`, casing conversion, symbol/timeframe defaults, reserve/count defaults, reference values and existing return type. No hook, renderer, backend, dependency or public route change.
+- [x] Add request-body assertions: omitted params -> null; null -> null; `{}` -> `{}`; `{ period: 20 }` preserved; non-period parameters such as `{ fast_period: 12, slow_period: 26 }` preserved; omitted symbol/timeframe/reserve/count remain `EURUSD`/`H1`/50/150; explicit zero reserve and reference arrays remain unchanged. Tests use the existing mock fetch; no stored history or database needed.
+
+*Acceptance:* `npm --prefix app/web test -- tests/workspace/code_editor/codeEditorClient.test.ts`; `npm --prefix app/web run typecheck`; UI package test/build baseline as required by the owner plan. Proposed commit: `fix(code-editor): preserve indicator-specific parameter defaults`.
+
+**Completion evidence — 2026-10-30:** Approved Phase 4.2 plan, iteration 1, executed against HEAD `bf6db55e`. The omitted/null regression cases failed with the former `{ period: 14 }` fallback before the fix. The client now sends null so the backend derives the selected indicator's defaults; explicit objects remain unchanged. Seven request-mapping regressions were added. No backend, hook, renderer, dependency or persistence change was made.
+
+| Verification command | Result |
+| --- | --- |
+| `npm --prefix app/web test -- tests/workspace/code_editor/codeEditorClient.test.ts` | Exit 0; 15 tests passed |
+| `npm --prefix app/web run typecheck` | Exit 0 |
+| `npm --prefix app/web run test` | Exit 0; 714 tests passed across 124 files |
+| `npm --prefix app/web run build` | Exit 0; existing data-manager mixed import and bundle-size warnings remain |
+| `git diff --check` | Exit 0 |
+
+### Phase 4.3: Tester request lifecycle — `WO-CE-TESTER-REQUEST-LIFECYCLE`
+
+**Status:** SPECIFIED; implementation pending. *Context to Read:* this order; `useIndicatorTest.ts`, `IndicatorTesterModal.tsx`, `codeEditorClient.ts` under `app/web/workspaces/code_editor`; `app/web/tests/e2e/code-editor-regressions.spec.ts`; `app/web/playwright.config.ts`.
+
+*Allowed implementation/test paths:* `app/web/workspaces/code_editor/useIndicatorTest.ts`; `app/web/tests/e2e/code-editor-regressions.spec.ts`.
+
+- [ ] `useIndicatorTest`: invalidate the current run when the selected indicator, parameters, symbol, timeframe or test window changes and on unmount, before the debounce starts another request. A response for the old inputs must never replace the current result/error/log/running state during that interval.
+- [ ] The defaults request effect must guard both success and failure using its existing cleanup flag. An old defaults failure must not set the new indicator's error or append a stale log entry.
+- [ ] Keep the current 250 ms debounce and public hook return shape. Cleanup clears the scheduled timer. This is client response ownership only; do not claim that it cancels Python computation or implements `stopTesting`.
+- [ ] Browser acceptance with controlled delayed responses: old run resolves within the debounce interval after an input change; old run rejects after a newer run; defaults request rejects after indicator change; modal closes while requests are pending. No stale chart, error or log update may be applied. Verify normal current-input results and missing-history errors still render.
+
+*Acceptance:* `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts`; `npm --prefix app/web run typecheck`; scoped unit checks plus package test/build under the owner plan. Existing intercepted browser tests prove UI behavior, not Python integration. Proposed commit: `fix(code-editor): discard stale indicator tester responses`.
+
+### Phase 4.4: Existing package UI contract — `WO-CE-PACK-UI-CONTRACT`
+
+**Status:** SPECIFIED; implementation pending. This bounded repair supports the current Python `.zip`/`.sxp` package API, not Java source-package interchange. *Context to Read:* this order; `app/web/workspaces/code_editor/ImportExportModal.tsx`; `CodeEditorWorkspace.tsx` (modal props only); `codeEditorClient.ts`; `app/workspace/code_editor/import_export.py`; `app/web/tests/e2e/code-editor-regressions.spec.ts`; donor `internal/plugins/CodeEditorImportExport/ImportExportService.js` and `ImportExport/ExtensionManager.java`.
+
+*Allowed implementation/test paths:* `app/web/workspaces/code_editor/ImportExportModal.tsx`; `app/web/tests/e2e/code-editor-regressions.spec.ts`. Existing `exportPack`, `inspectPack`, and `importPack` client signatures stay unchanged.
+
+- [ ] `ImportExportModal.handleExport`: use only nonempty `openFiles`; if none are supplied, disable export and show an explanation. Do not substitute an indicator directory where the backend requires existing `.py` files. Export remains disk-based; state this beside the control so unsaved buffers are not implied to be included.
+- [ ] Remove the source/metadata inclusion checkboxes: the current API always packages source and a manifest, and storing checkbox booleans as metadata does not implement inclusion behavior. Keep actual pack name/description metadata.
+- [ ] Replace the editable target-directory control with text explaining that archive-relative paths determine destinations within the authorized snippet roots. No destination argument is supported by the current API.
+- [ ] Preserve conflict mapping: `merge` -> `skip`, `overwrite` -> `overwrite`, `rename` -> `rename` for every preview record. Invalidate the preview when its archive input changes; do not allow importing an uninspected archive using another archive's conflict decisions.
+- [ ] Browser acceptance: no-open-files export sends no request; export of two open paths sends those exact paths and name/description; changing archive invalidates preview; three conflict options send exact rule maps; inspection/import/export rejection is visible; completion callback refreshes navigator only on successful import. Add accessible labels as needed to operate changed controls.
+
+*Acceptance:* `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts`; `npm --prefix app/web run typecheck`; package test/build under the owner plan. No backend mutation or archive extraction is performed by the intercepted browser test. Proposed commit: `fix(code-editor): align package controls with supported operations`.
+
 ## Phase 04.9: Full workspace feature orders — evidence-gated contracts
+
+The four orders below remain parent acceptance boundaries. Their historical replacement class/file names are candidates, not mandatory parallel implementations. Preserve existing `AppCodeEditor`, `CodeEditor`, `ImportExport`, `IndicatorTester`, CodeMirror editor and modal consumers; a future approved plan must enumerate any relocation. See the audit for exact donor request fields, effects, current matches and missing contracts.
 
 ### `AppCodeEditor`
 
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appcodeeditor). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppCodeEditor`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `AppCodeEditor` complete observed workspace contribution. **Task ID:** `I-AppCodeEditor`. **Readiness:** READY. **Evidence:** `OBS145-AppCodeEditor-SURFACE-001`.
+*Feature:* `AppCodeEditor` complete observed workspace contribution. **Task ID:** `I-AppCodeEditor`. **Readiness:** NEEDS-SPEC for the complete contribution; reuse/gaps are mapped in the [completion audit](research/code-editor-completion-audit.md). **Evidence:** `OBS145-AppCodeEditor-SURFACE-001`.
 
-*Implementation Files (reserved exact paths; do not create them while blocked):*
+*Historical candidate files (not an allowed write list; current services and screens take precedence as mapped in the completion audit):*
 - **Backend:** `app/workspace/code_editor/workspace.py` → `CodeEditorService`.
 - **Request/result models:** `app/workspace/code_editor/workspace_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/CodeEditorWorkspace.tsx`.
 - **Backend test:** `tests/workspace/code_editor/test_workspace.py`.
 - **Frontend test:** `app/web/tests/workspace/code_editor/CodeEditorWorkspace.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js`, `DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor`.
-- **Observed actions:** No client route literal was established; use the exact carrier context above..
+- **Observed contribution:** navigation/program registration and donor desktop `open`; the React workspace already exists. No generic CRUD service is implied. See the completion audit for current lifecycle coverage.
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement.
 - **Function/signature authorization:** none. Do not create `CodeEditorService.execute(payload: dict)` or infer CRUD methods from the feature name.
 - **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/code_editor/test_workspace.py -q`; `npm --prefix app/web test -- tests/workspace/code_editor/CodeEditorWorkspace.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
@@ -138,9 +213,9 @@ These results cover the Phase 4.1 helper slice only. Indicator computation, impo
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#codeeditorimportexport). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 4 previously recovered primary Java files for `CodeEditorImportExport`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CodeEditorImportExport` complete observed workspace contribution. **Task ID:** `I-CodeEditorImportExport`. **Readiness:** READY. **Evidence:** `OBS145-CodeEditorImportExport-SURFACE-001`.
+*Feature:* `CodeEditorImportExport` complete observed workspace contribution. **Task ID:** `I-CodeEditorImportExport`. **Readiness:** NEEDS-SPEC for the complete contribution; reuse/gaps are mapped in the [completion audit](research/code-editor-completion-audit.md). **Evidence:** `OBS145-CodeEditorImportExport-SURFACE-001`.
 
-*Implementation Files (reserved exact paths; do not create them while blocked):*
+*Historical candidate files (not an allowed write list; current services and screens take precedence as mapped in the completion audit):*
 - **Backend:** `app/workspace/code_editor/import_export.py` → `ExtensionPackageService`.
 - **Request/result models:** `app/workspace/code_editor/import_export_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/ImportExportPanel.tsx`.
@@ -158,16 +233,16 @@ These results cover the Phase 4.1 helper slice only. Indicator computation, impo
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#codeeditorindicatortester). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 5 previously recovered primary Java files for `CodeEditorIndicatorTester`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `CodeEditorIndicatorTester` complete observed workspace contribution. **Task ID:** `I-CodeEditorIndicatorTester`. **Readiness:** READY. **Evidence:** `OBS145-CodeEditorIndicatorTester-SURFACE-001`.
+*Feature:* `CodeEditorIndicatorTester` complete observed workspace contribution. **Task ID:** `I-CodeEditorIndicatorTester`. **Readiness:** NEEDS-SPEC for the complete contribution; reuse/gaps are mapped in the [completion audit](research/code-editor-completion-audit.md). **Evidence:** `OBS145-CodeEditorIndicatorTester-SURFACE-001`.
 
-*Implementation Files (reserved exact paths; do not create them while blocked):*
+*Historical candidate files (not an allowed write list; current services and screens take precedence as mapped in the completion audit):*
 - **Backend:** `app/workspace/code_editor/indicator_tester.py` → `IndicatorTestService`.
 - **Request/result models:** `app/workspace/code_editor/indicator_tester_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/IndicatorTesterPanel.tsx`.
 - **Backend test:** `tests/workspace/code_editor/test_indicator_tester.py`.
 - **Frontend test:** `app/web/tests/workspace/code_editor/IndicatorTesterPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester`.
-- **Observed actions:** `indyTester/addTests`; `indyTester/createNewConfig`; `indyTester/downloadTests`; `indyTester/listIndicators`; `indyTester/loadConfig`; `indyTester/saveConfig`; `indyTester/startTesting`; `indyTester/stopTesting`.
+- **Observed actions:** `indyTester/addTests`; `indyTester/createNewConfig`; `indyTester/downloadTests`; `indyTester/listIndicators`; `indyTester/loadConfig`; `indyTester/saveConfig`; `indyTester/startTesting`; `indyTester/stopTesting`; `indyTester/calibrate` (new servlet-source observation in the completion audit).
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `IndicatorTestService.execute(payload: dict)` or infer CRUD methods from the feature name.
 - **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/code_editor/test_indicator_tester.py -q`; `npm --prefix app/web test -- tests/workspace/code_editor/IndicatorTesterPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
@@ -178,16 +253,16 @@ These results cover the Phase 4.1 helper slice only. Indicator computation, impo
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletcodeeditor). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 12 current plugin JavaScript files and 13 previously recovered primary Java files for `ServletCodeEditor`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ServletCodeEditor` complete observed workspace contribution. **Task ID:** `I-ServletCodeEditor`. **Readiness:** READY. **Evidence:** `OBS145-ServletCodeEditor-SURFACE-001`.
+*Feature:* `ServletCodeEditor` complete observed workspace contribution. **Task ID:** `I-ServletCodeEditor`. **Readiness:** NEEDS-SPEC for the complete contribution; reuse/gaps are mapped in the [completion audit](research/code-editor-completion-audit.md). **Evidence:** `OBS145-ServletCodeEditor-SURFACE-001`.
 
-*Implementation Files (reserved exact paths; do not create them while blocked):*
+*Historical candidate files (not an allowed write list; current services and screens take precedence as mapped in the completion audit):*
 - **Backend:** `app/workspace/code_editor/commands.py` → `CodeEditorCommandService`.
 - **Request/result models:** `app/workspace/code_editor/commands_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/SourceEditor.tsx`.
 - **Backend test:** `tests/workspace/code_editor/test_commands.py`.
 - **Frontend test:** `app/web/tests/workspace/code_editor/SourceEditor.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`.
-- **Observed actions:** `codeeditor/clone`; `codeeditor/compile`; `codeeditor/compileAll`; `codeeditor/compilePlugin`; `codeeditor/createNew`; `codeeditor/createNewDir`; `codeeditor/createNewFile`; `codeeditor/createNewTemplate`; `codeeditor/delete`; `codeeditor/editorAutocomplete`; `codeeditor/findInFiles`; `codeeditor/fixImports`; `codeeditor/getContent`; `codeeditor/listCodeTypes`; `codeeditor/listIndicators`; `codeeditor/listTemplates`; `codeeditor/loadLastOpenedFiles`; `codeeditor/reload`; `codeeditor/reloadApp`; `codeeditor/rename`; `codeeditor/save`; `codeeditor/saveAs`; `codeeditor/saveLastOpenedFiles`; `codeeditor/stopCompilation`.
+- **Observed actions:** `codeeditor/clone`; `codeeditor/compile`; `codeeditor/compileAll`; `codeeditor/compilePlugin`; `codeeditor/createNew`; `codeeditor/createNewDir`; `codeeditor/createNewFile`; `codeeditor/createNewTemplate`; `codeeditor/delete`; `codeeditor/editorAutocomplete`; `codeeditor/findInFiles`; `codeeditor/fixImports`; `codeeditor/getContent`; `codeeditor/listCodeTypes`; `codeeditor/listIndicators`; `codeeditor/listTemplates`; `codeeditor/loadLastOpenedFiles`; `codeeditor/reload`; `codeeditor/reloadApp`; `codeeditor/rename`; `codeeditor/save`; `codeeditor/saveAs`; `codeeditor/saveLastOpenedFiles`; `codeeditor/stopCompilation`; `codeeditor/list`; `codeeditor/getInfo` (last two established by servlet source in the completion audit).
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `CodeEditorCommandService.execute(payload: dict)` or infer CRUD methods from the feature name.
 - **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/code_editor/test_commands.py -q`; `npm --prefix app/web test -- tests/workspace/code_editor/SourceEditor.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
@@ -199,7 +274,7 @@ These results cover the Phase 4.1 helper slice only. Indicator computation, impo
 
 *Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies readable primary source counts for every row below. Missing per-definition target contracts/fixtures remain the gate; no row is blocked because the shared libraries lack readable source.
 
-**Readiness:** READY for every row. A source category is not a formula spec. No strategy runtime or generic base-indicator clone is authorized here.
+**Readiness:** NEEDS-SPEC for every row. The [completion audit](research/code-editor-completion-audit.md#extension-inventory-and-reconciliation-cohorts) records counts, source fingerprints, reuse owners and cohort boundaries for all 11 categories. The 751 Java files include support/package files; they are not 751 independent formulas. No strategy runtime or generic base-indicator clone is authorized here.
 
 | Donor category under internal/extend/Snippets/SQ | Exact target module | Required missing contract |
 | --- | --- | --- |

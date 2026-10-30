@@ -209,6 +209,72 @@ describe('codeEditorClient', () => {
       }),
     );
   });
+  it.each([
+    ['omitted', {}, null],
+    ['null', { params: null }, null],
+    ['empty', { params: {} }, {}],
+    ['period', { params: { period: 20 } }, { period: 20 }],
+    [
+      'non-period',
+      { params: { fast_period: 12, slow_period: 26 } },
+      { fast_period: 12, slow_period: 26 },
+    ],
+  ] as const)('preserves %s indicator parameters and transport defaults', async (_label, input, expected) => {
+    const fetchFn = vi.fn().mockImplementation(mockResponse({}));
+    const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
+
+    await client.runIndicatorTest({ indicatorName: 'MACD', ...input });
+
+    expect(fetchFn).toHaveBeenCalledExactlyOnceWith(
+      '/api/v1/code-editor/indicator-test/run',
+      expect.objectContaining({
+        method: 'POST',
+        body: JSON.stringify({
+          indicator_name: 'MACD',
+          symbol: 'EURUSD',
+          timeframe: 'H1',
+          params: expected,
+          bars_to_reserve: 50,
+          bar_count: 150,
+        }),
+      }),
+    );
+  });
+
+  it.each([{ references: [1.1, 1.2] }, { references: [] }])(
+    'preserves explicit test settings and references $references',
+    async ({ references }) => {
+      const fetchFn = vi.fn().mockImplementation(mockResponse({}));
+      const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
+
+      await client.runIndicatorTest({
+        indicatorName: 'RSI',
+        symbol: 'GBPUSD',
+        timeframe: 'M5',
+        params: {},
+        barsToReserve: 0,
+        barCount: 2,
+        referenceValues: references,
+      });
+
+      expect(fetchFn).toHaveBeenCalledExactlyOnceWith(
+        '/api/v1/code-editor/indicator-test/run',
+        expect.objectContaining({
+          method: 'POST',
+          body: JSON.stringify({
+            indicator_name: 'RSI',
+            symbol: 'GBPUSD',
+            timeframe: 'M5',
+            params: {},
+            bars_to_reserve: 0,
+            bar_count: 2,
+            reference_values: references,
+          }),
+        }),
+      );
+    },
+  );
+
   it('passes the indicator category to both preview and creation', async () => {
     const fetchFn = vi
       .fn()
