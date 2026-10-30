@@ -39,13 +39,13 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - **Test Create:** `app/web/tests/workspace/grid_control/jobPresentation.test.ts`.
 *Types:* exported class GridJobPresentation with static methods; inputs are typed scalar values, not unvalidated provider responses.
 *Functional Requirements & Implementation:*
-- [ ] `GridJobPresentation.kind(blocking: boolean): 'Continuous' | 'One time'` -> true returns Continuous; false One time.
-- [ ] `GridJobPresentation.state(waiting: boolean): 'Waiting' | 'Running'` -> true Waiting; false Running.
-- [ ] `GridJobPresentation.progress(value: number): string` -> value exactly -1 gives N/A; otherwise native JavaScript string conversion plus `%`. Do not clamp, round or treat negative numbers other than -1 as N/A.
-- [ ] `GridJobPresentation.can_refresh(active_app: string): boolean` -> exact equality with GRIDCONTROL.
-- [ ] `GridJobPresentation.interval_ms(): 3000` -> literal 3000; do not create a timer in this pure helper.
-- [ ] `test('grid labels')` -> kind(true/false) = Continuous/One time; state(true/false)=Waiting/Running; progress(-1/0/12.5/-2)=N/A/0%/12.5%/-2%.
-- [ ] `test('active-only refresh metadata')` -> GRIDCONTROL true; gridcontrol and BUILDER false; interval_ms=3000.
+- [X] `GridJobPresentation.kind(blocking: boolean): 'Continuous' | 'One time'` -> true returns Continuous; false One time.
+- [X] `GridJobPresentation.state(waiting: boolean): 'Waiting' | 'Running'` -> true Waiting; false Running.
+- [X] `GridJobPresentation.progress(value: number): string` -> value exactly -1 gives N/A; otherwise native JavaScript string conversion plus `%`. Do not clamp, round or treat negative numbers other than -1 as N/A.
+- [X] `GridJobPresentation.can_refresh(active_app: string): boolean` -> exact equality with GRIDCONTROL.
+- [X] `GridJobPresentation.interval_ms(): 3000` -> literal 3000; do not create a timer in this pure helper.
+- [X] `test('grid labels')` -> kind(true/false) = Continuous/One time; state(true/false)=Waiting/Running; progress(-1/0/12.5/-2)=N/A/0%/12.5%/-2%.
+- [X] `test('active-only refresh metadata')` -> GRIDCONTROL true; gridcontrol and BUILDER false; interval_ms=3000.
 *Acceptance:* `npm --prefix app/web test -- tests/workspace/grid_control/jobPresentation.test.ts` exits 0, two tests.
 *Commit:* `grid-control: preserve job labels and refresh predicate`.
 
