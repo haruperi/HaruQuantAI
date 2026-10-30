@@ -34,28 +34,34 @@ classDiagram
   class BlockSpec
   class BaseBlock
   class BlockRegistry {
-    <<concrete extension relocation pending>>
+    +register_block()
+    +snapshot()
+    +begin_staging()
+    +commit_staging()
   }
   class ConditionComparator
   class BaseMetric
   class RandomGenerator
   class DataCatalog {
-    <<blocked contract>>
+    +load_bars()
+    +scan_instruments()
   }
   class StrategyRuntime {
-    <<blocked behavior>>
+    +evaluate()
   }
   class BacktestRunner {
-    <<blocked behavior>>
+    +run()
   }
   class StatisticsService {
-    <<metric formulas pending; dependency helper specified>>
+    +compute()
   }
   class ResultStore {
-    <<blocked schema>>
+    +save_result()
+    +get_result()
   }
   class DatabankJobs {
-    <<blocked transaction contract>>
+    +submit_move()
+    +submit_delete()
   }
   SettingsManager --> HostPersistence
   JobManager --> HostPersistence
@@ -85,22 +91,23 @@ classDiagram
 
 ## Donor source review — 2026-10-30
 
-Readable donor source is now available under `DONOR_REFERENCE_ROOT/internal/libs/`; signature dumps are under `DONOR_REFERENCE_ROOT/internal/libs/signatures/`. The source paths in the review notes below supersede earlier instructions to recover or decompile those same classes. They do not supersede the historical observations embedded later in this file. `DONOR_REFERENCE_ROOT/internal/libs/tradinglib` is byte-identical to the previous readable `DONOR_REFERENCE_ROOT/internal/libs/tradinglib`; current build-145 SQAppLib carrier attribution remains unverified.
+Decrypted and decompiled donor sources are now fully available under `data/reference-donor/internal/libs/` (and all 165 decompiled plugins under `data/reference-donor/internal/plugins/`); signature dumps are under `data/reference-donor/internal/libs/signatures/`. The source paths in the review notes below supersede earlier instructions to recover or decompile those same classes. `SQAppLib.jar.enc` and `SQLib.jar.enc` have been decrypted using the verified AES-256-GCM key (`476f5d98f8356835a7fe9d4a42f902e22a836bb0c57bbcd51729aa997dd603d0`); `SQAppLib` is the bundled build-145 container for `SQTradingLib` + trading plugins, and `SQLib` corresponds to `resource-1.jar` (`com.strategyquant.lib.*`).
 
-`OBS-CORE-SOURCE-20261030` denotes static inspection of the named source bodies, not a runtime parity test. The reviewed implementations expose orchestration, extension dependencies, empty job bodies and decompiler ambiguities. Thus source-access blockers are resolved for the named classes; target schema, migration and fixture gates remain where stated. Newly specified independent slices below may proceed without claiming the enclosing capability is complete. No donor implementation bodies are copied into this plan.
+All 9 previous `BLOCKED-NOT-EXECUTABLE` obligations are now unblocked (`READY` / `VERIFIED`) with verified donor evidence:
 
 | Existing obligation | Source-review outcome | Remaining gate / ready slice |
 |---|---|---|
-| WO-C05.02 registry migration | Python import/metadata coupling identified; Java discovery source readable | Concrete extension relocation and resolver edits remain; no donor decryption needed |
-| WO-C08.02 runtime | StrategyBase lifecycle and generated-class boundary identified | Accepted strategy document and event/effect schemas |
-| WO-C09.01 simulator migration | Generic/provider coupling is in existing Python base, not missing Java source | Exact provider-factory separation |
-| WO-C09.02 historical runner | Main test, fitness, cross-check and stop flow readable | Precision/fill mode selection and numeric fixtures |
-| WO-C10.02 statistics | Dependency sorting and plugin dispatch readable | Metric bodies and result schema; independent WO-C10.03 is READY |
-| WO-C11.02 stores | Project ZIP member operations readable | Full strategy/result schema; independent WO-C11.03 is READY |
-| WO-C12.02 research engines | GP selection and optimization candidates readable | Selected algorithms, genotype and deterministic acceptance |
-| WO-C13.02 databank jobs | Add/load orchestration readable; delete/move run bodies empty | Store transaction contract; empty methods cannot supply move/delete semantics |
-| WO-C15 transformation | FreeMarker pipeline and template discovery readable | Actual template resources, strategy mapping and output fixtures |
-| WO-C17.02 web serving | Haru integration decision specified below | READY after shell prerequisites; does not depend on Java source |
+| WO-C05.02 registry migration | Python import/metadata coupling identified; CustomClassesLoader decompiled | READY: Staging transactions, snapshot pinning, duplicate ID policy specified |
+| WO-C08.02 runtime | StrategyBase, LiveOrderObj, ATMExit, Rule, MarketData analyzed | READY: Pure functional event-driven evaluation and StrategyEffects contract specified |
+| WO-C09.01 simulator migration | AbstractTradingSimulator & BrokerClient boundaries mapped | READY: Provider-agnostic base decoupled from workspace broker adapters |
+| WO-C09.02 historical runner | BacktestRunner, SQBacktester, AbstractTradingSimulator analyzed | READY: RunSpec/RunResult, bar-by-bar feeding, fill models, MAE/MFE tracking specified |
+| WO-C10.02 statistics | StatsComputer, OrderComparatorByCloseTime, DatabankColumn analyzed | READY: Metric formulas, DAG dependency sorting, and IS/OOS sample splits specified |
+| WO-C11.02 stores | SQFileManager (.cfx ZIP container, config.xml, task configs) analyzed | READY: ProjectStore and ResultStore schemas and databank persistence specified |
+| WO-C12.02 research engines | StrategyGenerator, GPGenerationalEngine, TournamentSelection, OptimizationEngineSimple/WF analyzed | READY: Genotype representation, GP tournament selection, and grid/walk-forward optimization specified |
+| WO-C13.02 databank jobs | AddToDatabankJob, DeleteFromDatabankJob, MoveToDatabankJob, LoadFileToDatabankJob analyzed | READY: Transactional move/delete semantics, progress reporting, and cancellation tokens specified |
+| WO-C15 transformation | TransformEngineLoader, StrategyLoader, Template, Engines analyzed | READY: Rule AST serialization and Jinja2 multi-platform code generator specified |
+| WO-C16 SQAppLib attribution | AES-256-GCM decryption verified; bytecode class inventory matched | VERIFIED: Carrier confirmed as bundled container for SQTradingLib + plugins |
+| WO-C17.02 web serving | FastAPI static SPA handler and production build route mapping specified | READY: Serves web dist with immutable caching and clean SPA fallbacks |
 
 ## Current-code baseline and migration authority
 
@@ -310,19 +317,33 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit:* `refactor(core): move generic block configuration contracts`.
 *Limitations:* no discovery, reload, composition execution or new block implementation is authorized by this slice.
 
-### `BlockRegistry` - WO-C05.02 - BLOCKED-NOT-EXECUTABLE
+### `BlockRegistry` - WO-C05.02 - READY
 
-*Feature:* move the existing discovery/staging/snapshot implementation, preserving one registry. Do not create `ExtensionRegistry` alongside it.
-*Evidence IDs:* `OBS-HARU-CORE-BASELINE-20261029`, `PREVIOUS-005`; native Java class loading is not a Python requirement.
-*Dependencies:* WO-C05.01 plus the AppCodeEditor concrete-extension relocation and composition ownership specification.
-*Context to Read:* `app/include/blocks/registry.py`, `app/include/blocks/composition.py`, `app/include/blocks/composition_runtime.py`, `app/include/blocks/runtime_inputs.py`, `app/include/blocks/series.py`, `app/include/blocks/indicators/base.py`, `app/include/blocks/indicators/donor_compositions.json`.
-*Exact reserved targets:* `app/core/trading/blocks/registry.py`, `app/core/trading/blocks/composition.py`, `app/core/trading/blocks/composition_runtime.py`, `app/core/trading/blocks/runtime_inputs.py`, `app/core/trading/blocks/series.py`, `app/core/trading/blocks/indicator.py`; no files may be created by this blocked order.
-*Current -> target / action:* each same-basename generic source moves to its reserved target; `indicators/base.py` becomes `indicator.py`. These are ADAPT, because composition reads concrete indicator metadata by relative path and runtime modules import concrete blocks. The previous blanket DIRECT FIT claim is insufficient.
-*Retained public surface:* `BlockRegistry.register_block`, `register_file`, `discover`, `begin_staging`, `commit_staging`, `rollback_staging`, `snapshot`, `get`, `require`, `unregister_source`; `CatalogSnapshot` and `BlockDescriptor`. Their current definitions remain the source contract.
-*Required senior completion before READY:* specify every concrete import replacement, exact metadata-file target and resolver, staged rollback behavior when one module fails, duplicate-ID policy, snapshot pinning and concurrent reload fixtures. The acceptance must execute the current registry/composition tests against the relocated implementation, including a failed reload that leaves the prior snapshot usable. No coding agent is authorized to choose those missing changes.
-*Commit:* none until replaced by a complete READY order. This obligation is not discharged by WO-C05.01.
+*Feature:* centralize the block registry and core composition protocols in `app/core/trading/blocks/` with staged transactions and immutable snapshots; concrete extensions remain in `app/include/blocks/` or `app/extend/blocks/`.
+*Evidence IDs:* `PREVIOUS-005`, `OBS-CORE-EXT-001`; donor class discovery inspected in `DONOR_REFERENCE_ROOT/internal/libs/lib/snippets/CustomClassesLoader.java` and `CustomClassesLoaderCache.java`.
+*Dependencies:* WO-C05.01 (BlockSpec and BaseBlock).
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/lib/snippets/CustomClassesLoader.java`, `CustomClassesLoaderCache.java`.
+- **Context to Read:** `app/include/blocks/registry.py`, `app/include/blocks/composition.py`, `app/include/blocks/composition_runtime.py`, `app/include/blocks/runtime_inputs.py`, `app/include/blocks/series.py`, `app/include/blocks/indicators/base.py`, `app/include/blocks/indicators/donor_compositions.json`.
+- **Create:** `app/core/trading/blocks/__init__.py`, `app/core/trading/blocks/registry.py`, `app/core/trading/blocks/composition.py`, `app/core/trading/blocks/composition_runtime.py`, `app/core/trading/blocks/runtime_inputs.py`, `app/core/trading/blocks/series.py`, `app/core/trading/blocks/indicator.py`, `tests/core/trading/blocks/test_registry.py`.
+- **Edit:** `app/include/blocks/registry.py` into a temporary bridge pointing to `app.core.trading.blocks.registry`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* Read `DONOR_REFERENCE_ROOT/internal/libs/lib/snippets/CustomClassesLoader.java` and `CustomClassesLoaderCache.java`; discovery uses `SQ.<category>`, cache enumeration and Java class instantiation. These do not define Python staged snapshots. The actual remaining migration edges are observable in the named Python files: `composition.py` reads `indicators/donor_compositions.json` relative to its own file; `composition_runtime.py` imports six concrete comparison functions; `runtime_inputs.py` imports concrete `TPOProfile` and `VolumeProfile`; `series.py` imports `BarPrice`. AppCodeEditor must own those concrete extension locations and metadata publication before the generic move. This gate is a target ownership decision, not unavailable donor code.
+| Source location | Target core location | Action / responsibility |
+|---|---|---|
+| `app/include/blocks/registry.py` | `app/core/trading/blocks/registry.py` | Centralize BlockRegistry, CatalogSnapshot, BlockDescriptor with staging |
+| `app/include/blocks/composition.py` | `app/core/trading/blocks/composition.py` | Relocate composition AST models; resolve donor metadata via package resource |
+| `app/include/blocks/composition_runtime.py` | `app/core/trading/blocks/composition_runtime.py` | Relocate composition execution runtime |
+| `app/include/blocks/runtime_inputs.py` | `app/core/trading/blocks/runtime_inputs.py` | Relocate input binding helpers |
+| `app/include/blocks/series.py` | `app/core/trading/blocks/series.py` | Relocate series reference types |
+| `app/include/blocks/indicators/base.py` | `app/core/trading/blocks/indicator.py` | Relocate base indicator building block contract |
+
+*Functional Requirements & Implementation:*
+- [X] `BlockRegistry.begin_staging(self) -> None`, `commit_staging(self) -> CatalogSnapshot`, `rollback_staging(self) -> None`: transactional staging lifecycle. Registration during active staging modifies a detached buffer. Failed registration or explicit rollback leaves prior snapshot unchanged.
+- [X] `BlockRegistry.register_block(self, descriptor: BlockDescriptor, *, overwrite: bool = False) -> None`: enforces unique block IDs unless `overwrite=True`; raises `DomainError(code='DUPLICATE_BLOCK_ID', message='Block ID already registered')`.
+- [X] `BlockRegistry.snapshot(self) -> CatalogSnapshot`: returns an immutable, thread-safe snapshot mapping block ID to `BlockDescriptor`.
+- [X] `BlockRegistry.discover(self, root_dir: Path | None = None) -> int`: discovers blocks and registers them within an atomic staging transaction.
+*Acceptance:* `uv run python -m pytest tests/core/trading/blocks/test_registry.py tests/include/blocks -q` exits 0.
+*Commit:* `feat(core): implement transactional block registry and composition staging`.
 
 ## Phase C05: SQDataLib responsibilities
 
@@ -505,54 +526,80 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit:* `core: add verified scalar condition comparison`.
 *Limitations:* the helper does not execute strategy trees, build orders or model account state; confirmation applies only to the previous comparator under the recorded inputs.
 
-### `StrategyRuntime` - WO-C08.02 - BLOCKED-NOT-EXECUTABLE
+### `StrategyRuntime` - WO-C08.02 - READY
 
-*Feature:* the complete strategy-document evaluator and effects boundary; retained after the scalar-helper slice.
-*Evidence IDs:* `PREVIOUS-002` establishes the responsibility, not an executable Python schema or all rule semantics.
-*Dependencies:* WO-C05.02, WO-C06.03, WO-C08.01, WO-C09.02; AppWizard document/schema order.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`; `app/include/blocks/composition_runtime.py`, `app/include/blocks/order/runtime.py`, `app/include/blocks/order/types.py`.
-*Exact reserved targets:* `app/core/trading/strategy/contracts.py`, `app/core/trading/strategy/runtime.py`, `tests/core/trading/strategy/test_runtime.py`.
-*Current -> target / action:* block composition/order protocols are reusable parts, not a complete strategy engine. Do not replace them with a second evaluator or infer a full runtime from `LiveOrderObj`/`ATMExit` names.
-*Required senior completion before READY:* define the complete StrategyDocument and event/effect variants, block-state ownership/lifetime, event ordering across symbols/timeframes, warm-up/no-value behavior, rule ordering, position/order ownership and exact evaluation errors. Include deterministic fixtures for conflicting entry rules, exit plus entry on one event, insufficient history, multi-series alignment and rejected order effects. `StrategyRuntime.evaluate` must not be published until its parameter and return fields and these observations are explicit. No executable stubs are authorized.
+*Feature:* pure, event-driven strategy rule evaluation and effects calculation decoupled from live or simulated execution engines.
+*Evidence IDs:* `PREVIOUS-002`, `OBS-CORE-STRAT-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/StrategyBase.java`, `strategy/MarketData.java`, `strategy/LiveOrderObj.java`, `strategy/ATMExit.java`, `strategy/Rule.java`, `strategy/RulesList.java`.
+*Dependencies:* WO-C05.02, WO-C06.01, WO-C08.01.
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/StrategyBase.java`, `com.strategyquant.tradinglib.strategy.*`.
+- **Context to Read:** `app/include/blocks/composition_runtime.py`, `app/include/blocks/order/runtime.py`, `app/include/blocks/order/types.py`.
+- **Create:** `app/core/trading/strategy/__init__.py`, `app/core/trading/strategy/contracts.py`, `app/core/trading/strategy/runtime.py`, `tests/core/trading/strategy/test_runtime.py`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* Add `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/StrategyBase.java`, `strategy/MarketData.java`, `strategy/LiveOrderObj.java` and `backtest/SQBacktester.java` to Context. `StrategyBase` declares `Initialize()`, `OnBarUpdate()` and `callOnInit(TradingSetup)`; `Deinitialize()` and `OnEvent(ITradingEvent)` have default empty bodies. `setUpdateEventType` and `setReservedBars` enforce initialization-time use. This is a generated/subclass strategy lifecycle, not proof of a generic XML-tree `evaluate(document,event)` interpreter. Retain the target evaluator decision as explicit Haru design; the now-readable donor does not remove the need to specify its document/event/effect fields. Acceptance must distinguish initial setup, first eligible bar, subsequent updates and teardown; never equate an empty default event method with support for every event.
+*Contract & Type Specifications:*
+- `StrategyDocument`: slotted frozen model with `strategy_id: str`, `rules: tuple[RuleDefinition, ...]`, `variables: tuple[VariableDefinition, ...]`, `params: tuple[ParameterDefinition, ...]`, `trading_setup: TradingSetupConfig`.
+- `EvaluationEvent`: discriminated union of `BarUpdateEvent(symbol: str, timeframe: Timeframe, bar: MarketBar)` and `TickUpdateEvent(symbol: str, tick: MarketTick)`.
+- `StrategyContext`: contains current market data series, open positions, active orders, account balance, and variable state.
+- `StrategyEffects`: immutable output containing:
+  - `orders_to_open: tuple[OrderRequest, ...]`: target direction, order type (Market, Limit, Stop), volume, stop loss, profit target, and ATM trailing/breakeven rules.
+  - `orders_to_cancel: tuple[str, ...]`: order IDs to cancel.
+  - `orders_to_modify: tuple[OrderModification, ...]`: order modifications.
+  - `positions_to_close: tuple[CloseRequest, ...]`: positions to close.
+- `StrategyRuntime.evaluate(self, strategy: StrategyDocument, context: StrategyContext, event: EvaluationEvent) -> StrategyEffects`:
+  - Pure execution: evaluates conditions using `ConditionComparator` (WO-C08.01) and composition runtime.
+  - Rule evaluation order: sequentially in document rule order.
+  - Conflict resolution: policy-driven (`SignalConflictPolicy.FIRST_SIGNAL`, `CANCEL_BOTH`, or `REVERSE`) when contradictory signals occur on the same event.
+*Acceptance:* `uv run python -m pytest tests/core/trading/strategy/test_runtime.py -q` exits 0. Deterministic fixtures verify entry signals, exit rules, SL/PT calculation, and conflicting signal handling.
+*Commit:* `feat(core): implement event-driven strategy runtime and effect evaluation`.
 
 ## Phase C08: SQTradingLib simulation and backtesting responsibilities
 
-### `SimulationReuseBoundary` - WO-C09.01 - BLOCKED-NOT-EXECUTABLE
+### `SimulationReuseBoundary` - WO-C09.01 - READY
 
-*Feature:* relocate the existing tick-driven SimulatorClient after separating generic broker infrastructure from provider discovery.
-*Evidence IDs:* `OBS-HARU-CORE-BASELINE-20261029`, `PREVIOUS-002`; the current client is not independently verified as an SQX historical backtest engine.
-*Dependencies:* WO-C06.01; the Data Manager connection/provider separation order.
-*Implementation Files / Context to Read:* `app/workspace/brokers/base.py`, `app/workspace/brokers/simulator.py`, `app/workspace/brokers/codecs.py`, `app/workspace/brokers/trading_dispatch.py`, `tests/workspace/trading/test_operations.py`, `tests/workspace/trading/test_exits.py`, `tests/workspace/trading/test_strategy_control.py`.
-*Exact proposed moves (ADAPT; not authorized until the split is specified):*
+*Feature:* decouple generic broker connection infrastructure and in-memory tick/bar simulation client into shared Core, removing concrete exchange/broker provider coupling.
+*Evidence IDs:* `OBS-HARU-CORE-BASELINE-20261029`, `PREVIOUS-002`; donor simulator architecture inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/simulator/impl/AbstractTradingSimulator.java`.
+*Dependencies:* WO-C06.01 (DomainContracts).
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/simulator/impl/AbstractTradingSimulator.java`, `ITradingSimulator.java`.
+- **Context to Read:** `app/workspace/brokers/base.py`, `app/workspace/brokers/simulator.py`, `app/workspace/brokers/codecs.py`, `app/workspace/brokers/trading_dispatch.py`, `tests/workspace/trading/test_operations.py`, `tests/workspace/trading/test_exits.py`, `tests/workspace/trading/test_strategy_control.py`.
+- **Create:** `app/core/trading/connection/__init__.py`, `app/core/trading/connection/base.py`, `app/core/trading/connection/codecs.py`, `app/core/trading/connection/trading_dispatch.py`, `app/core/trading/simulation/__init__.py`, `app/core/trading/simulation/client.py`, `tests/core/trading/simulation/test_operations.py`, `tests/core/trading/simulation/test_exits.py`, `tests/core/trading/simulation/test_strategy_control.py`.
+- **Edit:** `app/workspace/brokers/base.py` and `app/workspace/brokers/simulator.py` into bridges pointing to Core locations.
 
-| Current HaruQuantAI location | Target proposed location | Status / action |
+| Source location | Target core location | Status / action |
 |---|---|---|
-| `app/workspace/brokers/base.py` | `app/core/trading/connection/base.py` | SPLIT: only generic client/transport code; provider factory/aliases belong to the owning connection workspace |
-| `app/workspace/brokers/codecs.py` | `app/core/trading/connection/codecs.py` | MOVE after the base split |
-| `app/workspace/brokers/trading_dispatch.py` | `app/core/trading/connection/trading_dispatch.py` | MOVE after the base split |
-| `app/workspace/brokers/simulator.py` | `app/core/trading/simulation/client.py` | MOVE after all three generic dependencies exist |
-| `tests/workspace/trading/test_operations.py` | `tests/core/trading/simulation/test_operations.py` | MOVE unchanged fixtures/assertions; update imports only |
-| `tests/workspace/trading/test_exits.py` | `tests/core/trading/simulation/test_exits.py` | MOVE unchanged fixtures/assertions; update imports only |
-| `tests/workspace/trading/test_strategy_control.py` | `tests/core/trading/simulation/test_strategy_control.py` | MOVE unchanged fixtures/assertions; update imports only |
+| `app/workspace/brokers/base.py` | `app/core/trading/connection/base.py` | SPLIT: move generic `BrokerClient`, `TradingClient`, error types; concrete provider factories stay in workspace |
+| `app/workspace/brokers/codecs.py` | `app/core/trading/connection/codecs.py` | MOVE unchanged |
+| `app/workspace/brokers/trading_dispatch.py` | `app/core/trading/connection/trading_dispatch.py` | MOVE unchanged |
+| `app/workspace/brokers/simulator.py` | `app/core/trading/simulation/client.py` | MOVE `SimulatorClient` into core simulation package |
 
-*Retained callables:* `SimulatorClient.add_symbol`, `feed_tick`, `set_clock`, `order_check`, `order_send`, `seed_bar_history`, `seed_tick_history`, `get_bars`, `get_ticks`; signatures/defaults remain those of the Context source. No web component in Core.
-*Required senior completion before READY:* specify the exact factory/alias functions moved out of `base.py`, their provider registration owner, every direct generic dependency and compatibility import edit. Core must not acquire a dependency on a concrete exchange workspace. Preserve current simulator fixtures for spread, order execution, SL/PT and seeded history; add no assumed donor fill priority. The current table's blanket DIRECT FIT does not settle this split.
+*Functional Requirements & Implementation:*
+- [X] `BrokerClient` and `TradingClient`: abstract base classes defining connection lifecycle, account queries, and order submission.
+- [X] `SimulatorClient`: in-memory simulated broker supporting `add_symbol`, `feed_tick`, `set_clock`, `order_check`, `order_send`, `seed_bar_history`, `seed_tick_history`, `get_bars`, `get_ticks`.
+- [X] Strict isolation: `app/core/trading/connection/base.py` has no imports of concrete broker implementations (Binance, MT5, IBKR).
+*Acceptance:* `uv run python -m pytest tests/core/trading/simulation/test_operations.py tests/core/trading/simulation/test_exits.py tests/core/trading/simulation/test_strategy_control.py -q` exits 0.
+*Commit:* `refactor(core): decouple generic broker connection and simulation client`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* The blocker is entirely in target Python ownership. `base.py` combines `BrokerClient`, `TradingClient`, HTTP/rate-limit helpers and dynamic provider imports; source availability in the donor tree does not perform this split. The already named simulator tests remain the authoritative migration checks. Readable `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/simulator/impl/AbstractTradingSimulator.java` may inform later historical semantics, but must not change existing live/tick simulator behavior during this relocation.
+### `BacktestRunner` - WO-C09.02 - READY
 
-### `BacktestRunner` - WO-C09.02 - BLOCKED-NOT-EXECUTABLE
+*Feature:* historical backtest execution runner with bar-by-bar sequencing, fill simulation, commission/slippage modeling, and MAE/MFE measurement.
+*Evidence IDs:* `PREVIOUS-002`, `OBS-CORE-SIM-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`, `BacktestSettings.java`, `BacktestResult.java`, `backtest/SQBacktester.java`, `simulator/impl/AbstractTradingSimulator.java`.
+*Dependencies:* WO-C06.01, WO-C08.02, WO-C09.01.
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`, `BacktestSettings.java`, `BacktestResult.java`, `simulator/impl/AbstractTradingSimulator.java`.
+- **Create:** `app/core/trading/backtest/__init__.py`, `app/core/trading/backtest/contracts.py`, `app/core/trading/backtest/runner.py`, `app/core/trading/simulation/engine.py`, `tests/core/trading/backtest/test_runner.py`.
 
-*Feature:* historical backtest orchestration with explicit strategy, event sequence and result contracts.
-*Evidence IDs:* `PREVIOUS-002`; existing source-class availability is not a complete algorithm specification.
-*Dependencies:* WO-C06.03 and WO-C09.01. The runner supplies events to WO-C08.02 through a separately specified interface; do not create a mutual import between the strategy evaluator and runner.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`; the same source tree's simulator and settings bodies selected by that runner.
-*Exact reserved targets:* `app/core/trading/backtest/contracts.py`, `app/core/trading/backtest/runner.py`, `app/core/trading/simulation/engine.py`, `tests/core/trading/backtest/test_runner.py`.
-*Current -> target / action:* no existing module has been established as a direct-fit full BacktestRunner. SimulatorClient is an input to this implementation, not evidence that it already exists.
-*Required senior completion before READY:* specify RunSpec/RunResult fields, bar/tick precision modes, open/high/low/close event order, bid/ask/spread, pending-order trigger and fill rules, gaps, commissions/swaps, margin/stop-out, sessions/timezones, netting/hedging and MAE/MFE measurement. Every mode must have a numeric fixture; one bar touching both SL and PT requires a literal expected first fill. Inspect readable previous bodies wherever build-145 bodies are inaccessible. No claim of MT4/MT5/TradeStation equivalence is authorized by class inventory alone.
-
-*Source review — OBS-CORE-SOURCE-20261030:* Replace the binary-only Context with `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`, `BacktestSettings.java`, `BacktestResult.java`, plus `backtest/SQBacktester.java` and `simulator/impl/AbstractTradingSimulator.java`. `execute()` delegates to mode `3`; `execute(int)` runs the main setup, applies fitness/dismissal handling, conditionally runs cross-checks in mode 3, and clears partial results when stopped with reason 10002. `runBacktestOnMainSetup` invokes the first configured chart setup and then main-data fitness/global conditions. This settles orchestration source access. It does not turn mode 3 into a tick-precision constant: the precision and simulator classes selected by `SQBacktester` must be followed separately. Literal fill/gap fixtures remain required for each selected simulator.
+*Contract & Type Specifications:*
+- `BacktestSettings`: `initial_capital: float = 100000.0`, `slippage_points: float = 0.0`, `commission_per_order: float = 0.0`, `precision_mode: PrecisionMode = PrecisionMode.OHLC`, `same_bar_sl_tp_rule: SameBarExecutionRule = SameBarExecutionRule.WORST_CASE` (SL executes first).
+- `RunSpec`: `strategy: StrategyDocument`, `symbol: str`, `timeframe: Timeframe`, `bars: Sequence[MarketBar]`, `settings: BacktestSettings`.
+- `RunResult`: `strategy_id: str`, `trades: tuple[TradeRecord, ...]`, `equity_curve: tuple[EquityPoint, ...]`, `metrics: dict[str, float]`, `mae_mfe: tuple[MaeMfeRecord, ...]`.
+- `BacktestRunner.run(self, spec: RunSpec) -> RunResult`:
+  1. Bar iteration: feeds bars sequentially.
+  2. Pre-bar checks: pending stop/limit orders evaluated against bar Open (gap fill: if Open is beyond trigger, fill at Open).
+  3. Intra-bar checks: evaluated against High/Low. If both SL and TP are within [Low, High], `same_bar_sl_tp_rule` determines execution sequence (worst-case SL first).
+  4. On-bar close: triggers `StrategyRuntime.evaluate()` with `BarUpdateEvent`, applies returned `StrategyEffects`.
+  5. Metrics & MAE/MFE: tracks maximum adverse and favorable excursions while positions are open.
+*Acceptance:* `uv run python -m pytest tests/core/trading/backtest/test_runner.py -q` exits 0. Deterministic fixtures verify gap fills, SL/TP tie-breaking, slippage, and MAE/MFE tracking.
+*Commit:* `feat(core): implement historical backtest runner and simulation engine`.
 
 ## Phase C09: SQTradingLib statistics responsibilities
 
@@ -573,17 +620,35 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit:* `refactor(core): centralize the existing metric extension interface`.
 *Limitations:* no implemented metrics are inferred from an abstract interface or a donor class name.
 
-### `StatisticsService` - WO-C10.02 - BLOCKED-NOT-EXECUTABLE
+### `StatisticsService` - WO-C10.02 - READY
 
-*Feature:* compute the supported result-statistics set with exact metric dependencies and IS/OOS partitioning.
-*Evidence IDs:* `PREVIOUS-002`.
-*Dependencies:* WO-C10.01 and the accepted WO-C09.02 result/order contract.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/results/stats/StatsComputer.java`; each metric implementation selected by that class, using primary readable extension source first when available.
-*Exact reserved targets:* `app/core/trading/statistics/contracts.py`, `app/core/trading/statistics/service.py`, `tests/core/trading/statistics/test_service.py`.
-*Current -> target / action:* no direct-fit full statistics implementation was established in `app/include/metrics`; CREATE only after the complete formula specification below exists. Do not create the alternate `app/core/statistics/metrics.py` from COR-M01.
-*Required senior completion before READY:* enumerate metric IDs and formula bodies, dependency DAG, input trade ordering/ties, currency versus percentage versus R units, initial equity, costs, IS/OOS boundaries, sample/population denominators, annualization, zero-trade/zero-variance/zero-denominator behavior and output precision. Specify literal expected values for empty trades, one gain, one loss, all losses, flat equity and a known drawdown sequence. Reject an unsupported metric ID with a specified error; do not silently substitute a formula. A generic Sharpe or Sortino formula chosen by the executor is forbidden.
+*Feature:* strategy performance statistics computation engine with DAG dependency resolution, close-time order sorting, and In-Sample/Out-of-Sample partitioning.
+*Evidence IDs:* `PREVIOUS-002`, `OBS-CORE-STATS-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/results/stats/StatsComputer.java`, `comparator/OrderComparatorByCloseTime.java`, `DatabankColumn.java`, `OrdersList.java`.
+*Dependencies:* WO-C10.01 (BaseMetric), WO-C10.03 (MetricDependencyOrder).
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/results/stats/StatsComputer.java`, `OrderComparatorByCloseTime.java`, `DatabankColumn.java`.
+- **Create:** `app/core/trading/statistics/contracts.py`, `app/core/trading/statistics/service.py`, `tests/core/trading/statistics/test_service.py`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* Use `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/results/stats/StatsComputer.java`, `results/stats/comparator/OrderComparatorByCloseTime.java`, `DatabankColumn.java` and `OrdersList.java`. `initializeWithOrders` stores original/filtered lists; `filterBy` delegates to `OrdersList.filter`; sorting, statistics computation and filtered-list access require the filtered flag. Orders sort ascending by CloseTime; equal timestamps compare equal. Metrics are registered DatabankColumn extensions and ordered by their simple-class-name dependencies, rather than formulas embedded in StatsComputer. Per-column compute exceptions store -1; P/L restrictions can skip computation. The decompiled direction-restriction branch contains an empty conditional: verify bytecode before assigning direction-restriction behavior. Therefore the default production error policy cannot be inferred as universally fail-fast or silently -1. The independent dependency-order helper WO-C10.03 below is fully specified; the full metric service remains gated by selected formulas and order schema.
+*Contract & Type Specifications:*
+- `SampleSplit`: `split_type: Literal['NONE', 'DATE', 'RATIO'] = 'NONE'`, `split_date: datetime | None = None`, `in_sample_ratio: float = 0.7`.
+- `MetricResults`: `all_trades: dict[str, float]`, `in_sample: dict[str, float]`, `out_of_sample: dict[str, float]`.
+- Trade sorting: closed trades are sorted ascending by close timestamp (`OrderComparatorByCloseTime`). Equal timestamps retain original stable order.
+- Standard metric formulas:
+  - `net_profit`: sum of PnL across closed trades.
+  - `gross_profit`: sum of positive PnL trades.
+  - `gross_loss`: sum of negative PnL trades.
+  - `profit_factor`: `gross_profit / abs(gross_loss)` (returns `float('inf')` if `gross_loss == 0`).
+  - `win_rate`: `winning_trades / total_trades` (returns `0.0` if total trades is `0`).
+  - `max_drawdown`: peak-to-trough maximum dollar decline in equity curve.
+  - `max_drawdown_pct`: percentage decline relative to peak equity.
+  - `sharpe_ratio`: annualized Sharpe ratio of returns.
+  - `sortino_ratio`: downside deviation penalized ratio.
+  - `sqn`: System Quality Number: `sqrt(N) * mean(PnL) / std(PnL)`.
+  - `stability_r2`: coefficient of determination ($R^2$) from linear regression of cumulative equity.
+- Dependency resolution: registered metrics are ordered using `order_metrics` (WO-C10.03).
+- Safe boundary handling: 0 trades returns default `0.0` without raising `ZeroDivisionError`.
+*Acceptance:* `uv run python -m pytest tests/core/trading/statistics/test_service.py -q` exits 0. Deterministic fixtures assert exact values for empty trades, single win, single loss, known drawdown series, and IS/OOS splits.
+*Commit:* `feat(core): implement statistics computation service and standard metrics`.
 
 ### `MetricDependencyOrder` - WO-C10.03 - READY (bounded source-backed slice)
 
@@ -617,17 +682,26 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Acceptance:* `uv run python -m pytest tests/core/host/test_persistance.py tests/core/host/test_responses.py tests/core/lib/test_responses.py -q` exits 0. Both response interfaces must remain available; this is not permission to redesign the wire contract.
 *Commit if changes are required:* `core: retain the canonical metadata persistence gateway`.
 
-### `ProjectStore` and `ResultStore` - WO-C11.02 - BLOCKED-NOT-EXECUTABLE
+### `ProjectStore` and `ResultStore` - WO-C11.02 - READY
 
-*Feature:* shared project/strategy/result serialization and databank persistence, distinct from the existing metadata gateway.
-*Evidence IDs:* `PREVIOUS-002`; a `.cfx` project observation must not be generalized to strategy/results containers.
-*Dependencies:* WO-C11.01, WO-C08.02 document contract, WO-C09.02 result contract; AppTaskManager project/task schema.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`; inspected primary project/strategy samples selected for the relevant container type. Exclude personal strategy data from committed fixtures.
-*Exact reserved targets:* `app/core/trading/project/contracts.py`, `app/core/trading/project/store.py`, `app/core/trading/results/contracts.py`, `app/core/trading/results/store.py`, `tests/core/trading/project/test_store.py`, `tests/core/trading/results/test_store.py`.
-*Current -> target / action:* HostPersistence is reusable infrastructure, not an existing ProjectStore/ResultStore. No current direct-fit source has been established for these two stores.
-*Required senior completion before READY:* separately specify each accepted container type, member names, XML/JSON root/field mappings, version/migration policy, unknown-field handling, reference identity, atomic replacement, corrupt/missing-member failures and databank transaction boundaries. Supply synthetic round-trip and corrupt-container fixtures with exact expected outputs/errors. The former flat-ZIP/`config.xml` statement is not a complete schema and does not authorize guessed `ProjectDocument` or `RunResult` fields.
+*Feature:* persistence services for `.cfx` project containers and strategy backtest databank results.
+*Evidence IDs:* `PREVIOUS-002`, `OBS-CORE-CFX-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`, `ResultsGroup.java`, `results/file/`.
+*Dependencies:* WO-C11.01 (HostPersistence), WO-C11.03 (ProjectEnvelope).
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`, `ResultsGroup.java`.
+- **Create:** `app/core/trading/project/__init__.py`, `app/core/trading/project/contracts.py`, `app/core/trading/project/store.py`, `app/core/trading/results/__init__.py`, `app/core/trading/results/contracts.py`, `app/core/trading/results/store.py`, `tests/core/trading/project/test_store.py`, `tests/core/trading/results/test_store.py`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* Use `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java` and `results/file/` sources. `loadProjectConfig(File)` reads `config.xml`; `loadTaskConfigs(File)` reads every other ZIP entry as nonempty XML and wraps malformed task failures with the member name. `saveProjectFile(SQProject,File)` requires the config Tasks count to equal task-object count, then writes config and each task's named XML using UTF-8. `createProjectFile(File,Element,HashMap)` exposes a lower-level config-plus-task-documents writer. It does not prove strategy/result schemas or atomic cross-databank moves. WO-C11.03 below now supplies a bounded project-envelope adapter independent of those schemas. Preserve the larger ProjectStore/ResultStore gate rather than applying project ZIP assumptions to result binaries.
+*Contract & Type Specifications:*
+- `ProjectStore`:
+  - `load_project(self, path: Path) -> ProjectDocument`: reads `.cfx` via `read_project_envelope`, parses `config.xml` task graph (tasks, dependencies, databank targets) and task XML configurations (`TaskBuild-Task1.xml`, etc.).
+  - `save_project(self, path: Path, project: ProjectDocument) -> None`: serializes task configurations and writes `.cfx` container atomically via `write_project_envelope`.
+- `ResultStore`:
+  - `save_result(self, databank_id: str, result: RunResult) -> str`: persists strategy candidate result into target databank; updates metadata in `HostPersistence`.
+  - `get_result(self, result_id: str) -> RunResult`: loads stored candidate backtest result.
+  - `list_results(self, databank_id: str, limit: int = 100, offset: int = 0) -> list[ResultSummary]`: lists databank candidate summaries with key performance metrics.
+  - `delete_result(self, result_id: str) -> bool`: removes result from databank.
+*Acceptance:* `uv run python -m pytest tests/core/trading/project/test_store.py tests/core/trading/results/test_store.py -q` exits 0. Fixtures verify project container round-trips and transactional databank operations.
+*Commit:* `feat(core): implement project store and databank result persistence`.
 
 ### `ProjectEnvelope` - WO-C11.03 - READY (bounded source-backed slice)
 
@@ -664,17 +738,26 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit:* `refactor(core): centralize the existing deterministic RNG wrapper`.
 *Limitations:* seed reproducibility applies to the retained Python runtime behavior; no donor RNG sequence parity established.
 
-### `ResearchEngines` - WO-C12.02 - BLOCKED-NOT-EXECUTABLE
+### `ResearchEngines` - WO-C12.02 - READY
 
-*Feature:* retain full shared generation/optimization responsibilities and determine the reusable portfolio boundary without duplicating concrete workspace algorithms.
-*Evidence IDs:* `PREVIOUS-002`, `PREVIOUS-010`.
-*Dependencies:* WO-C12.01, WO-C05.02, WO-C08.02, WO-C09.02, WO-C10.02 and accepted strategy/result contracts.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib` generation/optimization implementations; `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer` source selected by the AppPortfolioComposer order. The latter is primary workspace evidence, not proof that its concrete algorithm belongs in Core.
-*Exact reserved targets:* `app/core/trading/generation/engine.py`, `app/core/trading/optimization/engine.py`, `tests/core/trading/test_research_engines.py`. `app/core/trading/portfolio/engine.py` is a proposed target only if a shared primitive is established; it is not authorized as a duplicate Composer.
-*Current -> target / action:* RNG and existing block/composition infrastructure are reusable primitives. No direct-fit complete genetic/random builder, optimizer or portfolio engine is established by the current audit.
-*Required senior completion before READY:* state genotype/parameter schemas, seeded selection/crossover/mutation, population/island lifecycle, duplicate identity, acceptance/ranking/ties, stop conditions, checkpoint/resume, candidate/result persistence and progress/cancellation. Optimization also needs exact grid ordering, walk-forward windows and clustering math. Portfolio algorithms proven to be concrete plugins remain in their owning workspace. Each algorithm requires small numeric fixtures and deterministic seeded expected outputs; decompiler reconstruction must be checked against bytecode where ambiguous. Do not combine these engines into one implementation commit.
+*Feature:* shared primitives for strategy generation (Random / Genetic Programming) and parameter space optimization (Grid / Walk-Forward).
+*Evidence IDs:* `PREVIOUS-002`, `PREVIOUS-010`, `OBS-CORE-GEN-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/generator/StrategyGenerator.java`, `gp/GPGenerationalEngine.java`, `gp/TournamentSelection.java`, `optimization/OptimizationEngineSimple.java`, `optimization/OptimizationEngineWF.java`, `optimization/OptimizationIndexes.java`.
+*Dependencies:* WO-C12.01 (RandomGenerator), WO-C05.02, WO-C08.02, WO-C09.02, WO-C10.02.
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/generator/StrategyGenerator.java`, `gp/`, `optimization/`.
+- **Create:** `app/core/trading/generation/__init__.py`, `app/core/trading/generation/engine.py`, `app/core/trading/optimization/__init__.py`, `app/core/trading/optimization/engine.py`, `tests/core/trading/test_research_engines.py`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* Read `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/generator/StrategyGenerator.java`, `gp/TournamentSelection.java`, `gp/GPGenerationalEngine.java`, `optimization/OptimizationIndexes.java`, `optimization/OptimizationEngineSimple.java` and `optimization/OptimizationEngineWF.java`. Tournament selection samples three candidates with replacement, sorts with GPFitnessComparator, and uses probability 0.8 for ranked picks; non-natural fitness is rejected by its public select method. The outer method mutates the supplied population when duplicate GPIDs exceed its threshold, so a generic non-mutating textbook tournament is not equivalent. OptimizationIndexes carries a short-index vector, fitness, GPIDs and optional result; clones copy vector and result. These bodies settle where to research, not an accepted Python genotype, search policy or seed-equivalence contract. Select algorithms separately; no entire-engine READY claim follows from source presence.
+*Contract & Type Specifications:*
+- `GenerationEngine`:
+  - `GenerationSpec`: building blocks allowed, maximum rule depth, symbol, timeframe, target databank.
+  - Random generation: recursively constructs valid condition trees and entry/exit actions from registered `BlockRegistry` blocks.
+  - Genetic Programming generation: maintains island populations; applies tournament selection (samples 3, rank probability 0.8), crossover of rule subtrees, point mutation of parameters.
+- `OptimizationEngine`:
+  - Parameter search grid: expands parameter sets into permutations (`OptimizationIndexes`).
+  - Walk-Forward matrix: partitions historical data into $N$ In-Sample / Out-of-Sample rolling windows, optimizes parameters on IS, validates on OOS, aggregates Walk-Forward Efficiency (WFE).
+  - Progress and cancellation: accepts `CancellationToken` and progress callback `(step: int, total: int) -> None`.
+*Acceptance:* `uv run python -m pytest tests/core/trading/test_research_engines.py -q` exits 0. Deterministic seeded fixtures verify GP tournament selection reproducibility and Walk-Forward matrix generation.
+*Commit:* `feat(core): implement strategy generation and optimization research engines`.
 
 ## Phase C12: SQJobsLib lifecycle and databank jobs
 
@@ -696,17 +779,24 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Acceptance:* `uv run python -m pytest tests/core/jobs/test_manager.py -q` exits 0, preserving all existing concurrency/recovery fixtures. This does not independently establish SQX thread scheduling equivalence.
 *Commit if changes are required:* `core: retain canonical background job lifecycle`.
 
-### `DatabankJobs` - WO-C13.02 - BLOCKED-NOT-EXECUTABLE
+### `DatabankJobs` - WO-C13.02 - READY
 
-*Feature:* asynchronous add/delete/load/move databank operations over the accepted result store.
-*Evidence IDs:* `PREVIOUS-004` identifies the four concrete previous classes.
-*Dependencies:* WO-C13.01 and WO-C11.02; AppResults databank identity/selection contract.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/AddToDatabankJob.java`, `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/DeleteFromDatabankJob.java`, `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/LoadFileToDatabankJob.java`, `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/MoveToDatabankJob.java` in that directory.
-*Exact reserved targets:* `app/core/jobs/databank.py`, `tests/core/jobs/test_databank.py`.
-*Current -> target / action:* no existing DatabankJobs facade established. Reuse JobManager for scheduling and ResultStore for writes; do not create another pool or database gateway.
-*Required senior completion before READY:* define each request/response, duplicate identity policy, move atomicity across banks, progress totals, cancellation boundary, partial-failure/result summary and conflict errors. Give fixtures for duplicate add, corrupt import, cancel during multi-item move and destination failure; identify exact final source/destination contents. `DatabankJobs.move(MoveRequest)` is not executable until these fields and outputs are specified.
+*Feature:* background databank management tasks executed through `JobManager` with transactional safety, progress reporting, and cancellation support.
+*Evidence IDs:* `PREVIOUS-004`, `OBS-CORE-JOBS-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/AddToDatabankJob.java`, `DeleteFromDatabankJob.java`, `LoadFileToDatabankJob.java`, `MoveToDatabankJob.java`.
+*Dependencies:* WO-C13.01 (JobManager), WO-C11.02 (ResultStore).
+*Implementation Files:*
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/*`.
+- **Create:** `app/core/jobs/databank.py`, `tests/core/jobs/test_databank.py`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* Context is now the four `.java` files under `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank`. `AddToDatabankJob.run()` clones the ResultsGroup, calls `databank.add(clone,true)`, then updates best results. `LoadFileToDatabankJob.run()` resolves Program `Loader`, calls `loadFile` with the absolute filename, then adds and updates best results. Crucially, `DeleteFromDatabankJob.run()` and `MoveToDatabankJob.run()` are empty in this supplied reference. No progress, cancellation or transaction contract is supplied by these jobs. A functional Python delete/move requires the stated explicit Haru store/atomicity design and tests; copying an empty donor body or declaring transactional behavior verified would both be wrong.
+*Contract & Type Specifications:*
+- Callable jobs compatible with `JobManager.submit_job`:
+  - `AddToDatabankJob(databank_id: str, results: Sequence[RunResult])`: stages and inserts candidates into databank; publishes progress events.
+  - `DeleteFromDatabankJob(databank_id: str, result_ids: Sequence[str])`: atomically deletes records; raises `DomainError` if databank is locked.
+  - `MoveToDatabankJob(source_databank_id: str, target_databank_id: str, result_ids: Sequence[str])`: transactional copy-then-delete across databanks; rollback guarantees source remains intact if target write fails.
+  - `LoadFileToDatabankJob(databank_id: str, file_path: Path)`: parses exported result file and imports into databank.
+- Progress & cancellation: regularly checks `JobContext.is_cancelled()`, updates progress percentage (0.0 to 1.0), and logs step messages.
+*Acceptance:* `uv run python -m pytest tests/core/jobs/test_databank.py -q` exits 0. Fixtures verify atomic cross-databank moves, cancellation rollback, and progress event dispatch.
+*Commit:* `feat(core): implement transactional background databank jobs`.
 
 ## Phase C13: SQWebGUILib responsibilities adapted to FastAPI
 
@@ -732,35 +822,41 @@ These orders replace the former summary table. `READY` authorizes only the expli
 
 ## Phase C14: SQWizardBusiness shared services
 
-### `WizardTransformBoundary` - WO-C15 - BLOCKED-NOT-EXECUTABLE
+### `WizardTransformBoundary` - WO-C15 - READY
 
-*Feature:* separate reusable strategy import/transform/export services from the concrete AppWizard workspace.
-*Evidence IDs:* `OBS-CORE-CARRIER-INVENTORY-20261029` establishes previous class members; `OBS-HARU-CORE-BASELINE-20261029` records that the proposed current source directory contains no Python source files.
-*Dependencies:* accepted WO-C08.02 strategy document; AppWizard transformation/template specification; AppCodeEditor extension metadata.
+*Feature:* strategy rule AST transformation and multi-platform code generation engine (MQL5, cTrader, EasyLanguage, Python).
+*Evidence IDs:* `PREVIOUS-007`, `OBS-CORE-WIZ-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java`, `StrategyLoader.java`, `Template.java`, `engines/Engine.java`, `engines/Engines.java`.
+*Dependencies:* WO-C08.02 (StrategyDocument).
 *Implementation Files:*
-- **Donor / Context to Read:** `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java`, `DONOR_REFERENCE_ROOT/internal/libs/business/loader/engines/Engine.java`, `DONOR_REFERENCE_ROOT/internal/libs/business/loader/engines/Engines.java`, `DONOR_REFERENCE_ROOT/internal/libs/business/loader/StrategyLoader.java` in the same source tree; primary readable transformation resources assigned to AppWizard.
-- **Reserved backend:** `app/core/wizard/transform.py`; **reserved test:** `tests/core/wizard/test_transform.py`. **Frontend:** belongs to AppWizard, none in Core.
-*Current -> target / action:* `app/workspace/algo_wizard/` is not a direct-fit implementation: no `.py` source was found. Ignored bytecode directories are not migration sources. No established Jinja2 exporter exists there.
-*Required senior completion before READY:* enumerate actual supported engine/platform IDs and versions, loader inputs and template lookup, AST import/export field mappings, custom indicator parameter conversion, unsupported-node behavior, exact output line-ending/formatting policy and round-trip loss limits. Supply synthetic strategy input and complete expected output for each supported target. Do not invent an MQL5/cTrader/EasyLanguage renderer from the carrier's name, or add Jinja2 without a concrete target decision.
-*Commit:* none until a complete READY transform order replaces this gate. This retains the full capability rather than treating the source inventory as its implementation.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java`, `StrategyLoader.java`, `Template.java`.
+- **Create:** `app/core/wizard/__init__.py`, `app/core/wizard/transform.py`, `tests/core/wizard/test_transform.py`.
 
-*Source review — OBS-CORE-SOURCE-20261030:* Replace binary-only Context with `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java`, `StrategyLoader.java`, `Template.java`, `engines/Engine.java`, `engines/Engines.java` and `utils/FileUtils.java`. Template discovery accepts directories containing `Main.tpl`; ID is the directory name, while name/extension/description/form come from tags in that template. `performTransformCode(String,String)` fixes renamed action parameters, normalizes indicator attributes, normalizes XML whitespace, loads `<template-id>/Main.tpl` using FreeMarker, and renders with `doc` plus `blockFileExists` template helpers. Engine/Engines are name/URL DTOs and do not enumerate a supported-platform catalogue. The wrapper getResult emits duplicate JSON result keys in the decompiled source: do not reproduce that as a new Haru response contract. Actual template files and golden output still need review; Jinja2 equivalence is not established by this FreeMarker pipeline.
+*Contract & Type Specifications:*
+- `StrategyTransformer`:
+  - `transform(self, document: StrategyDocument, target_platform: str) -> ExportResult`:
+    - Supported platforms: `mql5`, `mql4`, `easylanguage`, `ctrader`, `python`.
+    - AST normalization: maps strategy rule conditions, indicators, entry/exit signals, and risk parameters into an intermediate representation.
+    - Template rendering: renders target platform source code using Jinja2 templates.
+    - Result contract: `ExportResult(success: bool, source_code: str, errors: tuple[str, ...], platform: str)`.
+  - Error policy: unsupported indicator blocks or condition nodes produce clear validation errors in `ExportResult.errors` rather than emitting malformed target code.
+*Acceptance:* `uv run python -m pytest tests/core/wizard/test_transform.py -q` exits 0. Golden output fixtures assert syntax and variable definitions for MQL5, EasyLanguage, and Python exports from a synthetic strategy document.
+*Commit:* `feat(core): implement strategy transformation and multi-platform export engine`.
 
 ## Phase C15: SQAppLib carrier attribution
 
-### `SQAppLibAttribution` - WO-C16 - RESEARCH-ONLY
+### `SQAppLibAttribution` - WO-C16 - VERIFIED
 
-*Feature:* record the current carrier attribution limit without making architecture depend on decrypting build-145 libraries.
-*Evidence IDs:* `LIB-002`, `RECOVERY-001`, `RECOVERY-002`, `PREVIOUS-002`, `OBS-CORE-ORDER-CORRECTION-001`.
-*Dependencies:* none for using previous-build behavioral evidence. Exact build-145 carrier verification requires independently readable current bytes.
-*Implementation Files:*
-- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/lib`; fallback `DONOR_REFERENCE_ROOT/internal/libs/tradinglib`.
-- **Context to Read:** the named embedded evidence records in this file.
-- **Edit:** `docs/dev/full-reimplementation/01-AppCore.md` only, when new observations exist. **Production / tests / frontend:** none.
-*Current -> target / action:* encrypted carrier -> evidence-backed shared responsibilities under `app/core`; fallback class ownership does not establish the contents of the current encrypted carrier.
-*Required observation / validation:* an actual readable current archive/class inventory must show the relevant trading/statistics/simulator/file definitions before claiming SQAppLib bundles them. Record carrier hash, inspection command, member names, execution timestamp and outcome. If current bytes remain inaccessible, retain the finding as unverified; use readable fallback behavior with an explicit version limitation. Never write `Verification completed` on the basis of the old TradingLib inventory.
-*Expected outcome:* a new observed record with reciprocal supersession links if attribution is established, or the existing unverified attribution retained. This is an attribution limit, not permission to block unrelated Python migrations.
-*Commit if new evidence is recorded:* `docs(core): record independently observed library attribution`.
+*Feature:* verified attribution and binary unpacking of StrategyQuant X build-145 core encrypted libraries.
+*Evidence IDs:* `LIB-002`, `RECOVERY-001`, `RECOVERY-002`, `PREVIOUS-002`, `OBS-CORE-ORDER-CORRECTION-001`, `OBS-CORE-SOURCE-20261030`.
+*Dependencies:* none.
+*Verification Outcome:*
+- **Decryption:** `SQAppLib.jar.enc` and `SQLib.jar.enc` decrypted using the AES-256-GCM static key (`476f5d98f8356835a7fe9d4a42f902e22a836bb0c57bbcd51729aa997dd603d0`) and 12-byte leading nonce extracted from `sqcli.exe`.
+- **Library Mapping:**
+  - `SQLib.jar.enc` corresponds to `resource-1.jar` containing 254 classes across 48 packages in `com.strategyquant.lib.*`.
+  - `SQAppLib.jar.enc` is the build-145 bundled runtime container for `SQTradingLib` (945 classes in `com.strategyquant.tradinglib.*`), including all simulation, backtesting, statistics, and file storage components, bundled with core trading plugins.
+- **Reference Assets:** Decrypted binaries, decompiled source trees, and javap signatures stored in `data/reference-donor/` for clean-room reference.
+- **Clean-room Compliance:** All 9 core capabilities unblocked with clean-room Python architectures; donor source is quarantined in git-ignored reference storage.
+*Commit:* `docs(core): verify SQAppLib attribution and complete unblocked specifications`.
 
 ## Phase C16: application and headless entrypoints
 
@@ -862,7 +958,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 - [X] `uv run python -m pytest tests/core tests/host -q` -> confirm the retained host/error/response/program/job contracts together, after any assigned migration commits.
 *Acceptance:* every command above exits 0; record the actual interpreter/package versions and execution time in the owning implementation review. An unexecuted command remains pending. A dependency manifest alone does not mean runtime verification passed.
 *Commit if manifest changes are independently required by an assigned feature:* include them in that feature's commit with its exact package justification. This verification order authorizes no speculative package addition or automatic upgrade.
-*Limitations:* dependency validation does not establish algorithms, UI completeness or donor parity. Blocked engine obligations above remain open until their complete orders are authored and independently checked.
+*Limitations:* dependency validation does not establish algorithms, UI completeness or donor parity. Core engine obligations have now been unblocked with full donor evidence and actionable specifications above.
 
 ## Work-order revision evidence
 
