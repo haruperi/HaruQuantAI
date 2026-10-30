@@ -280,6 +280,39 @@ class HostPersistence:
 
         return self._run("brokers.cost_schema", write=True, action=action)
 
+    def ensure_databanks_schema(self) -> dict[str, Any]:
+        """Install databank results tables and indices atomically."""
+        statements = (
+            (
+                "CREATE TABLE IF NOT EXISTS databank_results ("
+                "id TEXT PRIMARY KEY, "
+                "databank_id TEXT NOT NULL, "
+                "strategy_id TEXT NOT NULL, "
+                "strategy_name TEXT NOT NULL, "
+                "net_profit REAL NOT NULL DEFAULT 0.0, "
+                "profit_factor REAL NOT NULL DEFAULT 0.0, "
+                "drawdown REAL NOT NULL DEFAULT 0.0, "
+                "sharpe_ratio REAL NOT NULL DEFAULT 0.0, "
+                "trades_count INTEGER NOT NULL DEFAULT 0, "
+                "win_rate REAL NOT NULL DEFAULT 0.0, "
+                "metrics_json TEXT NOT NULL DEFAULT '{}', "
+                "result_json TEXT NOT NULL DEFAULT '{}', "
+                "created_at TEXT NOT NULL, "
+                "updated_at TEXT NOT NULL)"
+            ),
+            (
+                "CREATE INDEX IF NOT EXISTS idx_databank_results_databank_id "
+                "ON databank_results (databank_id, net_profit DESC)"
+            ),
+        )
+
+        def action(connection: sqlite3.Connection) -> dict[str, Any]:
+            for statement in statements:
+                connection.execute(statement)
+            return {"affected_rows": 0, "records": []}
+
+        return self._run("databanks.schema", write=True, action=action)
+
     def _check_scope(self) -> None:
         if self._closed:
             raise _OperationError(ErrorCode.CONFLICT, "Transaction scope is closed")
