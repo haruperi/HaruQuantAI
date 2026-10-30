@@ -1,45 +1,23 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import {
-  Activity,
   ArrowRight,
   Brain,
-  CheckCircle2,
   Code2,
   Copy,
   Layers,
-  Network,
   Pause,
   Play,
   Plus,
-  RotateCcw,
-  Sliders,
-  Sparkles,
   Trash2,
 } from 'lucide-react';
 import type { NNActivation, NNLossFunction, NNOptimizer } from '../../shell/types';
-import { Button, Checkbox, Field, Modal, ProgressBar, Section, Select, Stat, TextInput } from '../../common/components/ui';
+import { Button, Field, ProgressBar, Stat, TextInput } from '../../common/components/ui';
 import { availableFeatures, useNeuralNetStore } from './neuralNetStore';
 
-export function NeuralNetworkTrainer() {
+export function NeuralNetworkWorkspace() {
   const store = useNeuralNetStore();
   const [tab, setTab] = useState<'architecture' | 'training' | 'evaluation' | 'export'>('architecture');
-  const [showExportModal, setShowExportModal] = useState(false);
   const [copied, setCopied] = useState(false);
-  const timer = useRef<number | null>(null);
-
-  // Interval training simulation loop
-  useEffect(() => {
-    if (store.status === 'training') {
-      timer.current = window.setInterval(() => {
-        store.stepEpoch();
-      }, 120);
-    } else if (timer.current) {
-      clearInterval(timer.current);
-    }
-    return () => {
-      if (timer.current) clearInterval(timer.current);
-    };
-  }, [store.status]);
 
   const handleCopyCode = () => {
     if (store.generatedStrategyCode) {
@@ -52,7 +30,10 @@ export function NeuralNetworkTrainer() {
   const progressPercent = Math.min(100, Math.round((store.currentEpoch / store.config.epochs) * 100));
 
   return (
-    <div className="neural-net-workspace p-4 space-y-4 max-w-[1600px] mx-auto overflow-y-auto">
+    <div
+      data-testid="neural-network-workspace"
+      className="neural-net-workspace p-4 space-y-4 max-w-[1600px] mx-auto overflow-y-auto"
+    >
       {/* Workspace Header */}
       <div className="flex flex-wrap items-center justify-between gap-4 bg-surface p-4 rounded border border-border">
         <div className="flex items-center gap-3">
@@ -73,6 +54,7 @@ export function NeuralNetworkTrainer() {
               <button
                 key={t}
                 type="button"
+                data-testid={`tab-${t}`}
                 className={`px-3 py-1.5 text-xs font-semibold capitalize ${
                   tab === t ? 'bg-primary text-primary-foreground' : 'text-muted hover:text-foreground'
                 }`}
@@ -84,11 +66,16 @@ export function NeuralNetworkTrainer() {
           </nav>
 
           {store.status === 'training' ? (
-            <Button onClick={store.pauseTraining} className="bg-amber-600 hover:bg-amber-700 text-white">
+            <Button
+              data-testid="button-pause-training"
+              onClick={store.pauseTraining}
+              className="bg-amber-600 hover:bg-amber-700 text-white"
+            >
               <Pause size={15} /> Pause
             </Button>
           ) : (
             <Button
+              data-testid="button-start-training"
               className="primary"
               onClick={() => {
                 store.startTraining();
@@ -100,6 +87,7 @@ export function NeuralNetworkTrainer() {
           )}
 
           <Button
+            data-testid="button-export-strategy"
             onClick={() => {
               store.generateStrategyCode();
               setTab('export');
@@ -111,7 +99,7 @@ export function NeuralNetworkTrainer() {
       </div>
 
       {/* Model Specifications Strip */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-3">
+      <div data-testid="model-specs-strip" className="grid grid-cols-2 md:grid-cols-6 gap-3">
         <Stat label="Model Name" value={store.config.modelName} />
         <Stat label="Symbol / TF" value={`${store.config.symbol} · ${store.config.timeframe}`} />
         <Stat label="Input Features" value={store.config.inputFeatures.length} />
@@ -126,10 +114,10 @@ export function NeuralNetworkTrainer() {
 
       {/* TAB 1: MODEL ARCHITECTURE DESIGNER */}
       {tab === 'architecture' && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+        <div data-testid="architecture-panel" className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Left Column: Input Features & Hyperparameters */}
           <div className="lg:col-span-1 space-y-4">
-            <div className="bg-surface p-4 rounded border border-border space-y-3">
+            <div data-testid="input-features-selection" className="bg-surface p-4 rounded border border-border space-y-3">
               <strong className="text-sm">Input Features Selection</strong>
               <div className="space-y-1 max-h-56 overflow-y-auto">
                 {availableFeatures.map(f => (
@@ -148,7 +136,7 @@ export function NeuralNetworkTrainer() {
               </div>
             </div>
 
-            <div className="bg-surface p-4 rounded border border-border space-y-3">
+            <div data-testid="hyperparameters-section" className="bg-surface p-4 rounded border border-border space-y-3">
               <strong className="text-sm">Hyperparameters</strong>
               <div className="grid grid-cols-2 gap-2">
                 <Field label="Epochs">
@@ -214,13 +202,13 @@ export function NeuralNetworkTrainer() {
           </div>
 
           {/* Right Column: Interactive Layer Graph & Editor */}
-          <div className="lg:col-span-2 bg-surface p-4 rounded border border-border space-y-4">
+          <div data-testid="layer-hierarchy" className="lg:col-span-2 bg-surface p-4 rounded border border-border space-y-4">
             <div className="flex items-center justify-between border-b border-border pb-2">
               <div className="flex items-center gap-2">
                 <Layers size={16} />
                 <strong className="text-sm">Layer Hierarchy & Activations</strong>
               </div>
-              <Button onClick={store.addLayer} className="text-xs">
+              <Button data-testid="button-add-layer" onClick={store.addLayer} className="text-xs">
                 <Plus size={13} /> Add Hidden Layer
               </Button>
             </div>
@@ -331,11 +319,11 @@ export function NeuralNetworkTrainer() {
 
       {/* TAB 2: TRAINING PROGRESS MONITOR */}
       {tab === 'training' && (
-        <div className="space-y-4">
+        <div data-testid="training-panel" className="space-y-4">
           <div className="bg-surface p-4 rounded border border-border space-y-4">
             <div className="flex items-center justify-between">
               <div>
-                <strong className="text-sm">Live Backpropagation Training Loop</strong>
+                <strong className="text-sm">Model Training Monitor</strong>
                 <p className="text-xs text-muted">
                   Epoch {store.currentEpoch} of {store.config.epochs} · Optimizer: {store.config.optimizer} (LR: {store.config.learningRate})
                 </p>
@@ -359,7 +347,7 @@ export function NeuralNetworkTrainer() {
                   </div>
                 </div>
                 <div className="h-44 w-full flex items-end gap-1 pt-4 pb-2 px-1 border-b border-l border-border relative">
-                  {store.history.slice(-30).map((h, i) => (
+                  {store.history.slice(-30).map((h) => (
                     <div key={h.epoch} className="flex-1 flex flex-col justify-end items-center h-full gap-0.5">
                       <div
                         className="w-full bg-red-500/80 rounded-t"
@@ -385,7 +373,7 @@ export function NeuralNetworkTrainer() {
                   </div>
                 </div>
                 <div className="h-44 w-full flex items-end gap-1 pt-4 pb-2 px-1 border-b border-l border-border relative">
-                  {store.history.slice(-30).map((h, i) => (
+                  {store.history.slice(-30).map((h) => (
                     <div key={h.epoch} className="flex-1 flex flex-col justify-end items-center h-full gap-0.5">
                       <div
                         className="w-full bg-emerald-500/80 rounded-t"
@@ -407,7 +395,7 @@ export function NeuralNetworkTrainer() {
 
       {/* TAB 3: EVALUATION & CONFUSION MATRIX */}
       {tab === 'evaluation' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div data-testid="evaluation-panel" className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div className="bg-surface p-4 rounded border border-border space-y-3">
             <strong className="text-sm">Model Generalization Metrics (Test Split)</strong>
             <dl className="details">
@@ -466,7 +454,7 @@ export function NeuralNetworkTrainer() {
 
       {/* TAB 4: EXPORT TO STRATEGY */}
       {tab === 'export' && (
-        <div className="bg-surface p-4 rounded border border-border space-y-3">
+        <div data-testid="export-panel" className="bg-surface p-4 rounded border border-border space-y-3">
           <div className="flex items-center justify-between border-b border-border pb-2">
             <div>
               <strong className="text-sm">Rule & Code Integration</strong>
@@ -474,7 +462,7 @@ export function NeuralNetworkTrainer() {
                 Export trained neural network model into executable strategy rules.
               </p>
             </div>
-            <Button onClick={handleCopyCode}>
+            <Button data-testid="button-copy-code" onClick={handleCopyCode}>
               <Copy size={14} /> {copied ? 'Copied!' : 'Copy Code'}
             </Button>
           </div>
@@ -487,4 +475,5 @@ export function NeuralNetworkTrainer() {
     </div>
   );
 }
-export { NeuralNetworkTrainer as NeuralNetWorkspace };
+
+export { NeuralNetworkWorkspace as NeuralNetworkTrainer };

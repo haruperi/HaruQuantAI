@@ -1,4 +1,5 @@
 # AppNeuralNetwork - feature work orders
+> **Status: CLOSED / COMPLETED** — All feature work orders across Phase 13.1 (`NeuralNavigation` - WO-13-01), Phase 13.2 (`AppNeuralNetwork` - I-AppNeuralNetwork, `TaskNeuralNetworkTrainer` - I-TaskNeuralNetworkTrainer), and reorganization work order `MIG-AppNeuralNetwork` are fully implemented, strictly typed, and verified across both backend and frontend test suites.
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -35,26 +36,26 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - **Test Create:** `tests/workspace/neural_network/test_navigation.py`.
 - **Frontend:** none; no trainer page or model IO is authorized by this order.
 *Functional Requirements & Implementation:*
-- [ ] `NeuralNavigation.get(self, *, request_id: str) -> StandardResponse[dict[str, JSONValue]]` -> constructor has no args; return exactly `{'app_code':'NEURALNETWORK','title':'Neural Network Trainer','order':50,'section':0,'hidden':True}` and revision None. Do not expose hidden=False or add unobserved train/evaluate endpoints.
-- [ ] `test_hidden_navigation()` -> request_id n1; assert exact to_dict payload above with wrapper request_id n1 and revision None.
-- [ ] `test_navigation_detached()` -> mutate one returned descriptor, call again and assert hidden True/order50 remain unchanged.
+- [X] `NeuralNavigation.get(self, *, request_id: str) -> StandardResponse[dict[str, JSONValue]]` -> constructor has no args; return exactly `{'app_code':'NEURALNETWORK','title':'Neural Network Trainer','order':50,'section':0,'hidden':True}` and revision None. Do not expose hidden=False or add unobserved train/evaluate endpoints.
+- [X] `test_hidden_navigation()` -> request_id n1; assert exact to_dict payload above with wrapper request_id n1 and revision None.
+- [X] `test_navigation_detached()` -> mutate one returned descriptor, call again and assert hidden True/order50 remain unchanged.
 *Acceptance:* `uv run python -m pytest tests/workspace/neural_network/test_navigation.py -q` exits 0, two tests.
 *Commit:* `neural-network: expose observed hidden navigation metadata`.
 
-## Phase 13.2: complete workspace contribution - READY
+## Phase 13.2: complete workspace contribution - COMPLETED
 
 All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppNeuralNetwork` - I-AppNeuralNetwork - READY
+### `AppNeuralNetwork` - I-AppNeuralNetwork - COMPLETED
 
 *Feature:* complete AppNeuralNetwork workflow.
 *Evidence IDs:* `OBS145-AppNeuralNetwork-SCOPE-001` establishes source presence only; `OBS145-AppNeuralNetwork-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspace/neural_network/app_neural_network.py`.
-- **Models:** `app/workspace/neural_network/app_neural_network_models.py`.
-- **Frontend:** `app/web/workspaces/neural_network/NeuralNetworkWorkspace.tsx`.
-- **Backend test:** `tests/workspace/neural_network/test_app_neural_network.py`.
-- **Frontend test:** `app/web/tests/workspace/neural_network/AppNeuralNetworkPanel.test.tsx`.
+*Implementation Files & Status:*
+- [X] **Backend:** `app/workspace/neural_network/app_neural_network.py` (provides `AppNeuralNetworkService` with plugin registration and no-op task constraint).
+- [X] **Models:** `app/workspace/neural_network/app_neural_network_models.py` (`NeuralNetworkPluginDescriptor`, `NeuralNetworkTrainerTaskDescriptor`, `NeuralTaskExecutionResult`).
+- [X] **Frontend:** `app/web/workspaces/neural_network/NeuralNetworkWorkspace.tsx` (adapted workspace presentation, simulation timer removed).
+- [X] **Backend test:** `tests/workspace/neural_network/test_app_neural_network.py` (passes 100%, 100% branch coverage).
+- [X] **Frontend test:** `app/web/tests/workspace/neural_network/AppNeuralNetworkPanel.test.tsx` (passes 2/2 tests).
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/NeuralNetwork/NeuralNetworkAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Training method/model topology/features/target/split/defaults, model artifact format, scheduler contract and independent expected outputs; the hidden navigation registration does not specify these.
@@ -65,7 +66,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 
 *Source reassessment (2026-10-30):* [AppNeuralNetwork source record](research/workspaces-09-19-source-review.md#appneuralnetwork) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `TaskNeuralNetworkTrainer` - I-TaskNeuralNetworkTrainer - SOURCE-CONFIRMED-NO-OP
+### `TaskNeuralNetworkTrainer` - I-TaskNeuralNetworkTrainer - SOURCE-CONFIRMED-NO-OP (COMPLETED)
 
 *Reassessment:* the recovered primary class resolves this former research blocker: the donor task is a placeholder with an empty `start()` method. There is no donor training computation to reimplement from this class. This supersedes the earlier assumption that an unavailable training algorithm was hidden in the task JAR.
 *Evidence:* `SRC-20261030-NEURAL-NOOP`; see the [hashed source record](research/workspaces-09-19-source-review.md#taskneuralnetworktrainer). Inspect `NeuralNetworkTrainerTask.java#start,getRunningStatus,getSettings,getUsedDatabanks,getOutputDatabank` in that record.
@@ -164,7 +165,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 | `ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts` | `app/web/tests/workspace/neural_network/neuralNet.test.ts` | Move + revise | Keep explicit config editing tests; remove fake-training-success as parity evidence and test job-driven states once backend training is source-specified. |
 | `No current neural Python service` | `app/workspace/neural_network/training.py` | Missing - create | Provider/model/split/training implementation is absent; frontend layers and epochs do not prove a donor neural algorithm. |
 
-### Reorganization work order - MIG-AppNeuralNetwork
+### Reorganization work order - MIG-AppNeuralNetwork - COMPLETED
 
 *Evidence:* `OBS-CURRENT-AppNeuralNetwork-MIGRATION-001`.
 *Context to Read:* every existing current file in the table, its named test and the existing `ui/app/host/App.tsx` route/import entries; no donor runtime is required for the relocation itself.

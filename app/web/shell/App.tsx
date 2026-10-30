@@ -19,7 +19,7 @@ import { PortfolioMasterWorkspace } from '../workspaces/portfolio_master/Portfol
 import { CodeEditorWorkspace } from '../workspaces/code_editor/CodeEditorWorkspace';
 import { BusinessWorkspace } from '../workspaces/business/BusinessWorkspace';
 import { TradingDashboard } from '../workspaces/trading/TradingDashboard';
-import { NeuralNetworkTrainer } from '../workspaces/neural_network/NeuralNetworkTrainer';
+import { NeuralNetworkWorkspace } from '../workspaces/neural_network/NeuralNetworkWorkspace';
 import { MTAnalyzerWorkspace } from '../workspaces/mt_analyzer/MTAnalyzerWorkspace';
 import { DebugConsoleWorkspace } from '../workspaces/debug_console/DebugConsoleWorkspace';
 import { GridControlWorkspace } from '../workspaces/grid_control/GridControlWorkspace';
@@ -114,7 +114,7 @@ function AppShell() {
             <Route path="/builder" element={<BuilderWorkspace />} />
             <Route path="/algowizard" element={<AlgoWizardWorkspace />} />
             <Route path="/codeeditor" element={<CodeEditorWorkspace />} />
-            <Route path="/neuralnet" element={<NeuralNetworkTrainer />} />
+            <Route path="/neuralnet" element={<NeuralNetworkWorkspace />} />
             <Route path="/retester" element={<RetesterWorkspace />} />
             <Route path="/optimizer" element={<OptimizerWorkspace />} />
             <Route path="/mtanalyzer" element={<MTAnalyzerWorkspace />} />
