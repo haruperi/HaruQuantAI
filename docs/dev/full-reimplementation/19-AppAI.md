@@ -23,7 +23,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 
 ## Phase 19.1: observed deterministic behavior
 
-### `MemoryFlushLabel` - WO-19-01 - READY after its named prerequisites
+### `MemoryFlushLabel` - WO-19-01 - DONE
 
 *Evidence IDs:* `OBS145-AppSQAI-HELPER-001` (retained below).
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/web/SQAI` (resource folder; originally named `workspace-panel.js` is not present). Read only these donor files and the completed prerequisite files named in this order.
@@ -35,16 +35,16 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - **Frontend Create:** `app/web/workspaces/ai/memoryFlushLabel.ts`.
 - **Test Create:** `app/web/tests/workspace/ai/memoryFlushLabel.test.ts`.
 *Functional Requirements & Implementation:*
-- [ ] `MemoryFlushLabel.describe(memory_enabled: boolean, minutes: number): string` -> exported static method; false or negative minutes gives off; enabled+zero gives after every turn; all other values use native JavaScript string conversion in `every <minutes> min at most`. Do not substitute a default, round fractional values or start a timer.
-- [ ] `test('memory flush labels')` -> (false,5)=off; (true,-1)=off; (true,0)=after every turn; (true,5)=every 5 min at most; (true,1.5)=every 1.5 min at most; (true,NaN)=every NaN min at most. NaN case preserves this display helper's source behavior, not a valid backend scheduling interval.
+- [x] `MemoryFlushLabel.describe(memory_enabled: boolean, minutes: number): string` -> exported static method; false or negative minutes gives off; enabled+zero gives after every turn; all other values use native JavaScript string conversion in `every <minutes> min at most`. Do not substitute a default, round fractional values or start a timer.
+- [x] `test('memory flush labels')` -> (false,5)=off; (true,-1)=off; (true,0)=after every turn; (true,5)=every 5 min at most; (true,1.5)=every 1.5 min at most; (true,NaN)=every NaN min at most. NaN case preserves this display helper's source behavior, not a valid backend scheduling interval.
 *Acceptance:* `npm --prefix app/web test -- tests/workspace/ai/memoryFlushLabel.test.ts` exits 0, six parameter rows.
 *Commit:* `ai: preserve memory-flush description text`.
 
-## Phase 19.2: complete workspace contribution - READY
+## Phase 19.2: complete workspace contribution - DONE
 
 All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `ServletMCP` - I-ServletMCP - READY
+### `ServletMCP` - I-ServletMCP - DONE
 
 *Feature:* complete ServletMCP workflow.
 *Evidence IDs:* `OBS145-AppSQAI-SCOPE-001` establishes source presence only; `OBS145-AppSQAI-HELPER-001` establishes only the separately scoped helper.
@@ -64,7 +64,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 
 *Source reassessment (2026-10-30):* [ServletMCP source record](research/workspaces-09-19-source-review.md#servletmcp) identifies 0 matching readable Java files and 0 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `ServletSQAI` - I-ServletSQAI - READY
+### `ServletSQAI` - I-ServletSQAI - DONE
 
 *Feature:* complete ServletSQAI workflow.
 *Evidence IDs:* `OBS145-AppSQAI-SCOPE-001` establishes source presence only; `OBS145-AppSQAI-HELPER-001` establishes only the separately scoped helper.

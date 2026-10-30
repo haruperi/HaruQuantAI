@@ -177,6 +177,7 @@ async def _shutdown_workspace_jobs(application: FastAPI) -> None:
 
 def _register_routers(application: FastAPI) -> None:
     """Register workspace API routers."""
+    from app.workspace.ai.routes import ai_router
     from app.workspace.code_editor import code_editor_router
     from app.workspace.data_manager import create_router
     from app.workspace.grid_control import grid_control_router
@@ -186,6 +187,7 @@ def _register_routers(application: FastAPI) -> None:
     application.include_router(code_editor_router)
     application.include_router(grid_control_router)
     application.include_router(trading_router)
+    application.include_router(ai_router)
 
 
 def create_app(
