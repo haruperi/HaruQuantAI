@@ -1,4 +1,22 @@
-"""Shared asynchronous order execution and request/result access."""
+"""Shared asynchronous order execution and request/result access.
+
+Description:
+    Provides concrete asynchronous order execution without strategy selection policy.
+    Implements OrderSend, OrderCheck, send_checked, prepare_entry_request, close,
+    cancel, and modify_protection with strict volume quantization and slippage guards.
+Purpose:
+    FEAT-LIVE-TRADING-FACADE: Centralize live trading facade and order execution.
+Key Capabilities:
+    - FR-trading-order-send: Check and execute orders via broker backend with arming.
+    - FR-trading-order-check: Validate orders and calculate margin/profit.
+    - FR-trading-position-close: Close positions with volume validation.
+    - FR-trading-order-cancel: Cancel working pending orders.
+    - FR-trading-order-modify: Modify stop-loss and take-profit protections.
+Python API Usage:
+    from app.workspace.trading.trade import Trade
+CLI Usage:
+    uv run python -m pytest tests/workspace/trading -q
+"""
 
 # ruff: noqa: N802 -- MQL5 PascalCase API compatibility
 from __future__ import annotations
@@ -9,9 +27,7 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from typing import Any
 
-from app.core.host.logging import get_logger
-from app.include.blocks.order.types import normalize_price
-from app.include.contracts import (
+from app.core.data.contracts import (
     BridgeError,
     OrderInfo,
     PositionInfo,
@@ -21,13 +37,15 @@ from app.include.contracts import (
     TradeResult,
     TradingBackend,
 )
-from app.include.enums import (
+from app.core.enums import (
     OrderFilling,
     OrderTime,
     OrderType,
     TradeAction,
     TradeRetcode,
 )
+from app.core.host.logging import get_logger
+from app.include.blocks.order.types import normalize_price
 
 from .base import (
     TradingClass,
@@ -68,26 +86,43 @@ class Trade(TradingClass):
 
     async def LogLevel(self, log_level: int) -> bool:
         """Set logging verbosity on the trade execution context."""
+        logger.debug(
+            "FR-trading-order-send: setting log level", extra={"level": log_level}
+        )
         return bool(await self._call("LogLevel", log_level))
 
     async def SetExpertMagicNumber(self, magic: int) -> None:
         """Set default magic number for subsequent orders."""
+        logger.debug(
+            "FR-trading-order-send: setting magic number", extra={"magic": magic}
+        )
         await self._call("SetExpertMagicNumber", magic)
         self._magic = magic
 
     async def SetDeviationInPoints(self, deviation: int) -> None:
         """Set default slippage deviation in points for market orders."""
+        logger.debug(
+            "FR-trading-order-send: setting deviation points",
+            extra={"deviation": deviation},
+        )
         await self._call("SetDeviationInPoints", deviation)
         self._deviation = deviation
 
     async def SetTypeFilling(self, filling: OrderFilling | int) -> None:
         """Set default order filling execution policy."""
         val = filling.value if isinstance(filling, OrderFilling) else filling
+        logger.debug(
+            "FR-trading-order-send: setting filling mode", extra={"filling": val}
+        )
         await self._call("SetTypeFilling", val)
         self._filling = OrderFilling(val)
 
     async def SetTypeFillingBySymbol(self, symbol: str) -> bool:
         """Resolve and set the most appropriate filling mode supported by symbol."""
+        logger.debug(
+            "FR-trading-order-send: resolving filling mode by symbol",
+            extra={"symbol": symbol},
+        )
         spec = await self._symbol.SymbolInfo(symbol)
         filling = self._symbol_filling(spec)
         await self.SetTypeFilling(filling)
@@ -95,10 +130,12 @@ class Trade(TradingClass):
 
     async def SetAsyncMode(self, mode: bool) -> None:
         """Enable or disable asynchronous order sending mode."""
+        logger.debug("FR-trading-order-send: setting async mode", extra={"mode": mode})
         await self._call("SetAsyncMode", mode)
 
     async def SetMarginMode(self) -> None:
         """Recalculate margin mode based on account and connected broker terminal."""
+        logger.debug("FR-trading-order-send: setting margin mode")
         await self._call("SetMarginMode")
 
     async def OrderSend(
@@ -107,7 +144,7 @@ class Trade(TradingClass):
         result: TradeResult | None = None,
     ) -> TradeResult:
         """Send a trade request to the broker terminal."""
-        logger.debug("FR-TRADING-MUTATION: executing OrderSend")
+        logger.debug("FR-trading-order-send: executing OrderSend")
         raw = await self._call("OrderSend", serialize_request(request))
         if isinstance(raw, TradeResult):
             res = raw
@@ -129,7 +166,7 @@ class Trade(TradingClass):
         result: TradeCheckResult | None = None,
     ) -> TradeCheckResult:
         """Validate an order request and calculate required margin and profit."""
-        logger.debug("FR-TRADING-MUTATION: executing OrderCheck")
+        logger.debug("FR-trading-order-check: executing OrderCheck")
         raw = await self._call("OrderCheck", serialize_request(request))
         if isinstance(raw, TradeCheckResult):
             res = raw
@@ -156,6 +193,7 @@ class Trade(TradingClass):
 
     async def Request(self) -> TradeRequest:
         """Fetch the last trade request snapshot."""
+        logger.debug("FR-trading-order-send: fetching last request snapshot")
         raw = await self._call("Request")
         if isinstance(raw, TradeRequest):
             return raw
@@ -167,6 +205,7 @@ class Trade(TradingClass):
 
     async def Result(self) -> TradeResult:
         """Fetch the last trade result snapshot."""
+        logger.debug("FR-trading-order-send: fetching last result snapshot")
         raw = await self._call("Result")
         if isinstance(raw, TradeResult):
             return raw
@@ -178,6 +217,7 @@ class Trade(TradingClass):
 
     async def CheckResult(self) -> TradeCheckResult:
         """Fetch the last trade check result snapshot."""
+        logger.debug("FR-trading-order-check: fetching last check result snapshot")
         raw = await self._call("CheckResult")
         if isinstance(raw, TradeCheckResult):
             return raw
@@ -190,18 +230,22 @@ class Trade(TradingClass):
 
     async def PrintRequest(self) -> bool:
         """Log the last trade request metadata."""
+        logger.debug("FR-trading-order-send: printing request")
         return bool(await self._call("PrintRequest"))
 
     async def PrintResult(self) -> bool:
         """Log the last trade result metadata."""
+        logger.debug("FR-trading-order-send: printing result")
         return bool(await self._call("PrintResult"))
 
     async def FormatRequest(self) -> str:
         """Format the last trade request as a text string."""
+        logger.debug("FR-trading-order-send: formatting request")
         return str(await self._call("FormatRequest"))
 
     async def FormatRequestResult(self) -> str:
         """Format the last trade request and result as a text string."""
+        logger.debug("FR-trading-order-send: formatting request and result")
         return str(await self._call("FormatRequestResult"))
 
     @staticmethod
@@ -250,6 +294,10 @@ class Trade(TradingClass):
         expiration: datetime | None,
     ) -> TradeRequest:
         """Validate and normalize one concrete entry request."""
+        logger.debug(
+            "FR-trading-order-send: preparing entry request",
+            extra={"symbol": symbol, "direction": direction, "volume": volume},
+        )
         if type(direction) is not int or direction not in (-1, 1):
             raise ValueError("entry direction must be 1 or -1")
         if not symbol or symbol in ("Current", "Any"):
@@ -294,6 +342,10 @@ class Trade(TradingClass):
 
     async def send_checked(self, request: TradeRequest) -> TradeResult:
         """Check and submit one concrete execution request."""
+        logger.debug(
+            "FR-trading-order-send: sending checked order",
+            extra={"symbol": request.symbol},
+        )
         checked = await self.OrderCheck(request)
         # Native MT5 OrderCheck succeeds with zero; the simulator uses DONE.
         if checked.retcode not in (0, int(TradeRetcode.DONE)):
@@ -306,6 +358,10 @@ class Trade(TradingClass):
         self, position: PositionInfo, volume: float | None = None
     ) -> TradeResult:
         """Close one explicitly selected position snapshot."""
+        logger.debug(
+            "FR-trading-position-close: closing position",
+            extra={"ticket": position.ticket},
+        )
         amount = position.volume if volume is None else volume
         if not math.isfinite(amount) or amount <= 0 or amount > position.volume:
             raise ValueError(
@@ -339,6 +395,10 @@ class Trade(TradingClass):
 
     async def cancel(self, order: OrderInfo) -> TradeResult:
         """Cancel one explicitly selected pending order."""
+        logger.debug(
+            "FR-trading-order-cancel: canceling pending order",
+            extra={"ticket": order.ticket},
+        )
         return await self.send_checked(
             TradeRequest(
                 action=TradeAction.REMOVE,
@@ -357,6 +417,10 @@ class Trade(TradingClass):
         tp: float | None = None,
     ) -> TradeResult:
         """Normalize and submit protection for one explicitly selected record."""
+        logger.debug(
+            "FR-trading-order-modify: modifying protection",
+            extra={"ticket": item.ticket},
+        )
         for value in (sl, tp):
             if value is not None and (not math.isfinite(value) or value < 0):
                 raise ValueError("protection price must be finite and nonnegative")

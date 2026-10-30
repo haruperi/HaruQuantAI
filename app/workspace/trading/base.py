@@ -1,4 +1,23 @@
-"""Backend-neutral proxy identity, serialization, and snapshot helpers."""
+"""Backend-neutral proxy identity, serialization, and snapshot helpers.
+
+Description:
+    Provides base proxy class TradingClass and serialization/deserialization
+    primitives converting between wire representations and domain contract dataclasses.
+Purpose:
+    FEAT-LIVE-TRADING-FACADE: Centralize live trading facade and proxy serialization.
+Key Capabilities:
+    - FR-trading-proxy-call: Serialized asynchronous method invocation with argument
+      normalization and logging.
+    - FR-trading-snapshot-conversion: Decoding backend dictionaries or dataclasses into
+      strongly-typed domain models.
+    - FR-trading-request-serialization: Wire format encoding of orders, checks, times.
+Python API Usage:
+    from app.workspace.trading.base import (
+        TradingClass, normalize_request, serialize_request
+    )
+CLI Usage:
+    uv run python -m pytest tests/workspace/trading -q
+"""
 
 from __future__ import annotations
 
@@ -8,24 +27,23 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from typing import Any, TypeVar
 
-from app.core.host.logging import get_logger
-from app.include.contracts import (
+from app.core.data.contracts import (
     PropertyValue,
     TradeCheckResult,
     TradeRequest,
     TradeResult,
     TradingBackend,
 )
-from app.include.enums import (
+from app.core.enums import (
     OrderFilling,
     OrderTime,
     OrderType,
     TradeAction,
     TradeRetcode,
 )
+from app.core.host.logging import get_logger
 
 _T = TypeVar("_T")
-
 
 logger = get_logger(__name__)
 
@@ -39,7 +57,10 @@ class TradingClass:
     def __init__(
         self, backend: TradingBackend, *, object_id: str | None = None
     ) -> None:
-        logger.debug("FR-TRADING-COMPOSITION: creating object")
+        logger.debug(
+            "FR-trading-proxy-call: creating trading class object",
+            extra={"class_name": self.CLASS_NAME},
+        )
         self.backend = backend
         self.object_id = object_id or f"{self.CLASS_NAME.lower()}-{uuid.uuid4().hex}"
         self._lock = asyncio.Lock()
@@ -51,7 +72,7 @@ class TradingClass:
 
     async def _call(self, method: str, *args: Any) -> Any:
         logger.debug(
-            "FR-TRADING-COMPOSITION: invoking backend",
+            "FR-trading-proxy-call: invoking backend method",
             extra={"class_name": self.CLASS_NAME, "method_name": method},
         )
         wire_args: list[Any] = []
@@ -85,6 +106,10 @@ class TradingClass:
         self, method: str, model_cls: type[_T], label: str, *args: Any
     ) -> _T:
         """Execute backend snapshot call and coerce dict into model_cls."""
+        logger.debug(
+            "FR-trading-snapshot-conversion: querying snapshot",
+            extra={"method": method, "model": model_cls.__name__},
+        )
         data = await self._call(method, *args)
         if isinstance(data, model_cls):
             return data
@@ -96,6 +121,10 @@ class TradingClass:
         self, model_cls: type[Any], label: str, *args: Any
     ) -> dict[str, Any]:
         """Execute backend as_dict call and coerce model_cls into dict."""
+        logger.debug(
+            "FR-trading-snapshot-conversion: querying snapshot dictionary",
+            extra={"model": model_cls.__name__},
+        )
         data = await self._call("as_dict", *args)
         if isinstance(data, dict):
             return data
@@ -109,6 +138,10 @@ class TradingClass:
         """Execute backend collection call and coerce items into model_cls."""
         if args and kwargs:
             raise TypeError("use positional arguments or keyword filters, not both")
+        logger.debug(
+            "FR-trading-snapshot-conversion: querying collection",
+            extra={"method": method, "model": model_cls.__name__},
+        )
         data = (
             await self._call(method, kwargs)
             if kwargs

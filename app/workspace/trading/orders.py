@@ -1,12 +1,26 @@
-"""Shared working-order selection and collection queries."""
+"""Shared working-order selection and collection queries.
+
+Description:
+    Provides asynchronous OrderProxy for working pending order inspection,
+    ticket-based selection, and list retrieval from the connected backend.
+Purpose:
+    FEAT-LIVE-TRADING-FACADE: Centralize live trading facade and order queries.
+Key Capabilities:
+    - FR-trading-orders-query: Await OrderInfo snapshots and collections.
+    - FR-trading-orders-selection: Select orders by ticket or index, check state.
+Python API Usage:
+    from app.workspace.trading.orders import OrderProxy
+CLI Usage:
+    uv run python -m pytest tests/workspace/trading -q
+"""
 
 # ruff: noqa: N802 -- MQL5 PascalCase API compatibility
 from __future__ import annotations
 
 from typing import Any
 
+from app.core.data import contracts
 from app.core.host.logging import get_logger
-from app.include import contracts
 
 from .base import TradingClass
 
@@ -20,7 +34,7 @@ class OrderProxy(TradingClass):
 
     async def OrderInfo(self, *args: Any) -> contracts.OrderInfo:
         """Await the backend OrderInfo snapshot."""
-        logger.debug("FR-TRADING-ORDERS: querying order snapshot")
+        logger.debug("FR-trading-orders-query: querying order snapshot")
         return await self._snapshot(
             "OrderInfo", contracts.OrderInfo, "order info", *args
         )
@@ -31,29 +45,35 @@ class OrderProxy(TradingClass):
 
     async def as_dict(self, *args: Any) -> dict[str, Any]:
         """Await the backend order snapshot represented as a dictionary."""
+        logger.debug("FR-trading-orders-query: querying order as dict")
         return await self._snapshot_dict(contracts.OrderInfo, "order", *args)
 
     async def Select(self, *args: Any) -> Any:
         """Await the backend OrderInfo.Select operation."""
+        logger.debug("FR-trading-orders-selection: selecting order")
         return await self._call("Select", *args)
 
     async def SelectByIndex(self, *args: Any) -> Any:
         """Await the backend OrderInfo.SelectByIndex operation."""
+        logger.debug("FR-trading-orders-selection: selecting order by index")
         return await self._call("SelectByIndex", *args)
 
     async def StoreState(self, *args: Any) -> Any:
         """Await the backend OrderInfo.StoreState operation."""
+        logger.debug("FR-trading-orders-selection: storing order state")
         return await self._call("StoreState", *args)
 
     async def CheckState(self, *args: Any) -> Any:
         """Await the backend OrderInfo.CheckState operation."""
+        logger.debug("FR-trading-orders-selection: checking order state")
         return await self._call("CheckState", *args)
 
     async def OrdersTotal(self, *args: Any) -> Any:
         """Await the backend OrderInfo.OrdersTotal operation."""
+        logger.debug("FR-trading-orders-query: querying orders total")
         return await self._call("OrdersTotal", *args)
 
     async def OrdersGet(self, *args: Any, **kwargs: Any) -> list[contracts.OrderInfo]:
         """Await the backend OrderInfo.OrdersGet operation."""
-        logger.debug("FR-TRADING-ORDERS: querying orders collection")
+        logger.debug("FR-trading-orders-query: querying orders collection")
         return await self._collection("OrdersGet", contracts.OrderInfo, *args, **kwargs)

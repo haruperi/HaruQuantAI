@@ -1,4 +1,22 @@
-"""Shared, explicitly driven exit policies for live and simulated positions."""
+"""Shared, explicitly driven exit policies for live and simulated positions.
+
+Description:
+    Dynamic exit manager evaluating protective StopLoss, ProfitTarget, TrailingStop,
+    MoveSL2BE, and ExitAfterBars against open positions.
+Purpose:
+    FEAT-LIVE-TRADING-FACADE: Centralize live trading facade and dynamic exits.
+Key Capabilities:
+    - FR-trading-exit-manager: Attach, detach, and evaluate exit rules.
+    - FR-trading-exit-brackets: Stop-loss and profit-target bracket maintenance.
+    - FR-trading-exit-trailing: Trailing stop and breakeven adjustment.
+    - FR-trading-exit-time: Time-based bar count exit trigger.
+Python API Usage:
+    from app.workspace.trading.exits import (
+        ExitManager, ExitPlan, ProfitTarget, StopLoss
+    )
+CLI Usage:
+    uv run python -m pytest tests/workspace/trading -q
+"""
 
 from __future__ import annotations
 
@@ -10,13 +28,16 @@ from datetime import datetime
 from decimal import Decimal
 from typing import Literal
 
+from app.core.data.contracts import PositionInfo, SymbolInfo, TradeResult
+from app.core.enums import TradeRetcode
+from app.core.host.logging import get_logger
 from app.include.blocks.order.close.close_position import close_position
 from app.include.blocks.order.modify.set_profit_target import set_profit_target
 from app.include.blocks.order.modify.set_stop_loss import set_stop_loss
 from app.include.blocks.order.runtime import TradingRuntime
 from app.include.blocks.order.types import TradeFilter, aware_timestamp, bars_since
-from app.include.contracts import PositionInfo, SymbolInfo, TradeResult
-from app.include.enums import TradeRetcode
+
+logger = get_logger(__name__)
 
 
 def _nonnegative(value: float, label: str, *, positive: bool = False) -> None:
@@ -156,6 +177,7 @@ class ExitManager:
 
     async def attach(self, scope: TradeFilter, plan: ExitPlan) -> list[int]:
         """Attach to filled matches, preserving state when reconfiguring a lifecycle."""
+        logger.debug("FR-trading-exit-manager: attaching exit plan")
         async with self._lock:
             tickets = []
             for position in await self._position.PositionsGet():
@@ -172,10 +194,18 @@ class ExitManager:
 
     def detach(self, ticket: int) -> None:
         """Remove policy state; already dispatched requests are not cancelled."""
+        logger.debug(
+            "FR-trading-exit-manager: detaching exit plan",
+            extra={"ticket": ticket},
+        )
         self._bindings.pop(ticket, None)
 
     def resume(self, ticket: int) -> None:
         """Allow a later evaluation after the caller has reconciled the position."""
+        logger.debug(
+            "FR-trading-exit-manager: resuming exit plan",
+            extra={"ticket": ticket},
+        )
         self._bindings[ticket].blocked = False
 
     async def evaluate(
@@ -192,6 +222,7 @@ class ExitManager:
         Bar-count exits require actual chart starts, oldest first and covering entry.
         Repeated timestamps do not repeat requests; backward timestamps are rejected.
         """
+        logger.debug("FR-trading-exit-manager: evaluating exits")
         stamp = aware_timestamp(as_of)
         async with self._lock:
             positions = {
@@ -251,6 +282,10 @@ class ExitManager:
                 )
             opened = (position.time_msc or position.time * 1000) / 1000
             if bars_since(opened, bar_times[position.symbol], as_of) >= bars.bars:
+                logger.debug(
+                    "FR-trading-exit-time: triggered exit after bars",
+                    extra={"ticket": position.ticket},
+                )
                 return [await self._close(position, binding, scope, as_of)]
         decision = position.price_current if prices is None else prices[position.symbol]
         _nonnegative(decision, "decision price", positive=True)
@@ -335,6 +370,10 @@ class ExitManager:
                 favorable, be.activation, rel_tol=0.0, abs_tol=1e-12
             )
             if binding.break_even_active:
+                logger.debug(
+                    "FR-trading-exit-trailing: MoveSL2BE activated",
+                    extra={"ticket": position.ticket},
+                )
                 candidates.append(position.price_open + direction * be.offset)
         if plan.trailing_stop is not None:
             trailing = plan.trailing_stop
@@ -342,6 +381,10 @@ class ExitManager:
                 favorable, trailing.activation, rel_tol=0.0, abs_tol=1e-12
             )
             if binding.trailing_active:
+                logger.debug(
+                    "FR-trading-exit-trailing: TrailingStop activated",
+                    extra={"ticket": position.ticket},
+                )
                 candidates.append(
                     binding.favorable_price - direction * trailing.distance
                 )

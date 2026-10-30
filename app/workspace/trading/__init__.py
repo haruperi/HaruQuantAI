@@ -1,4 +1,19 @@
-"""Shared asynchronous trading API for live and simulated execution."""
+"""Shared asynchronous trading API for live and simulated execution.
+
+Description:
+    Exports the canonical Trading facade, execution proxies (Trade, AccountProxy,
+    OrderProxy, PositionProxy, DealProxy, HistoryOrderProxy, SymbolProxy,
+    TerminalProxy), base classes, and dynamic exit policy definitions.
+Purpose:
+    FEAT-LIVE-TRADING-FACADE: Centralize live trading facade and exit manager.
+Key Capabilities:
+    - FR-trading-facade-composition: Provide unified Trading facade and proxies.
+    - FR-trading-exit-manager: Provide ExitManager, ExitPlan, and exit policies.
+Python API Usage:
+    from app.workspace.trading import Trading, Trade, ExitManager, ExitPlan
+CLI Usage:
+    uv run python -m pytest tests/workspace/trading -q
+"""
 
 from .account import AccountProxy
 from .api import Trading
