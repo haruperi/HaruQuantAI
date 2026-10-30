@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import Any
+
 import pytest
 from app.workspace.task_manager.app_task_manager import AppTaskManager
 from app.workspace.task_manager.app_task_manager_models import (
@@ -250,3 +252,44 @@ class TestAppTaskManagerPipeline:
         assert stats[0]["projectName"] == "P1"
         assert "runningStatus" in stats[0]
         assert "tasksIterations" in stats[0]
+
+    def test_dispatch_standard_tasks(
+        self,
+        setup_pipeline: tuple[TaskManagerProjects, TaskManagerTasks, AppTaskManager],
+    ) -> None:
+        """Verify AppTaskManager dispatches to standard task coordinators."""
+        proj_engine, task_engine, app_tm = setup_pipeline
+        proj_engine.create_project("MultiTaskProj")
+
+        standard_tasks: list[tuple[str, dict[str, Any]]] = [
+            ("ApplyMassConfig", {"targetDatabank": "Results"}),
+            ("AutomaticPortfolioBuilder", {"portfolioSize": 3}),
+            ("AutomaticRetest", {"databank": "Results"}),
+            ("CreatePortfolio", {"portfolioName": "Port1"}),
+            ("ClearDatabanks", {"databanks": ["Results"]}),
+            ("DeleteFile", {"file": "/tmp/dummy.csv"}),
+            ("Filtering", {"filterConditions": []}),
+            ("LogDatabankStats", {"databank": "Results"}),
+            ("CallExternalScript", {"scriptPath": ""}),
+            ("CustomAnalysis", {"snippetName": "test_metric"}),
+            ("LoadFromFiles", {"directoryPath": "data/"}),
+            ("Notification", {"channel": "desktop"}),
+            ("SaveToFiles", {"sourceDatabank": "Results"}),
+            ("UpdateData", {"symbol": "EURUSD"}),
+        ]
+
+        for idx, (ttype, cfg) in enumerate(standard_tasks):
+            task_engine.add_task("MultiTaskProj", f"T_{idx}", ttype, config=cfg)
+
+        app_tm.start_project("MultiTaskProj")
+        for _ in range(len(standard_tasks) - 1):
+            cont = app_tm.step_project("MultiTaskProj")
+            assert cont is True
+
+        # Pipeline finishes
+        cont = app_tm.step_project("MultiTaskProj")
+        assert cont is False
+        assert (
+            app_tm.get_project_status("MultiTaskProj").running_status.value
+            == "finished"
+        )

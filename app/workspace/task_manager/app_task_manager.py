@@ -59,8 +59,110 @@ from app.workspace.task_manager.conditions.runtime import RuntimeCondition
 from app.workspace.task_manager.task_manager_projects import (
     TaskManagerProjects,
 )
+from app.workspace.task_manager.tasks.apply_mass_config import (
+    ApplyMassConfigTask,
+)
+from app.workspace.task_manager.tasks.automatic_portfolio_builder import (
+    AutomaticPortfolioBuilderTask,
+)
+from app.workspace.task_manager.tasks.automatic_retest import (
+    AutomaticRetestTask,
+)
+from app.workspace.task_manager.tasks.call_external_script import (
+    CallExternalScriptTask,
+)
+from app.workspace.task_manager.tasks.clear_databanks import (
+    ClearBank,
+    ClearDatabanksTask,
+)
+from app.workspace.task_manager.tasks.create_portfolio import (
+    CreatePortfolioTask,
+)
+from app.workspace.task_manager.tasks.custom_analysis import (
+    CustomAnalysisTask,
+)
+from app.workspace.task_manager.tasks.delete_file import (
+    DeleteFileTask,
+)
+from app.workspace.task_manager.tasks.filtering import (
+    FilteringTask,
+)
+from app.workspace.task_manager.tasks.go_to_task import (
+    GoToTaskCoordinator,
+)
+from app.workspace.task_manager.tasks.load_from_files import (
+    LoadFromFilesTask,
+)
+from app.workspace.task_manager.tasks.log_databank_stats import (
+    LogDatabankStatsTask,
+)
+from app.workspace.task_manager.tasks.notification import (
+    NotificationTask,
+)
+from app.workspace.task_manager.tasks.save_to_files import (
+    SaveToFilesTask,
+)
+from app.workspace.task_manager.tasks.stop_and_start import (
+    StopAndStartTaskCoordinator,
+)
+from app.workspace.task_manager.tasks.update_data import (
+    UpdateDataTask,
+)
+from app.workspace.task_manager.tasks.wait_for import (
+    WaitForTaskCoordinator,
+)
 
 logger = logging.getLogger("haruquant.task_manager.app")
+
+
+class _DefaultDeleteProgress:
+    def set_log_prefix(self, _prefix: str) -> None:
+        pass
+
+    def log(self, message: str) -> None:
+        logger.info("%s", message)
+
+    def start(self) -> None:
+        pass
+
+    def finish(self) -> None:
+        pass
+
+
+class _DefaultFileOperations:
+    def exists(self, _path: str) -> bool:
+        return False
+
+    def delete(self, _path: str) -> bool:
+        return False
+
+    def basename(self, path: str) -> str:
+        return path
+
+
+class _DefaultClearProgress:
+    def set_log_prefix(self, _prefix: str) -> None:
+        pass
+
+    def log(self, message: str) -> None:
+        logger.info("%s", message)
+
+    def start(self) -> None:
+        pass
+
+    def finish(self) -> None:
+        pass
+
+
+class _DefaultClearProject:
+    def list_banks(self) -> list[ClearBank]:
+        return []
+
+    def get_bank(self, _name: str) -> ClearBank | None:
+        return None
+
+    def on_memory_error(self, _error: MemoryError) -> None:
+        pass
 
 
 class AppTaskManager:
@@ -266,24 +368,157 @@ class AppTaskManager:
         target_name = cfg.get("task", "")
 
         conditions_met = self._evaluate_conditions(project_name, conditions, task_name)
-
-        cur_idx = self._current_indices.get(project_name, 0)
         if conditions_met and target_name:
             act_map = self._activated_cycles.setdefault(project_name, {})
             act_map[task_name] = act_map.get(task_name, 0) + 1
-            for idx, t in enumerate(tasks):
-                name = t.get("task_name") or t.get("name")
-                if name == target_name:
-                    logger.info(
-                        "GoToTask '%s' jumping to '%s' (index %d)",
-                        task_name,
-                        target_name,
-                        idx,
-                    )
-                    return idx
 
-        # If conditions not met or no target, proceed to next
-        return cur_idx + 1
+        cur_idx = self._current_indices.get(project_name, 0)
+        res = GoToTaskCoordinator.evaluate_jump(
+            task_name=task_name,
+            target_task_name=target_name,
+            conditions_met=conditions_met,
+            current_index=cur_idx,
+            tasks_list=tasks,
+            task_log_prefix=f"[{project_name}] ",
+        )
+        return res.next_index
+
+    def _dispatch_portfolio_task(
+        self, task_type: str, cfg: dict[str, Any], prefix: str
+    ) -> None:
+        """Dispatch portfolio-related tasks."""
+        if task_type == "ApplyMassConfig":
+            ApplyMassConfigTask.run(
+                str(cfg.get("targetDatabank", "Results")),
+                str(cfg.get("configType", "default")),
+                dict(cfg.get("parameters", {})),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "AutomaticPortfolioBuilder":
+            AutomaticPortfolioBuilderTask.run(
+                str(cfg.get("sourceDatabank", "Results")),
+                str(cfg.get("targetDatabank", "Portfolio")),
+                int(cfg.get("portfolioSize", 5)),
+                float(cfg.get("correlationThreshold", 0.7)),
+                str(cfg.get("rankingMethod", "SharpeRatio")),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "AutomaticRetest":
+            AutomaticRetestTask.run(
+                str(cfg.get("databank", "Results")),
+                str(cfg.get("retestProfile", "Default")),
+                bool(cfg.get("filterResults", True)),
+                bool(cfg.get("saveToTargetDatabank", False)),
+                str(cfg.get("targetDatabank", "")),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "CreatePortfolio":
+            CreatePortfolioTask.run(
+                str(cfg.get("sourceDatabank", "Results")),
+                str(cfg.get("portfolioName", "MyPortfolio")),
+                str(cfg.get("selectionMode", "all")),
+                int(cfg.get("topN", 10)),
+                task_log_prefix=prefix,
+            )
+
+    def _dispatch_databank_task(
+        self,
+        task_type: str,
+        cfg: dict[str, Any],
+        prefix: str,
+        project_name: str,
+        task_name: str,
+    ) -> None:
+        """Dispatch databank operations."""
+        if task_type == "ClearDatabanks":
+            ClearDatabanksTask.run(
+                list(cfg.get("databanks", ["Results"])),
+                project_name=project_name,
+                task_title=task_name,
+                task_log_prefix=prefix,
+                project=_DefaultClearProject(),
+                progress=_DefaultClearProgress(),
+            )
+        elif task_type == "DeleteFile":
+            DeleteFileTask.run(
+                str(cfg.get("file", "") or cfg.get("filePath", "")),
+                task_log_prefix=prefix,
+                files=_DefaultFileOperations(),
+                progress=_DefaultDeleteProgress(),
+            )
+        elif task_type == "Filtering":
+            FilteringTask.run(
+                str(cfg.get("sourceDatabank", "Results")),
+                str(cfg.get("targetDatabank", "Filtered")),
+                list(cfg.get("filterConditions", [])),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "LogDatabankStats":
+            LogDatabankStatsTask.run(
+                str(cfg.get("databank", "Results")),
+                list(cfg.get("metrics", ["count"])),
+                str(cfg.get("logLevel", "INFO")),
+                task_log_prefix=prefix,
+            )
+
+    def _dispatch_external_task(
+        self,
+        task_type: str,
+        cfg: dict[str, Any],
+        prefix: str,
+        project_name: str,
+        task_name: str,
+    ) -> None:
+        """Dispatch external I/O and notification tasks."""
+        if task_type == "CallExternalScript":
+            CallExternalScriptTask.run(
+                str(cfg.get("scriptPath", "")),
+                list(cfg.get("arguments", [])),
+                str(cfg.get("workingDirectory", "")),
+                int(cfg.get("timeoutSeconds", 300)),
+                bool(cfg.get("failOnError", True)),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "CustomAnalysis":
+            CustomAnalysisTask.run(
+                str(cfg.get("snippetName", "")),
+                str(cfg.get("targetDatabank", "Results")),
+                dict(cfg.get("parameters", {})),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "LoadFromFiles":
+            LoadFromFilesTask.run(
+                str(cfg.get("directoryPath", "")),
+                str(cfg.get("filePattern", "*.sqx")),
+                str(cfg.get("targetDatabank", "Results")),
+                bool(cfg.get("clearBeforeLoad", False)),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "Notification":
+            NotificationTask.run(
+                str(cfg.get("channel", "email")),
+                str(cfg.get("recipient", "")),
+                str(cfg.get("subject", "Task Finished")),
+                str(cfg.get("messageTemplate", "Project {projectName} finished.")),
+                {"projectName": project_name, "taskName": task_name},
+                task_log_prefix=prefix,
+            )
+        elif task_type == "SaveToFiles":
+            SaveToFilesTask.run(
+                str(cfg.get("sourceDatabank", "Results")),
+                str(cfg.get("outputDirectory", "exports")),
+                str(cfg.get("fileFormat", "sqx")),
+                bool(cfg.get("saveAll", True)),
+                task_log_prefix=prefix,
+            )
+        elif task_type == "UpdateData":
+            UpdateDataTask.run(
+                str(cfg.get("symbol", "EURUSD")),
+                str(cfg.get("timeframe", "H1")),
+                str(cfg.get("dataProvider", "Default")),
+                bool(cfg.get("cleanHistory", False)),
+                task_log_prefix=prefix,
+            )
 
     def _execute_task_behavior(
         self,
@@ -297,13 +532,21 @@ class AppTaskManager:
         """Dispatch task-specific behavior and return (next_index, should_continue)."""
         task_name = str(task.get("task_name") or task.get("name"))
         task_type = str(task.get("task_type") or task.get("type"))
+        cfg = task.get("config", {})
+        prefix = f"[{project_name}] "
 
         if task_type == "GoToTask":
             return self._handle_goto_task(project_name, task, task_name, tasks), True
 
         if task_type == "WaitFor":
-            cfg = task.get("config", {})
-            if cfg.get("action", "user") == "user":
+            action = str(cfg.get("action", "user"))
+            file_path = str(cfg.get("file", ""))
+            res = WaitForTaskCoordinator.run(
+                action=action,
+                file_path=file_path,
+                task_log_prefix=prefix,
+            )
+            if res.should_pause:
                 state.running_status = ExecutionStatus.PAUSED
                 logger.info(
                     "Project %s paused at WaitFor task '%s'",
@@ -314,14 +557,25 @@ class AppTaskManager:
             return cur_idx + 1, True
 
         if task_type == "StopAndStart":
-            cfg = task.get("config", {})
             conditions = cfg.get("conditions", [])
-            if self._evaluate_conditions(project_name, conditions, task_name):
+            met = self._evaluate_conditions(project_name, conditions, task_name)
+            action = str(cfg.get("action", "stop"))
+            target_proj = str(cfg.get("targetProject", "") or cfg.get("project", ""))
+            StopAndStartTaskCoordinator.run(
+                action=action,
+                target_project=target_proj,
+                conditions_met=met,
+                task_log_prefix=prefix,
+            )
+            if met and action == "stop":
                 state.running_status = ExecutionStatus.STOPPED
                 state.active_task = None
-                logger.info("Project %s stopped by StopAndStart task", project_name)
                 return cur_idx + 1, False
             return cur_idx + 1, True
+
+        self._dispatch_portfolio_task(task_type, cfg, prefix)
+        self._dispatch_databank_task(task_type, cfg, prefix, project_name, task_name)
+        self._dispatch_external_task(task_type, cfg, prefix, project_name, task_name)
 
         return cur_idx + 1, True
 

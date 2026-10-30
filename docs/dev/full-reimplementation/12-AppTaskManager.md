@@ -51,7 +51,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `uv run python -m pytest tests/workspace/task_manager/test_wait_for_settings.py -q` exits 0 and collects three tests.
 *Commit:* `task-manager: preserve WaitFor settings JSON semantics`.
 
-## Phase 12.2: complete workspace contribution - READY
+## Phase 12.2: complete workspace contribution - COMPLETED
 
 All 43 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
@@ -176,7 +176,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 *Acceptance:* `uv run python -m pytest tests/workspace/task_manager/conditions/test_runtime.py -q` exits0 with the listed boundary/display/error cases collected. No SQX application, database or wall clock is required.
 *Commit:* `task-manager: implement runtime project condition`. Only named files belong to this one feature commit.
 
-### `SettingsAdvancedTM` - I-SettingsAdvancedTM - READY
+### `SettingsAdvancedTM` - I-SettingsAdvancedTM - COMPLETED
 
 *Feature:* complete SettingsAdvancedTM workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -196,7 +196,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsAdvancedTM source record](research/workspaces-09-19-source-review.md#settingsadvancedtm) identifies 0 matching readable Java files and 5 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsApplyMassConfig` - I-SettingsApplyMassConfig - READY
+### `SettingsApplyMassConfig` - I-SettingsApplyMassConfig - COMPLETED
 
 *Feature:* complete SettingsApplyMassConfig workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -216,7 +216,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsApplyMassConfig source record](research/workspaces-09-19-source-review.md#settingsapplymassconfig) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsAutomaticPortfolioBuilder` - I-SettingsAutomaticPortfolioBuilder - READY
+### `SettingsAutomaticPortfolioBuilder` - I-SettingsAutomaticPortfolioBuilder - COMPLETED
 
 *Feature:* complete SettingsAutomaticPortfolioBuilder workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -236,7 +236,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsAutomaticPortfolioBuilder source record](research/workspaces-09-19-source-review.md#settingsautomaticportfoliobuilder) identifies 0 matching readable Java files and 6 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsAutomaticRetest` - I-SettingsAutomaticRetest - READY
+### `SettingsAutomaticRetest` - I-SettingsAutomaticRetest - COMPLETED
 
 *Feature:* complete SettingsAutomaticRetest workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -256,7 +256,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsAutomaticRetest source record](research/workspaces-09-19-source-review.md#settingsautomaticretest) identifies 0 matching readable Java files and 3 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsCallExternalScript` - I-SettingsCallExternalScript - READY
+### `SettingsCallExternalScript` - I-SettingsCallExternalScript - COMPLETED
 
 *Feature:* complete SettingsCallExternalScript workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -276,7 +276,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsCallExternalScript source record](research/workspaces-09-19-source-review.md#settingscallexternalscript) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsClearDatabanks` - I-SettingsClearDatabanks - READY
+### `SettingsClearDatabanks` - I-SettingsClearDatabanks - COMPLETED
 
 *Feature:* complete SettingsClearDatabanks workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -296,7 +296,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsClearDatabanks source record](research/workspaces-09-19-source-review.md#settingscleardatabanks) identifies 0 matching readable Java files and 3 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsCreatePortfolio` - I-SettingsCreatePortfolio - READY
+### `SettingsCreatePortfolio` - I-SettingsCreatePortfolio - COMPLETED
 
 *Feature:* complete SettingsCreatePortfolio workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -316,7 +316,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsCreatePortfolio source record](research/workspaces-09-19-source-review.md#settingscreateportfolio) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsCustomAnalysis` - I-SettingsCustomAnalysis - READY
+### `SettingsCustomAnalysis` - I-SettingsCustomAnalysis - COMPLETED
 
 *Feature:* complete SettingsCustomAnalysis workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -336,7 +336,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsCustomAnalysis source record](research/workspaces-09-19-source-review.md#settingscustomanalysis) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsDeleteFile` - I-SettingsDeleteFile - READY
+### `SettingsDeleteFile` - I-SettingsDeleteFile - COMPLETED
 
 *Feature:* complete SettingsDeleteFile workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -356,7 +356,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsDeleteFile source record](research/workspaces-09-19-source-review.md#settingsdeletefile) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsFiltering` - I-SettingsFiltering - READY
+### `SettingsFiltering` - I-SettingsFiltering - COMPLETED
 
 *Feature:* complete SettingsFiltering workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -376,7 +376,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsFiltering source record](research/workspaces-09-19-source-review.md#settingsfiltering) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsGoToTask` - I-SettingsGoToTask - READY
+### `SettingsGoToTask` - I-SettingsGoToTask - COMPLETED
 
 *Feature:* complete SettingsGoToTask workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -396,7 +396,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsGoToTask source record](research/workspaces-09-19-source-review.md#settingsgototask) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsLoadFromFiles` - I-SettingsLoadFromFiles - READY
+### `SettingsLoadFromFiles` - I-SettingsLoadFromFiles - COMPLETED
 
 *Feature:* complete SettingsLoadFromFiles workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -416,7 +416,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsLoadFromFiles source record](research/workspaces-09-19-source-review.md#settingsloadfromfiles) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsLogDatabankStats` - I-SettingsLogDatabankStats - READY
+### `SettingsLogDatabankStats` - I-SettingsLogDatabankStats - COMPLETED
 
 *Feature:* complete SettingsLogDatabankStats workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -436,7 +436,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsLogDatabankStats source record](research/workspaces-09-19-source-review.md#settingslogdatabankstats) identifies 0 matching readable Java files and 8 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsNotification` - I-SettingsNotification - READY
+### `SettingsNotification` - I-SettingsNotification - COMPLETED
 
 *Feature:* complete SettingsNotification workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -456,7 +456,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsNotification source record](research/workspaces-09-19-source-review.md#settingsnotification) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsSaveToFiles` - I-SettingsSaveToFiles - READY
+### `SettingsSaveToFiles` - I-SettingsSaveToFiles - COMPLETED
 
 *Feature:* complete SettingsSaveToFiles workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -476,7 +476,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsSaveToFiles source record](research/workspaces-09-19-source-review.md#settingssavetofiles) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsStopAndStart` - I-SettingsStopAndStart - READY
+### `SettingsStopAndStart` - I-SettingsStopAndStart - COMPLETED
 
 *Feature:* complete SettingsStopAndStart workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -496,7 +496,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsStopAndStart source record](research/workspaces-09-19-source-review.md#settingsstopandstart) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsUpdateData` - I-SettingsUpdateData - READY
+### `SettingsUpdateData` - I-SettingsUpdateData - COMPLETED
 
 *Feature:* complete SettingsUpdateData workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -516,7 +516,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsUpdateData source record](research/workspaces-09-19-source-review.md#settingsupdatedata) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `SettingsWaitFor` - I-SettingsWaitFor - READY
+### `SettingsWaitFor` - I-SettingsWaitFor - COMPLETED
 
 *Feature:* complete SettingsWaitFor workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -536,7 +536,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [SettingsWaitFor source record](research/workspaces-09-19-source-review.md#settingswaitfor) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
-### `TaskApplyMassConfig` - I-TaskApplyMassConfig - READY
+### `TaskApplyMassConfig` - I-TaskApplyMassConfig - COMPLETED
 
 *Feature:* complete TaskApplyMassConfig workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -556,7 +556,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskApplyMassConfig source record](research/workspaces-09-19-source-review.md#taskapplymassconfig) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskAutomaticPortfolioBuilder` - I-TaskAutomaticPortfolioBuilder - READY
+### `TaskAutomaticPortfolioBuilder` - I-TaskAutomaticPortfolioBuilder - COMPLETED
 
 *Feature:* complete TaskAutomaticPortfolioBuilder workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -576,7 +576,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskAutomaticPortfolioBuilder source record](research/workspaces-09-19-source-review.md#taskautomaticportfoliobuilder) identifies 2 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskAutomaticRetest` - I-TaskAutomaticRetest - READY
+### `TaskAutomaticRetest` - I-TaskAutomaticRetest - COMPLETED
 
 *Feature:* complete TaskAutomaticRetest workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -596,7 +596,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskAutomaticRetest source record](research/workspaces-09-19-source-review.md#taskautomaticretest) identifies 2 matching readable Java files and 5 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskCallExternalScript` - I-TaskCallExternalScript - READY
+### `TaskCallExternalScript` - I-TaskCallExternalScript - COMPLETED
 
 *Feature:* complete TaskCallExternalScript workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -638,7 +638,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 *Acceptance:* `uv run python -m pytest tests/workspace/task_manager/tasks/test_clear_databanks.py -q` exits0 with every listed fake-port branch. No production databank is opened.
 *Commit:* `task-manager: implement source-backed databank clearing`.
 
-### `TaskCreatePortfolio` - I-TaskCreatePortfolio - READY
+### `TaskCreatePortfolio` - I-TaskCreatePortfolio - COMPLETED
 
 *Feature:* complete TaskCreatePortfolio workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -658,7 +658,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskCreatePortfolio source record](research/workspaces-09-19-source-review.md#taskcreateportfolio) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskCustomAnalysis` - I-TaskCustomAnalysis - READY
+### `TaskCustomAnalysis` - I-TaskCustomAnalysis - COMPLETED
 
 *Feature:* complete TaskCustomAnalysis workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -700,7 +700,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 *Acceptance:* `uv run python -m pytest tests/workspace/task_manager/tasks/test_delete_file.py -q` exits0; all specified fake-port branches pass. No real file deletion occurs.
 *Commit:* `task-manager: preserve delete-file task failure policy`.
 
-### `TaskFiltering` - I-TaskFiltering - READY
+### `TaskFiltering` - I-TaskFiltering - COMPLETED
 
 *Feature:* complete TaskFiltering workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -720,7 +720,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskFiltering source record](research/workspaces-09-19-source-review.md#taskfiltering) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskGoToTask` - I-TaskGoToTask - READY
+### `TaskGoToTask` - I-TaskGoToTask - COMPLETED
 
 *Feature:* complete TaskGoToTask workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -740,7 +740,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskGoToTask source record](research/workspaces-09-19-source-review.md#taskgototask) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskLoadFromFiles` - I-TaskLoadFromFiles - READY
+### `TaskLoadFromFiles` - I-TaskLoadFromFiles - COMPLETED
 
 *Feature:* complete TaskLoadFromFiles workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -760,7 +760,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskLoadFromFiles source record](research/workspaces-09-19-source-review.md#taskloadfromfiles) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskLogDatabankStats` - I-TaskLogDatabankStats - READY
+### `TaskLogDatabankStats` - I-TaskLogDatabankStats - COMPLETED
 
 *Feature:* complete TaskLogDatabankStats workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -834,7 +834,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskManagerTasks source record](research/workspaces-09-19-source-review.md#taskmanagertasks) identifies 1 matching readable Java files and 11 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskNotification` - I-TaskNotification - READY
+### `TaskNotification` - I-TaskNotification - COMPLETED
 
 *Feature:* complete TaskNotification workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -854,7 +854,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskNotification source record](research/workspaces-09-19-source-review.md#tasknotification) identifies 1 matching readable Java files and 5 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskSaveToFiles` - I-TaskSaveToFiles - READY
+### `TaskSaveToFiles` - I-TaskSaveToFiles - COMPLETED
 
 *Feature:* complete TaskSaveToFiles workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -874,7 +874,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskSaveToFiles source record](research/workspaces-09-19-source-review.md#tasksavetofiles) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskStopAndStart` - I-TaskStopAndStart - READY
+### `TaskStopAndStart` - I-TaskStopAndStart - COMPLETED
 
 *Feature:* complete TaskStopAndStart workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -894,7 +894,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskStopAndStart source record](research/workspaces-09-19-source-review.md#taskstopandstart) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskUpdateData` - I-TaskUpdateData - READY
+### `TaskUpdateData` - I-TaskUpdateData - COMPLETED
 
 *Feature:* complete TaskUpdateData workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -914,7 +914,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskUpdateData source record](research/workspaces-09-19-source-review.md#taskupdatedata) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskWaitFor` - I-TaskWaitFor - READY
+### `TaskWaitFor` - I-TaskWaitFor - COMPLETED
 
 *Feature:* complete TaskWaitFor workflow.
 *Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
@@ -1072,7 +1072,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 | `app/workspace/custom_projects (no Python source; only ignored cache)` | `app/workspace/task_manager/workspace.py` | Missing - create | No backend exists to move. Implement task/project orchestration from the source-resolved work orders; do not interpret a stale pyc as source. |
 | `ui/app/host/store.ts (project/task UI slices)` | `app/web/workspaces/task_manager/taskManagerStore.ts` | Extract presentation state | Keep active selection/drafts locally. Persisted project definitions and run state come from Python; eliminate an independent browser task runner. |
 
-### Reorganization work order - MIG-AppTaskManager
+### Reorganization work order - MIG-AppTaskManager - COMPLETED
 
 *Evidence:* `OBS-CURRENT-AppTaskManager-MIGRATION-001`.
 *Context to Read:* every existing current file in the table, its named test and the existing `ui/app/host/App.tsx` route/import entries; no donor runtime is required for the relocation itself.
