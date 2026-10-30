@@ -4,6 +4,18 @@ Run `python -m app.main` or the `haruquantai` console command to start Uvicorn
 using the stored host.host and host.port settings. ASGI servers can import
 `app.main:app`. Resources initialize during lifespan startup, not import.
 Use `python -m app.main --reload` to restart on Python source changes in app/.
+
+Description:
+    Creates the HTTP application and owns service startup and shutdown.
+Purpose:
+    FEAT-HOST-LIFECYCLE: Release host resources, including editor job workers.
+Key Capabilities:
+    - FR-host-editor-job-lifecycle: Shut down editor workers through host lifespan;
+      lifecycle tests verify completion logs and isolated resource release.
+Python API Usage:
+    application = create_app()
+CLI Usage:
+    uv run python -m app.main
 """
 
 from __future__ import annotations
@@ -152,6 +164,30 @@ def install_web_build(application: FastAPI, build_dir: Path) -> None:
         return _serve_file(index_file, is_asset=False, is_head=is_head)
 
 
+async def _shutdown_workspace_jobs(application: FastAPI) -> None:
+    """Release lazy workspace workers before host persistence is detached."""
+    for name in ("basket_jobs", "download_jobs", "code_editor_jobs"):
+        if (jobs := getattr(application.state, name, None)) is not None:
+            await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
+            delattr(application.state, name)
+            logger.info("FR-host-editor-job-lifecycle: worker service released")
+    if hasattr(application.state, "code_editor_compilation"):
+        del application.state.code_editor_compilation
+
+
+def _register_routers(application: FastAPI) -> None:
+    """Register workspace API routers."""
+    from app.workspace.code_editor import code_editor_router
+    from app.workspace.data_manager import create_router
+    from app.workspace.grid_control import grid_control_router
+    from app.workspace.trading.routes import trading_router
+
+    application.include_router(create_router())
+    application.include_router(code_editor_router)
+    application.include_router(grid_control_router)
+    application.include_router(trading_router)
+
+
 def create_app(
     persistence: HostPersistence | None = None,
     *,
@@ -187,10 +223,7 @@ def create_app(
             yield
         finally:
             logger.info("Backend shutting down")
-            for name in ("basket_jobs", "download_jobs", "code_editor_jobs"):
-                if (jobs := getattr(application.state, name, None)) is not None:
-                    await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
-                    delattr(application.state, name)
+            await _shutdown_workspace_jobs(application)
             if (mt5 := getattr(application.state, "data_mt5", None)) is not None:
                 await mt5.close()
             del application.state.data_logs
@@ -209,17 +242,7 @@ def create_app(
         **dict(connection_testers or {}),
     }
     install_transport(application)
-    from app.workspace.data_manager import create_router
-
-    application.include_router(create_router())
-
-    from app.workspace.code_editor import code_editor_router
-
-    application.include_router(code_editor_router)
-
-    from app.workspace.grid_control import grid_control_router
-
-    application.include_router(grid_control_router)
+    _register_routers(application)
 
     @application.get("/health", tags=["host"])
     async def health() -> dict[str, str]:

@@ -101,7 +101,7 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 
 ## Phase LT.1: Core Trading Facade Migration
 
-### `TradingFacade` — WO-LT01 — READY
+### `TradingFacade` — WO-LT01 — DONE
 
 *Feature:* Relocate the canonical `Trading` facade and its sub-interfaces (`Trade`, `Account`, `Orders`, `Positions`, `History`, `Symbol`, `Terminal`, `Exits`) into `app/workspace/trading/`.
 *Evidence IDs:* `OBS-HARU-LIVE-TRADING-20261030`, `DEC-CORE-MIGRATION-20261029`.
@@ -113,10 +113,10 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 - **Edit:** `app/workspace/trading/__init__.py` into a temporary backwards-compatibility bridge.
 
 *Functional Requirements & Implementation:*
-- [ ] `Trading(backend: TradingBackend)`: Structurally implements the `TradingRuntime` protocol. Composes sub-services with lazy proxy creation and isolated state.
-- [ ] `Trade`: Implements `send_checked()`, `prepare_entry_request()`, `close()`, `cancel()`, and `modify_protection()`. Enforces arming checks, volume step quantization, and slippage guards.
-- [ ] `ExitManager`: Implements `attach()`, `detach()`, and dynamic evaluation of `StopLoss`, `ProfitTarget`, `TrailingStop`, `MoveSL2BE`, and `ExitAfterBars`.
-- [ ] Account & State queries: Async typed collection getters for positions, open orders, and account balance.
+- [x] `Trading(backend: TradingBackend)`: Structurally implements the `TradingRuntime` protocol. Composes sub-services with lazy proxy creation and isolated state.
+- [x] `Trade`: Implements `send_checked()`, `prepare_entry_request()`, `close()`, `cancel()`, and `modify_protection()`. Enforces arming checks, volume step quantization, and slippage guards.
+- [x] `ExitManager`: Implements `attach()`, `detach()`, and dynamic evaluation of `StopLoss`, `ProfitTarget`, `TrailingStop`, `MoveSL2BE`, and `ExitAfterBars`.
+- [x] Account & State queries: Async typed collection getters for positions, open orders, and account balance.
 *Acceptance:* `uv run python -m pytest tests/workspace/trading/test_facade.py tests/workspace/trading/test_exits.py -q` exits 0.
 *Commit:* `feat(trading): centralize trading facade and exit manager in live trading workspace`.
 
@@ -124,7 +124,7 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 
 ## Phase LT.2: Live Broker Connectors
 
-### `BrokerConnectors` — WO-LT02 — READY
+### `BrokerConnectors` — WO-LT02 — DONE
 
 *Feature:* Centralize live broker connector adapters (MetaTrader, cTrader, Binance/Crypto) in `app/workspace/trading/brokers/` adhering strictly to the `BrokerClient` protocol.
 *Evidence IDs:* `OBS-HARU-LIVE-TRADING-20261030`.
@@ -135,10 +135,10 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 - **Tests Create:** `tests/workspace/trading/test_broker_registry.py`, `tests/workspace/trading/test_broker_contracts.py`.
 
 *Functional Requirements & Implementation:*
-- [ ] `BrokerRegistry`: Thread-safe registry mapping connection IDs and broker types to instantiated `BrokerClient` adapters.
-- [ ] `MetaTraderClient`: ZeroMQ/IPC transport implementing `connect()`, `disconnect()`, `subscribe_ticks()`, `order_send()`, `order_check()`, `get_positions()`.
-- [ ] `CryptoBrokerClient`: REST and WebSocket client for Binance Spot and Futures with automatic signature generation and reconnect backoff.
-- [ ] Invariant: Each broker adapter returns canonical `OrderInfo`, `PositionInfo`, and `TradeResult` domain types defined in `app/core/enums.py` and `app/core/data/contracts.py`.
+- [x] `BrokerRegistry`: Thread-safe registry mapping connection IDs and broker types to instantiated `BrokerClient` adapters.
+- [x] `MetaTraderClient`: ZeroMQ/IPC transport implementing `connect()`, `disconnect()`, `subscribe_ticks()`, `order_send()`, `order_check()`, `get_positions()`.
+- [x] `CryptoBrokerClient`: REST and WebSocket client for Binance Spot and Futures with automatic signature generation and reconnect backoff.
+- [x] Invariant: Each broker adapter returns canonical `OrderInfo`, `PositionInfo`, and `TradeResult` domain types defined in `app/core/enums.py` and `app/core/data/contracts.py`.
 *Acceptance:* `uv run python -m pytest tests/workspace/trading/test_broker_registry.py tests/workspace/trading/test_broker_contracts.py -q` exits 0.
 *Commit:* `feat(trading): implement broker connection registry and live adapters`.
 
@@ -146,7 +146,7 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 
 ## Phase LT.3: Live Strategy Supervisor & Risk Guard
 
-### `LiveStrategySupervisor` — WO-LT03 — READY
+### `LiveStrategySupervisor` — WO-LT03 — DONE
 
 *Feature:* Background execution supervisor that receives real-time market data ticks, feeds them to `StrategyRuntime.evaluate()`, and safely dispatches the generated `StrategyEffects` to the active `BrokerClient`.
 *Evidence IDs:* `OBS-HARU-LIVE-TRADING-20261030`.
@@ -172,7 +172,7 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 
 ## Phase LT.4: Live Trading HTTP & WebSocket API
 
-### `LiveTradingRoutes` — WO-LT04 — READY
+### `LiveTradingRoutes` — WO-LT04 — DONE
 
 *Feature:* FastAPI endpoints and real-time streaming WebSocket/SSE endpoints for live dashboard monitoring and manual trade interventions.
 *Evidence IDs:* `OBS-HARU-LIVE-TRADING-20261030`.
@@ -196,7 +196,7 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 
 ## Phase LT.5: Frontend Live Trading Dashboard
 
-### `LiveTradingDashboard` — WO-LT05 — READY
+### `LiveTradingDashboard` — WO-LT05 — DONE
 
 *Feature:* Relocate and enhance the React trading workspace in `app/web/workspaces/trading/` with real-time streaming, positions table, manual trading ticket, and emergency controls.
 *Evidence IDs:* `OBS-HARU-LIVE-TRADING-20261030`.
@@ -207,9 +207,9 @@ StrategyQuant X does not have an integrated live trading engine—it delegates e
 - **Tests Create:** `app/web/tests/workspace/trading/TradingWorkspace.test.tsx`, `app/web/tests/workspace/trading/tradingStore.test.ts`.
 
 *Functional Requirements & Implementation:*
-- [ ] `TradingWorkspace`: Primary layout containing Account summary header, Live Chart panel, Positions/Orders tabbed table, and Active Strategies monitor.
-- [ ] `tradingStore`: Zustand store managing WebSocket connection, optimistic order state, and live tick updates.
-- [ ] `EmergencyControls`: Prominent, confirmation-gated "Flatten All" and "Cancel All" buttons with instant visual feedback.
-- [ ] `OrderEntryModal`: Manual trade execution modal with automatic lot-size calculation based on risk percentage and stop-loss distance.
+- [x] `TradingWorkspace`: Primary layout containing Account summary header, Live Chart panel, Positions/Orders tabbed table, and Active Strategies monitor.
+- [x] `tradingStore`: Zustand store managing WebSocket connection, optimistic order state, and live tick updates.
+- [x] `EmergencyControls`: Prominent, confirmation-gated "Flatten All" and "Cancel All" buttons with instant visual feedback.
+- [x] `OrderEntryModal`: Manual trade execution modal with automatic lot-size calculation based on risk percentage and stop-loss distance.
 *Acceptance:* `npm --prefix app/web test -- tests/workspace/trading/TradingWorkspace.test.tsx tests/workspace/trading/tradingStore.test.ts` exits 0.
 *Commit:* `feat(web): implement live trading dashboard and real-time execution UI`.
