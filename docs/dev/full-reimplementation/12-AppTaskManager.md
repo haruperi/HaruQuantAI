@@ -3,6 +3,8 @@
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
 
+> Architectural decision — Native JSON Persistence: HaruQuantAI uses native JSON (`.json`, `dict[str, Any]`, `Mapping[str, Any]`) across all task manager settings, project graph configurations, and task condition snapshots. Legacy SQX donor XML elements (`xmlDoc`, `Element`, `task.xml`, `/project/getXMLConfig`) are adapted directly to typed JSON dictionaries and RESTful JSON endpoints.
+
 
 ```mermaid
 classDiagram
@@ -11,8 +13,8 @@ classDiagram
     +action: str
   }
   class WaitForSettings {
-    +load(node, current) WaitForConfig
-    +write(node, config) None
+    +load(payload, current) WaitForConfig
+    +write(target, config) None
   }
   WaitForSettings --> WaitForConfig
 ```
@@ -33,21 +35,21 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Evidence IDs:* `OBS145-AppTaskManager-HELPER-001` (retained below).
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWaitFor/SettingsWaitForService.js`, `DONOR_REFERENCE_ROOT/internal/web/common` (resource folder; originally named `libs.js` is not present). Read only these donor files and the completed prerequisite files named in this order.
 
-*Feature:* read/write the WaitFor settings element only; do not execute waits, poll a filesystem or schedule projects.
+*Feature:* read/write the WaitFor settings dictionary/JSON object only; do not execute waits, poll a filesystem or schedule projects.
 *Dependencies:* WO-C00 Python package foundation.
 *Implementation Files:*
 - **Backend Create:** `app/workspace/task_manager/__init__.py` (empty), `app/workspace/task_manager/wait_for_settings.py`.
 - **Test Create:** `tests/workspace/task_manager/test_wait_for_settings.py`.
 - **Frontend:** none in this order; watcher/task integration is blocked.
-*Types:* frozen/slotted `WaitForConfig(file: str = '', action: str = 'user')`; `Element` is xml.etree.ElementTree.Element. No enum coercion, stripping or filesystem access.
+*Types:* frozen/slotted `WaitForConfig(file: str = '', action: str = 'user')`; `payload` is `Mapping[str, Any] | None`; `target` is `dict[str, Any]`. No enum coercion, stripping or filesystem access.
 *Functional Requirements & Implementation:*
-- [ ] `WaitForSettings.load(node: Element | None, current: WaitForConfig) -> WaitForConfig` -> static method. None returns current by identity. Otherwise read the first direct File and Action children; absent child or parsed empty child uses defaults `''` and `'user'`. Other text, including spaces/unknown action, is returned unchanged. Node tag itself is not validated here; caller supplies the WaitFor element.
-- [ ] `WaitForSettings.write(node: Element, config: WaitForConfig) -> None` -> static method. In File-then-Action order update first matching direct child, or append if absent. Preserve existing child attributes and unrelated siblings, remove that child's nested children, and set text to the config string. No whole-element clear, XML string concatenation or new validation rule. A second duplicate named child is not modified.
-- [ ] `test_wait_defaults_and_missing_parent()` -> parse `<WaitFor/>`, expect `WaitForConfig('', 'user')`; load None with current `WaitForConfig('old','file')` returns identical current object.
-- [ ] `test_wait_preserves_text()` -> `<WaitFor><File> a&amp;b </File><Action>custom</Action></WaitFor>` produces file `' a&b '` and action `'custom'` without path normalization.
-- [ ] `test_wait_write_preserves_attributes_and_siblings()` -> parse `<WaitFor><File unit="x"><Nested/></File><Extra>keep</Extra></WaitFor>`; write file `a&b`, action `file`; File retains unit x, has no child elements and text `a&b`; Extra remains keep; Action text file. After serialization/reparse load yields `WaitForConfig('a&b','file')`.
+- [ ] `WaitForSettings.load(payload: Mapping[str, Any] | None, current: WaitForConfig) -> WaitForConfig` -> static method. None returns current by identity. Otherwise read `'file'` (or legacy `'File'`) and `'action'` (or legacy `'Action'`); absent key, None, or parsed empty string uses defaults `''` and `'user'`. Other string values, including spaces/unknown action, are returned unchanged.
+- [ ] `WaitForSettings.write(target: dict[str, Any], config: WaitForConfig) -> None` -> static method. In file-then-action order update keys `target['file'] = config.file` and `target['action'] = config.action`. Preserve existing unrelated keys and nested values in `target`. No whole-dict replacement or new validation rules.
+- [ ] `test_wait_defaults_and_missing_parent()` -> load `{}` or `None`, expect `WaitForConfig('', 'user')`; load None with current `WaitForConfig('old','file')` returns identical current object.
+- [ ] `test_wait_preserves_text()` -> `{"file": " a&b ", "action": "custom"}` produces file `' a&b '` and action `'custom'` without path normalization.
+- [ ] `test_wait_write_preserves_attributes_and_siblings()` -> dict `{"extra": "keep", "nested": {"k": 1}}`; write file `a&b`, action `file`; dict retains `'extra': 'keep'`, `'nested': {'k': 1}`, and sets `'file': 'a&b'`, `'action': 'file'`. After re-load yields `WaitForConfig('a&b','file')`.
 *Acceptance:* `uv run python -m pytest tests/workspace/task_manager/test_wait_for_settings.py -q` exits 0 and collects three tests.
-*Commit:* `task-manager: preserve WaitFor settings XML semantics`.
+*Commit:* `task-manager: preserve WaitFor settings JSON semantics`.
 
 ## Phase 12.2: complete workspace contribution - READY
 
@@ -76,7 +78,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 ### `ProjectConditionCyclesCount` - TM-COND-01 - BACKEND CONTRACT RESOLVED
 
 *Feature:* evaluate this concrete project condition against an injected project/task counter snapshot; do not build another comparator or query browser state.
-*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary incomplete donor XML is not part of this condition evaluator commit.
+*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary donor XML/JSON project configurations is not part of this condition evaluator commit; the adapter consumes typed Python scalar snapshots matching the app's JSON schema.
 *Dependencies:* Core `ConditionComparator.validate` in `app/core/trading/conditions.py`; TM-COND-01 for subsequent orders; Core `format_duration_seconds` in `app/core/lib/time.py` for RuntimeCondition only.
 *Implementation Files:*
 - **Current HaruQuantAI Location:** no condition Python source exists under `app/workspace/custom_projects`; **Fit / Action:** Missing - create, not a move from bytecode cache.
@@ -95,7 +97,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 ### `ProjectConditionGoToActivated` - TM-COND-02 - BACKEND CONTRACT RESOLVED
 
 *Feature:* evaluate this concrete project condition against an injected project/task counter snapshot; do not build another comparator or query browser state.
-*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary incomplete donor XML is not part of this condition evaluator commit.
+*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary donor XML/JSON project configurations is not part of this condition evaluator commit; the adapter consumes typed Python scalar snapshots matching the app's JSON schema.
 *Dependencies:* Core `ConditionComparator.validate` in `app/core/trading/conditions.py`; TM-COND-01 for subsequent orders; Core `format_duration_seconds` in `app/core/lib/time.py` for RuntimeCondition only.
 *Implementation Files:*
 - **Current HaruQuantAI Location:** no condition Python source exists under `app/workspace/custom_projects`; **Fit / Action:** Missing - create, not a move from bytecode cache.
@@ -114,7 +116,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 ### `ProjectConditionGoToEvaluated` - TM-COND-03 - BACKEND CONTRACT RESOLVED
 
 *Feature:* evaluate this concrete project condition against an injected project/task counter snapshot; do not build another comparator or query browser state.
-*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary incomplete donor XML is not part of this condition evaluator commit.
+*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary donor XML/JSON project configurations is not part of this condition evaluator commit; the adapter consumes typed Python scalar snapshots matching the app's JSON schema.
 *Dependencies:* Core `ConditionComparator.validate` in `app/core/trading/conditions.py`; TM-COND-01 for subsequent orders; Core `format_duration_seconds` in `app/core/lib/time.py` for RuntimeCondition only.
 *Implementation Files:*
 - **Current HaruQuantAI Location:** no condition Python source exists under `app/workspace/custom_projects`; **Fit / Action:** Missing - create, not a move from bytecode cache.
@@ -133,7 +135,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 ### `ProjectConditionResultsCount` - TM-COND-04 - BACKEND CONTRACT RESOLVED
 
 *Feature:* evaluate this concrete project condition against an injected project/task counter snapshot; do not build another comparator or query browser state.
-*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary incomplete donor XML is not part of this condition evaluator commit.
+*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary donor XML/JSON project configurations is not part of this condition evaluator commit; the adapter consumes typed Python scalar snapshots matching the app's JSON schema.
 *Dependencies:* Core `ConditionComparator.validate` in `app/core/trading/conditions.py`; TM-COND-01 for subsequent orders; Core `format_duration_seconds` in `app/core/lib/time.py` for RuntimeCondition only.
 *Implementation Files:*
 - **Current HaruQuantAI Location:** no condition Python source exists under `app/workspace/custom_projects`; **Fit / Action:** Missing - create, not a move from bytecode cache.
@@ -153,7 +155,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 ### `ProjectConditionRunTime` - TM-COND-05 - BACKEND CONTRACT RESOLVED
 
 *Feature:* evaluate this concrete project condition against an injected project/task counter snapshot; do not build another comparator or query browser state.
-*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary incomplete donor XML is not part of this condition evaluator commit.
+*Evidence ID:* `OBS145-TASK-CONDITIONS-002`. Defaults below are the primary UI field-descriptor defaults; source constructors alone do not seed them. Typed scalar snapshots are the Python adapter boundary. Serializing arbitrary donor XML/JSON project configurations is not part of this condition evaluator commit; the adapter consumes typed Python scalar snapshots matching the app's JSON schema.
 *Dependencies:* Core `ConditionComparator.validate` in `app/core/trading/conditions.py`; TM-COND-01 for subsequent orders; Core `format_duration_seconds` in `app/core/lib/time.py` for RuntimeCondition only.
 *Implementation Files:*
 - **Current HaruQuantAI Location:** no condition Python source exists under `app/workspace/custom_projects`; **Fit / Action:** Missing - create, not a move from bytecode cache.
@@ -618,7 +620,7 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 - **Backend create:** `app/workspace/task_manager/tasks/clear_databanks.py`.
 - **Backend test create:** `tests/workspace/task_manager/tasks/test_clear_databanks.py`.
 - **Frontend:** no new panel; shared task catalogue/settings UI consumes the source-resolved operation.
-- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks/ClearDatabanks/ClearDatabanksTask.java#start`; `DONOR_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks/task.xml`; `pyproject.toml`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks/ClearDatabanks/ClearDatabanksTask.java#start`; `DONOR_REFERENCE_ROOT/internal/plugins/TaskClearDatabanks/task.xml` (historical reference only; runtime uses JSON schemas); `pyproject.toml`.
 *Exact local contracts:* `ClearBank` Protocol has `name: str` and `clear_records(reset_view: bool, notify: bool, reason: str)->None`; `ClearProject` has `list_banks()->Sequence[ClearBank]`, `get_bank(name: str)->ClearBank|None`, `on_memory_error(error: MemoryError)->None`; `ClearProgress` has set_log_prefix/log/start/finish as in the delete coordinator. Ports are local typed adapters, not a second ResultStore implementation.
 *Functional Requirements & Implementation:*
 - [ ] `ClearDatabanksTask.run(names: Sequence[str], *, project_name: str, task_title: str, task_log_prefix: str, project: ClearProject, progress: ClearProgress) -> None` -> static method; set prefix, log `Clearing databanks...`, start. Do not strip/normalize/deduplicate names.
