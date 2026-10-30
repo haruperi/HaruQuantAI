@@ -76,9 +76,9 @@ def main() -> int:
         (sys.executable, "-m", "ruff", "check", "tests"),
         (sys.executable, "-m", "ruff", "format", "--check", "tests"),
         (sys.executable, "-m", "pytest"),
-        (npm, "--prefix", "ui", "run", "typecheck"),
-        (npm, "--prefix", "ui", "run", "test"),
-        (npm, "--prefix", "ui", "run", "build"),
+        (npm, "--prefix", "app/web", "run", "typecheck"),
+        (npm, "--prefix", "app/web", "run", "test"),
+        (npm, "--prefix", "app/web", "run", "build"),
     )
     for command in commands:
         logger.info("FR-DEV-RUN-CHECKS: running %s", " ".join(command))

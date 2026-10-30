@@ -1,4 +1,9 @@
 # AppCore - library work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+> C00 is completed isolated test infrastructure. Its placeholder entrypoint is now superseded by the approved real-application migration; its original no-UI-import restriction does not apply to that migration.
+
 
 ```mermaid
 classDiagram
@@ -684,17 +689,17 @@ These orders replace the former summary table. `READY` authorizes only the expli
 
 ### `ProjectStore` and `ResultStore` - WO-C11.02 - READY
 
-*Feature:* persistence services for native `.haru` project containers (and `.cfx` conversion import/export) and strategy backtest databank results.
+*Feature:* persistence services for `.cfx` project containers and strategy backtest databank results.
 *Evidence IDs:* `PREVIOUS-002`, `OBS-CORE-CFX-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`, `ResultsGroup.java`, `results/file/`.
 *Dependencies:* WO-C11.01 (HostPersistence), WO-C11.03 (ProjectEnvelope).
 *Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`, `ResultsGroup.java`.
-- **Create:** `app/core/trading/project/__init__.py`, `app/core/trading/project/contracts.py`, `app/core/trading/project/store.py`, `app/core/trading/results/__init__.py`, `app/core/trading/results/contracts.py`, `app/core/trading/results/store.py`, `tests/core/trading/project/test_store.py`, `tests/core/trading/results/test_store.py`. Legacy SQX conversion is isolated in dedicated converter utilities (`cfx_importer.py` / `cfx_exporter.py`).
+- **Create:** `app/core/trading/project/__init__.py`, `app/core/trading/project/contracts.py`, `app/core/trading/project/store.py`, `app/core/trading/results/__init__.py`, `app/core/trading/results/contracts.py`, `app/core/trading/results/store.py`, `tests/core/trading/project/test_store.py`, `tests/core/trading/results/test_store.py`.
 
 *Contract & Type Specifications:*
 - `ProjectStore`:
-  - `load_project(self, path: Path) -> ProjectDocument`: reads `.haru` via `read_project_envelope`, parses `manifest.json`, `project.json` task graph (tasks, dependencies, databank targets) and task configurations (`tasks/<task_id>.json`).
-  - `save_project(self, path: Path, project: ProjectDocument) -> None`: serializes task configurations and writes `.haru` container atomically via `write_project_envelope`.
+  - `load_project(self, path: Path) -> ProjectDocument`: reads `.cfx` via `read_project_envelope`, parses `config.xml` task graph (tasks, dependencies, databank targets) and task XML configurations (`TaskBuild-Task1.xml`, etc.).
+  - `save_project(self, path: Path, project: ProjectDocument) -> None`: serializes task configurations and writes `.cfx` container atomically via `write_project_envelope`.
 - `ResultStore`:
   - `save_result(self, databank_id: str, result: RunResult) -> str`: persists strategy candidate result into target databank; updates metadata in `HostPersistence`.
   - `get_result(self, result_id: str) -> RunResult`: loads stored candidate backtest result.
@@ -705,17 +710,17 @@ These orders replace the former summary table. `READY` authorizes only the expli
 
 ### `ProjectEnvelope` - WO-C11.03 - READY (bounded source-backed slice)
 
-*Feature:* read/write native HaruQuantAI `.haru` project container archives containing `manifest.json`, `project.json`, and named task configuration documents `tasks/<task_id>.json` without interpreting the full project/strategy schema. SQX `.cfx` files are handled via dedicated converter utilities rather than as native internal representation. This does not complete WO-C11.02 or authorize result-container support.
+*Feature:* read/write a project config XML document plus named task XML documents without interpreting the full project/strategy schema. This does not complete WO-C11.02 or authorize result-container support.
 *Evidence:* `OBS-CORE-SOURCE-20261030`; `SQFileManager.createProjectFile`, `loadProjectConfig` and `loadTaskConfigs` in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`.
-*Dependencies:* WO-C01. No dependency on StrategyDocument or RunResult, since JSON documents are opaque dictionaries at this boundary.
+*Dependencies:* WO-C01. No dependency on StrategyDocument or RunResult, since XML is opaque at this boundary.
 *Create:* `app/core/trading/project/envelope.py`, `tests/core/trading/project/test_envelope.py`; create an empty package initializer only if absent.
-*Target API:* frozen/slotted `ProjectEnvelope(manifest: dict[str, JSONValue], project: dict[str, JSONValue], tasks: Mapping[str, dict[str, JSONValue]])`; `read_project_envelope(path: Path | str) -> ProjectEnvelope`; `write_project_envelope(path: Path | str, envelope: ProjectEnvelope) -> None`. Constructor detaches tasks into a read-only mapping (`MappingProxyType`) and validates manifest dictionary fields (`app_name`, `schema_version`, `project_id`, `name`). Preserve JSON dictionaries semantically.
-*Container contract:* ZIP archive containing UTF-8 JSON members: `manifest.json` and `project.json` (required), plus zero or more task members under `tasks/<task_id>.json`. Validate every document is nonempty and valid JSON. Reject duplicate ZIP names, directory entries, absolute names, drive-prefixed names, backslashes, `.`/`..` segments and any member not conforming to `manifest.json`, `project.json`, or `tasks/<task_id>.json`. Paths are ZIP member keys only; never extract to disk. This strict admission policy is an explicit Haru decision; the donor loader does not provide these protections.
-*Error contract:* missing path raises `DomainError(code='PROJECT_FILE_NOT_FOUND', message='Project file not found')`; malformed ZIP, absent `manifest.json`, absent `project.json`, non-UTF-8 member, empty/malformed JSON or rejected member name raises `DomainError(code='INVALID_PROJECT_CONTAINER', message='Invalid project container', details={'member':name})`, with member `''` for failures without a known member. I/O failures other than missing input propagate as OSError.
-*Write policy:* validate the entire envelope before opening a destination; encode UTF-8; write `manifest.json`, `project.json`, and tasks in sorted key order to a temporary sibling ZIP, close successfully, then `os.replace` it over path. Parent directory must already exist. On any pre-replacement failure retain the prior destination unchanged and remove the temporary file. Atomic replacement and sorted output order are explicit Haru decisions; do not describe them as observed donor guarantees. This helper does not update a databank or emit project events.
-*Exact fixtures:* round-trip envelope with manifest, project, and two tasks (`tasks/TaskBuild-1.json`, `tasks/TaskOptimizer-2.json`) and assert identical dictionary contents and member keys. Minimal envelope (manifest + project, 0 tasks) round-trips. Missing manifest, missing project, empty task member, malformed JSON, non-UTF-8 bytes, and traversal paths (`../escape.json`, `tasks/../../secret.json`) each raise the stated code with the offending member. Monkeypatch replacement to fail and assert the previous destination bytes remain unchanged and no temporary file remains. A rejected envelope must never truncate the prior archive.
-*Acceptance:* `uv run python -m pytest tests/core/trading/project/test_envelope.py -q` exits 0. Fixtures contain synthetic JSON dictionaries. ZIP byte identity is not required; member names and JSON payloads are.
-*Commit:* `core: add validated native project envelope container adapter`.
+*Target API:* frozen/slotted `ProjectEnvelope(config_xml: str, task_xml: Mapping[str,str])`; `read_project_envelope(path: Path) -> ProjectEnvelope`; `write_project_envelope(path: Path, envelope: ProjectEnvelope) -> None`. Constructor detaches task_xml into a read-only mapping. Preserve XML strings semantically and retain text on successful read/write; this helper performs validation without reserializing trees. No namespace, root name, task filename pattern, task count or strategy version is invented here.
+*Container contract:* one `config.xml` UTF-8 XML member and zero or more other UTF-8 XML members. Validate every document is nonempty and well-formed. Reject duplicate ZIP names, directory entries, absolute names, drive-prefixed names, backslashes, `.`/`..` segments and any task key equal to config.xml. Paths are ZIP member keys only; never extract to disk. This strict admission policy is an explicit Haru decision; the donor loader does not provide these protections.
+*Error contract:* missing path raises `DomainError(code='PROJECT_FILE_NOT_FOUND', message='Project file not found')`; malformed ZIP, absent config.xml, non-UTF-8 member, empty/malformed XML or rejected member name raises `DomainError(code='INVALID_PROJECT_CONTAINER', message='Invalid project container', details={'member':name})`, with member `''` for failures without a known member. I/O failures other than missing input propagate as OSError. Reject XML containing a DOCTYPE declaration, using the same invalid-container error; no external entity resolution is permitted.
+*Write policy:* validate the entire envelope before opening a destination; encode UTF-8; write config.xml first and tasks in sorted key order to a temporary sibling ZIP, close successfully, then `os.replace` it over path. Parent directory must already exist. On any pre-replacement failure retain the prior destination unchanged and remove the temporary file. Atomic replacement and sorted output order are explicit Haru decisions; do not describe them as observed donor guarantees. This helper does not update a databank or emit project events.
+*Exact fixtures:* round-trip config `<Project><Tasks/></Project>` plus `TaskBuild-Task1.xml` containing `<TaskSettings><Value>7</Value></TaskSettings>` and assert identical strings and member keys. Config-only archive round-trips. Missing config, duplicate task member, empty task member, malformed XML, non-UTF-8 bytes and `../escape.xml` each raise the stated code with the offending member. Monkeypatch replacement to fail and assert the previous destination bytes remain unchanged and no temporary file remains. A rejected envelope must never truncate the prior archive.
+*Acceptance:* `uv run python -m pytest tests/core/trading/project/test_envelope.py -q` exits 0. Fixtures contain only synthetic XML. ZIP byte identity is not required; member names and XML text are.
+*Commit:* `core: add a validated project XML envelope adapter`.
 
 ## Phase C11: shared generation, optimization and portfolio primitives
 

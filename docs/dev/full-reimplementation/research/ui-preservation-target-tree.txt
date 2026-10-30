@@ -1,0 +1,1230 @@
+Implemented app/web file structure after UI preservation migration (2026-10-30).
+Includes the preserved existing application, existing target helpers and migration verification assets.
+Generated dependencies, builds and test results excluded.
+
+app/web/
+├── common/
+│   ├── assets/
+│   │   ├── dm-yahoo.png
+│   │   └── metatrader5.png
+│   ├── components/
+│   │   ├── HelpTooltip.tsx
+│   │   ├── README.md
+│   │   └── ui.tsx
+│   └── project/
+│       ├── results/
+│       │   ├── tabs/
+│       │   │   ├── ConditionalTabs.tsx
+│       │   │   └── SmallTabs.tsx
+│       │   ├── ResultsCharts.tsx
+│       │   ├── ResultsChrome.tsx
+│       │   ├── resultsFixtures.ts
+│       │   ├── ResultsModals.tsx
+│       │   └── resultsModel.ts
+│       ├── settings/
+│       │   ├── SettingsControls.tsx
+│       │   └── sharedSettingsFixtures.ts
+│       ├── contracts.ts
+│       ├── index.ts
+│       ├── projectFixtures.ts
+│       ├── ProjectFrame.tsx
+│       ├── ProjectModal.tsx
+│       ├── README.md
+│       └── registry.md
+├── docs/
+│   └── education/
+│       ├── development/
+│       │   ├── backtesting-biases.md
+│       │   ├── branch-and-commit-conventions.md
+│       │   ├── building-blocks.md
+│       │   ├── chart-setup.md
+│       │   ├── market-edge.md
+│       │   ├── performance-optimization-guide.md
+│       │   ├── ranking.md
+│       │   ├── special-strategies.md
+│       │   ├── stop-loss-analysis.md
+│       │   ├── strategy-filters.md
+│       │   └── test-layer-policy.md
+│       ├── fundamentals/
+│       │   ├── financial-symbols.md
+│       │   ├── key-concepts.md
+│       │   ├── order-types.md
+│       │   ├── perfect-market-selection.md
+│       │   ├── performance-metrics-analysis.md
+│       │   ├── strategies-to-trade.md
+│       │   ├── strategy-basic-components.md
+│       │   └── things-to-keep-an-eye-on.md
+│       └── robustness/
+│           ├── core-validation.md
+│           ├── final-test.md
+│           ├── overview.md
+│           ├── parameter-discovery-optimization.md
+│           ├── stress-test.md
+│           └── workflow.md
+├── shell/
+│   ├── App.tsx
+│   ├── bootstrap.tsx
+│   ├── branding.ts
+│   ├── globalSettings.ts
+│   ├── GlobalSettingsMenu.tsx
+│   ├── HeaderApplications.tsx
+│   ├── HostConnection.tsx
+│   ├── HostConnectionModal.tsx
+│   ├── hostSettings.ts
+│   ├── HostSettingsModal.tsx
+│   ├── README.md
+│   ├── router.tsx
+│   ├── store.ts
+│   ├── styles.css
+│   ├── themeProjection.ts
+│   ├── transport.ts
+│   └── types.ts
+├── tests/
+│   ├── common/
+│   │   └── project/
+│   │       ├── projectFiles.ts
+│   │       ├── projectWorkbench.test.ts
+│   │       ├── settingsDataMapping.test.ts
+│   │       ├── settingsTradingMapping.test.ts
+│   │       ├── settingsValidationMapping.test.ts
+│   │       ├── sourceMapping.test.ts
+│   │       └── sourceMappingValidation.ts
+│   ├── e2e/
+│   │   ├── ui-migration-parity.spec.ts-snapshots/
+│   │   │   ├── dark-aiassistant-win32.png
+│   │   │   ├── dark-algowizard-win32.png
+│   │   │   ├── dark-builder-win32.png
+│   │   │   ├── dark-business-win32.png
+│   │   │   ├── dark-chart-win32.png
+│   │   │   ├── dark-codeeditor-win32.png
+│   │   │   ├── dark-composer-win32.png
+│   │   │   ├── dark-datamanager-win32.png
+│   │   │   ├── dark-debugconsole-win32.png
+│   │   │   ├── dark-gridcontrol-win32.png
+│   │   │   ├── dark-gridtest-win32.png
+│   │   │   ├── dark-home-win32.png
+│   │   │   ├── dark-mtanalyzer-win32.png
+│   │   │   ├── dark-neuralnet-win32.png
+│   │   │   ├── dark-optimizer-win32.png
+│   │   │   ├── dark-portfolio-win32.png
+│   │   │   ├── dark-projects-win32.png
+│   │   │   ├── dark-retester-win32.png
+│   │   │   ├── dark-trading-win32.png
+│   │   │   ├── light-aiassistant-win32.png
+│   │   │   ├── light-algowizard-win32.png
+│   │   │   ├── light-builder-win32.png
+│   │   │   ├── light-business-win32.png
+│   │   │   ├── light-chart-win32.png
+│   │   │   ├── light-codeeditor-win32.png
+│   │   │   ├── light-composer-win32.png
+│   │   │   ├── light-datamanager-win32.png
+│   │   │   ├── light-debugconsole-win32.png
+│   │   │   ├── light-gridcontrol-win32.png
+│   │   │   ├── light-gridtest-win32.png
+│   │   │   ├── light-home-win32.png
+│   │   │   ├── light-mtanalyzer-win32.png
+│   │   │   ├── light-neuralnet-win32.png
+│   │   │   ├── light-optimizer-win32.png
+│   │   │   ├── light-portfolio-win32.png
+│   │   │   ├── light-projects-win32.png
+│   │   │   ├── light-retester-win32.png
+│   │   │   └── light-trading-win32.png
+│   │   ├── ai-assistant-parity.spec.ts
+│   │   ├── algowizard-parity.spec.ts
+│   │   ├── branding-cleanup.spec.ts
+│   │   ├── builder-results-parity.spec.ts
+│   │   ├── builder-settings-parity.spec.ts
+│   │   ├── chart-performance.spec.ts
+│   │   ├── chart-platform.spec.ts
+│   │   ├── chart-tools.spec.ts
+│   │   ├── code-editor-regressions.spec.ts
+│   │   ├── data-manager-broker-profiles.spec.ts
+│   │   ├── data-manager-crypto.spec.ts
+│   │   ├── data-manager-darwinex.spec.ts
+│   │   ├── data-manager-dukascopy-disclaimer.spec.ts
+│   │   ├── data-manager-dukascopy-download.spec.ts
+│   │   ├── data-manager-dukascopy.spec.ts
+│   │   ├── data-manager-export.spec.ts
+│   │   ├── data-manager-external-indicators.spec.ts
+│   │   ├── data-manager-file-import.spec.ts
+│   │   ├── data-manager-file-symbol.spec.ts
+│   │   ├── data-manager-live-catalog.spec.ts
+│   │   ├── data-manager-log.spec.ts
+│   │   ├── data-manager-mt5-import.spec.ts
+│   │   ├── data-manager-sessions.spec.ts
+│   │   ├── data-manager-source-ribbon.spec.ts
+│   │   ├── data-manager-sq-data.spec.ts
+│   │   ├── data-manager-stock-groups.spec.ts
+│   │   ├── data-manager-symbols.spec.ts
+│   │   ├── data-manager-tickdownloader.spec.ts
+│   │   ├── data-manager-tools.spec.ts
+│   │   ├── data-manager-workspace.spec.ts
+│   │   ├── data-manager-yahoo.spec.ts
+│   │   ├── databank-compare-editing-structure.spec.ts
+│   │   ├── databank-core-actions-structure.spec.ts
+│   │   ├── databank-delete-structure.spec.ts
+│   │   ├── databank-filter-correlation-structure.spec.ts
+│   │   ├── databank-load-structure.spec.ts
+│   │   ├── databank-portfolio-structure.spec.ts
+│   │   ├── databank-rename-structure.spec.ts
+│   │   ├── databank-retest-structure.spec.ts
+│   │   ├── databank-save-exports-structure.spec.ts
+│   │   ├── databank-selection-notes-structure.spec.ts
+│   │   ├── databank-source-code-structure.spec.ts
+│   │   ├── databank-structure.spec.ts
+│   │   ├── databank-views-structure.spec.ts
+│   │   ├── frontendStructureFixtures.ts
+│   │   ├── global-settings.spec.ts
+│   │   ├── header-applications.spec.ts
+│   │   ├── home-landing.spec.ts
+│   │   ├── host-login.spec.ts
+│   │   ├── host-settings-coverage.spec.ts
+│   │   ├── optimization-surface-structure.spec.ts
+│   │   ├── optimizer-parity.spec.ts
+│   │   ├── portfolio-composer-parity.spec.ts
+│   │   ├── portfolio-master-parity.spec.ts
+│   │   ├── project-data-results-structure.spec.ts
+│   │   ├── project-shell-structure.spec.ts
+│   │   ├── project-trading-secondary-results-structure.spec.ts
+│   │   ├── project-validation-conditional-structure.spec.ts
+│   │   ├── retester-parity.spec.ts
+│   │   ├── shellTestUtils.ts
+│   │   ├── sidebar-navigation.spec.ts
+│   │   ├── smoke.spec.ts
+│   │   └── ui-migration-parity.spec.ts
+│   ├── shell/
+│   │   ├── branding.test.ts
+│   │   ├── globalSettings.test.ts
+│   │   ├── headerApplications.test.ts
+│   │   ├── hostConnection.test.tsx
+│   │   ├── hostSettings.test.ts
+│   │   ├── router.test.ts
+│   │   ├── storeHydration.test.ts
+│   │   ├── themeProjection.test.ts
+│   │   └── transport.test.ts
+│   ├── workspace/
+│   │   ├── algo_wizard/
+│   │   │   ├── algoWizardModel.test.ts
+│   │   │   └── algoWizardRules.test.ts
+│   │   ├── builder/
+│   │   │   ├── fullSettings.test.ts
+│   │   │   ├── progressDashboard.test.ts
+│   │   │   ├── resultsModel.test.ts
+│   │   │   └── resultsView.test.ts
+│   │   ├── business/
+│   │   │   └── business.test.ts
+│   │   ├── chart/
+│   │   │   ├── alerts.test.ts
+│   │   │   ├── drawings.test.ts
+│   │   │   ├── history.test.ts
+│   │   │   ├── indicators.test.ts
+│   │   │   ├── mockFeed.test.ts
+│   │   │   ├── persistence.test.ts
+│   │   │   ├── positions.test.ts
+│   │   │   ├── replay.test.ts
+│   │   │   ├── resample.test.ts
+│   │   │   ├── scales.test.ts
+│   │   │   └── search.test.ts
+│   │   ├── code_editor/
+│   │   │   ├── codeEditor.test.ts
+│   │   │   └── codeEditorClient.test.ts
+│   │   ├── data_manager/
+│   │   │   ├── plugins/
+│   │   │   │   ├── Catalogs/
+│   │   │   │   │   ├── BrokerProfiles/
+│   │   │   │   │   │   ├── brokerApiClient.test.ts
+│   │   │   │   │   │   └── brokerProfiles.test.ts
+│   │   │   │   │   ├── Sessions/
+│   │   │   │   │   │   ├── sessionApiClient.test.ts
+│   │   │   │   │   │   ├── sessions.test.ts
+│   │   │   │   │   │   └── SessionsModal.test.tsx
+│   │   │   │   │   ├── StockGroups/
+│   │   │   │   │   │   ├── stockGroupApiClient.test.ts
+│   │   │   │   │   │   └── stockGroups.test.ts
+│   │   │   │   │   └── Symbols/
+│   │   │   │   │       ├── symbols.test.ts
+│   │   │   │   │       ├── symbolsApiClient.test.ts
+│   │   │   │   │       └── SymbolsModal.test.tsx
+│   │   │   │   ├── Common/
+│   │   │   │   │   ├── dataSourceRibbon.test.ts
+│   │   │   │   │   └── ProviderConnectionsDialog.test.tsx
+│   │   │   │   ├── Crypto/
+│   │   │   │   │   ├── crypto.test.ts
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   └── sourceMappingValidation.ts
+│   │   │   │   ├── Darwinex/
+│   │   │   │   │   ├── darwinex.test.ts
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   └── sourceMappingValidation.ts
+│   │   │   │   ├── Dukascopy/
+│   │   │   │   │   ├── dukascopy.test.ts
+│   │   │   │   │   ├── dukascopyDownload.test.ts
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   └── sourceMappingValidation.ts
+│   │   │   │   ├── Export/
+│   │   │   │   │   └── dataExport.test.ts
+│   │   │   │   ├── FileImport/
+│   │   │   │   │   ├── fileImport.test.ts
+│   │   │   │   │   ├── fileSymbols.test.ts
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   └── sourceMappingValidation.ts
+│   │   │   │   ├── Indicators/
+│   │   │   │   │   ├── externalIndicators.test.ts
+│   │   │   │   │   └── externalIndicatorsApiClient.test.ts
+│   │   │   │   ├── MetaTrader/
+│   │   │   │   │   ├── mt5Import.test.ts
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   └── sourceMappingValidation.ts
+│   │   │   │   ├── SQData/
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   ├── sourceMappingValidation.ts
+│   │   │   │   │   └── sqData.test.ts
+│   │   │   │   ├── TickDownloader/
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   ├── sourceMappingValidation.ts
+│   │   │   │   │   └── tickDownloader.test.ts
+│   │   │   │   ├── Tools/
+│   │   │   │   │   └── dataTools.test.ts
+│   │   │   │   ├── Yahoo/
+│   │   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   │   ├── sourceMappingValidation.ts
+│   │   │   │   │   └── yahoo.test.ts
+│   │   │   │   ├── historicalSourceStore.test.ts
+│   │   │   │   └── symbolContract.test.ts
+│   │   │   ├── dataManagerHelp.test.tsx
+│   │   │   ├── dataManagerHome.test.tsx
+│   │   │   ├── dataManagerLog.test.tsx
+│   │   │   └── dataManagerWorkspace.test.tsx
+│   │   ├── debug_console/
+│   │   │   └── debugConsole.test.ts
+│   │   ├── grid_control/
+│   │   │   └── gridControl.test.ts
+│   │   ├── grid_test/
+│   │   │   └── gridTest.test.ts
+│   │   ├── home/
+│   │   │   ├── databankDefaults.test.ts
+│   │   │   ├── home.test.tsx
+│   │   │   └── notesPreview.test.ts
+│   │   ├── mt_analyzer/
+│   │   │   └── mtAnalyzer.test.ts
+│   │   ├── neural_network/
+│   │   │   └── neuralNet.test.ts
+│   │   ├── optimizer/
+│   │   │   ├── plugins/
+│   │   │   │   ├── optimizationSurface.test.ts
+│   │   │   │   └── optimizationSurfaceMapping.test.ts
+│   │   │   └── optimizerModes.test.ts
+│   │   ├── portfolio_composer/
+│   │   │   ├── composerDraft.test.ts
+│   │   │   ├── portfolioComposer.test.ts
+│   │   │   └── portfolioMembers.test.ts
+│   │   ├── portfolio_master/
+│   │   │   └── portfolioMaster.test.ts
+│   │   ├── results/
+│   │   │   ├── databank/
+│   │   │   │   ├── databankCompareEditing.test.ts
+│   │   │   │   ├── databankCompareEditingMapping.test.ts
+│   │   │   │   ├── databankCoreActions.test.ts
+│   │   │   │   ├── databankCoreActionsMapping.test.ts
+│   │   │   │   ├── databankCorrelation.test.ts
+│   │   │   │   ├── databankDeleteMapping.test.ts
+│   │   │   │   ├── databankFilterCorrelationMapping.test.ts
+│   │   │   │   ├── databankLoadMapping.test.ts
+│   │   │   │   ├── databankPortfolioActions.test.ts
+│   │   │   │   ├── databankPortfolioCompositionMapping.test.ts
+│   │   │   │   ├── databankRenameController.test.ts
+│   │   │   │   ├── databankRenameMapping.test.ts
+│   │   │   │   ├── databankRetestMapping.test.ts
+│   │   │   │   ├── databankSaveExports.test.ts
+│   │   │   │   ├── databankSaveExportsMapping.test.ts
+│   │   │   │   ├── databankSelectionNotes.test.ts
+│   │   │   │   ├── databankSelectionNotesMapping.test.ts
+│   │   │   │   ├── databankSourceCodeMapping.test.ts
+│   │   │   │   ├── databankSplitter.test.ts
+│   │   │   │   ├── databankToolbar.test.ts
+│   │   │   │   ├── databankViews.test.ts
+│   │   │   │   ├── fixtures.test.ts
+│   │   │   │   ├── resultsDatabankViewsMapping.test.ts
+│   │   │   │   ├── sourceMapping.test.ts
+│   │   │   │   ├── sourceMappingValidation.ts
+│   │   │   │   └── strategyCompare.test.ts
+│   │   │   ├── portfolioCorrelation.test.ts
+│   │   │   ├── tradeAnalysis.test.ts
+│   │   │   └── tradesOnChart.test.ts
+│   │   ├── retester/
+│   │   │   └── retesterWorkflow.test.ts
+│   │   ├── task_manager/
+│   │   │   └── customProjects.test.ts
+│   │   └── trading/
+│   │       └── trading.test.ts
+│   └── bootstrap.test.tsx
+├── workspaces/
+│   ├── ai/
+│   │   ├── AIAssistant.css
+│   │   ├── AIAssistantWorkspace.tsx
+│   │   ├── capabilities.json
+│   │   ├── catalog.ts
+│   │   ├── ConfigureMcpModal.tsx
+│   │   ├── README.md
+│   │   └── source-map.json
+│   ├── algo_wizard/
+│   │   ├── AlgoWizard.css
+│   │   ├── AlgoWizardAI.tsx
+│   │   ├── AlgoWizardBlockEditor.tsx
+│   │   ├── AlgoWizardControls.tsx
+│   │   ├── AlgoWizardEditor.tsx
+│   │   ├── algoWizardFixtures.ts
+│   │   ├── AlgoWizardHome.tsx
+│   │   ├── algoWizardModel.ts
+│   │   ├── AlgoWizardResources.tsx
+│   │   ├── AlgoWizardResults.tsx
+│   │   ├── AlgoWizardRuleDialogs.tsx
+│   │   ├── AlgoWizardSettings.tsx
+│   │   ├── algoWizardTemplates.ts
+│   │   ├── AlgoWizardToolbar.tsx
+│   │   ├── AlgoWizardWorkspace.tsx
+│   │   ├── NewStrategyModal.tsx
+│   │   ├── README.md
+│   │   ├── StrategyCodeExportModal.tsx
+│   │   └── StrategyTemplatesModal.tsx
+│   ├── builder/
+│   │   ├── results/
+│   │   │   ├── tabs/
+│   │   │   │   ├── ConditionalTabs.tsx
+│   │   │   │   ├── EquityChartTab.tsx
+│   │   │   │   ├── OverviewTab.tsx
+│   │   │   │   ├── SmallTabs.tsx
+│   │   │   │   ├── SourceCodeTab.tsx
+│   │   │   │   └── TradeListTab.tsx
+│   │   │   ├── ResultsCharts.tsx
+│   │   │   ├── ResultsChrome.tsx
+│   │   │   ├── resultsFixtures.ts
+│   │   │   ├── ResultsModals.tsx
+│   │   │   └── resultsModel.ts
+│   │   ├── settings/
+│   │   │   ├── AtmTab.tsx
+│   │   │   ├── BuildingBlocksTab.tsx
+│   │   │   ├── CrossChecksTab.tsx
+│   │   │   ├── CustomAnalysisTab.tsx
+│   │   │   ├── DataTab.tsx
+│   │   │   ├── GeneticOptionsTab.tsx
+│   │   │   ├── MoneyManagementTab.tsx
+│   │   │   ├── NotesTab.tsx
+│   │   │   ├── PartsToImproveTab.tsx
+│   │   │   ├── RankingTab.tsx
+│   │   │   ├── SettingsControls.tsx
+│   │   │   ├── settingsFixtures.ts
+│   │   │   ├── TradingOptionsTab.tsx
+│   │   │   └── WhatToBuildTab.tsx
+│   │   ├── SettingsRankings/
+│   │   │   ├── FitnessFunction/
+│   │   │   │   ├── fitnessFunction.tsx
+│   │   │   │   └── FitnessFunctionCtrl.ts
+│   │   │   ├── views/
+│   │   │   │   └── ranking.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── RankingCtrl.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── builderClient.ts
+│   │   ├── BuilderWorkspace.tsx
+│   │   ├── EngineCharts.tsx
+│   │   ├── EnginePanel.tsx
+│   │   ├── FitnessEvolutionModal.tsx
+│   │   ├── fixtures.ts
+│   │   ├── FullSettingsView.tsx
+│   │   ├── ProgressDashboard.tsx
+│   │   ├── README.md
+│   │   ├── ResultsColumn.tsx
+│   │   ├── ResultsView.tsx
+│   │   └── SettingsSummary.tsx
+│   ├── business/
+│   │   ├── BusinessWorkspace.tsx
+│   │   └── fixtures.ts
+│   ├── chart/
+│   │   ├── src/
+│   │   │   ├── components/
+│   │   │   │   ├── bottombar/
+│   │   │   │   │   └── BottomBar.tsx
+│   │   │   │   ├── dialogs/
+│   │   │   │   │   ├── AlertDialog.tsx
+│   │   │   │   │   ├── ConfirmDialog.tsx
+│   │   │   │   │   ├── DrawingSettings.tsx
+│   │   │   │   │   ├── HelpDialog.tsx
+│   │   │   │   │   ├── IndicatorsDialog.tsx
+│   │   │   │   │   ├── OrderTicket.tsx
+│   │   │   │   │   ├── SettingsDialog.tsx
+│   │   │   │   │   └── SymbolSearch.tsx
+│   │   │   │   ├── panels/
+│   │   │   │   │   ├── AlertsPanel.tsx
+│   │   │   │   │   ├── FavoritesPanel.tsx
+│   │   │   │   │   ├── Minimap.tsx
+│   │   │   │   │   ├── PositionsPanel.tsx
+│   │   │   │   │   ├── ReplayControls.tsx
+│   │   │   │   │   └── Toasts.tsx
+│   │   │   │   ├── toolbar/
+│   │   │   │   │   └── LeftToolbar.tsx
+│   │   │   │   ├── topbar/
+│   │   │   │   │   └── TopBar.tsx
+│   │   │   │   ├── ChartArea.tsx
+│   │   │   │   ├── ContextMenu.tsx
+│   │   │   │   ├── Modal.tsx
+│   │   │   │   └── Tooltip.tsx
+│   │   │   ├── engine/
+│   │   │   │   ├── candles.ts
+│   │   │   │   ├── ChartEngine.ts
+│   │   │   │   ├── export.ts
+│   │   │   │   └── scales.ts
+│   │   │   ├── feed/
+│   │   │   │   ├── adapter.ts
+│   │   │   │   ├── MockFeed.ts
+│   │   │   │   ├── resample.ts
+│   │   │   │   ├── sessions.ts
+│   │   │   │   └── symbols.ts
+│   │   │   ├── hooks/
+│   │   │   │   ├── useChartEngine.ts
+│   │   │   │   └── useShortcuts.ts
+│   │   │   ├── indicators/
+│   │   │   │   ├── ATR.ts
+│   │   │   │   ├── BollingerBands.ts
+│   │   │   │   ├── catalog.ts
+│   │   │   │   ├── EMA.ts
+│   │   │   │   ├── MACD.ts
+│   │   │   │   ├── renderers.ts
+│   │   │   │   ├── RSI.ts
+│   │   │   │   ├── SMA.ts
+│   │   │   │   ├── Stochastic.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   ├── Volume.ts
+│   │   │   │   ├── VWAP.ts
+│   │   │   │   └── WMA.ts
+│   │   │   ├── store/
+│   │   │   │   ├── alerts.ts
+│   │   │   │   ├── chartStore.ts
+│   │   │   │   ├── history.ts
+│   │   │   │   ├── persistence.ts
+│   │   │   │   ├── positions.ts
+│   │   │   │   └── replay.ts
+│   │   │   ├── tools/
+│   │   │   │   ├── AnchoredNote.ts
+│   │   │   │   ├── Arrow.ts
+│   │   │   │   ├── Brush.ts
+│   │   │   │   ├── catalog.ts
+│   │   │   │   ├── Circle.ts
+│   │   │   │   ├── Ellipse.ts
+│   │   │   │   ├── FibExtension.ts
+│   │   │   │   ├── FibRetracement.ts
+│   │   │   │   ├── FibTimezone.ts
+│   │   │   │   ├── GannFan.ts
+│   │   │   │   ├── geometry.ts
+│   │   │   │   ├── HorizontalLine.ts
+│   │   │   │   ├── HorizontalRay.ts
+│   │   │   │   ├── Measure.ts
+│   │   │   │   ├── Pitchfork.ts
+│   │   │   │   ├── Polygon.ts
+│   │   │   │   ├── PriceLine.ts
+│   │   │   │   ├── Ray.ts
+│   │   │   │   ├── Rectangle.ts
+│   │   │   │   ├── Segment.ts
+│   │   │   │   ├── Sticker.ts
+│   │   │   │   ├── Text.ts
+│   │   │   │   ├── TrendLine.ts
+│   │   │   │   ├── Triangle.ts
+│   │   │   │   ├── types.ts
+│   │   │   │   └── VerticalLine.ts
+│   │   │   ├── utils/
+│   │   │   │   ├── format.ts
+│   │   │   │   ├── search.ts
+│   │   │   │   └── time.ts
+│   │   │   └── types.ts
+│   │   ├── ChartWorkspace.module.css
+│   │   ├── ChartWorkspace.tsx
+│   │   └── README.md
+│   ├── code_editor/
+│   │   ├── codeEditorClient.ts
+│   │   ├── CodeEditorWorkspace.tsx
+│   │   ├── CreateFromTemplateModal.tsx
+│   │   ├── EditorBottomPanel.tsx
+│   │   ├── EditorInspector.tsx
+│   │   ├── EditorToolbar.tsx
+│   │   ├── EditorTreeItem.tsx
+│   │   ├── fixtures.ts
+│   │   ├── ImportExportModal.tsx
+│   │   ├── IndicatorChart.tsx
+│   │   ├── IndicatorTesterModal.tsx
+│   │   ├── NewExtensionModal.tsx
+│   │   ├── pythonEditorSupport.ts
+│   │   ├── SourceCodeEditor.tsx
+│   │   ├── templateCatalog.ts
+│   │   ├── useCodeEditorWorkspace.ts
+│   │   └── useIndicatorTest.ts
+│   ├── data_manager/
+│   │   ├── plugins/
+│   │   │   ├── Catalogs/
+│   │   │   │   ├── BrokerProfiles/
+│   │   │   │   │   ├── brokerApiClient.ts
+│   │   │   │   │   ├── BrokerBulkEditDialog.tsx
+│   │   │   │   │   ├── brokerProfiles.css
+│   │   │   │   │   ├── brokerProfiles.ts
+│   │   │   │   │   ├── BrokerProfilesModal.tsx
+│   │   │   │   │   ├── BrokerRecordImportDialog.tsx
+│   │   │   │   │   ├── BrokerStocksDialog.tsx
+│   │   │   │   │   └── BrokerTransferDialog.tsx
+│   │   │   │   ├── Sessions/
+│   │   │   │   │   ├── sessionApiClient.ts
+│   │   │   │   │   ├── SessionElementDialog.tsx
+│   │   │   │   │   ├── SessionNtImportDialog.tsx
+│   │   │   │   │   ├── sessions.css
+│   │   │   │   │   ├── sessions.ts
+│   │   │   │   │   ├── SessionsModal.tsx
+│   │   │   │   │   ├── sessionStore.ts
+│   │   │   │   │   └── SessionTransferDialog.tsx
+│   │   │   │   ├── StockGroups/
+│   │   │   │   │   ├── stockGroupApiClient.ts
+│   │   │   │   │   ├── stockGroups.css
+│   │   │   │   │   ├── stockGroups.ts
+│   │   │   │   │   ├── StockGroupsModal.tsx
+│   │   │   │   │   ├── stockGroupsStore.ts
+│   │   │   │   │   ├── StockGroupStocksDialog.tsx
+│   │   │   │   │   └── StockGroupTransferDialog.tsx
+│   │   │   │   └── Symbols/
+│   │   │   │       ├── SymbolDetailsFields.tsx
+│   │   │   │       ├── symbols.css
+│   │   │   │       ├── symbols.ts
+│   │   │   │       ├── symbolsApiClient.ts
+│   │   │   │       ├── SymbolsModal.tsx
+│   │   │   │       ├── symbolsStore.ts
+│   │   │   │       └── SymbolTransferDialog.tsx
+│   │   │   ├── Common/
+│   │   │   │   ├── dataManagerStore.ts
+│   │   │   │   ├── dataSourceRibbon.ts
+│   │   │   │   ├── fixtures.ts
+│   │   │   │   ├── HistoricalSourceDialog.tsx
+│   │   │   │   ├── historicalSourceStore.ts
+│   │   │   │   ├── ProviderConnectionsDialog.tsx
+│   │   │   │   └── symbolContract.ts
+│   │   │   ├── Crypto/
+│   │   │   │   ├── add/
+│   │   │   │   │   ├── addPopup.tsx
+│   │   │   │   │   ├── addPopupCtrl.ts
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── import/
+│   │   │   │   │   ├── importPopup.tsx
+│   │   │   │   │   ├── importPopupCtrl.ts
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── crypto.ts
+│   │   │   │   ├── cryptoStore.ts
+│   │   │   │   ├── DataSourceCryptoService.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── source-map.json
+│   │   │   │   └── style.css
+│   │   │   ├── Darwinex/
+│   │   │   │   ├── add/
+│   │   │   │   │   ├── addPopup.tsx
+│   │   │   │   │   ├── addPopupCtrl.ts
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── selectSymbolsPopup.tsx
+│   │   │   │   │   └── styles.css
+│   │   │   │   ├── disclaimer/
+│   │   │   │   │   ├── darwinexDisclaimerCtrl.ts
+│   │   │   │   │   ├── darwinexDisclaimerPopup.tsx
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── download/
+│   │   │   │   │   ├── downloadPopup.tsx
+│   │   │   │   │   ├── downloadPopupCtrl.ts
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── import/
+│   │   │   │   │   ├── importPopup.tsx
+│   │   │   │   │   ├── importPopupCtrl.ts
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── darwinex.ts
+│   │   │   │   ├── DarwinexService.ts
+│   │   │   │   ├── darwinexStore.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── source-map.json
+│   │   │   │   └── style.css
+│   │   │   ├── Dukascopy/
+│   │   │   │   ├── add/
+│   │   │   │   │   ├── addPopup.tsx
+│   │   │   │   │   ├── addPopupCtrl.ts
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── selectSymbolsPopup.tsx
+│   │   │   │   │   └── styles.css
+│   │   │   │   ├── disclaimer/
+│   │   │   │   │   ├── cdnDisclaimerPopup.tsx
+│   │   │   │   │   ├── disclaimerPopup.tsx
+│   │   │   │   │   ├── dukascopyDataDisclaimerCtrl.ts
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── import/
+│   │   │   │   │   ├── cdnDisclaimerPopup.tsx
+│   │   │   │   │   ├── importPopup.tsx
+│   │   │   │   │   ├── importPopupCtrl.ts
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── downloadStore.ts
+│   │   │   │   ├── dukascopy.ts
+│   │   │   │   ├── dukascopyDownload.ts
+│   │   │   │   ├── DukascopyService.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── source-map.json
+│   │   │   │   └── style.css
+│   │   │   ├── Export/
+│   │   │   │   ├── CsvExportDialog.tsx
+│   │   │   │   ├── dataExport.css
+│   │   │   │   ├── dataExport.ts
+│   │   │   │   ├── dataExportStore.ts
+│   │   │   │   ├── Mt4ExportDialog.tsx
+│   │   │   │   └── Mt5ExportDialog.tsx
+│   │   │   ├── FileImport/
+│   │   │   │   ├── add/
+│   │   │   │   │   ├── addPopup.tsx
+│   │   │   │   │   ├── DataSourceFilesAddCtrl.ts
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── import/
+│   │   │   │   │   ├── DataSourceFilesImportCtrl.ts
+│   │   │   │   │   ├── importPopup.tsx
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   └── newFormatPopup.tsx
+│   │   │   │   ├── massImport/
+│   │   │   │   │   ├── DataSourceFilesMassImportCtrl.ts
+│   │   │   │   │   ├── massImportPopup.tsx
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── DataSourceFilesService.ts
+│   │   │   │   ├── fileImport.ts
+│   │   │   │   ├── fileImportStore.ts
+│   │   │   │   ├── fileSymbols.ts
+│   │   │   │   ├── fileSymbolsStore.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── source-map.json
+│   │   │   │   └── styles.css
+│   │   │   ├── Indicators/
+│   │   │   │   ├── ExternalIndicatorDeleteDialog.tsx
+│   │   │   │   ├── ExternalIndicatorEditorDialog.tsx
+│   │   │   │   ├── ExternalIndicatorImportDialog.tsx
+│   │   │   │   ├── ExternalIndicatorRecognizeDialog.tsx
+│   │   │   │   ├── externalIndicators.css
+│   │   │   │   ├── externalIndicators.ts
+│   │   │   │   ├── externalIndicatorsApiClient.ts
+│   │   │   │   ├── externalIndicatorsStore.ts
+│   │   │   │   ├── ExternalIndicatorTransferDialog.tsx
+│   │   │   │   └── ExternalIndicatorViewDialog.tsx
+│   │   │   ├── MetaTrader/
+│   │   │   │   ├── import/
+│   │   │   │   │   ├── DataSourceMt5ApiImportCtrl.ts
+│   │   │   │   │   ├── importPopup.tsx
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── DataSourceMt5Api.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── mt5Import.ts
+│   │   │   │   ├── mt5ImportStore.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── source-map.json
+│   │   │   │   └── styles.css
+│   │   │   ├── SQData/
+│   │   │   │   ├── Equity/
+│   │   │   │   │   ├── add/
+│   │   │   │   │   │   ├── addPopup.tsx
+│   │   │   │   │   │   ├── dataUsageConditionsPopup.tsx
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── SQEquityDataAddCtrl.ts
+│   │   │   │   │   ├── update/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── SQEquityDataUpdateCtrl.ts
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── source-map.json
+│   │   │   │   │   ├── SQEquityDataService.ts
+│   │   │   │   │   └── styles.css
+│   │   │   │   ├── Futures/
+│   │   │   │   │   ├── add/
+│   │   │   │   │   │   ├── addPopup.tsx
+│   │   │   │   │   │   ├── dataUsageConditionsPopup.tsx
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── SQFuturesDataAddCtrl.ts
+│   │   │   │   │   ├── update/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── SQFuturesDataUpdateCtrl.ts
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── source-map.json
+│   │   │   │   │   ├── SQFuturesDataService.ts
+│   │   │   │   │   └── styles.css
+│   │   │   │   ├── README.md
+│   │   │   │   ├── source-map.json
+│   │   │   │   ├── sqData.ts
+│   │   │   │   └── sqDataStore.ts
+│   │   │   ├── TickDownloader/
+│   │   │   │   ├── import/
+│   │   │   │   │   ├── DataSourceTDImportCtrl.ts
+│   │   │   │   │   ├── importPopup.tsx
+│   │   │   │   │   └── module.ts
+│   │   │   │   ├── DataSourceTDService.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── README.md
+│   │   │   │   ├── source-map.json
+│   │   │   │   ├── styles.css
+│   │   │   │   └── tickDownloader.ts
+│   │   │   ├── Tools/
+│   │   │   │   ├── CloneTimezoneDialog.tsx
+│   │   │   │   ├── DataReviewChart.tsx
+│   │   │   │   ├── dataTools.css
+│   │   │   │   ├── dataTools.ts
+│   │   │   │   ├── dataToolsStore.ts
+│   │   │   │   └── ViewAnalyzeDialog.tsx
+│   │   │   └── Yahoo/
+│   │   │       ├── add/
+│   │   │       │   ├── addPopup.tsx
+│   │   │       │   ├── addPopupCtrl.ts
+│   │   │       │   └── module.ts
+│   │   │       ├── download/
+│   │   │       │   ├── downloadPopup.tsx
+│   │   │       │   ├── downloadPopupCtrl.ts
+│   │   │       │   └── module.ts
+│   │   │       ├── module.ts
+│   │   │       ├── README.md
+│   │   │       ├── source-map.json
+│   │   │       ├── style.css
+│   │   │       ├── yahoo.ts
+│   │   │       ├── YahooService.ts
+│   │   │       └── yahooStore.ts
+│   │   ├── DataManager.tsx
+│   │   ├── DataManagerChart.tsx
+│   │   ├── DataManagerDock.css
+│   │   ├── DataManagerDock.tsx
+│   │   ├── DataManagerHome.tsx
+│   │   ├── dataManagerLogClient.ts
+│   │   ├── DataManagerPanels.tsx
+│   │   └── dataManagerWorkspaceClient.ts
+│   ├── debug_console/
+│   │   └── DebugConsoleWorkspace.tsx
+│   ├── grid_control/
+│   │   ├── AddNodeModal.tsx
+│   │   └── GridControlWorkspace.tsx
+│   ├── grid_test/
+│   │   └── GridTestWorkspace.tsx
+│   ├── home/
+│   │   ├── EnginePanel/
+│   │   │   ├── directives/
+│   │   │   │   └── engineChartPanel/
+│   │   │   │       └── engineChartPanel.tsx
+│   │   │   ├── engine.tsx
+│   │   │   ├── EngineCtrl.ts
+│   │   │   ├── EnginePanel.css
+│   │   │   ├── module.ts
+│   │   │   ├── projectConfigHelpPopup.tsx
+│   │   │   ├── README.md
+│   │   │   └── source-map.json
+│   │   ├── ProjectResults/
+│   │   │   ├── module.ts
+│   │   │   ├── newCustomPluginModal.tsx
+│   │   │   ├── README.md
+│   │   │   ├── results.tsx
+│   │   │   ├── ResultsCtrl.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── ProjectSettings/
+│   │   │   ├── views/
+│   │   │   │   └── settings.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   └── source-map.json
+│   │   ├── SettingsData/
+│   │   │   ├── views/
+│   │   │   │   └── data.tsx
+│   │   │   ├── DataCtrl.ts
+│   │   │   ├── module.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── SettingsMoneyManagement/
+│   │   │   ├── views/
+│   │   │   │   └── moneyManagement.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── MoneyManagementCtrl.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── SettingsNotes/
+│   │   │   ├── module.ts
+│   │   │   ├── notes.tsx
+│   │   │   ├── NotesCtrl.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── SettingsOptions/
+│   │   │   ├── views/
+│   │   │   │   └── options.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── OptionsCtrl.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── SettingsPanel/
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── settings.tsx
+│   │   │   ├── SettingsPanelCtrl.ts
+│   │   │   └── source-map.json
+│   │   ├── databankDefaults.ts
+│   │   ├── homeClient.ts
+│   │   ├── homeContent.json
+│   │   ├── HomeScreen.css
+│   │   ├── HomeScreen.tsx
+│   │   └── notesPreview.ts
+│   ├── mt_analyzer/
+│   │   ├── mtAnalyzerStore.ts
+│   │   └── MTAnalyzerWorkspace.tsx
+│   ├── neural_network/
+│   │   ├── neuralNetStore.ts
+│   │   └── NeuralNetworkTrainer.tsx
+│   ├── optimizer/
+│   │   ├── plugins/
+│   │   │   ├── ResultsOptimizationProfile/
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── optimizationProfile.tsx
+│   │   │   │   ├── OptimizationProfileCtrl.ts
+│   │   │   │   ├── optimizationSurfaceLogic.ts
+│   │   │   │   └── source-map.json
+│   │   │   └── README.md
+│   │   ├── OptimizationDialogs.tsx
+│   │   ├── OptimizationParameters.tsx
+│   │   ├── optimizerClient.ts
+│   │   ├── optimizerFixtures.ts
+│   │   ├── OptimizerProgress.tsx
+│   │   ├── OptimizerResults.tsx
+│   │   ├── OptimizerSettings.tsx
+│   │   ├── OptimizerWorkspace.tsx
+│   │   ├── README.md
+│   │   └── WalkForwardMatrixView.tsx
+│   ├── portfolio_composer/
+│   │   ├── composerModel.ts
+│   │   ├── fixtures.ts
+│   │   ├── PortfolioAutocomputation.tsx
+│   │   ├── PortfolioCandidatesModal.tsx
+│   │   ├── PortfolioComposerDialogs.tsx
+│   │   ├── PortfolioComposerResults.tsx
+│   │   ├── PortfolioComposerWorkspace.tsx
+│   │   ├── PortfolioComposition.tsx
+│   │   ├── PortfolioConfiguration.tsx
+│   │   ├── portfolioOptimization.ts
+│   │   └── README.md
+│   ├── portfolio_master/
+│   │   ├── PortfolioMasterDialogs.tsx
+│   │   ├── portfolioMasterFixtures.ts
+│   │   ├── portfolioMasterModel.ts
+│   │   ├── PortfolioMasterProgress.tsx
+│   │   ├── PortfolioMasterSettings.tsx
+│   │   ├── PortfolioMasterWorkspace.tsx
+│   │   └── README.md
+│   ├── results/
+│   │   ├── databank/
+│   │   │   ├── DatabankFilterByCorrelation/
+│   │   │   │   ├── databankFilterByCorrelationPopup.tsx
+│   │   │   │   ├── module.ts
+│   │   │   │   └── source-map.json
+│   │   │   ├── DatabankRename/
+│   │   │   │   ├── ui/
+│   │   │   │   │   ├── databankRenamePopup.tsx
+│   │   │   │   │   ├── DatabankRenamePopupCtrl.ts
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   └── styles.css
+│   │   │   │   └── source-map.json
+│   │   │   ├── ProjectDatabanks/
+│   │   │   │   ├── views/
+│   │   │   │   │   ├── databank.tsx
+│   │   │   │   │   └── databanks.tsx
+│   │   │   │   ├── databankColumns.ts
+│   │   │   │   ├── DatabankCtrl.ts
+│   │   │   │   ├── DatabankDialogs.tsx
+│   │   │   │   ├── DatabanksCtrl.ts
+│   │   │   │   ├── DatabankService.ts
+│   │   │   │   ├── databankStore.ts
+│   │   │   │   ├── DatabankToolbar.tsx
+│   │   │   │   ├── FilterByCorrelationModal.tsx
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── source-map.json
+│   │   │   │   ├── StrategyTable.tsx
+│   │   │   │   └── styles.css
+│   │   │   ├── ResultsDatabankActions/
+│   │   │   │   ├── clearAll/
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── delete/
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── load/
+│   │   │   │   │   ├── loadBtnCtrl.ts
+│   │   │   │   │   ├── loadPopup.tsx
+│   │   │   │   │   ├── LoadPopupCtrl.ts
+│   │   │   │   │   ├── LoadService.ts
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── source-map.json
+│   │   │   │   │   └── styles.css
+│   │   │   │   ├── newDatabank/
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── portfolio/
+│   │   │   │   │   ├── merge/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── mergeWF/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── moveToPC/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   ├── README.md
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── moveToPM/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   ├── README.md
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── split/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── README.md
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── refresh/
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── retest/
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── retestDialog.tsx
+│   │   │   │   │   ├── RetestDialogCtrl.ts
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── save/
+│   │   │   │   │   ├── exportCSV/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── exportHTML/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── exportPDF/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── exportStrategyTrades/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── saveToSQ3/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── saveToSQ4/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── sourceCode/
+│   │   │   │   │   │   ├── jforex/
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── mc/
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── mt4/
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── mt5/
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── pseudoCode/
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── xmlStrategy/
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   ├── saveBtnPopupCtrl.ts
+│   │   │   │   │   ├── SaveButtonService.ts
+│   │   │   │   │   ├── savePopup.tsx
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── sync/
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── tools/
+│   │   │   │   │   ├── compareStrategies/
+│   │   │   │   │   │   ├── CompareStrategiesCtrl.ts
+│   │   │   │   │   │   ├── compareStrategiesPopup.tsx
+│   │   │   │   │   │   ├── CompareStrategiesPopupCtrl.ts
+│   │   │   │   │   │   ├── CompareStrategiesService.ts
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── edit/
+│   │   │   │   │   │   ├── editParameters/
+│   │   │   │   │   │   │   ├── EditParametersCtrl.ts
+│   │   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── editStrategy/
+│   │   │   │   │   │   │   ├── EditStrategyCtrl.ts
+│   │   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── runCa/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   ├── RunCaCtrl.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── select/
+│   │   │   │   │   │   ├── failed/
+│   │   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── passed/
+│   │   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   │   ├── DatabankSelectService.ts
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── setNote/
+│   │   │   │   │   │   ├── module.ts
+│   │   │   │   │   │   ├── setNote.tsx
+│   │   │   │   │   │   ├── SetNoteCtrl.ts
+│   │   │   │   │   │   ├── SetNotePopupCtrl.ts
+│   │   │   │   │   │   └── source-map.json
+│   │   │   │   │   ├── module.ts
+│   │   │   │   │   └── source-map.json
+│   │   │   │   ├── DatabankActionsService.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   └── source-map.json
+│   │   │   ├── ResultsDatabankViews/
+│   │   │   │   ├── databankViews.tsx
+│   │   │   │   ├── DatabankViewsCtrl.ts
+│   │   │   │   ├── DatabankViewsService.ts
+│   │   │   │   ├── module.ts
+│   │   │   │   ├── source-map.json
+│   │   │   │   └── styles.css
+│   │   │   ├── fixtures.ts
+│   │   │   └── README.md
+│   │   ├── ResultsChart/
+│   │   │   ├── chart.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   └── source-map.json
+│   │   ├── ResultsEquityChart/
+│   │   │   ├── benchmark/
+│   │   │   │   ├── Benchmark.ts
+│   │   │   │   ├── benchmark.tsx
+│   │   │   │   └── BenchmarkCtrl.ts
+│   │   │   ├── equityChart.tsx
+│   │   │   ├── EquityChartCtrl.ts
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── ResultsOverview/
+│   │   │   ├── module.ts
+│   │   │   ├── overview.tsx
+│   │   │   ├── README.md
+│   │   │   ├── ResultsOverviewCtrl.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── ResultsPortfolioCorrelation/
+│   │   │   ├── tabs/
+│   │   │   │   └── correlationMatrix/
+│   │   │   │       └── correlationMatrix.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── portfolioCorrelation.tsx
+│   │   │   ├── PortfolioCorrelationCtrl.ts
+│   │   │   ├── README.md
+│   │   │   └── source-map.json
+│   │   ├── ResultsProfileChart/
+│   │   │   ├── module.ts
+│   │   │   ├── profileChart.tsx
+│   │   │   ├── ProfileChartCtrl.ts
+│   │   │   ├── README.md
+│   │   │   └── source-map.json
+│   │   ├── ResultsRobustnessTests/
+│   │   │   ├── directives/
+│   │   │   │   └── robustnessAnalysis/
+│   │   │   │       └── robustnessAnalysis.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── robustnessTests.tsx
+│   │   │   ├── RobustnessTestsResultsCtrl.ts
+│   │   │   └── source-map.json
+│   │   ├── ResultsSourceCode/
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── source-map.json
+│   │   │   ├── sourceCode.tsx
+│   │   │   ├── SourceCodeCtrl.ts
+│   │   │   └── styles.css
+│   │   ├── ResultsSPOverview/
+│   │   │   ├── directives/
+│   │   │   │   └── spOverviewStats/
+│   │   │   │       └── spOverviewStats.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── source-map.json
+│   │   │   ├── spOverview.tsx
+│   │   │   ├── SPOverviewCtrl.ts
+│   │   │   └── styles.css
+│   │   ├── ResultsStockpicker/
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── source-map.json
+│   │   │   └── stockpicker.tsx
+│   │   ├── ResultsStrategyConfig/
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── source-map.json
+│   │   │   ├── strategyconfig.tsx
+│   │   │   └── styles.css
+│   │   ├── ResultsTradeAnalysis/
+│   │   │   ├── controllers/
+│   │   │   │   └── TradeAnalysisCtrl.ts
+│   │   │   ├── directives/
+│   │   │   │   └── tradeAnalysisPanel.tsx
+│   │   │   ├── styles/
+│   │   │   │   └── TradeAnalysis.css
+│   │   │   ├── views/
+│   │   │   │   └── tradeAnalysis.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   └── source-map.json
+│   │   ├── ResultsTradeList/
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── ResultsTradelistCtrl.ts
+│   │   │   ├── source-map.json
+│   │   │   ├── style.css
+│   │   │   └── tradeList.tsx
+│   │   ├── ResultsTradelistViews/
+│   │   │   ├── module.ts
+│   │   │   ├── README.md
+│   │   │   ├── source-map.json
+│   │   │   ├── tradelistViews.tsx
+│   │   │   └── TradelistViewsCtrl.ts
+│   │   ├── views/
+│   │   │   ├── PortfolioCorrelationView.tsx
+│   │   │   ├── TradeAnalysisView.tsx
+│   │   │   └── TradesOnChartView.tsx
+│   │   ├── EquityChart.tsx
+│   │   └── ResultsWorkspace.tsx
+│   ├── retester/
+│   │   ├── SettingsCrossChecks/
+│   │   │   ├── crosscheck/
+│   │   │   │   └── crossCheck.tsx
+│   │   │   ├── crossChecks.tsx
+│   │   │   ├── CrossChecksCtrl.ts
+│   │   │   ├── crossCheckSettingsDialog.tsx
+│   │   │   ├── module.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── README.md
+│   │   ├── retesterClient.ts
+│   │   ├── retesterFixtures.ts
+│   │   ├── RetesterProgress.tsx
+│   │   ├── RetesterSettings.tsx
+│   │   └── RetesterWorkspace.tsx
+│   ├── task_manager/
+│   │   ├── SettingsAdvancedTM/
+│   │   │   ├── addNewExitPopup.tsx
+│   │   │   ├── advancedTM.tsx
+│   │   │   ├── AdvancedTMCtrl.ts
+│   │   │   ├── module.ts
+│   │   │   ├── source-map.json
+│   │   │   └── styles.css
+│   │   ├── fixtures.ts
+│   │   ├── NewTaskModal.tsx
+│   │   └── TaskManagerWorkspace.tsx
+│   └── trading/
+│       ├── TradingDashboard.tsx
+│       └── tradingStore.ts
+├── .prettier.chart.json
+├── eslint.chart.config.mjs
+├── index.html
+├── package-lock.json
+├── package.json
+├── playwright.config.ts
+├── README.md
+├── tsconfig.json
+├── vite.config.ts
+└── vitest.config.ts

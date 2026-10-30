@@ -1,0 +1,170 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ProjectSettings bounded structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings",
+  "target_root": "HARUQUANTAI_ROOT/app/web/workspaces/home/ProjectSettings",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "decision": "DEC-UI-PROJECT-SHELL-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-PROJECT-source-mapping",
+      "FR-UI-PROJECT-workflow-preservation",
+      "FR-UI-PROJECT-clean-room"
+    ],
+    "domain": "plugins/project",
+    "feature": "FEAT-UI-PROJECT_WORKBENCH"
+  },
+  "clean_room": {
+    "contains_personal_data": false,
+    "contains_proprietary_source": false,
+    "contains_sensitive_data": false,
+    "paraphrased_behavior_only": true
+  },
+  "source_catalog": [
+    {
+      "family": "bounded installed frontend plugin artifacts",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings",
+      "id": "sqx-projectsettings-ui"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/module.js",
+      "relative_path": "module.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "f86dd97766d3b6c0bd61ccfd08e0e6b9850d25b5df6ffba08f66b29e5d86c8e8",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsCtrl.js",
+      "relative_path": "SettingsCtrl.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "58b656d3427baf90647f1346fbdc936c767f6606844c08b6306d9183efd8529d",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Donor simple-task/event/config lifecycle has no exact shared advanced-settings controller counterpart. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/SettingsService.js",
+      "relative_path": "SettingsService.js",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "d9ebf5df72e911056ec1d9ea6b255a0aec4d4485a4b659888624ab5651f6e420",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend/live transport or runtime service has no existing frontend counterpart; retained preview utilities are not a transport implementation. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/styles.css",
+      "relative_path": "styles.css",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "artifact explicitly excluded from counterpart count",
+      "access_date": "2026-10-06",
+      "sha256": "df64f057b4d9a92d6cf2f49bb24e6ee853ff7168f3dfdae49bcced9e061a56d9",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Existing settings selectors are shared with Builder FullSettingsView; retained coordinator-owned host styles. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-projectsettings-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ProjectSettings/views/settings.html",
+      "relative_path": "views/settings.html",
+      "location": "whole-file structural identity",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "independently authored target structural counterpart",
+      "access_date": "2026-10-06",
+      "sha256": "71536692ecdd30e9fed5705f025469f72012ba861e4781a2088b2374f6bf1716",
+      "target": "views/settings.tsx",
+      "classification": "counterpart",
+      "limitation": "Existing independently authored React presentation only; filename/responsibility identity does not establish SQX runtime parity. Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Bounded structural manifest; not behavioral ledger"
+    },
+    {
+      "path": "README.md",
+      "reason": "Coordinator-owned scope ownership/limitations documentation"
+    }
+  ],
+  "retained_support": [
+    {
+      "locator": "HARUQUANTAI_ROOT/app/web/common/project/contracts.ts",
+      "reason": "Shared explicit typed presentation contracts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/app/web/common/project/ProjectFrame.tsx",
+      "reason": "Shared project panel frame has no exact donor-family counterpart"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/app/web/common/project/ProjectModal.tsx",
+      "reason": "Shared modal focus/Escape implementation"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/app/web/common/project/projectFixtures.ts",
+      "reason": "Independent bounded local preview clock retained"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/app/web/common/project/results/ResultsCharts.tsx",
+      "reason": "Shared independently authored synthetic charts"
+    },
+    {
+      "locator": "HARUQUANTAI_ROOT/app/web/shell/styles.css",
+      "reason": "Shared coordinator-owned settings/workspace rules retained"
+    }
+  ],
+  "limitations": [
+    "No backend, database mutation, live engine capability, new route or SQX parity claim.",
+    "Canonical reimplementation ledger/schema absent; structural manifest is not behavioral evidence.",
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00"
+}

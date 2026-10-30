@@ -1,0 +1,20 @@
+import { projectFiles } from "./projectFiles";
+import { describe, expect, it } from 'vitest';
+import { validateSourceMapping, type SourceMapping, type MappingScope } from '../../workspace/results/databank/sourceMappingValidation';
+import registry from '../../../common/project/registry.md?raw';
+const root = "project/";
+const rawFiles = projectFiles;
+const scopes: MappingScope[] = [{"css":1,"allowFrontendExclusions":true,"plugin":"SettingsData","excluded":3,"html":1,"js":2,"domain":"project"}];
+describe('project bounded structural inventories', () => {
+  for (const scope of scopes) it(scope.plugin, () => {
+    const prefix = root + scope.plugin + '/';
+    const mapping = JSON.parse(rawFiles[prefix + 'source-map.json']) as SourceMapping;
+    const childRoots = Object.keys(rawFiles).filter(path => path.startsWith(prefix) && path.endsWith('/source-map.json') && path !== prefix + 'source-map.json').map(path => path.slice(0, -'source-map.json'.length));
+    const files = Object.keys(rawFiles).filter(path => path.startsWith(prefix) && !childRoots.some(child => path.startsWith(child))).map(path => path.slice(prefix.length));
+    expect(validateSourceMapping(mapping, files, registry, scope)).toEqual([]);
+    const drift = structuredClone(mapping);
+    drift.sources[0].sha256 = 'invalid';
+    expect(validateSourceMapping(drift, files, registry, scope)).toContain('Invalid fingerprint');
+    expect(validateSourceMapping(mapping, [...files, 'unclassified.ts'], registry, scope)).toContain('Unclassified target file: unclassified.ts');
+  });
+});

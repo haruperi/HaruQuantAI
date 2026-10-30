@@ -1,4 +1,8 @@
 # AppResults — executable work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+
 
 ```mermaid
 classDiagram
@@ -250,7 +254,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/app_results.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/results/test_app_results.py`.
-- **Frontend tests:** `app/web/tests/results/AppResults.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/AppResults.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppResults/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `project/getDataItems`
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
@@ -267,7 +271,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/custom_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomDatabankActions.tsx`.
 - **Backend tests:** `tests/workspace/results/test_custom_databank_actions.py`.
-- **Frontend tests:** `app/web/tests/results/CustomDatabankActions.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/CustomDatabankActions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveLeft/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveRight/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveToPosition/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
@@ -284,7 +288,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/custom_results_plugin_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomResultsPluginActions.tsx`.
 - **Backend tests:** `tests/workspace/results/test_custom_results_plugin_actions.py`.
-- **Frontend tests:** `app/web/tests/results/CustomResultsPluginActions.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/CustomResultsPluginActions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/rename/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
@@ -301,7 +305,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/databank_filter_by_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankFilterByCorrelation.tsx`.
 - **Backend tests:** `tests/workspace/results/test_databank_filter_by_correlation.py`.
-- **Frontend tests:** `app/web/tests/results/DatabankFilterByCorrelation.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/DatabankFilterByCorrelation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
@@ -318,7 +322,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/databank_rename.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankRename.tsx`.
 - **Backend tests:** `tests/workspace/results/test_databank_rename.py`.
-- **Frontend tests:** `app/web/tests/results/DatabankRename.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/DatabankRename.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/databank/rename`
 *Exact unresolved contract:* Conflict/collision behavior and transaction semantics of the shared databank store are not yet pinned; source per-item log-and-continue behavior must be reconciled with the target receipt/error contract.
@@ -335,7 +339,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/equity_chart_benchmark.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartBenchmark.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_benchmark.py`.
-- **Frontend tests:** `app/web/tests/results/EquityChartBenchmark.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/EquityChartBenchmark.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/Benchmark/Benchmark.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -352,7 +356,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/equity_chart_daily_chart.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDailyChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_daily_chart.py`.
-- **Frontend tests:** `app/web/tests/results/EquityChartDailyChart.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/EquityChartDailyChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart/DailyChart/DailyChart.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -369,7 +373,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/equity_chart_drawdown.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDrawdown.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_drawdown.py`.
-- **Frontend tests:** `app/web/tests/results/EquityChartDrawdown.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/EquityChartDrawdown.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown/Drawdown/EquityChartDrawdown.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -386,7 +390,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/equity_chart_volatility.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolatility.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_volatility.py`.
-- **Frontend tests:** `app/web/tests/results/EquityChartVolatility.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/EquityChartVolatility.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility/Volatility/Volatility.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -403,7 +407,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/equity_chart_volume.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolume.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_volume.py`.
-- **Frontend tests:** `app/web/tests/results/EquityChartVolume.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/EquityChartVolume.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume/Volume/EquityChartVolume.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -420,7 +424,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/loader_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ3.tsx`.
 - **Backend tests:** `tests/workspace/results/test_loader_s_q3.py`.
-- **Frontend tests:** `app/web/tests/results/LoaderSQ3.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/LoaderSQ3.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
@@ -437,7 +441,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/loader_s_q4.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ4.tsx`.
 - **Backend tests:** `tests/workspace/results/test_loader_s_q4.py`.
-- **Frontend tests:** `app/web/tests/results/LoaderSQ4.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/LoaderSQ4.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4/SQ4/SQ4LoaderPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
@@ -454,7 +458,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_chart.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsChart.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsCharts/cancelLoading` `resultsCharts/loadChartData`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -471,7 +475,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankActions.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_databank_actions.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsDatabankActions.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsDatabankActions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsDatabankActions/getStrategyXml` `/instruments/addAlias` `/instruments/addInstrument` `/project/instrumentSelected` `project/retest` `resultsDatabankActions/exportDatabankToCSV` `project/saveReports` `project/saveSingleFileJava` `dirs/setLastFolderUsed` `project/synchronizeDatabank` `project/setDatabankSynchronization` `resultsDatabankActions/compareStrategies` `resultsDatabankActions/getStrategyParameters` `resultsDatabankActions/setStrategyParameters`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -488,7 +492,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_databank_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankViews.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_databank_views.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsDatabankViews.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsDatabankViews.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/dbviews/removeView` `/dbviews/addView` `/dbviews/updateView` `/dbviews/changeView`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -505,7 +509,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_equity_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsEquityChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_equity_chart.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsEquityChart.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsEquityChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/main/openlink` `equitychart/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -522,7 +526,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_explore.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsExplore.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_explore.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsExplore.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsExplore.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `explore/info`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -539,7 +543,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsOverview.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_overview.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsOverview.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsOverview.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -556,7 +560,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_plugins.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPlugins.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_plugins.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsPlugins.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsPlugins.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/ResultsPluginsService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsPlugins/list` `resultsPlugins/create` `resultsPlugins/rename` `resultsPlugins/delete` `resultsPlugins/stats` `resultsPlugins/orders` `resultsPlugins/settings` `sourcecode/print` `resultsPlugins/databankStrategies` `resultsPlugins/strategyStats` `resultsPlugins/strategyOrders` `resultsPlugins/strategyResultKeys` `resultsPlugins/candles` `resultsPlugins/dataSymbols` `sqai/complete`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -573,7 +577,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_portfolio_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPortfolioCorrelation.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_portfolio_correlation.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsPortfolioCorrelation.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsPortfolioCorrelation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocorrelation/compute` `portfoliocorrelation/stop` `portfoliocorrelation/correlationSave`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -590,7 +594,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_profile_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsProfileChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_profile_chart.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsProfileChart.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsProfileChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `profilechart/paths`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -607,7 +611,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_report.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsReport.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_report.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsReport.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsReport.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -624,7 +628,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_source_code.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSourceCode.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_source_code.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsSourceCode.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsSourceCode.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sourcecode/print` `sourcecode/getDataPath` `sourcecode/saveMTPaths` `sourcecode/saveEA` `sourcecode/saveWFCalendar`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -641,7 +645,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_s_p_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSPOverview.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_s_p_overview.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsSPOverview.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsSPOverview.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `spoverview/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -658,7 +662,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_stockpicker.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStockpicker.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_stockpicker.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsStockpicker.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsStockpicker.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `stockpicker/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -675,7 +679,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_strategy_config.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStrategyConfig.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_strategy_config.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsStrategyConfig.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsStrategyConfig.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `strategyconfig/print` `strategyconfig/loadStrategySettings`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -692,7 +696,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_trade_analysis.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeAnalysis.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_trade_analysis.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsTradeAnalysis.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsTradeAnalysis.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `tradeanalysis/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -709,7 +713,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_trade_list.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeList.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_trade_list.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsTradeList.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsTradeList.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -726,7 +730,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/results_tradelist_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradelistViews.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_tradelist_views.py`.
-- **Frontend tests:** `app/web/tests/results/ResultsTradelistViews.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ResultsTradelistViews.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/tradelistviews/removeView` `/tradelistviews/addView` `/tradelistviews/updateView` `/tradelistviews/changeView`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -743,7 +747,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/saver_h_t_m_l.py`.
 - **Frontend:** `app/web/workspaces/results/SaverHTML.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_h_t_m_l.py`.
-- **Frontend tests:** `app/web/tests/results/SaverHTML.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/SaverHTML.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML/HTML/HTMLReportPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
@@ -760,7 +764,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/saver_p_d_f.py`.
 - **Frontend:** `app/web/workspaces/results/SaverPDF.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_p_d_f.py`.
-- **Frontend tests:** `app/web/tests/results/SaverPDF.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/SaverPDF.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF/PDF/PDFReportPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
@@ -777,7 +781,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/saver_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/SaverSQ3.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_s_q3.py`.
-- **Frontend tests:** `app/web/tests/results/SaverSQ3.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/SaverSQ3.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
@@ -794,7 +798,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/saver_strategy_trades.py`.
 - **Frontend:** `app/web/workspaces/results/SaverStrategyTrades.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_strategy_trades.py`.
-- **Frontend tests:** `app/web/tests/results/SaverStrategyTrades.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/SaverStrategyTrades.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades/StrategyTrades/StrategyTradesSaverPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
@@ -811,7 +815,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/results/servlet_rename_tool.py`.
 - **Frontend:** `app/web/workspaces/results/ServletRenameTool.tsx`.
 - **Backend tests:** `tests/workspace/results/test_servlet_rename_tool.py`.
-- **Frontend tests:** `app/web/tests/results/ServletRenameTool.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/results/ServletRenameTool.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Conflict/collision behavior and transaction semantics of the shared databank store are not yet pinned; source per-item log-and-continue behavior must be reconciled with the target receipt/error contract.

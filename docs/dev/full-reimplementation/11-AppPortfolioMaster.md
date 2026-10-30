@@ -1,4 +1,8 @@
 # AppPortfolioMaster — executable work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+
 
 ```mermaid
 classDiagram
@@ -121,7 +125,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/portfolio_master/app_portfolio_master.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/PortfolioMasterWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_master/test_app_portfolio_master.py`.
-- **Frontend tests:** `app/web/tests/portfolio_master/AppPortfolioMaster.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/portfolio_master/AppPortfolioMaster.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`.
 *Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
@@ -138,7 +142,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/portfolio_master/fitness_method_existing_portfolio.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/FitnessMethodExistingPortfolio.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_master/test_fitness_method_existing_portfolio.py`.
-- **Frontend tests:** `app/web/tests/portfolio_master/FitnessMethodExistingPortfolio.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/portfolio_master/FitnessMethodExistingPortfolio.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/module.js`.
 *Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `fitnessExistingPortfolio/list`
 *Exact unresolved contract:* Exact metric expression, value-type mapping, weight normalization, missing-value policy and independently computed expected scores are not locked.

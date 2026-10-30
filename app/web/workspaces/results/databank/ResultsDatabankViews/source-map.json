@@ -1,0 +1,156 @@
+{
+  "schema_version": 1,
+  "scope": "Frontend-only ResultsDatabankViews structural traceability",
+  "donor_root": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews",
+  "target_root": "HARUQUANTAI_ROOT/app/web/workspaces/results/databank/ResultsDatabankViews",
+  "source_head": "01067f00031428613c6394064ca1bcadc1ba00ee",
+  "review": {
+    "reference": "HARUQUANTAI_ROOT/.agents/logs/20261006_184755Z_sqx145-only-migration/implementation-plan.md",
+    "state": "owner-approved-plan",
+    "version": 1
+  },
+  "owner": {
+    "domain": "plugins/databank",
+    "feature": "FEAT-UI-DATABANK_BUILDER",
+    "decision": "DEC-UI-DATABANK-VIEWS-STRUCTURAL-OWNERSHIP",
+    "requirements": [
+      "FR-UI-DATABANK-source-mapping",
+      "FR-UI-DATABANK-workflow-preservation",
+      "FR-UI-DATABANK-clean-room"
+    ]
+  },
+  "clean_room": {
+    "paraphrased_behavior_only": true,
+    "contains_personal_data": false,
+    "contains_sensitive_data": false,
+    "contains_proprietary_source": false
+  },
+  "source_catalog": [
+    {
+      "id": "sqx-resultsdatabankviews-ui",
+      "locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews",
+      "family": "installed plugin artifacts"
+    }
+  ],
+  "sources": [
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/databankViews.html",
+      "relative_path": "databankViews.html",
+      "location": "lines 1-2; plugin responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "61ced83556d9e6c51e24f6e534b3420f8a559b5bf80c7920613f1f1a4de9ca5c",
+      "target": "databankViews.tsx",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsCtrl.js",
+      "relative_path": "DatabankViewsCtrl.js",
+      "location": "lines 1-77; plugin responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "266afbf7a9bbbc0ba4663bf5a5c65d7f17a53e8ebb43d272e0366c64f4d8d799",
+      "target": "DatabankViewsCtrl.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js",
+      "relative_path": "DatabankViewsService.js",
+      "location": "lines 1-131; plugin responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "96c0f1b1e2bf6d88b814755aa09c634f8c26212db39b1b87b3fddb0c520109be",
+      "target": "DatabankViewsService.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js",
+      "relative_path": "module.js",
+      "location": "lines 1-87; plugin responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "ccdc3ea846558cb9796da3f5996cc58cb8fc274c0a4674067d6eecad1972a693",
+      "target": "module.ts",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/ResultsDatabankViews.jar",
+      "relative_path": "ResultsDatabankViews.jar",
+      "location": "whole archive; inventory only",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "excluded backend binary",
+      "access_date": "2026-10-06",
+      "sha256": "9417855649b74f0f06bd6756e06094edc6672442de5f49db062c9ec849cc56e1",
+      "target": null,
+      "classification": "excluded",
+      "limitation": "Backend excluded; no runtime inspection Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    },
+    {
+      "catalog_id": "sqx-resultsdatabankviews-ui",
+      "artifact_locator": "SQX_145_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/styles.css",
+      "relative_path": "styles.css",
+      "location": "lines 1-94; plugin responsibility boundary",
+      "inspection_method": "current local inventory, SHA-256 and scoped structural reinspection",
+      "relation": "structural counterpart adapted from independently written target code",
+      "access_date": "2026-10-06",
+      "sha256": "035db719484fc5e27d886b3860661086ac34302b0b33af8bc200868078563680",
+      "target": "styles.css",
+      "classification": "counterpart",
+      "limitation": "Structural mapping only; shared directive, XML/backend and advanced settings not qualified Current source identity is revalidated; target backend/behavioral equivalence remains unverified.",
+      "reinspection": {
+        "reference_cohort": "145-dev1",
+        "captured_at": "2026-10-06T19:04:15.848666+00:00",
+        "scope": "current artifact identity; behavioral equivalence unverified"
+      }
+    }
+  ],
+  "target_only": [
+    {
+      "path": "source-map.json",
+      "reason": "Structural provenance manifest; not behavioral ledger"
+    }
+  ],
+  "reference_cohort": "145-dev1",
+  "provenance_captured_at": "2026-10-06T19:04:15.848666+00:00",
+  "limitations": [
+    "Current source fingerprints do not establish connected backend functionality or runtime parity."
+  ]
+}

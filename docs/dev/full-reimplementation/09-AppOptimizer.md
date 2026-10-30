@@ -1,4 +1,8 @@
 # AppOptimizer — executable work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+
 
 ```mermaid
 classDiagram
@@ -142,7 +146,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/app_optimizer.py`.
 - **Frontend:** `app/web/workspaces/optimizer/OptimizerWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_app_optimizer.py`.
-- **Frontend tests:** `app/web/tests/optimizer/AppOptimizer.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/AppOptimizer.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer/module.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
@@ -159,7 +163,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/fitness_method_w_f_result.py`.
 - **Frontend:** `app/web/workspaces/optimizer/FitnessMethodWFResult.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_fitness_method_w_f_result.py`.
-- **Frontend tests:** `app/web/tests/optimizer/FitnessMethodWFResult.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/FitnessMethodWFResult.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult/WFResult/FitnessMethodWFResult.java`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact metric expression, value-type mapping, weight normalization, missing-value policy and independently computed expected scores are not locked.
@@ -176,7 +180,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/results_optimization_profile.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsOptimizationProfile.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_optimization_profile.py`.
-- **Frontend tests:** `app/web/tests/optimizer/ResultsOptimizationProfile.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsOptimizationProfile.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `optimprof/viewsGetViews` `optimprof/viewsRemoveView` `optimprof/viewsAddView` `optimprof/viewsUpdateView` `optimprof/print` `optimprof/getAvailableParams` `optimprof/printChart` `optimprof/printResults` `optimprof/export`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -193,7 +197,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/results_sequential_optimization.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsSequentialOptimization.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_sequential_optimization.py`.
-- **Frontend tests:** `app/web/tests/optimizer/ResultsSequentialOptimization.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsSequentialOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/module.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sequentialoptimization/applyParams` `sequentialoptimization/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -210,7 +214,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/results_sys_param_permutation.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsSysParamPermutation.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_sys_param_permutation.py`.
-- **Frontend tests:** `app/web/tests/optimizer/ResultsSysParamPermutation.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsSysParamPermutation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/services/SysParamPermutationService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sysParamPermutation/print` `sysParamPermutation/printTable`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -227,7 +231,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/results_walk_forward.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsWalkForward.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_walk_forward.py`.
-- **Frontend tests:** `app/web/tests/optimizer/ResultsWalkForward.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsWalkForward.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/directives/manageviews/ManageViewsServiceWF.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/WFResultsService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `walkforward/viewsGetViews` `walkforward/viewsRemoveView` `walkforward/viewsAddView` `walkforward/viewsUpdateView` `/main/openlink` `walkforward/print` `walkforward/getConditions` `walkforward/printTable` `resultsDatabankActions/setStrategyParameters` `walkforward/export`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -244,7 +248,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/settings_optimization.py`.
 - **Frontend:** `app/web/workspaces/optimizer/SettingsOptimization.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_settings_optimization.py`.
-- **Frontend tests:** `app/web/tests/optimizer/SettingsOptimization.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/SettingsOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `main/checkFileExists` `optimization/loadStrategyToOptimize` `optimization/getNumberOfTests`
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -261,7 +265,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/optimizer/task_optimize.py`.
 - **Frontend:** `app/web/workspaces/optimizer/TaskOptimize.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_task_optimize.py`.
-- **Frontend tests:** `app/web/tests/optimizer/TaskOptimize.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/optimizer/TaskOptimize.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize/module.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.

@@ -1,4 +1,9 @@
 # AppHome - shell and shared-panel work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+> Current shell state/navigation files are `router.tsx` and `store.ts`, with navigation in App; preserve them rather than creating replacement navigation state.
+
 
 ```mermaid
 classDiagram
@@ -39,8 +44,8 @@ classDiagram
 |---|---|---|
 | ui/app/host/App.tsx | app/web/shell/App.tsx | REORGANIZE (UI): Desktop app layout, header bar, active workspace view router, and modal host |
 | ui/app/host/branding.ts | app/web/shell/branding.ts | DIRECT FIT: Application branding, titles, and product metadata |
-| ui/app/host/navigation.ts | app/web/shell/navigation.ts | ADAPT: Top navigation bar and sidebar catalog matching SQX workspace routes |
-| ui/app/host/navigationState.ts | app/web/shell/navigationState.ts | DIRECT FIT: Tab and active workspace navigation state machine |
+| ui/app/host/router.tsx | app/web/shell/router.tsx | MIGRATED: Preserve current routes and navigation synchronization; visible navigation remains in App.tsx |
+| ui/app/host/store.ts | app/web/shell/store.ts | MIGRATED: Preserve current Zustand state, persisted IDs and browser storage schema |
 | ui/app/host/HostConnection.tsx | app/web/shell/HostConnection.tsx | DIRECT FIT: Server connection status indicator |
 | ui/app/host/HostConnectionModal.tsx | app/web/shell/HostConnectionModal.tsx | DIRECT FIT: Host connection settings dialog |
 | ui/app/host/HostSettingsModal.tsx | app/web/shell/HostSettingsModal.tsx | DIRECT FIT: Global system settings dialog |

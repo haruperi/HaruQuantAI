@@ -1,4 +1,8 @@
 # AppPortfolioComposer — executable work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+
 
 ```mermaid
 classDiagram
@@ -158,7 +162,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/portfolio_composer/app_portfolio_composer.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/PortfolioComposerWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_app_portfolio_composer.py`.
-- **Frontend tests:** `app/web/tests/portfolio_composer/AppPortfolioComposer.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/portfolio_composer/AppPortfolioComposer.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/module.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
@@ -175,7 +179,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/portfolio_composer/portfolio_composer.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/PortfolioComposer.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_portfolio_composer.py`.
-- **Frontend tests:** `app/web/tests/portfolio_composer/PortfolioComposer.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/portfolio_composer/PortfolioComposer.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/portfoliocomposer/addBuyHoldStrategy` `/portfoliocomposer/recompute` `/portfoliocomposer/stop` `/portfoliocomposer/loadFiles` `/project/saveReports` `/portfoliocomposer/savePortfolio` `/portfoliocomposer/loadGridData` `/portfoliocomposer/removeAllReports` `/portfoliocomposer/removeReports`
 *Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
@@ -192,7 +196,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/portfolio_composer/results_portfolio_composer_chart.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerChart.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_results_portfolio_composer_chart.py`.
-- **Frontend tests:** `app/web/tests/portfolio_composer/ResultsPortfolioComposerChart.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/portfolio_composer/ResultsPortfolioComposerChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/PortfolioComposerChartService.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocomposerchart/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -209,7 +213,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/portfolio_composer/results_portfolio_composer_log.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerLog.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_results_portfolio_composer_log.py`.
-- **Frontend tests:** `app/web/tests/portfolio_composer/ResultsPortfolioComposerLog.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/portfolio_composer/ResultsPortfolioComposerLog.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/PortfolioComposerLogService.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocomposerlog/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.

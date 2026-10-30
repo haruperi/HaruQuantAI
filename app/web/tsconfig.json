@@ -1,20 +1,38 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "useDefineForClassFields": true,
+    "lib": [
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
+    ],
+    "allowJs": false,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": true,
     "jsx": "react-jsx",
-    "strict": true,
-    "skipLibCheck": true,
-    "noEmit": true
+    "types": [
+      "vite/client"
+    ]
   },
   "include": [
     "shell",
     "common",
     "workspaces",
     "tests",
+    "vite.config.ts",
     "vitest.config.ts",
-    "vite.config.ts"
+    "playwright.config.ts"
+  ],
+  "exclude": [
+    "tests/e2e"
   ]
 }

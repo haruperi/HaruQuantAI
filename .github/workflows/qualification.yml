@@ -13,13 +13,16 @@ jobs:
         with:
           node-version: '22'
           cache: npm
-          cache-dependency-path: app/ui/package-lock.json
+          cache-dependency-path: app/web/package-lock.json
       - run: uv sync --locked
-      - run: npm --prefix app/ui ci
-      - run: node app/ui/node_modules/@playwright/test/cli.js install chrome
-      - run: uv run python scripts/release_check.py --report .agents/logs/ci-release/report.json
+      - run: npm --prefix app/web ci
+      - run: node app/web/node_modules/@playwright/test/cli.js install chrome
+      - run: uv run python scripts/ci_check.py 2>&1 | Tee-Object -FilePath qualification.log
+      - run: npm --prefix app/web run test:ui -- ui-migration-parity.spec.ts --grep "saved Builder|shell geometry" --workers=1 --timeout=60000
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: release-qualification-evidence
-          path: .agents/logs/ci-release/
+          path: |
+            qualification.log
+            app/web/test-results/

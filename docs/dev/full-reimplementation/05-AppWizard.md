@@ -1,4 +1,9 @@
 # AppWizard — Visual Strategy Authoring and Export
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+> Use `app/web/workspaces/algo_wizard` and `tests/workspace/algo_wizard` for both existing and future Wizard UI; retain `/algowizard`.
+
 
 ```mermaid
 classDiagram
@@ -65,8 +70,8 @@ efactor(wizard): migrate algowizard workspace and rule models.
 *Context to Read:* `app/web/package.json`, `app/web/vitest.config.ts`, `DONOR_REFERENCE_ROOT/internal/web/AlgoWizard/assets` (resource folder; originally named `index-C12ZW4O3.js.map` is not present) sources entry `../../../src/helpers/strategyName.ts`. Read sourcesContent for that exact source key; do not copy its text to the repository or port unrelated store code.
 
 *Implementation Files:*
-- **Frontend create:** `app/web/workspaces/wizard/strategy_names.ts`.
-- **Frontend test create:** `app/web/tests/workspace/wizard/strategy_names.test.ts`.
+- **Frontend create:** `app/web/workspaces/algo_wizard/strategy_names.ts`.
+- **Frontend test create:** `app/web/tests/workspace/algo_wizard/strategy_names.test.ts`.
 - **Backend:** none in this commit. The helper proposes display names; it does not grant persistence uniqueness or change core IDs.
 
 *Functional Requirements & Implementation:*
@@ -94,7 +99,7 @@ efactor(wizard): migrate algowizard workspace and rule models.
 
 Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cases. Suffix conversion uses Number.parseInt(text,10) and JavaScript Number addition, not BigInt. A suffix that parses as Infinity therefore yields the string `A (Infinity)` for base A; do not add a safe-integer rejection to this display helper. A later public persistence API requires a separate accepted name-validation contract.
 
-*Verification:* `npm --prefix app/web test -- tests/workspace/wizard/strategy_names.test.ts` exits 0. Commit only the two named files. No API endpoint, store migration, core strategy ID change or backend name-allocation service belongs in this commit.
+*Verification:* `npm --prefix app/web test -- tests/workspace/algo_wizard/strategy_names.test.ts` exits 0. Commit only the two named files. No API endpoint, store migration, core strategy ID change or backend name-allocation service belongs in this commit.
 
 
 ## Phase 05.9: Full workspace feature orders — evidence-gated contracts
@@ -109,14 +114,14 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspace/wizard/workspace.py` → `WizardService`.
 - **Request/result models:** `app/workspace/wizard/workspace_models.py`.
-- **Frontend:** `app/web/workspaces/wizard/WizardWorkspace.tsx`.
-- **Backend test:** `tests/workspace/wizard/test_workspace.py`.
-- **Frontend test:** `app/web/tests/workspace/wizard/WizardWorkspace.test.tsx`.
+- **Frontend:** `app/web/workspaces/algo_wizard/WizardWorkspace.tsx`.
+- **Backend test:** `tests/workspace/algo_wizard/test_workspace.py`.
+- **Frontend test:** `app/web/tests/workspace/algo_wizard/WizardWorkspace.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/AppWizard/Wizard/WizardAppPlugin.java`.
 - **Observed actions:** `/AlgoWizard/examples/examples.json`; `/algowizard/loadExample`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `WizardService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/wizard/test_workspace.py -q`; `npm --prefix app/web test -- tests/workspace/wizard/WizardWorkspace.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/algo_wizard/test_workspace.py -q`; `npm --prefix app/web test -- tests/workspace/algo_wizard/WizardWorkspace.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletAlgoCloud`
@@ -129,14 +134,14 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspace/wizard/cloud_export.py` → `CloudExportService`.
 - **Request/result models:** `app/workspace/wizard/cloud_export_models.py`.
-- **Frontend:** `app/web/workspaces/wizard/CloudExportPanel.tsx`.
-- **Backend test:** `tests/workspace/wizard/test_cloud_export.py`.
-- **Frontend test:** `app/web/tests/workspace/wizard/CloudExportPanel.test.tsx`.
+- **Frontend:** `app/web/workspaces/algo_wizard/CloudExportPanel.tsx`.
+- **Backend test:** `tests/workspace/algo_wizard/test_cloud_export.py`.
+- **Frontend test:** `app/web/tests/workspace/algo_wizard/CloudExportPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoCloud`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `CloudExportService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/wizard/test_cloud_export.py -q`; `npm --prefix app/web test -- tests/workspace/wizard/CloudExportPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/algo_wizard/test_cloud_export.py -q`; `npm --prefix app/web test -- tests/workspace/algo_wizard/CloudExportPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletAlgoWizard`
@@ -149,14 +154,14 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspace/wizard/visual_blocks.py` → `VisualBlockService`.
 - **Request/result models:** `app/workspace/wizard/visual_blocks_models.py`.
-- **Frontend:** `app/web/workspaces/wizard/VisualBlockPanel.tsx`.
-- **Backend test:** `tests/workspace/wizard/test_visual_blocks.py`.
-- **Frontend test:** `app/web/tests/workspace/wizard/VisualBlockPanel.test.tsx`.
+- **Frontend:** `app/web/workspaces/algo_wizard/VisualBlockPanel.tsx`.
+- **Backend test:** `tests/workspace/algo_wizard/test_visual_blocks.py`.
+- **Frontend test:** `app/web/tests/workspace/algo_wizard/VisualBlockPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `VisualBlockService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/wizard/test_visual_blocks.py -q`; `npm --prefix app/web test -- tests/workspace/wizard/VisualBlockPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/algo_wizard/test_visual_blocks.py -q`; `npm --prefix app/web test -- tests/workspace/algo_wizard/VisualBlockPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletConstants`
@@ -169,14 +174,14 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspace/wizard/catalogue.py` → `WizardCatalogueService`.
 - **Request/result models:** `app/workspace/wizard/catalogue_models.py`.
-- **Frontend:** `app/web/workspaces/wizard/WizardCataloguePanel.tsx`.
-- **Backend test:** `tests/workspace/wizard/test_catalogue.py`.
-- **Frontend test:** `app/web/tests/workspace/wizard/WizardCataloguePanel.test.tsx`.
+- **Frontend:** `app/web/workspaces/algo_wizard/WizardCataloguePanel.tsx`.
+- **Backend test:** `tests/workspace/algo_wizard/test_catalogue.py`.
+- **Frontend test:** `app/web/tests/workspace/algo_wizard/WizardCataloguePanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletConstants`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `WizardCatalogueService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/wizard/test_catalogue.py -q`; `npm --prefix app/web test -- tests/workspace/wizard/WizardCataloguePanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/algo_wizard/test_catalogue.py -q`; `npm --prefix app/web test -- tests/workspace/algo_wizard/WizardCataloguePanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletStrategy`
@@ -189,14 +194,14 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspace/wizard/strategies.py` → `StrategyDocumentService`.
 - **Request/result models:** `app/workspace/wizard/strategies_models.py`.
-- **Frontend:** `app/web/workspaces/wizard/StrategyDocumentPanel.tsx`.
-- **Backend test:** `tests/workspace/wizard/test_strategies.py`.
-- **Frontend test:** `app/web/tests/workspace/wizard/StrategyDocumentPanel.test.tsx`.
+- **Frontend:** `app/web/workspaces/algo_wizard/StrategyDocumentPanel.tsx`.
+- **Backend test:** `tests/workspace/algo_wizard/test_strategies.py`.
+- **Frontend test:** `app/web/tests/workspace/algo_wizard/StrategyDocumentPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletStrategy`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `StrategyDocumentService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/wizard/test_strategies.py -q`; `npm --prefix app/web test -- tests/workspace/wizard/StrategyDocumentPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/algo_wizard/test_strategies.py -q`; `npm --prefix app/web test -- tests/workspace/algo_wizard/StrategyDocumentPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ## Phase 5.10: Complete template coverage

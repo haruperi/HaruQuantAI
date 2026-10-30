@@ -1,4 +1,8 @@
 # AppBuilder — executable work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+
 
 ```mermaid
 classDiagram
@@ -192,7 +196,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/app_builder.py`.
 - **Frontend:** `app/web/workspaces/builder/BuilderWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_app_builder.py`.
-- **Frontend tests:** `app/web/tests/builder/AppBuilder.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/AppBuilder.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
@@ -209,7 +213,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/fitness_method_strategy_result.py`.
 - **Frontend:** `app/web/workspaces/builder/FitnessMethodStrategyResult.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_fitness_method_strategy_result.py`.
-- **Frontend tests:** `app/web/tests/builder/FitnessMethodStrategyResult.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/FitnessMethodStrategyResult.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `fitnessMethodStrategyResult/list`
 *Exact unresolved contract:* Exact metric expression, value-type mapping, weight normalization, missing-value policy and independently computed expected scores are not locked.
@@ -226,7 +230,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/servlet_builder.py`.
 - **Frontend:** `app/web/workspaces/builder/ServletBuilder.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_servlet_builder.py`.
-- **Frontend tests:** `app/web/tests/builder/ServletBuilder.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/ServletBuilder.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.
@@ -243,7 +247,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/settings_blocks.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsBlocks.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_blocks.py`.
-- **Frontend tests:** `app/web/tests/builder/SettingsBlocks.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/SettingsBlocks.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `blocks/list` `blocks/loadFromFile` `blocks/saveToFile`
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -260,7 +264,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/settings_genetic_options.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsGeneticOptions.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_genetic_options.py`.
-- **Frontend tests:** `app/web/tests/builder/SettingsGeneticOptions.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/SettingsGeneticOptions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -277,7 +281,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/settings_parts_to_improve.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsPartsToImprove.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_parts_to_improve.py`.
-- **Frontend tests:** `app/web/tests/builder/SettingsPartsToImprove.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/SettingsPartsToImprove.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -294,7 +298,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/settings_rankings.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsRankings.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_rankings.py`.
-- **Frontend tests:** `app/web/tests/builder/SettingsRankings.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/SettingsRankings.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/FitnessFunction/FitnessFunctionService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rankingsettings/getDefaultWFConditions` `project/changeMaxRecords`
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -311,7 +315,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/settings_what_to_build.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsWhatToBuild.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_what_to_build.py`.
-- **Frontend tests:** `app/web/tests/builder/SettingsWhatToBuild.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/SettingsWhatToBuild.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/BuildModeService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/conditionsAndPeriods/ConditionsAndPeriodsService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `buildType/listFiles` `buildType/getTemplateConfig` `project/checkTemplateResources`
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -328,7 +332,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/builder/task_build.py`.
 - **Frontend:** `app/web/workspaces/builder/TaskBuild.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_task_build.py`.
-- **Frontend tests:** `app/web/tests/builder/TaskBuild.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/builder/TaskBuild.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/BuildTaskService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `indyTester/calibrate`
 *Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.

@@ -1,4 +1,8 @@
 # AppRetester — executable work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+
 
 ```mermaid
 classDiagram
@@ -139,7 +143,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/app_retester.py`.
 - **Frontend:** `app/web/workspaces/retester/RetesterWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_app_retester.py`.
-- **Frontend tests:** `app/web/tests/retester/AppRetester.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/AppRetester.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppRetester/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
@@ -156,7 +160,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_monte_carlo_manipulation.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckMonteCarloManipulation.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_monte_carlo_manipulation.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckMonteCarloManipulation.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckMonteCarloManipulation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/FitnessFunction/MCManipulationFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/MonteCarloManipulationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `monteCarloManipulation/fitnessList` `monteCarloManipulation/fitnessGetConfidenceLevels` `monteCarloManipulation/list`
 *Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
@@ -173,7 +177,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_monte_carlo_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckMonteCarloRetest.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_monte_carlo_retest.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckMonteCarloRetest.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckMonteCarloRetest.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/FitnessFunction/MCRetestFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/MonteCarloRetestService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `monteCarloRetest/fitnessList` `monteCarloRetest/fitnessGetConfidenceLevels` `monteCarloRetest/list`
 *Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
@@ -190,7 +194,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_opt_profile_sys_param_permutation.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckOptProfileSysParamPermutation.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_opt_profile_sys_param_permutation.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckOptProfileSysParamPermutation.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckOptProfileSysParamPermutation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/OptProfileSysParamPermutationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -207,7 +211,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_retest_on_additional_markets.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckRetestOnAdditionalMarkets.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_retest_on_additional_markets.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckRetestOnAdditionalMarkets.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckRetestOnAdditionalMarkets.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/FitnessFunction/PortfolioFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/RetestOnAdditionalMarketsService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `retestOnAdditionalMarkets/list`
 *Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
@@ -224,7 +228,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_retest_with_higher_precision.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckRetestWithHigherPrecision.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_retest_with_higher_precision.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckRetestWithHigherPrecision.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckRetestWithHigherPrecision.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/FitnessFunction/CCHigherPrecisionService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/RetestWithHigherPrecisionService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `retestWithHigherPrecision/list`
 *Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
@@ -241,7 +245,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_sequential_optimization.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckSequentialOptimization.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_sequential_optimization.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckSequentialOptimization.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckSequentialOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/SequentialOptimizationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
@@ -258,7 +262,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_walk_forward_matrix.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWalkForwardMatrix.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_walk_forward_matrix.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckWalkForwardMatrix.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckWalkForwardMatrix.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/WalkForwardMatrixService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -275,7 +279,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_walk_forward_optimization.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWalkForwardOptimization.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_walk_forward_optimization.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckWalkForwardOptimization.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckWalkForwardOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/WalkForwardOptimizationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -292,7 +296,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/cross_check_what_if.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWhatIf.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_what_if.py`.
-- **Frontend tests:** `app/web/tests/retester/CrossCheckWhatIf.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckWhatIf.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/WhatIfService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `whatIf/list`
 *Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
@@ -309,7 +313,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/results_robustness_tests.py`.
 - **Frontend:** `app/web/workspaces/retester/ResultsRobustnessTests.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_results_robustness_tests.py`.
-- **Frontend tests:** `app/web/tests/retester/ResultsRobustnessTests.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/ResultsRobustnessTests.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/services/RTService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rtresults/viewsGetViews` `rtresults/viewsRemoveView` `rtresults/viewsAddView` `rtresults/viewsUpdateView` `rtresults/printChart` `rtresults/printConfLevels` `rtresults/getMethods`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
@@ -326,7 +330,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/settings_auto_retest_data.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsAutoRetestData.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_settings_auto_retest_data.py`.
-- **Frontend tests:** `app/web/tests/retester/SettingsAutoRetestData.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/SettingsAutoRetestData.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/AutoRetestDataService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -343,7 +347,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/settings_cross_checks.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsCrossChecks.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_settings_cross_checks.py`.
-- **Frontend tests:** `app/web/tests/retester/SettingsCrossChecks.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/SettingsCrossChecks.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rankingsettings/getDefaultWFConditions` `optProfileSysParamPerm/getDefaultSPPConditions`
 *Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
@@ -360,7 +364,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/settings_what_to_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsWhatToRetest.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_settings_what_to_retest.py`.
-- **Frontend tests:** `app/web/tests/retester/SettingsWhatToRetest.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/SettingsWhatToRetest.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/SettingsWhatToRetestService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
@@ -377,7 +381,7 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - **Backend:** `app/workspace/retester/task_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/TaskRetest.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_task_retest.py`.
-- **Frontend tests:** `app/web/tests/retester/TaskRetest.test.tsx`.
+- **Frontend tests:** `app/web/tests/workspace/retester/TaskRetest.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.

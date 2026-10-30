@@ -1,4 +1,9 @@
 # AppBusiness - feature work orders
+> UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
+
+> UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
+> Preserve current Business presentation. AddNodeModal is owned by grid_control and ConfigureMcpModal by ai; Business retains its existing access to both. Product-build replacement and service changes are deferred.
+
 
 ```mermaid
 classDiagram
@@ -156,9 +161,9 @@ Migration fit is separate from implementation status. Direct fit below means the
 | --- | --- | --- | --- |
 | `ui/app/workspace/Business/BusinessWorkspace.tsx` | `app/web/workspaces/business/BusinessWorkspace.tsx` | Replace donor-mismatched feature surface | Current component is node/user/MCP management; primary SQXBusiness is product/project/EA options/resources/build. Do not call current Business component a direct-fit donor workspace. |
 | `ui/app/workspace/Business/AddNodeModal.tsx` | `app/web/workspaces/grid_control/AddNodeModal.tsx` | Reassign - owned by AppGridControl | No second copy under sqx_business. See GridControl migration order for source changes. |
-| `ui/app/workspace/Business/ConfigureMcpModal.tsx` | `app/web/workspaces/sqai/ConfigureMcpModal.tsx` | Reassign - owned by AppSQAI | No second copy under sqx_business; replace fake connected/authenticated responses through the accepted service contract. |
+| `ui/app/workspace/Business/ConfigureMcpModal.tsx` | `app/web/workspaces/ai/ConfigureMcpModal.tsx` | Reassign - owned by AppSQAI | No second copy under sqx_business; replace fake connected/authenticated responses through the accepted service contract. |
 | `ui/app/workspace/Business/fixtures.ts` | `app/web/tests/workspace/business/fixtures.ts` | Retire production fixtures | Current4node/user/MCP fixtures are not SQXBusiness product-build examples. Keep only test cases assigned to the actual owner; create product-build fixtures from inspected XML. |
-| `ui/tests/unit/workspace/Business/business.test.ts` | `app/web/tests/workspace/grid_control/cluster.test.ts` | Split test ownership | Compute aggregation/node-state assertions belong GridControl; MCP settings cases move to app/web/tests/workspace/sqai/mcpConnections.test.ts. Do not duplicate source tests under Business. |
+| `ui/tests/unit/workspace/Business/business.test.ts` | `app/web/tests/workspace/grid_control/cluster.test.ts` | Split test ownership | Compute aggregation/node-state assertions belong GridControl; MCP settings cases move to app/web/tests/workspace/ai/mcpConnections.test.ts. Do not duplicate source tests under Business. |
 | `No current product-build Python source` | `app/workspace/business/build.py` | Missing - create | Target product-build orchestration consumes Wizard exporters. Current cluster UI is not an implementation of product locking/export/compilation. |
 
 ### Reorganization work order - MIG-AppSQXBusiness

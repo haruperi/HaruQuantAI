@@ -1,5 +1,15 @@
 # Full reimplementation - work-order dispatch
 
+## Preserve and migrate the existing UI
+
+Before further UI restructuring, follow the [UI preservation migration plan](research/ui-preservation-migration-plan.md).
+It accounts for every tracked file in the current `ui/` and existing `app/web/`,
+preserves the current browser presentation, and defines the namespace reconciliation,
+baseline checks, coordinated source cutover and verification required before retiring old paths.
+The preservation migration is implemented. See the [verification report](research/ui-preservation-migration-verification.md)
+for measured results and pre-existing limitations. Current UI work continues in `app/web`;
+this migration does not release blocked backend feature orders.
+
 ```mermaid
 classDiagram
   class WorkOrder {

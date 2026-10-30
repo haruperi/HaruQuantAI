@@ -1,9 +1,0 @@
-import {describe,it,expect} from 'vitest';
-import {composerDefaults,composerError,moveMembers,parseComposition,serializeComposition,type ComposerDraft} from '../../../../app/workspace/PortfolioComposer/composerModel';
-const draft=():ComposerDraft=>({config:{...composerDefaults},members:[{id:'a',name:'A',symbol:'EURUSD',money:'Fixed size',weight:200,selected:true,equity:[100,105]},{id:'b',name:'B',symbol:'GBPUSD',money:'Fixed size',weight:50,selected:false,equity:[100,102]}]});
-describe('FEAT-UI-PORTFOLIO_COMPOSER_WORKSPACE draft',()=>{
- it('retains independent sizing multipliers through export/import',()=>{const d=draft();expect(composerError(d)).toBeUndefined();expect(parseComposition(serializeComposition(d))).toEqual(d);expect(d.members.map(m=>m.weight)).toEqual([200,50]);});
- it('moves selected rows without changing weights or source arrays',()=>{const d=draft();const moved=moveMembers(d.members,1);expect(moved.map(m=>m.id)).toEqual(['b','a']);expect(moved[1].weight).toBe(200);expect(d.members[0].id).toBe('a');expect(moveMembers(moved,1)).toEqual(moved);});
- it('rejects malformed/imported duplicate identities and foreign formats',()=>{const d=draft();d.members[1].id='a';expect(()=>parseComposition(serializeComposition(d))).toThrow(/duplicate/);expect(()=>parseComposition('{"format":"sqx"}')).toThrow(/preview/);expect(()=>parseComposition('not json')).toThrow();});
- it('guards empty selection, invalid ranges and inputs',()=>{const d=draft();d.members.forEach(m=>m.selected=false);expect(composerError(d)).toMatch(/Select/);d.members[0].selected=true;d.members[0].weight=-1;expect(composerError(d)).toMatch(/weights/);d.members[0].weight=0;expect(composerError(d)).toBeUndefined();d.config.range='Limited';d.config.from='2027-01-01';expect(composerError(d)).toMatch(/data range/);});
-});
