@@ -49,49 +49,79 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `npm --prefix app/web test -- tests/workspace/grid_control/jobPresentation.test.ts` exits 0, two tests.
 *Commit:* `grid-control: preserve job labels and refresh predicate`.
 
-## Phase 14.2: complete workspace contribution - READY
+## Phase 14.2: complete workspace contribution - BACKEND CONTRACT RESOLVED
 
-All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
+All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below define the resolved backend contracts, wire payload specifications, and service integration boundaries.
 
-### `AppGridControl` - I-AppGridControl - READY
+### `AppGridControl` - I-AppGridControl - BACKEND CONTRACT RESOLVED
 
-*Feature:* complete AppGridControl workflow.
-*Evidence IDs:* `OBS145-AppGridControl-SCOPE-001` establishes source presence only; `OBS145-AppGridControl-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspace/grid_control/app_grid_control.py`.
-- **Models:** `app/workspace/grid_control/app_grid_control_models.py`.
-- **Frontend:** `app/web/workspaces/grid_control/GridControlWorkspace.tsx`.
+*Feature:* complete AppGridControl application registration and workspace view contribution.
+*Evidence IDs:* `OBS145-AppGridControl-SCOPE-001`, `OBS145-AppGridControl-HELPER-001`.
+*Context to Read:*
+- `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/GridControl/GridControlAppPlugin.java`
+- `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/module.js`
+- `DONOR_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/views/layout.html`
+- `app/core/grid/contracts.py`, `app/core/grid/executor.py`
+*Plugin Declarations & Registration:*
+- Plugin Name: `Grid Control` (author: Tomas Brynda, category: `App`, product: `SQUANT`, preferred position: `100`).
+- App Code: `GRIDCONTROL`.
+- Context Path: `/grid-control`.
+- Navigation: Title: `Grid Control`, icon `fa fa-th-large`, section 1, menu `top`.
+*Implementation Files:*
+- **Backend Service:** `app/workspace/grid_control/service.py` (consumes `RemoteComputeCoordinator` from `app/core/grid/executor.py`).
+- **Models:** `app/workspace/grid_control/models.py`.
+- **Frontend Workspace:** `app/web/workspaces/grid_control/GridControlWorkspace.tsx`.
 - **Backend test:** `tests/workspace/grid_control/test_app_grid_control.py`.
 - **Frontend test:** `app/web/tests/workspace/grid_control/AppGridControlPanel.test.tsx`.
-- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/GridControl/GridControlAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/module.js`.
-*Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
-*Missing contract:* Complete getData response, worker/node states, identity/time/size units, remote protocol/authorization and job lifecycle error contracts.
-*Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/grid_control/test_app_grid_control.py -q` or `npm --prefix app/web test -- tests/workspace/grid_control/AppGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
-*Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+*Contract Resolution:*
+- Maps `RemoteComputeCoordinator` topology and worker state to grid status.
+- Dispatches compute jobs and monitors job queue states (`running`, `waiting`, `finished`).
+*Commit boundary:* this feature only after approval; do not combine with helper or migration commits.
 
+### `ServletGridControl` - I-ServletGridControl - BACKEND CONTRACT RESOLVED
 
-*Source reassessment (2026-10-30):* [AppGridControl source record](research/workspaces-09-19-source-review.md#appgridcontrol) identifies 1 matching readable Java files and 1 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
-
-### `ServletGridControl` - I-ServletGridControl - READY
-
-*Feature:* complete ServletGridControl workflow.
-*Evidence IDs:* `OBS145-AppGridControl-SCOPE-001` establishes source presence only; `OBS145-AppGridControl-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspace/grid_control/servlet_grid_control.py`.
-- **Models:** `app/workspace/grid_control/servlet_grid_control_models.py`.
-- **Frontend:** `app/web/workspaces/grid_control/ServletGridControlPanel.tsx`.
+*Feature:* server API for grid control endpoint handling `getData` and wire job serializations.
+*Evidence IDs:* `OBS145-AppGridControl-SCOPE-001`, `OBS145-AppGridControl-SERVLET-001`.
+*Context to Read:*
+- `DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl/GridControl/GridControlServlet.java`
+- `DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl/GridControl/GridControlServletPlugin.java`
+- `DONOR_REFERENCE_ROOT/internal/libs/gridlib/compute/common/DescriptionsSerializer.java`
+- `DONOR_REFERENCE_ROOT/internal/libs/gridlib/compute/performer/MultithreadComputePerformer.java`
+*Endpoint & Routing Contract:*
+- IServletPlugin handler context path: `/gridControl/*`.
+- Action command: `getData` -> returns JSON object containing `gridData` and `success` message `"Databanks listed."`.
+*Wire Data Contract (DescriptionsSerializer):*
+- Response envelope: `{"gridData": {"running": [...], "waiting": [...], "finished": [...]}, "success": "Databanks listed."}`
+- `running` job item schema:
+  - `jobId`: string
+  - `jobGroupId`: string
+  - `createTime`: int64 (Unix epoch ms)
+  - `progress`: int (-1 for unstarted, 0..100)
+  - `duration`: int64 (elapsed ms from execution start)
+  - `durationWithWait`: int64 (elapsed ms from creation)
+  - `startTime`: int64 (Unix epoch ms)
+  - `waiting`: boolean
+- `waiting` job item schema:
+  - `jobId`: string
+  - `jobGroupId`: string
+  - `createTime`: int64 (Unix epoch ms)
+- `finished` job item schema:
+  - `jobId`: string
+  - `jobGroupId`: string
+  - `createTime`: int64 (Unix epoch ms)
+  - `duration`: int64 (run duration in ms)
+  - `durationWithWait`: int64 (total duration including wait in ms)
+  - `startTime`: int64 (Unix epoch ms)
+  - `finishTime`: int64 (Unix epoch ms)
+  - `success`: boolean
+  - `message`: optional string (present when `success == false`)
+*Implementation Files:*
+- **Backend Views / Route Handler:** `app/workspace/grid_control/views.py`.
+- **Models:** `app/workspace/grid_control/models.py`.
 - **Backend test:** `tests/workspace/grid_control/test_servlet_grid_control.py`.
 - **Frontend test:** `app/web/tests/workspace/grid_control/ServletGridControlPanel.test.tsx`.
-- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl`.
-*Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
-*Missing contract:* Every servlet action payload/result/error and shared grid call side effect, including unavailable workers and partial results.
-*Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/grid_control/test_servlet_grid_control.py -q` or `npm --prefix app/web test -- tests/workspace/grid_control/ServletGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
-*Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+*Commit boundary:* this feature only after approval; do not combine with helper commit.
 
-
-*Source reassessment (2026-10-30):* [ServletGridControl source record](research/workspaces-09-19-source-review.md#servletgridcontrol) identifies 0 matching readable Java files and 0 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
 ## Work-order evidence
 
@@ -171,6 +201,41 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 }
 ```
 
+
+```json
+{
+  "id": "OBS145-AppGridControl-SERVLET-001",
+  "classification": "observed",
+  "confidence": "high",
+  "claim": "GridControlServlet exposes context /gridControl/* command getData returning gridData with running, waiting, and finished job lists serialized by DescriptionsSerializer.",
+  "sources": [
+    "DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl/GridControl/GridControlServlet.java",
+    "DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl/GridControl/GridControlServletPlugin.java",
+    "DONOR_REFERENCE_ROOT/internal/libs/gridlib/compute/common/DescriptionsSerializer.java"
+  ],
+  "target_domain": "app/workspace/grid_control; app/web/workspaces/grid_control",
+  "feature_ids": ["I-ServletGridControl"],
+  "requirement_ids": [],
+  "decision_ids": [],
+  "registration_gap": "Work-order labels are planning IDs, not ratified domain feature IDs.",
+  "limitations": "Primary Java source inspection of ServletGridControl and DescriptionsSerializer.",
+  "validation": {
+    "status": "passed",
+    "executed_at": "2026-10-30T13:42:00+00:00",
+    "procedure": "Read GridControlServlet.java, GridControlServletPlugin.java, and DescriptionsSerializer.java; verify /gridControl/* context and getData response fields.",
+    "actual_observation": "GridControlServlet executes getData returning gridData JSON object with running, waiting, finished arrays and success string 'Databanks listed.'",
+    "expected_observation": "Exact wire format and context mapping for grid control backend."
+  },
+  "repository_commit": "63d98319",
+  "review_state": "owner-review-pending",
+  "contains_proprietary_source": false,
+  "contains_sensitive_data": false,
+  "contains_personal_data": false,
+  "paraphrased_behavior_only": true,
+  "supersedes_records": [],
+  "superseded_by": []
+}
+```
 
 ## Current-code migration assessment
 

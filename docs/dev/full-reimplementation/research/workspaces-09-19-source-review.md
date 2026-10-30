@@ -572,9 +572,16 @@ Owner: `14-AppGridControl.md`. Readable Java matches: 1; primary frontend/settin
 
 ### ServletGridControl
 
-Owner: `14-AppGridControl.md`. Readable Java matches: 0; primary frontend/settings files: 0.
+Owner: `14-AppGridControl.md`. Readable Java matches: 2; primary frontend/settings files: 0.
 
-No matching plugin Java body was found in the bounded library/recovered-source search. This contribution may be frontend-only. Review its listed UI handlers and their actual backend dependencies before declaring a missing server; a similarly named core library class does not establish that dependency.
+- Source: `DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl/GridControl/GridControlServlet.java`; SHA-256 `bf004611583f6b68500fdcdeeb8370019428a7170b11c7d056092adc8d4428a7`.
+  - Declared callables: `execute(String command, Map<String, String[]> args, String method)`; `onGetData(Map<String, String[]> parameterMap)`.
+- Source: `DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl/GridControl/GridControlServletPlugin.java`; SHA-256 `7039be1d2f94b7708cfd7b62a96b3e39bf37fb568d222031eac2570dbeb8d699`.
+  - Declared callables: `getProduct()`; `getPreferredPosition()`; `initPlugin()`; `getHandler()`.
+- Source: `DONOR_REFERENCE_ROOT/internal/libs/gridlib/compute/common/DescriptionsSerializer.java`; SHA-256 `cc2e8c2186abe3949a55e4eac87a8d75acf76c6f2d53f93ab8334f5eea42920c`.
+  - Declared callables: `getJson(...)`; `getRunning(...)`; `getWaiting(...)`; `addFinishedJobs(...)`; `addCommonsJobsInfo(...)`; `addJobs(...)`.
+
+**Inspected behavior:** `GridControlServletPlugin` binds `GridControlServlet` to context path `/gridControl/*`. The servlet accepts command `getData` and returns a JSON payload containing `gridData` (serialized via `DescriptionsSerializer` from `SQGrid.getGridClient().getGridDescriptions()`) and a localized success message (`"Databanks listed."`). The wire payload formats jobs into three sections: `running` (with `progress`, `duration`, `durationWithWait`, `startTime`, `waiting`), `waiting` (with `createTime`), and `finished` (with `duration`, `durationWithWait`, `startTime`, `finishTime`, `success`, and optional `message`).
 
 
 ### AppGridTest
