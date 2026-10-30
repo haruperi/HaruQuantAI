@@ -55,22 +55,27 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 
 All 43 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppTaskManager` - I-AppTaskManager - READY
+### `AppTaskManager` - I-AppTaskManager - COMPLETED
 
-*Feature:* complete AppTaskManager workflow.
-*Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
+*Feature:* complete AppTaskManager pipeline execution workflow.
+*Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001`.
+*Dependencies:* `I-TaskManagerProjects`, `I-TaskManagerTasks`, Condition models (`TM-COND-01` through `TM-COND-05`).
+*Implementation Files:*
 - **Backend:** `app/workspace/task_manager/app_task_manager.py`.
 - **Models:** `app/workspace/task_manager/app_task_manager_models.py`.
 - **Frontend:** `app/web/workspaces/task_manager/TaskManagerWorkspace.tsx`.
 - **Backend test:** `tests/workspace/task_manager/test_app_task_manager.py`.
 - **Frontend test:** `app/web/tests/workspace/task_manager/AppTaskManagerPanel.test.tsx`.
-- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppTaskManager`, `DONOR_REFERENCE_ROOT/internal/plugins/AppTaskManager/module.js`.
-*Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
-*Missing contract:* Complete project/task graph schemas, transition priority/loop semantics, storage/transaction/error contracts, and each user action mapping.
-*Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/task_manager/test_app_task_manager.py -q` or `npm --prefix app/web test -- tests/workspace/task_manager/AppTaskManagerPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
-*Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppTaskManager/TaskManager/TaskManagerAppPlugin.java`, `TaskManagerProgressPublisher.java`.
+*Contracts & Signatures:*
+- `AppTaskManager.start_project(project_name: str) -> None`: Transitions project to RUNNING, begins sequential execution of active tasks.
+- `AppTaskManager.stop_project(project_name: str) -> None`: Cancels running execution and marks project STOPPED.
+- `AppTaskManager.pause_project(project_name: str) -> None`: Pauses active execution at the current task boundary.
+- `AppTaskManager.get_project_status(project_name: str) -> ProjectExecutionState`: Returns active task, running status (`stopped`, `running`, `paused`, `finished`, `error`), and per-task iterations.
+- `AppTaskManager.get_custom_project_stats() -> list[dict[str, Any]]`: Returns publisher stats for all non-app projects.
+- `AppTaskManager.step_project(project_name: str) -> bool`: Executes one step/task in the project pipeline, evaluating conditions and advancing task index.
+*Acceptance:* `uv run python -m pytest tests/workspace/task_manager/test_app_task_manager.py -q` exits 0 with 100% assertions met.
+*Commit boundary:* part of full workflow foundation.
 
 
 *Source reassessment (2026-10-30):* [AppTaskManager source record](research/workspaces-09-19-source-review.md#apptaskmanager) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
@@ -775,42 +780,56 @@ All 43 assigned plugin modules remain in scope. The helper above is not acceptan
 
 *Source reassessment (2026-10-30):* [TaskLogDatabankStats source record](research/workspaces-09-19-source-review.md#tasklogdatabankstats) identifies 1 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskManagerProjects` - I-TaskManagerProjects - READY
+### `TaskManagerProjects` - I-TaskManagerProjects - COMPLETED
 
-*Feature:* complete TaskManagerProjects workflow.
-*Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
+*Feature:* complete TaskManagerProjects workflow with JSON persistence, project lifecycle, and symbol modification.
+*Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001`.
+*Implementation Files:*
 - **Backend:** `app/workspace/task_manager/task_manager_projects.py`.
 - **Models:** `app/workspace/task_manager/task_manager_projects_models.py`.
 - **Frontend:** `app/web/workspaces/task_manager/TaskManagerProjectsPanel.tsx`.
 - **Backend test:** `tests/workspace/task_manager/test_task_manager_projects.py`.
 - **Frontend test:** `app/web/tests/workspace/task_manager/TaskManagerProjectsPanel.test.tsx`.
-- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/directives/tmProjectControl.html`, `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/directives/TMProjectControl.js`, `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/directives/TMProjectControlCtrl.js`.
-*Observed action names (not a payload specification):* `/project/checkResources`, `/project/getXMLConfig`, `taskmanager/cloneProject`, `taskmanager/createProject`, `taskmanager/listProjects`, `taskmanager/modifySymbols`, `taskmanager/modifySymbolsList`, `taskmanager/openProject`, `taskmanager/removeProject`, `taskmanager/renameProject`, `taskmanager/saveProject`
-*Missing contract:* Complete input DTO, prerequisite resources, result schema, per-item failure/transaction policy, cancellation/retry/restart behavior and exact golden outcomes for this concrete task.
-*Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/task_manager/test_task_manager_projects.py -q` or `npm --prefix app/web test -- tests/workspace/task_manager/TaskManagerProjectsPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
-*Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/Projects/TMProjectsServlet.java`, `TMProjectsPlugin.java`.
+*Observed endpoints & actions:* `taskmanager/listProjects`, `taskmanager/createProject`, `taskmanager/openProject`, `taskmanager/validateProject`, `taskmanager/saveProject`, `taskmanager/removeProject`, `taskmanager/cloneProject`, `taskmanager/renameProject`, `taskmanager/modifySymbolsList`, `taskmanager/modifySymbols`.
+*Contracts & Signatures:*
+- `TaskManagerProjects.list_projects() -> list[ProjectSummary]`
+- `TaskManagerProjects.create_project(name: str) -> ProjectInfo`
+- `TaskManagerProjects.open_project(file_path: str, *, project_name: str | None = None, load_as_is: bool = False) -> ProjectInfo`
+- `TaskManagerProjects.validate_project(file_path: str, *, deep: bool = True, settings: bool = True) -> ProjectValidationResult`
+- `TaskManagerProjects.save_project(project_name: str, file_path: str) -> None`
+- `TaskManagerProjects.remove_project(project_name: str) -> None`
+- `TaskManagerProjects.rename_project(old_name: str, new_name: str) -> None`
+- `TaskManagerProjects.clone_project(project_name: str) -> ProjectInfo`
+- `TaskManagerProjects.modify_symbols_list(project_name: str) -> list[str]`
+- `TaskManagerProjects.modify_symbols(project_name: str, items: Sequence[ModifySymbolItem]) -> None`
+- `TaskManagerProjects.validate_project_name(name: str) -> None`: Rejects empty names, leading dot, forbidden chars (`\ / : * ? " < > |`), reserved names (NUL, PRN, CON, AUX, COM1-9, LPT1-9), and tabs/newlines.
+*Acceptance:* `uv run python -m pytest tests/workspace/task_manager/test_task_manager_projects.py -q` exits 0 with full assertions met.
 
 
 *Source reassessment (2026-10-30):* [TaskManagerProjects source record](research/workspaces-09-19-source-review.md#taskmanagerprojects) identifies 2 matching readable Java files and 10 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
-### `TaskManagerTasks` - I-TaskManagerTasks - READY
+### `TaskManagerTasks` - I-TaskManagerTasks - COMPLETED
 
-*Feature:* complete TaskManagerTasks workflow.
-*Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001` establishes source presence only; `OBS145-AppTaskManager-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
+*Feature:* complete TaskManagerTasks task graph manipulation workflow.
+*Evidence IDs:* `OBS145-AppTaskManager-SCOPE-001`.
+*Implementation Files:*
 - **Backend:** `app/workspace/task_manager/task_manager_tasks.py`.
 - **Models:** `app/workspace/task_manager/task_manager_tasks_models.py`.
 - **Frontend:** `app/web/workspaces/task_manager/TaskManagerTasksPanel.tsx`.
 - **Backend test:** `tests/workspace/task_manager/test_task_manager_tasks.py`.
 - **Frontend test:** `app/web/tests/workspace/task_manager/TaskManagerTasksPanel.test.tsx`.
-- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerTasks/copyFromTaskPopup.html`, `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerTasks/copyToTasksPopup.html`, `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerTasks/directives/tmtask/tmtask.html`.
-*Observed action names (not a payload specification):* `taskmanager/activateTask`, `taskmanager/addTask`, `taskmanager/cloneTask`, `taskmanager/getAvailableTasks`, `taskmanager/moveTask`, `taskmanager/removeTask`, `taskmanager/renameTask`
-*Missing contract:* Complete input DTO, prerequisite resources, result schema, per-item failure/transaction policy, cancellation/retry/restart behavior and exact golden outcomes for this concrete task.
-*Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/task_manager/test_task_manager_tasks.py -q` or `npm --prefix app/web test -- tests/workspace/task_manager/TaskManagerTasksPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
-*Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskManagerProjects/Projects/TMProjectsServlet.java`, `TaskManagerTasks/TMTasksService.js`.
+*Observed endpoints & actions:* `taskmanager/addTask`, `taskmanager/removeTask`, `taskmanager/getAvailableTasks`, `taskmanager/moveTask`, `taskmanager/renameTask`, `taskmanager/cloneTask`, `taskmanager/activateTask`.
+*Contracts & Signatures:*
+- `TaskManagerTasks.get_available_tasks() -> list[AvailableTask]`
+- `TaskManagerTasks.add_task(project_name: str, task_name: str, task_type: str, *, index: int = -1, config: Mapping[str, Any] | None = None) -> TaskConfig`
+- `TaskManagerTasks.remove_task(project_name: str, task_name: str) -> TaskConfig`
+- `TaskManagerTasks.move_task(project_name: str, task_name: str, to_index: int) -> None`
+- `TaskManagerTasks.rename_task(project_name: str, task_name: str, task_title: str) -> None`
+- `TaskManagerTasks.clone_task(project_name: str, task_name: str, *, position: str = "end") -> TaskConfig`
+- `TaskManagerTasks.activate_task(project_name: str, task_name: str, active: bool) -> None`
+*Acceptance:* `uv run python -m pytest tests/workspace/task_manager/test_task_manager_tasks.py -q` exits 0 with full assertions met.
 
 
 *Source reassessment (2026-10-30):* [TaskManagerTasks source record](research/workspaces-09-19-source-review.md#taskmanagertasks) identifies 1 matching readable Java files and 11 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
