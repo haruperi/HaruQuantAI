@@ -9,6 +9,32 @@ Donor root (`D` below): `data/reference-donor` relative to the repository root.
 Plugin root (`P`): `D/internal/plugins`. Library root (`L`): `D/internal/libs`.
 These are local source locators, not remote services to invoke.
 
+## Consolidated command implementation update — 2026-10-30
+
+The original tables below remain evidence of the pinned audit baseline, not a
+current missing-feature checklist. Consolidated owner-approved iteration 2 now
+implements all fourteen `WO-CE-COMMAND-GAPS` items; completed verification is
+recorded in [Phase 4.7](../04-AppCodeEditor.md#phase-47-complete-editor-command-gaps--wo-ce-command-gaps).
+
+| Prior missing boundary | Native target implementation |
+| --- | --- |
+| Save As/reload | `AppCodeEditor.save_as/reload_disk`, exclusive publication and explicit dirty authority |
+| Catalogue/completion | `catalogue.py`, typed symbol/member and indicator descriptors, class-qualified identities |
+| Code types/templates/subtypes | `templates.py`, typed `/code-types`, path filtering, order/MonteCarlo choices and indicator-derived signals |
+| Export template authoring | `export_templates.py`; Python/pseudocode only, explicit extensions and path validation |
+| Package compilation/jobs/cancellation | `compilation.py`, host JobManager thread pool, per-file results, progress and cooperative cancellation |
+| Import repair | `import_repair.py`; unique candidates, explicit ambiguity selection and proposed-buffer delivery |
+| Reconnect/restart diagnostics | Validated per-job/latest host-stored snapshots, interrupted orphan state, source hashes and stale-response guards |
+| Reload all extensions | `registered` compilation scope; failed/missing workspace registrations are removed |
+| Search/navigation/protection | Full search UI flags/scope, builtin/user filtering, versioned inventory, shared mutation authority and user clone mapping |
+| Session recovery | Retained dirty missing-file buffers, visible warnings and fail-closed corrupt/duplicate state handling |
+
+These are Python target contracts, not a claim of Java compiler, SQX archive,
+trading-platform export or numerical parity. Cancellation cannot interrupt an
+arbitrary import mid-execution; it waits and then stops the remaining work.
+Batch tester suites, distribution/calibration and the other parent acceptance
+orders remain outside this command-gap implementation.
+
 ## Evidence and limits
 
 This audit inspects current Python/React sources, tests, donor JavaScript, and

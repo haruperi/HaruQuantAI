@@ -80,6 +80,7 @@ class WorkspaceInfo(WorkspaceState):
 
     status: Literal["ready"]
     layout: Layout
+    recovery_warnings: NotRequired[list[str]]
 
 
 @with_config(ConfigDict(extra="forbid", allow_inf_nan=False))
@@ -127,6 +128,19 @@ class SaveAllResult(TypedDict):
 
 
 @with_config(ConfigDict(extra="forbid", allow_inf_nan=False))
+class SaveAsResult(TypedDict):
+    """New file publication and persisted replacement of one tab identity."""
+
+    status: Literal["saved_as"]
+    source_path: str
+    file_path: str
+    tab: Tab
+    active_file: str
+    bytes_written: int
+    diagnostics: list[Diagnostic]
+
+
+@with_config(ConfigDict(extra="forbid", allow_inf_nan=False))
 class NavigatorItem(TypedDict):
     """A file or recursive directory entry."""
 
@@ -136,6 +150,8 @@ class NavigatorItem(TypedDict):
     extension: NotRequired[str]
     path: NotRequired[str]
     children: NotRequired[list[NavigatorItem]]
+    protected: NotRequired[bool]
+    ownership: NotRequired[Literal["builtin", "user", "host"]]
 
 
 @with_config(ConfigDict(extra="forbid", allow_inf_nan=False))

@@ -1,19 +1,21 @@
 import { useLayoutEffect, useRef } from 'react';
 import { basicSetup } from 'codemirror';
-import { acceptCompletion, autocompletion } from '@codemirror/autocomplete';
+import { acceptCompletion, autocompletion, type CompletionContext } from '@codemirror/autocomplete';
 import { indentWithTab } from '@codemirror/commands';
 import { python } from '@codemirror/lang-python';
 import { indentUnit, syntaxHighlighting } from '@codemirror/language';
 import { setDiagnostics, type Diagnostic } from '@codemirror/lint';
 import { Compartment, EditorState, Transaction, type Extension } from '@codemirror/state';
 import { EditorView, keymap, placeholder } from '@codemirror/view';
-import type { SyntaxDiagnosticDto } from './codeEditorClient';
-import { codeEditorTheme, pythonBuiltinHighlight, pythonHighlightStyle } from './pythonEditorSupport';
+import type { SyntaxDiagnosticDto, SymbolDto } from './codeEditorClient';
+import { catalogueCompletion, codeEditorTheme, pythonBuiltinHighlight, pythonHighlightStyle } from './pythonEditorSupport';
 
 interface SourceCodeEditorProps {
   filePath: string | null;
   value: string;
   openPaths: string[];
+  readOnly?: boolean;
+  symbols?: SymbolDto[];
   diagnostics: SyntaxDiagnosticDto[];
   onChange: (value: string) => void;
   onCursorChange: (position: { line: number; col: number }) => void;
@@ -23,6 +25,7 @@ export function SourceCodeEditor(props: SourceCodeEditorProps) {
   const container = useRef<HTMLDivElement>(null);
   const view = useRef<EditorView | null>(null);
   const current = useRef(props);
+  const completionSource = useRef((context: CompletionContext) => catalogueCompletion(context, current.current.symbols ?? []));
   const currentPath = useRef<string | null>(null);
   const documents = useRef(new Map<string, { state: EditorState; scrollTop: number; scrollLeft: number }>());
   const syncing = useRef(false);
@@ -84,7 +87,7 @@ export function SourceCodeEditor(props: SourceCodeEditorProps) {
         editor.setState(saved?.state ?? EditorState.create({ doc: props.value, extensions: extensions.current }));
         editor.dispatch({
           effects: [
-            language.current.reconfigure(props.filePath?.endsWith('.py') ? [python(), pythonBuiltinHighlight] : []),
+            language.current.reconfigure(props.filePath?.endsWith('.py') ? [python(), pythonBuiltinHighlight, EditorState.languageData.of(() => [{ autocomplete: completionSource.current }]) ] : []),
             editable.current.reconfigure(EditorView.editable.of(Boolean(props.filePath))),
           ],
         });
@@ -109,6 +112,13 @@ export function SourceCodeEditor(props: SourceCodeEditorProps) {
     const open = new Set(props.openPaths);
     for (const path of documents.current.keys()) if (!open.has(path)) documents.current.delete(path);
   }, [props.openPaths]);
+
+  useLayoutEffect(() => {
+    view.current?.dispatch({ effects: editable.current.reconfigure([
+      EditorView.editable.of(Boolean(props.filePath) && !props.readOnly),
+      EditorState.readOnly.of(!props.filePath || Boolean(props.readOnly)),
+    ]) });
+  }, [props.filePath, props.readOnly]);
 
   useLayoutEffect(() => {
     const editor = view.current;

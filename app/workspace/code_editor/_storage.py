@@ -6,6 +6,8 @@ Description:
 Purpose:
     FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
 Key Capabilities:
+    - FR-code-editor-create-file: Publish a staged complete file exclusively;
+      race, failure and safe logging cases are tested in test_save_as.py.
     - FR-code-editor-state-gateway: Observe the associated workflow; fixed-label logs
       are
       verified by the contract logging tests or HTTP integration checks.
@@ -134,6 +136,41 @@ class StateStore:
                     )
                 )
         logger.info("FR-code-editor-state-write: completed")
+
+
+def atomic_create_file(destination: Path, content: bytes) -> None:
+    """Publish complete bytes exclusively; never replace an existing destination.
+
+    The caller authorizes the destination. Same-directory staging and a hard link
+    provide complete-file visibility and an atomic no-replace collision check.
+    Unsupported filesystems fail closed instead of falling back to replacement.
+    """
+    logger.debug("FR-code-editor-create-file: invoked")
+    destination.parent.mkdir(parents=True, exist_ok=True)
+    descriptor, name = tempfile.mkstemp(dir=destination.parent, prefix=".editor-new-")
+    staged = Path(name)
+    try:
+        with os.fdopen(descriptor, "wb") as stream:
+            stream.write(content)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.link(staged, destination)
+    except FileExistsError:
+        logger.warning("FR-code-editor-create-file: conflict")
+        raise CodeEditorError(
+            "Save As destination already exists", code=ErrorCode.CONFLICT
+        ) from None
+    except OSError:
+        logger.error("FR-code-editor-create-file: publication failed")
+        raise CodeEditorError(
+            "Could not publish Save As file", code=ErrorCode.UNAVAILABLE
+        ) from None
+    finally:
+        try:
+            staged.unlink(missing_ok=True)
+        except OSError:
+            logger.warning("FR-code-editor-create-file: staging cleanup failed")
+    logger.info("FR-code-editor-create-file: completed")
 
 
 def atomic_write_batch(files: Mapping[Path, bytes]) -> None:

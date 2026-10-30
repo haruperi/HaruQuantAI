@@ -6,6 +6,7 @@ import { ImportExportModal } from './ImportExportModal';
 import { IndicatorTesterModal } from './IndicatorTesterModal';
 
 import { EditorToolbar } from './EditorToolbar';
+import { EditorCommands } from './EditorCommands';
 import { EditorBottomPanel } from './EditorBottomPanel';
 import { EditorInspector } from './EditorInspector';
 import { RenderTreeItem } from './EditorTreeItem';
@@ -52,6 +53,7 @@ export function CodeEditorWorkspace() {
   return (
     <div className="h-full flex flex-col bg-slate-950 text-slate-100 select-none overflow-hidden font-sans">
       <EditorToolbar workspace={workspace} />
+      <EditorCommands workspace={workspace} />
       {/* 2. MAIN 3-COLUMN WORKSPACE BODY */}
       <div className="flex-1 flex overflow-hidden">
         {/* LEFT COLUMN: NAVIGATOR (Matching Overview1.png & File Context Menu.png) */}
@@ -165,6 +167,8 @@ export function CodeEditorWorkspace() {
                 filePath={activeFilePath}
                 value={activeContent}
                 openPaths={tabs.map((tab) => tab.file_path)}
+                readOnly={workspace.isDocumentCommandRunning || workspace.activeProtected}
+                symbols={workspace.completionSymbols}
                 diagnostics={diagnostics}
                 onChange={handleContentChange}
                 onCursorChange={setCursorPos}
@@ -231,7 +235,8 @@ export function CodeEditorWorkspace() {
           <div className="my-1 border-t border-slate-800" />
 
           <button
-            onClick={() => handleContextMenuAction('clone')}
+            disabled={contextMenu.item.type !== 'file'}
+            onClick={() => handleContextMenuAction('clone').catch(error => setOutputLogs(previous => [String(error), ...previous]))}
             className="w-full px-3 py-1.5 text-left hover:bg-blue-600 hover:text-white flex items-center gap-2"
           >
             <Copy className="w-3.5 h-3.5" /> Clone
@@ -240,6 +245,7 @@ export function CodeEditorWorkspace() {
             onClick={() =>
               handleContextMenuAction('rename').catch((error) => setOutputLogs((prev) => [String(error), ...prev]))
             }
+            disabled={contextMenu.item.protected}
             className="w-full px-3 py-1.5 text-left hover:bg-blue-600 hover:text-white flex items-center justify-between"
           >
             <span>Rename</span>
@@ -249,6 +255,7 @@ export function CodeEditorWorkspace() {
             onClick={() =>
               handleContextMenuAction('delete').catch((error) => setOutputLogs((prev) => [String(error), ...prev]))
             }
+            disabled={contextMenu.item.protected}
             className="w-full px-3 py-1.5 text-left hover:bg-rose-600 hover:text-white text-rose-400 flex items-center justify-between"
           >
             <span className="flex items-center gap-2">
@@ -286,6 +293,7 @@ export function CodeEditorWorkspace() {
       {/* 5. MODALS */}
       {showTemplateModal && (
         <CreateFromTemplateModal
+          contextPath={selectedNavPath ?? undefined}
           onClose={() => setShowTemplateModal(false)}
           onSnippetCreated={(tabInfo) => {
             refreshNavigator();

@@ -1,6 +1,28 @@
 import { HighlightStyle, syntaxTree } from '@codemirror/language';
 import { Decoration, EditorView, MatchDecorator, ViewPlugin, type ViewUpdate } from '@codemirror/view';
 import { tags } from '@lezer/highlight';
+import { type CompletionContext, type CompletionResult } from '@codemirror/autocomplete';
+import type { SymbolDto } from './codeEditorClient';
+
+export function catalogueCompletion(context: CompletionContext, symbols: SymbolDto[]): CompletionResult | null {
+  const node = syntaxTree(context.state).resolveInner(context.pos, -1);
+  if (/String|Comment/.test(node.name)) return null;
+  const token = context.matchBefore(/[A-Za-z_]\w*(?:\.[A-Za-z_]\w*)?\.?/);
+  if (!token) return null;
+  const pieces = token.text.split('.');
+  let owner = pieces.length > 1 ? pieces[0] : null;
+  const prefix = pieces.at(-1) ?? '';
+  if (owner) {
+    const source = context.state.sliceDoc(0, token.from);
+    const binding = [...source.matchAll(new RegExp(`\\b${owner}\\s*=\\s*([A-Za-z_]\\w*)\\s*\\(`, 'g'))].at(-1);
+    const alias = [...source.matchAll(new RegExp(`\\b([A-Za-z_]\\w*)\\s+as\\s+${owner}\\b`, 'g'))].at(-1);
+    owner = binding?.[1] ?? alias?.[1] ?? owner;
+  }
+  const options = owner
+    ? symbols.filter(symbol => symbol.name === owner).flatMap(symbol => symbol.members.map(label => ({ label, type: 'method', detail: symbol.module })))
+    : symbols.map(symbol => ({ label: symbol.name, type: symbol.kind, detail: symbol.module }));
+  return { from: context.pos - prefix.length, options, validFor: /^\w*$/ };
+}
 
 export const pythonHighlightStyle = HighlightStyle.define([
   { tag: tags.keyword, color: '#c792ea' },

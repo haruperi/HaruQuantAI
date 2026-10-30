@@ -83,6 +83,7 @@ export function RenderTreeItem({
           <FileCode className="w-3.5 h-3.5 text-blue-400 ml-4 flex-shrink-0" />
         )}
         <span className="truncate">{item.name}</span>
+        {item.ownership && <span className="text-[9px] text-slate-500">{item.ownership}{item.protected ? ' · protected' : ''}</span>}
         {badge && (
           <span
             title="Building block domain"

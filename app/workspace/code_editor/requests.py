@@ -89,6 +89,14 @@ class SaveAllRequest(EditorRequest):
     files: list[SaveFileRequest] | None = None
 
 
+class SaveAsRequest(EditorRequest):
+    """Save an open source buffer under a new authorized document identity."""
+
+    source_path: str
+    target_path: str
+    content: str
+
+
 class NewFileRequest(EditorRequest):
     """Create a source file with optional empty content."""
 
@@ -145,6 +153,9 @@ class CreateSnippetRequest(EditorRequest):
     template_type: str
     name: str
     category: str = "custom"
+    indicator: str | None = None
+    order_action_type: str | None = None
+    mc_type: str | None = None
 
 
 class RenderTemplateRequest(EditorRequest):
@@ -153,6 +164,9 @@ class RenderTemplateRequest(EditorRequest):
     template_id: str
     name: str
     category: str | None = None
+    indicator: str | None = None
+    order_action_type: str | None = None
+    mc_type: str | None = None
 
 
 class ExportPackRequest(EditorRequest):

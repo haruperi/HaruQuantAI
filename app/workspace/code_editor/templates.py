@@ -40,6 +40,7 @@ from app.workspace.code_editor._template_generators import (
     _gen_signal,
     _gen_trade_column,
     _gen_what_if,
+    _to_pascal_case,
     _to_snake_case,
 )
 from app.workspace.code_editor.results import (
@@ -189,7 +190,7 @@ _GENERATORS = {
 }
 
 
-def list_templates() -> list[TemplateInfo]:
+def list_templates(file_path: str | None = None) -> list[TemplateInfo]:
     """Return catalog of all available snippet templates."""
     logger.debug("FR-code-editor-templates-list-templates: invoked")
     return [
@@ -202,7 +203,25 @@ def list_templates() -> list[TemplateInfo]:
             "target_subdir": t.target_subdir,
         }
         for t in _TEMPLATES.values()
+        if file_path is None or _template_matches_path(t, file_path)
     ]
+
+
+def _template_matches_path(template: SnippetTemplate, file_path: str) -> bool:
+    from app.workspace.code_editor._common import INCLUDE_DIR, resolve_safe_path
+
+    path = resolve_safe_path(file_path)
+    if path == INCLUDE_DIR.resolve() or path.name == "user":
+        return True
+    user_root = INCLUDE_DIR / "user"
+    if path.is_relative_to(user_root):
+        path = INCLUDE_DIR / path.relative_to(user_root)
+    target = resolve_safe_path(template.target_subdir)
+    if template.template_id == "BlocksIndicators":
+        target = INCLUDE_DIR / "blocks" / "indicators"
+    if "code_templates" in path.parts:
+        return False
+    return path.is_relative_to(target) or target.is_relative_to(path)
 
 
 def get_template(template_id: str) -> SnippetTemplate:
@@ -214,7 +233,12 @@ def get_template(template_id: str) -> SnippetTemplate:
 
 
 def render_template(
-    template_id: str, name: str, category: str | None = None
+    template_id: str,
+    name: str,
+    category: str | None = None,
+    indicator: str | None = None,
+    order_action_type: str | None = None,
+    mc_type: str | None = None,
 ) -> tuple[str, str]:
     """Generate Python boilerplate code and target relative file path.
 
@@ -222,6 +246,9 @@ def render_template(
         template_id: Template category identifier.
         name: User-provided name for the new snippet.
         category: Optional subcategory folder (e.g. for indicators).
+        indicator: Optional canonical indicator for a derived signal.
+        order_action_type: Optional Open, Modify or Close subtype.
+        mc_type: Manipulation or Retest for the MonteCarlo alias.
 
     Returns:
         Tuple of (rendered_code, relative_file_path).
@@ -229,6 +256,10 @@ def render_template(
     logger.debug("FR-code-editor-templates-render-template: invoked")
     if not name.isidentifier() or name.startswith("_"):
         raise CodeEditorError("Snippet name must be a public Python identifier")
+    if template_id == "MonteCarlo":
+        if mc_type not in ("Manipulation", "Retest"):
+            raise CodeEditorError("Select Manipulation or Retest")
+        template_id += mc_type
     tmpl = get_template(template_id)
     gen_func = _GENERATORS[tmpl.generator_func_name]
     content = gen_func(name)
@@ -246,5 +277,39 @@ def render_template(
         )
     else:
         target_dir = tmpl.target_subdir
+    if template_id == "BlocksOrder" and order_action_type is not None:
+        if order_action_type not in ("Open", "Modify", "Close"):
+            raise CodeEditorError("Select Open, Modify or Close order action")
+        target_dir += "/" + order_action_type.lower()
+        content += f"\nACTION_KIND = {order_action_type.lower()!r}\n"
+        content = content.replace(
+            '"symbol": symbol,', '"action": ACTION_KIND,\n            "symbol": symbol,'
+        )
+    if template_id == "BlocksSignal" and indicator:
+        from app.workspace.code_editor._indicator_resolver import resolve_indicator
+
+        cls = resolve_indicator(indicator)
+        target_dir += "/" + _to_snake_case(cls.__name__)
+        content += f"\n# Canonical indicator identity used by this signal.\nINDICATOR = {indicator!r}\nOUTPUT = {cls.spec.outputs[0].name!r}\n"
+        from app.workspace.code_editor.catalogue import symbol_catalogue
+
+        candidates = [s for s in symbol_catalogue() if s.name == cls.__name__]
+        if "/" in indicator:
+            candidates = [
+                s for s in candidates if s.file_path == indicator.split("::", 1)[0]
+            ]
+        if len(candidates) != 1:
+            raise CodeEditorError("Select an unambiguous indicator file")
+        class_name = _to_pascal_case(name)
+        content += f'''
+from {candidates[0].module} import {cls.__name__} as SourceIndicator
+from app.include.blocks.series import BarData
+
+
+def evaluate_indicator(bars: BarData, bar_idx: int, threshold: float = 0.0) -> bool:
+    """Calculate the selected indicator output and evaluate this signal."""
+    output = SourceIndicator().calculate(bars)[OUTPUT]
+    return {class_name}(threshold=threshold).evaluate(output, bars, bar_idx)
+'''
     file_path = f"{target_dir}/{snake_name}.py"
     return content, file_path

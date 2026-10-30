@@ -6,6 +6,8 @@ Description:
 Purpose:
     FEAT-CODE-EDITOR-CONTRACTS: Preserve typed editor behavior and host ownership.
 Key Capabilities:
+    - FR-code-editor-save-as: Publish a new file and persist replacement tab
+      identity; collision, preservation, failure and logging cases are tested.
     - FR-code-editor-editor: Observe the associated workflow; fixed-label logs are
       verified by the contract logging tests or HTTP integration checks.
     - FR-code-editor-editor-close-file-tab: Observe the associated workflow; fixed-label
@@ -44,6 +46,7 @@ from __future__ import annotations
 
 import logging
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 
 from pydantic import TypeAdapter
 
@@ -56,14 +59,24 @@ from app.workspace.code_editor._common import (
     validate_python_syntax,
     writable_snippet_path,
 )
-from app.workspace.code_editor._storage import StateStore, atomic_write_batch
-from app.workspace.code_editor.requests import SaveAllRequest, SessionRequest
+from app.workspace.code_editor._storage import (
+    StateStore,
+    atomic_create_file,
+    atomic_write_batch,
+)
+from app.workspace.code_editor.requests import (
+    SaveAllRequest,
+    SaveAsRequest,
+    SessionRequest,
+)
 from app.workspace.code_editor.results import (
     CloseTabResult,
     OpenTabResult,
     SaveAllResult,
+    SaveAsResult,
     SavedFile,
     SaveResult,
+    Tab,
     WorkspaceInfo,
     WorkspaceState,
     validate_result,
@@ -92,6 +105,11 @@ class AppCodeEditor:
             "status": "ready",
             "active_file": self._active_file,
             "open_tabs": [tab.to_dict() for tab in self._tabs.values()],
+            "recovery_warnings": [
+                f"Missing file: {key}; buffer retained for Save As"
+                for key in self._tabs
+                if not resolve_safe_path(key).is_file()
+            ],
             "layout": {
                 "navigator_visible": True,
                 "split_mode": "single",
@@ -197,6 +215,82 @@ class AppCodeEditor:
             "diagnostics": [d.to_dict() for d in diagnostics],
         }
 
+    def save_as(self, source_path: str, target_path: str, content: str) -> SaveAsResult:
+        """Save to a new identity; retain a published file if session saving fails."""
+        logger.debug("FR-code-editor-save-as: invoked")
+        request = SaveAsRequest(
+            source_path=source_path, target_path=target_path, content=content
+        )
+        source = resolve_safe_path(request.source_path)
+        target = writable_snippet_path(request.target_path)
+        self._restore()
+        source_key = next(
+            (key for key in self._tabs if resolve_safe_path(key) == source), None
+        )
+        if source_key is None:
+            raise CodeEditorError(
+                "Save As requires an open source tab", code=ErrorCode.NOT_FOUND
+            )
+        raw_target = Path(request.target_path)
+        if not raw_target.is_absolute():
+            raw_target = PROJECT_ROOT / raw_target
+        if (
+            target == source
+            or target.exists()
+            or raw_target.is_symlink()
+            or any(resolve_safe_path(key) == target for key in self._tabs)
+        ):
+            logger.warning("FR-code-editor-save-as: conflict")
+            raise CodeEditorError(
+                "Save As destination already exists or is open", code=ErrorCode.CONFLICT
+            )
+        relative = target.relative_to(PROJECT_ROOT).as_posix()
+        original = self._tabs[source_key]
+        tab = EditorTab(
+            file_path=relative,
+            title=target.name,
+            content=request.content,
+            mode=original.mode,
+            cursor_position=original.cursor_position.copy(),
+        )
+        updated = {
+            (relative if key == source_key else key): (
+                tab if key == source_key else value
+            )
+            for key, value in self._tabs.items()
+        }
+        payload = request.content.encode("utf-8")
+        diagnostics = (
+            validate_python_syntax(request.content) if target.suffix == ".py" else []
+        )
+        atomic_create_file(target, payload)
+        try:
+            self._store.write(
+                "workspace",
+                {
+                    "open_tabs": [value.to_dict() for value in updated.values()],
+                    "active_file": relative,
+                },
+            )
+        except Exception:
+            logger.error("FR-code-editor-save-as: file created; session saving failed")
+            raise CodeEditorError(
+                "File created; workspace state could not be saved. Original session retained.",
+                code=ErrorCode.UNAVAILABLE,
+            ) from None
+        self._tabs = updated
+        self._active_file = relative
+        logger.info("FR-code-editor-save-as: completed")
+        return {
+            "status": "saved_as",
+            "source_path": source_key,
+            "file_path": relative,
+            "tab": tab.to_dict(),
+            "active_file": relative,
+            "bytes_written": len(payload),
+            "diagnostics": [item.to_dict() for item in diagnostics],
+        }
+
     def save_all_files(
         self, files: Sequence[Mapping[str, str]] | None = None
     ) -> SaveAllResult:
@@ -266,6 +360,8 @@ class AppCodeEditor:
             }
             path = resolve_safe_path(item["file_path"])
             relative = path.relative_to(PROJECT_ROOT).as_posix()
+            if relative in updated:
+                raise CodeEditorError("Duplicate session document identity")
             tab = EditorTab(
                 file_path=relative,
                 title=path.name,
@@ -278,9 +374,15 @@ class AppCodeEditor:
             updated[relative] = tab
         if active_file is not None and active_file not in updated:
             raise CodeEditorError("Active document must be an open tab")
+        self._store.write(
+            "workspace",
+            {
+                "open_tabs": [tab.to_dict() for tab in updated.values()],
+                "active_file": active_file,
+            },
+        )
         self._tabs = updated
         self._active_file = active_file
-        self._persist()
         return self.init_workspace()
 
     def _restore(self) -> None:
@@ -293,12 +395,19 @@ class AppCodeEditor:
         state = validate_result(TypeAdapter(WorkspaceState), raw)
         restored = {}
         for item in state["open_tabs"]:
-            resolve_safe_path(item["file_path"])
-            if item["file_path"] in restored:
+            path = resolve_safe_path(item["file_path"])
+            canonical = path.relative_to(PROJECT_ROOT).as_posix()
+            if canonical != item["file_path"] or canonical in restored:
                 raise CodeEditorError(
                     "Invalid editor stored state", code=ErrorCode.INTERNAL
                 )
-            restored[item["file_path"]] = EditorTab(**item)
+            tab = EditorTab(**item)
+            if not path.is_file():
+                tab.is_dirty = True
+                logger.warning(
+                    "FR-editor-session-recovery: missing file buffer retained"
+                )
+            restored[canonical] = tab
         if state["active_file"] is not None and state["active_file"] not in restored:
             raise CodeEditorError(
                 "Invalid editor stored state", code=ErrorCode.INTERNAL
@@ -316,6 +425,42 @@ class AppCodeEditor:
                 "active_file": self._active_file,
             },
         )
+
+    def reload_disk(self, file_path: str, *, discard_dirty: bool = False) -> Tab:
+        """Replace one buffer from disk only with explicit dirty authority."""
+        logger.debug("FR-editor-reload: invoked")
+        self._restore()
+        path = resolve_safe_path(file_path)
+        key = path.relative_to(PROJECT_ROOT).as_posix()
+        original = self._tabs.get(key)
+        if original is None or not path.is_file():
+            raise CodeEditorError(
+                "Reload requires an open file present on disk", code=ErrorCode.NOT_FOUND
+            )
+        if original.is_dirty and not discard_dirty:
+            logger.warning("FR-editor-reload: dirty confirmation required")
+            raise CodeEditorError(
+                "Confirm discarding the dirty buffer", code=ErrorCode.CONFLICT
+            )
+        replacement = EditorTab(
+            file_path=key,
+            title=path.name,
+            content=path.read_text(encoding="utf-8"),
+            mode=original.mode,
+            cursor_position=original.cursor_position.copy(),
+        )
+        candidate = {**self._tabs, key: replacement}
+        self._store.write(
+            "workspace",
+            {
+                "open_tabs": [t.to_dict() for t in candidate.values()],
+                "active_file": key,
+            },
+        )
+        self._tabs = candidate
+        self._active_file = key
+        logger.info("FR-editor-reload: completed")
+        return replacement.to_dict()
 
     def remap_tabs(self, old_path: str, new_path: str | None) -> None:
         """FR-CODEEDITOR-REMAP: Preserve buffers when paths move or are deleted."""

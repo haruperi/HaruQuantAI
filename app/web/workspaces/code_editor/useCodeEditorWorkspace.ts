@@ -1,12 +1,15 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import {
   createCodeEditorClient,
-  type CompileResultDto,
   type EditorTabDto,
   type NavigatorItemDto,
   type SearchMatchDto,
   type SyntaxDiagnosticDto,
+  type SymbolDto,
+  type CompilationDto,
 } from './codeEditorClient';
+
+const NO_DIAGNOSTICS: SyntaxDiagnosticDto[] = [];
 
 export function useCodeEditorWorkspace() {
   const client = useMemo(() => createCodeEditorClient(), []);
@@ -21,12 +24,22 @@ export function useCodeEditorWorkspace() {
   });
 
   const [sessionReady, setSessionReady] = useState(false);
+  const [completionSymbols, setCompletionSymbols] = useState<SymbolDto[]>([]);
+  const [compilation, setCompilation] = useState<CompilationDto | null>(null);
+  useEffect(() => {
+    if (compilation?.status === 'COMPLETED') client.symbols().then(setCompletionSymbols).catch(error => setOutputLogs(previous => [`Completion refresh error: ${String(error)}`, ...previous]));
+  }, [compilation?.job_id, compilation?.status]);
   const sessionQueue = useRef<Promise<unknown>>(Promise.resolve());
+  const documentCommandPending = useRef(false);
+  const [isDocumentCommandRunning, setIsDocumentCommandRunning] = useState(false);
 
   // Navigator Tree
   const [treeRoot, setTreeRoot] = useState<NavigatorItemDto | null>(null);
+  const [pathProtection, setPathProtection] = useState<Record<string, boolean>>({});
+  const navigatorGeneration = useRef(0);
   const [collapsedFolders, setCollapsedFolders] = useState<Record<string, boolean>>({});
   const [navSearchQuery, setNavSearchQuery] = useState<string>('');
+  const [ownershipFilter, setOwnershipFilter] = useState('all');
   const [selectedNavPath, setSelectedNavPath] = useState<string | null>(null);
 
   // Bottom Dock Tabs
@@ -41,6 +54,7 @@ export function useCodeEditorWorkspace() {
   ]);
   const [searchResults, setSearchResults] = useState<SearchMatchDto[]>([]);
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [searchOptions, setSearchOptions] = useState({ caseSensitive: false, regex: false, wholeWord: false, searchDir: '' });
 
   // Modals
   const [showTemplateModal, setShowTemplateModal] = useState<boolean>(false);
@@ -56,20 +70,34 @@ export function useCodeEditorWorkspace() {
 
   // Load initial workspace state & navigator
   const refreshNavigator = async () => {
+    const generation = ++navigatorGeneration.current;
     try {
-      const tree = await client.fetchNavigator();
-      setTreeRoot(tree);
+      const tree = await client.fetchNavigator(undefined, ownershipFilter);
+      const protection: Record<string, boolean> = {};
+      const visit = (item: NavigatorItemDto) => { if (item.protected !== undefined) protection[item.id] = item.protected; item.children?.forEach(visit); };
+      visit(tree);
+      setPathProtection(previous => ({ ...previous, ...protection }));
+      if (generation === navigatorGeneration.current) setTreeRoot(tree);
     } catch (error) {
       setOutputLogs((prev) => [`Navigator error: ${String(error)}`, ...prev]);
     }
   };
 
+  useEffect(() => { void refreshNavigator(); }, [ownershipFilter]);
+
   useEffect(() => {
+    let active = true;
     refreshNavigator();
+    client.symbols().then(value => { if (active) setCompletionSymbols(value); }).catch(error => { if (active) setOutputLogs(previous => [`Completion catalogue error: ${String(error)}`, ...previous]); });
     client
       .initWorkspace()
       .then((init) => {
+        if (!active) return;
         setSessionReady(true);
+        if (init.recovery_warnings?.length) {
+          setOutputLogs(previous => [...init.recovery_warnings!, ...previous]);
+          setBottomTab('output');
+        }
         if (init.open_tabs && init.open_tabs.length > 0) {
           setTabs(init.open_tabs);
           setActiveFilePath(init.active_file || init.open_tabs[0].file_path);
@@ -80,17 +108,20 @@ export function useCodeEditorWorkspace() {
           setFileContents(contents);
         }
       })
-      .catch((error) => setOutputLogs((prev) => [`Session error: ${String(error)}`, ...prev]));
+      .catch((error) => { if (active) { setOutputLogs((prev) => [`Session error: ${String(error)}`, ...prev]); setBottomTab('output'); } });
+    return () => { active = false; };
   }, []);
 
   const activeTab = tabs.find((t) => t.file_path === activeFilePath) || tabs[0];
   const activeContent = activeFilePath ? (fileContents[activeFilePath] ?? activeTab?.content ?? '') : '';
+  const findProtected = (item: NavigatorItemDto | null): boolean => Boolean(item && ((item.id === activeFilePath && item.protected) || item.children?.some(child => findProtected(child))));
+  const activeProtected = activeFilePath && pathProtection[activeFilePath] !== undefined ? pathProtection[activeFilePath] : findProtected(treeRoot);
 
   useEffect(() => {
-    if (!sessionReady) return;
+    if (!sessionReady || documentCommandPending.current) return;
     sessionQueue.current = sessionQueue.current.catch(() => {}).then(() => client.syncSession(tabs, activeFilePath));
     sessionQueue.current.catch((error) => setOutputLogs((prev) => [`Session save error: ${String(error)}`, ...prev]));
-  }, [tabs, activeFilePath, sessionReady, client]);
+  }, [tabs, activeFilePath, sessionReady, client, isDocumentCommandRunning]);
 
   useEffect(() => {
     const warn = (event: BeforeUnloadEvent) => {
@@ -105,6 +136,7 @@ export function useCodeEditorWorkspace() {
 
   // Tab & File actions
   const handleOpenPath = async (filePath: string) => {
+    if (documentCommandPending.current) return;
     try {
       await sessionQueue.current;
       if (tabs.some((tab) => tab.file_path === filePath)) {
@@ -128,6 +160,7 @@ export function useCodeEditorWorkspace() {
 
   const handleCloseTab = async (filePath: string, e?: React.MouseEvent) => {
     if (e) e.stopPropagation();
+    if (documentCommandPending.current) return;
     const tab = tabs.find((item) => item.file_path === filePath);
     if (tab?.is_dirty && !confirm(`Discard unsaved changes in ${tab.title}?`)) return;
     try {
@@ -146,13 +179,13 @@ export function useCodeEditorWorkspace() {
   };
 
   const handleContentChange = (content: string) => {
-    if (!activeFilePath) return;
+    if (!activeFilePath || documentCommandPending.current || activeProtected) return;
     setFileContents((prev) => ({ ...prev, [activeFilePath]: content }));
     setTabs((prev) => prev.map((t) => (t.file_path === activeFilePath ? { ...t, is_dirty: true, content } : t)));
   };
 
   const handleSave = async () => {
-    if (!activeFilePath) return;
+    if (!activeFilePath || documentCommandPending.current) return;
     try {
       await sessionQueue.current;
       const res = await client.saveFile(activeFilePath, activeContent);
@@ -169,7 +202,42 @@ export function useCodeEditorWorkspace() {
     }
   };
 
+  const handleSaveAs = async () => {
+    if (!activeFilePath || documentCommandPending.current) return;
+    const target = prompt('Save As path:', activeFilePath.replace(/(\.[^/.]+)?$/, '_copy$1'));
+    if (!target) return;
+    const source = activeFilePath;
+    const content = activeContent;
+    documentCommandPending.current = true;
+    setIsDocumentCommandRunning(true);
+    try {
+      const operation = sessionQueue.current.then(() => client.saveAsFile(source, target, content));
+      sessionQueue.current = operation;
+      const result = await operation;
+      setTabs((previous) => previous.map((tab) => tab.file_path === result.source_path ? result.tab : tab));
+      setFileContents((previous) => {
+        const updated = { ...previous };
+        delete updated[result.source_path];
+        updated[result.file_path] = result.tab.content;
+        return updated;
+      });
+      setActiveFilePath(result.active_file);
+      setSelectedNavPath(result.file_path);
+      setDiagnostics(result.diagnostics);
+      setDiagnosticFile(result.file_path);
+      setOutputLogs((previous) => [`Saved As ${result.file_path} (${result.bytes_written} bytes).`, ...previous]);
+      void refreshNavigator();
+    } catch (error) {
+      setOutputLogs((previous) => [`Save As error: ${String(error)}`, ...previous]);
+      setBottomTab('output');
+    } finally {
+      documentCommandPending.current = false;
+      setIsDocumentCommandRunning(false);
+    }
+  };
+
   const handleSaveAll = async () => {
+    if (documentCommandPending.current) return;
     const dirtyFiles = tabs
       .filter((t) => t.is_dirty)
       .map((t) => ({
@@ -190,30 +258,37 @@ export function useCodeEditorWorkspace() {
     }
   };
 
+  const handleReload = async () => {
+    if (!activeFilePath || documentCommandPending.current) return;
+    if (activeTab?.is_dirty && !confirm('Discard unsaved changes and reload from disk?')) return;
+    documentCommandPending.current = true;
+    setIsDocumentCommandRunning(true);
+    try {
+      await sessionQueue.current;
+      const result = await client.reloadDisk(activeFilePath, Boolean(activeTab?.is_dirty));
+      setTabs(previous => previous.map(tab => tab.file_path === result.tab.file_path ? result.tab : tab));
+      setFileContents(previous => ({ ...previous, [result.tab.file_path]: result.tab.content }));
+      setDiagnostics([]);
+      setDiagnosticFile(null);
+    } catch (error) {
+      setOutputLogs(previous => [`Reload error: ${String(error)}`, ...previous]);
+      setBottomTab('output');
+    } finally {
+      documentCommandPending.current = false;
+      setIsDocumentCommandRunning(false);
+    }
+  };
+
   const handleCompile = async () => {
-    if (!activeFilePath) return;
+    if (!activeFilePath || documentCommandPending.current) return;
+    if (compilation && !['COMPLETED', 'FAILED', 'CANCELLED', 'INTERRUPTED'].includes(compilation.status)) return;
     setOutputLogs((prev) => [
       `[${new Date().toLocaleTimeString()}] Starting AST syntax validation for ${activeFilePath}...`,
       ...prev,
     ]);
     try {
-      const res = await client.compileFile(activeFilePath, activeContent);
-      setDiagnostics(res.errors || []);
-      setDiagnosticFile(activeFilePath);
-      if (res.success) {
-        setOutputLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] ✓ AST Syntax Check Passed. Module reloaded dynamically.`,
-          `[${new Date().toLocaleTimeString()}] Compilation successful (0 errors, 0 warnings).`,
-          ...prev,
-        ]);
-        setBottomTab('output');
-      } else {
-        setOutputLogs((prev) => [
-          `[${new Date().toLocaleTimeString()}] ✗ Compilation failed with ${res.errors?.length || 1} error(s).`,
-          ...prev,
-        ]);
-        setBottomTab('problems');
-      }
+      const snapshot = await client.startCompilation('file', activeFilePath, activeContent);
+      setCompilation(snapshot);
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : 'Compilation error';
       setOutputLogs((prev) => [`[${new Date().toLocaleTimeString()}] ✗ Error: ${msg}`, ...prev]);
@@ -224,11 +299,12 @@ export function useCodeEditorWorkspace() {
   const handleSearchInFiles = async () => {
     if (!searchQuery.trim()) return;
     try {
-      const matches = await client.searchFiles(searchQuery.trim());
+      const matches = await client.searchFiles(searchQuery.trim(), { ...searchOptions, searchDir: searchOptions.searchDir || undefined });
       setSearchResults(matches);
       setBottomTab('search');
     } catch (error) {
       setOutputLogs((prev) => [`Search error: ${String(error)}`, ...prev]);
+      setBottomTab('output');
     }
   };
 
@@ -245,7 +321,7 @@ export function useCodeEditorWorkspace() {
     };
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [activeFilePath, activeContent]);
+  }, [activeFilePath, activeContent, compilation?.status, isDocumentCommandRunning]);
 
   // Document & Outline Parsers
   const outlineSymbols = useMemo(() => {
@@ -293,6 +369,7 @@ export function useCodeEditorWorkspace() {
 
   // Context Menu Actions
   const handleContextMenuAction = async (action: string) => {
+    if (documentCommandPending.current) return;
     if (!contextMenu && !['new_file', 'new_dir'].includes(action)) return;
     const item = contextMenu?.item ?? { id: 'app/include', name: 'snippets', type: 'directory' as const };
     setContextMenu(null);
@@ -317,7 +394,8 @@ export function useCodeEditorWorkspace() {
         refreshNavigator();
       }
     } else if (action === 'clone') {
-      const target = prompt('Clone to path:', `${item.id.replace(/\.py$/, '')}_clone.py`);
+      const info = await client.pathInfo(item.id);
+      const target = prompt('Clone to path:', info.clone_target);
       if (target) {
         await client.cloneFile(item.id, target);
         refreshNavigator();
@@ -375,22 +453,33 @@ export function useCodeEditorWorkspace() {
   return {
     tabs,
     activeFilePath,
-    setActiveFilePath,
+    setActiveFilePath: (path: string | null) => {
+      if (!documentCommandPending.current) setActiveFilePath(path);
+    },
+    isDocumentCommandRunning,
+    activeProtected,
+    completionSymbols,
+    compilation,
+    setCompilation,
     cursorPos,
     setCursorPos,
     treeRoot,
     collapsedFolders,
     setCollapsedFolders,
     navSearchQuery,
+    ownershipFilter,
+    setOwnershipFilter,
     setNavSearchQuery,
     selectedNavPath,
     bottomTab,
     setBottomTab,
-    diagnostics: diagnosticFile === activeFilePath ? diagnostics : [],
+    diagnostics: diagnosticFile === activeFilePath ? diagnostics : NO_DIAGNOSTICS,
     outputLogs,
     setOutputLogs,
     searchResults,
     searchQuery,
+    searchOptions,
+    setSearchOptions,
     setSearchQuery,
     showTemplateModal,
     setShowTemplateModal,
@@ -407,6 +496,9 @@ export function useCodeEditorWorkspace() {
     handleCloseTab,
     handleContentChange,
     handleSave,
+    handleSaveAs,
+    handleReload,
+    publishDiagnostics: (file: string, errors: SyntaxDiagnosticDto[]) => { setDiagnosticFile(file); setDiagnostics(errors); },
     handleSaveAll,
     handleCompile,
     handleSearchInFiles,

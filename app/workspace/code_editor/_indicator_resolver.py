@@ -112,6 +112,14 @@ def resolve_indicator(name: str) -> type[BaseIndicator]:
     """Prefer live compiled classes; never execute imports outside indicator roots."""
     logger.debug("FR-code-editor-indicator-resolver-resolve-indicator: invoked")
     clean = name.replace("\\", "/").strip()
+    if "::" in clean:
+        file_name, class_name = clean.rsplit("::", 1)
+        if not class_name.isidentifier() or class_name.startswith("_"):
+            raise CodeEditorError("Invalid indicator class identity")
+        classes = _classes(_safe_indicator_path(Path(file_name)))
+        if class_name not in classes:
+            raise CodeEditorError("Indicator class is not declared by this file")
+        return classes[class_name]
     if clean.endswith(".py") or "/" in clean:
         raw = Path(clean)
         path = _safe_indicator_path(raw)

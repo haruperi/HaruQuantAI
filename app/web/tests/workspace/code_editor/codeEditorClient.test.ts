@@ -6,6 +6,35 @@ function mockResponse(data: unknown) {
 }
 
 describe('codeEditorClient', () => {
+  it('maps reload, import selection, job lifecycle and export authoring contracts', async () => {
+    const fetchFn = vi.fn().mockImplementation(mockResponse({}));
+    const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
+    await client.reloadDisk('app/include/user/a.py', true);
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/file/reload', expect.objectContaining({ body: JSON.stringify({ file_path: 'app/include/user/a.py', discard_dirty: true }) }));
+    await client.repairImports('app/include/user/a.py', '', { Symbol: 'app.include.user.source' });
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/imports/repair', expect.objectContaining({ body: JSON.stringify({ file_path: 'app/include/user/a.py', content: '', selections: { Symbol: 'app.include.user.source' } }) }));
+    await client.startCompilation('package', 'app/include/user/package');
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/compilations', expect.objectContaining({ body: JSON.stringify({ scope: 'package', file_path: 'app/include/user/package' }) }));
+    await client.cancelCompilation('editor-1');
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/compilations/editor-1/cancel', expect.objectContaining({ method: 'POST' }));
+    await client.compilation('editor-1');
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/compilations?job_id=editor-1', expect.objectContaining({ method: 'GET' }));
+    await client.createExportTemplate(['app/include/user/a.py'], 'app/include/user/new.py.tpl', 'python');
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/export-templates', expect.objectContaining({ body: JSON.stringify({ source_paths: ['app/include/user/a.py'], target_path: 'app/include/user/new.py.tpl', format_id: 'python' }) }));
+  });
+  it('sends the exact Save As source, destination and empty buffer', async () => {
+    const result = {
+      status: 'saved_as', source_path: 'app/include/source.py', file_path: 'app/include/new.py',
+      active_file: 'app/include/new.py', bytes_written: 0, diagnostics: [],
+      tab: { file_path: 'app/include/new.py', title: 'new.py', content: '', mode: 'python', is_dirty: false },
+    };
+    const fetchFn = vi.fn().mockImplementation(mockResponse(result));
+    const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
+    expect(await client.saveAsFile('app/include/source.py', 'app/include/new.py', '')).toEqual(result);
+    expect(fetchFn).toHaveBeenCalledExactlyOnceWith('/api/v1/code-editor/file/save-as', expect.objectContaining({
+      method: 'POST', body: JSON.stringify({ source_path: 'app/include/source.py', target_path: 'app/include/new.py', content: '' }),
+    }));
+  });
   it('retains typed diagnostic variants and nullable reference differences', async () => {
     const result: IndicatorTestResultDto = {
       test_id: 'diagnostics', status: 'success', symbol: 'EURUSD', timeframe: 'H1',

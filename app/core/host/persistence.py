@@ -4,6 +4,18 @@ CRUD calls return StandardResponse dictionaries. Writes are atomic and bounded
 to 1,000 records. Filters are ANDed; mappings mean equality (None means IS NULL).
 Use RecordFilter for comparisons or IN. Identifiers come from the live schema;
 values are always bound parameters. No caller-supplied SQL is accepted.
+
+Description:
+    Owns SQLite schemas, bounded CRUD and transactions for host capabilities.
+Purpose:
+    FEAT-HOST-PERSISTENCE: Keep schema and transaction authority in the host.
+Key Capabilities:
+    - FR-host-job-schema: Install additive job tables and reject incompatible
+      existing columns; isolated persistence tests verify explicit result logs.
+Python API Usage:
+    response = HostPersistence(path).ensure_jobs_schema()
+CLI Usage:
+    uv run python -m pytest tests/core/host --no-cov
 """
 
 # Dynamic SQL below contains schema-validated, quoted identifiers and fixed
@@ -158,6 +170,40 @@ class HostPersistence:
             return {"affected_rows": 0, "records": []}
 
         return self._run("code_editor.schema", write=True, action=action)
+
+    def ensure_jobs_schema(self) -> dict[str, Any]:
+        """Install host job/event tables without altering existing definitions."""
+
+        def action(connection: sqlite3.Connection) -> dict[str, Any]:
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS host_jobs ("
+                "job_id TEXT PRIMARY KEY, owner TEXT NOT NULL DEFAULT 'default', "
+                "kind TEXT NOT NULL DEFAULT 'compute', status TEXT NOT NULL, "
+                "progress REAL NOT NULL DEFAULT 0, accepted INTEGER DEFAULT 0, "
+                "rejected INTEGER DEFAULT 0, message TEXT NOT NULL DEFAULT '', "
+                "attempt_id INTEGER DEFAULT 1, "
+                "submitted_at_utc TEXT NOT NULL DEFAULT '', "
+                "started_at_utc TEXT, finished_at_utc TEXT, error_message TEXT)"
+            )
+            connection.execute(
+                "CREATE TABLE IF NOT EXISTS host_job_events ("
+                "event_id TEXT PRIMARY KEY, job_id TEXT NOT NULL, attempt_id TEXT, "
+                "from_state TEXT, to_state TEXT NOT NULL, details_json TEXT NOT NULL, "
+                "created_at_utc TEXT NOT NULL)"
+            )
+            connection.execute(
+                "SELECT job_id,owner,kind,status,progress,accepted,rejected,"
+                "message,attempt_id,submitted_at_utc,started_at_utc,"
+                "finished_at_utc,error_message FROM host_jobs LIMIT 0"
+            )
+            connection.execute(
+                "SELECT event_id,job_id,attempt_id,from_state,to_state,"
+                "details_json,created_at_utc FROM host_job_events LIMIT 0"
+            )
+            logger.info("FR-host-job-schema: verified")
+            return {"affected_rows": 0, "records": []}
+
+        return self._run("host_jobs.schema", write=True, action=action)
 
     def ensure_custom_data_schema(self) -> dict[str, Any]:
         """Install additive Data Manager custom-indicator tables atomically.

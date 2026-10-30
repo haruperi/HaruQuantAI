@@ -87,6 +87,7 @@ from app.workspace.code_editor._common import (
     validate_python_syntax,
     writable_snippet_path,
 )
+from app.workspace.code_editor._storage import atomic_create_file
 from app.workspace.code_editor._template_generators import _to_pascal_case
 from app.workspace.code_editor.editor import AppCodeEditor
 from app.workspace.code_editor.registry import registry, unresolved_symbols
@@ -162,11 +163,22 @@ class CodeEditor:
             for tab in self.maintabs()
         ]
 
-    def navigator(self, root_dir: str | None = None) -> NavigatorItem:
+    def navigator(
+        self,
+        root_dir: str | None = None,
+        *,
+        ownership: str = "all",
+        filter_text: str = "",
+    ) -> NavigatorItem:
         """FR-CODEEDITOR-NAVIGATOR: Build hierarchical file tree of snippet repository."""
         logger.debug("FR-code-editor-routes-navigator: invoked")
         target_root = resolve_safe_path(root_dir) if root_dir else INCLUDE_DIR
-        target_root.mkdir(parents=True, exist_ok=True)
+        from app.workspace.code_editor.path_policy import inspect_path
+
+        if ownership not in ("all", "builtin", "user"):
+            raise CodeEditorError("Unknown navigator ownership filter")
+        if not target_root.is_dir():
+            raise CodeEditorError("Navigator root is not an existing directory")
 
         def _build_tree(folder: Path) -> NavigatorItem:
             children: list[NavigatorItem] = []
@@ -181,6 +193,11 @@ class CodeEditor:
                     children.append(_build_tree(item))
                 else:
                     rel_p = item.relative_to(PROJECT_ROOT).as_posix()
+                    info = inspect_path(item)
+                    if ownership != "all" and info.ownership != ownership:
+                        continue
+                    if filter_text.casefold() not in rel_p.casefold():
+                        continue
                     children.append(
                         {
                             "id": rel_p,
@@ -188,13 +205,24 @@ class CodeEditor:
                             "type": "file",
                             "extension": item.suffix.lstrip("."),
                             "path": rel_p,
+                            "protected": info.protected,
+                            "ownership": info.ownership,
                         }
                     )
+            if ownership != "all" or filter_text:
+                children = [
+                    child
+                    for child in children
+                    if child["type"] == "file" or child.get("children")
+                ]
+            folder_info = inspect_path(folder)
             return {
                 "id": folder.relative_to(PROJECT_ROOT).as_posix(),
                 "name": folder.name,
                 "type": "directory",
                 "children": children,
+                "protected": folder_info.protected,
+                "ownership": folder_info.ownership,
             }
 
         tree = _build_tree(target_root)
@@ -233,7 +261,17 @@ class CodeEditor:
         resolved = resolve_safe_path(file_path)
         if resolved.exists():
             raise CodeEditorError(f"File already exists: {file_path}")
-        return self.editor.save_file(str(resolved), content)
+        resolved = writable_snippet_path(resolved)
+        payload = content.encode("utf-8")
+        atomic_create_file(resolved, payload)
+        return {
+            "status": "saved",
+            "file_path": resolved.relative_to(PROJECT_ROOT).as_posix(),
+            "bytes_written": len(payload),
+            "diagnostics": [d.to_dict() for d in validate_python_syntax(content)]
+            if resolved.suffix == ".py"
+            else [],
+        }
 
     def new_dir(self, dir_path: str) -> DirectoryResult:
         """FR-CODEEDITOR-NEW-DIR: Create a new directory."""
@@ -245,18 +283,32 @@ class CodeEditor:
         return {"status": "created", "dir_path": rel_p}
 
     def create_new(
-        self, template_type: str, name: str, category: str = "custom"
+        self,
+        template_type: str,
+        name: str,
+        category: str = "custom",
+        *,
+        indicator: str | None = None,
+        order_action_type: str | None = None,
+        mc_type: str | None = None,
     ) -> CreatedSnippet:
         """FR-CODEEDITOR-CREATE-NEW: Generate a new snippet from one of 12 templates."""
         logger.debug("FR-code-editor-routes-create-new: invoked")
-        content, rel_path = render_template(template_type, name, category=category)
+        content, rel_path = render_template(
+            template_type,
+            name,
+            category=category,
+            indicator=indicator,
+            order_action_type=order_action_type,
+            mc_type=mc_type,
+        )
         resolved = resolve_safe_path(rel_path)
         if resolved.exists():
             raise CodeEditorError(
                 f"Snippet already exists at {rel_path}. Choose a different name."
             )
 
-        saved = self.editor.save_file(str(resolved), content)
+        saved = self.new_file(str(resolved), content)
         tab_info = self.editor.open_file_tab(str(resolved))
         logger.info("FR-code-editor-routes: operation")
         return {
@@ -305,7 +357,7 @@ class CodeEditor:
                         return node
 
                 content = ast.unparse(Rename().visit(tree)) + "\n"
-        return self.editor.save_file(str(tgt_res), content)
+        return self.new_file(str(tgt_res), content)
 
     def rename_file(self, old_path: str, new_path: str) -> RenameResult:
         """FR-CODEEDITOR-RENAME: Rename a file or directory."""
@@ -367,11 +419,16 @@ class CodeEditor:
         if whole_word:
             pattern_str = rf"\b{pattern_str}\b"
 
-        matcher = re.compile(pattern_str, flags)
+        try:
+            matcher = re.compile(pattern_str, flags)
+        except re.error:
+            raise CodeEditorError("Invalid search regular expression") from None
         matches: list[SearchMatch] = []
 
         if root.exists():
             for p in root.rglob("*.py"):
+                if p.is_symlink() or not p.resolve().is_relative_to(root.resolve()):
+                    continue
                 try:
                     lines = p.read_text(encoding="utf-8").splitlines()
                     for idx, line in enumerate(lines, start=1):
@@ -385,8 +442,8 @@ class CodeEditor:
                                     "match": m.group(0),
                                 }
                             )
-                except Exception as exc:
-                    logger.debug("FR-code-editor-routes: operation")
+                except OSError, UnicodeError:
+                    logger.warning("FR-editor-search: unreadable source skipped")
 
         self._search_history = matches
         logger.info("FR-code-editor-routes: operation")
@@ -396,9 +453,24 @@ class CodeEditor:
         """FR-CODEEDITOR-COMPILE: Validate syntax and dynamically reload module."""
         logger.debug("FR-code-editor-routes-compile-file: invoked")
         resolved = resolve_safe_path(file_path)
-        code_str = (
-            content if content is not None else resolved.read_text(encoding="utf-8")
-        )
+        try:
+            code_str = (
+                content if content is not None else resolved.read_text(encoding="utf-8")
+            )
+        except OSError, UnicodeError:
+            return {
+                "file": resolved.relative_to(PROJECT_ROOT).as_posix(),
+                "timestamp": datetime.now(UTC).isoformat(),
+                "success": False,
+                "errors": [
+                    {
+                        "line": 1,
+                        "column": 1,
+                        "message": "Source file is missing or unreadable",
+                        "severity": "error",
+                    }
+                ],
+            }
         diagnostics = validate_python_syntax(code_str)
 
         log_entry: CompileResult = {

@@ -15,6 +15,8 @@ export function EditorBottomPanel({ workspace }: { workspace: CodeEditorState })
     handleOpenPath,
     handleCompile,
     handleSearchInFiles,
+    searchOptions,
+    setSearchOptions,
   } = workspace;
   return (
     <>
@@ -139,6 +141,13 @@ export function EditorBottomPanel({ workspace }: { workspace: CodeEditorState })
                 </button>
               </div>
               <div className="font-mono text-xs divide-y divide-slate-800">
+                <div className="flex gap-2 flex-wrap">
+                  {(['caseSensitive', 'regex', 'wholeWord'] as const).map(key => <label key={key}>
+                    <input type="checkbox" checked={searchOptions[key]} onChange={e => setSearchOptions(previous => ({ ...previous, [key]: e.target.checked }))} />
+                    {key === 'caseSensitive' ? 'Case sensitive' : key === 'regex' ? 'Regular expression' : 'Whole word'}
+                  </label>)}
+                  <label>Search directory <input aria-label="Search directory" value={searchOptions.searchDir} onChange={e => setSearchOptions(previous => ({ ...previous, searchDir: e.target.value }))} placeholder="app/include" /></label>
+                </div>
                 {searchResults.map((m, i) => (
                   <div
                     key={i}

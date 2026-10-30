@@ -183,6 +183,11 @@ def writable_snippet_path(target_path: str | Path) -> Path:
         raise CodeEditorError("Only files in app/include can be modified") from exc
     if not parts or any(part.startswith((".", "__")) for part in parts):
         raise CodeEditorError("Protected snippet package path")
+    from app.workspace.code_editor.path_policy import inspect_path
+
+    if inspect_path(resolved).protected:
+        logger.warning("FR-editor-path-policy: mutation rejected")
+        raise CodeEditorError("Protected builtin or package path")
     return resolved
 
 

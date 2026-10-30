@@ -59,6 +59,7 @@ from app.workspace.code_editor.requests import (
     RenameRequest,
     RenderTemplateRequest,
     SaveAllRequest,
+    SaveAsRequest,
     SaveFileRequest,
     SaveTestRequest,
     SearchRequest,
@@ -84,6 +85,7 @@ __all__ = [
     "RenameRequest",
     "RenderTemplateRequest",
     "SaveAllRequest",
+    "SaveAsRequest",
     "SaveFileRequest",
     "SaveTestRequest",
     "SearchRequest",
@@ -174,10 +176,14 @@ def get_workspace_init() -> dto.SuccessEnvelope[dto.WorkspaceInfo]:
 @router.get("/navigator", response_model=dto.SuccessEnvelope[dto.NavigatorItem])
 def get_navigator(
     root_dir: str | None = None,
+    ownership: str = "all",
+    filter_text: str = "",
 ) -> dto.SuccessEnvelope[dto.NavigatorItem]:
     """Return snippet repository directory tree."""
     logger.debug("FR-code-editor-http-get-navigator: invoked")
-    return _envelope(_code_editor.navigator(root_dir))
+    return _envelope(
+        _code_editor.navigator(root_dir, ownership=ownership, filter_text=filter_text)
+    )
 
 
 @router.get("/tabs", response_model=dto.SuccessEnvelope[list[dto.Tab]])
@@ -208,6 +214,14 @@ def save_file(req: SaveFileRequest) -> dto.SuccessEnvelope[dto.SaveResult]:
     logger.debug("FR-code-editor-http-save-file: invoked")
     res = _code_editor.editor.save_file(req.file_path, req.content)
     return _envelope(res)
+
+
+@router.post("/file/save-as", response_model=dto.SuccessEnvelope[dto.SaveAsResult])
+def save_as(req: SaveAsRequest) -> dto.SuccessEnvelope[dto.SaveAsResult]:
+    """Publish a new file and persist its replacement tab identity."""
+    return _envelope(
+        _code_editor.editor.save_as(req.source_path, req.target_path, req.content)
+    )
 
 
 @router.post("/file/save-all", response_model=dto.SuccessEnvelope[dto.SaveAllResult])
@@ -296,10 +310,12 @@ def compile_all() -> dto.SuccessEnvelope[dto.CompileAllResult]:
 
 
 @router.get("/templates", response_model=dto.SuccessEnvelope[list[dto.TemplateInfo]])
-def get_templates() -> dto.SuccessEnvelope[list[dto.TemplateInfo]]:
+def get_templates(
+    file_path: str | None = None,
+) -> dto.SuccessEnvelope[list[dto.TemplateInfo]]:
     """Return catalog metadata for all 12 templates."""
     logger.debug("FR-code-editor-http-get-templates: invoked")
-    return _envelope(list_templates())
+    return _envelope(list_templates(file_path))
 
 
 @router.post(
@@ -310,7 +326,14 @@ def render_template_preview(
 ) -> dto.SuccessEnvelope[dto.TemplatePreview]:
     """Generate boilerplate code and target path for template preview."""
     logger.debug("FR-code-editor-http-render-template-preview: invoked")
-    code, path = render_template(req.template_id, req.name, req.category)
+    code, path = render_template(
+        req.template_id,
+        req.name,
+        req.category,
+        req.indicator,
+        req.order_action_type,
+        req.mc_type,
+    )
     return _envelope({"content": code, "file_path": path})
 
 
@@ -322,7 +345,14 @@ def create_from_template(
 ) -> dto.SuccessEnvelope[dto.CreatedSnippet]:
     """Instantiate template snippet on disk and open tab."""
     logger.debug("FR-code-editor-http-create-from-template: invoked")
-    res = _code_editor.create_new(req.template_type, req.name, req.category)
+    res = _code_editor.create_new(
+        req.template_type,
+        req.name,
+        req.category,
+        indicator=req.indicator,
+        order_action_type=req.order_action_type,
+        mc_type=req.mc_type,
+    )
     return _envelope(res)
 
 
@@ -472,3 +502,7 @@ def call_extension_tool(
 
 
 router.include_router(mcp_router)
+
+from app.workspace.code_editor.command_http import install_commands  # noqa: E402
+
+install_commands(router)

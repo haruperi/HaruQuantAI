@@ -5,6 +5,60 @@ from app.main import create_app
 from fastapi.testclient import TestClient
 
 
+def test_http_save_as_identity_collision_and_validation(client):
+    import tempfile
+    from pathlib import Path
+
+    from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+
+    with tempfile.TemporaryDirectory(dir=INCLUDE_DIR, prefix="http_save_as_") as name:
+        folder = Path(name).resolve()
+        assert folder.is_relative_to(INCLUDE_DIR.resolve())
+        source = folder / "source.py"
+        target = folder / "new.py"
+        source.write_text("original = 1", encoding="utf-8")
+        source_key = source.relative_to(PROJECT_ROOT).as_posix()
+        target_key = target.relative_to(PROJECT_ROOT).as_posix()
+        assert (
+            client.post(
+                "/api/v1/code-editor/tabs/open", json={"file_path": source_key}
+            ).status_code
+            == 200
+        )
+        endpoint = "/api/v1/code-editor/file/save-as"
+        assert (
+            client.post(
+                endpoint, json={"source_path": source_key, "target_path": target_key}
+            ).status_code
+            == 422
+        )
+        response = client.post(
+            endpoint,
+            json={"source_path": source_key, "target_path": target_key, "content": ""},
+        )
+        assert response.status_code == 200
+        result = response.json()["data"]
+        assert result["status"] == "saved_as"
+        assert result["source_path"] == source_key
+        assert result["file_path"] == result["active_file"] == target_key
+        assert result["bytes_written"] == 0
+        assert result["tab"]["is_dirty"] is False
+        assert target.read_bytes() == b""
+        assert source.read_text(encoding="utf-8") == "original = 1"
+        collision = client.post(
+            endpoint,
+            json={
+                "source_path": target_key,
+                "target_path": source_key,
+                "content": "overwrite",
+                "overwrite": True,
+            },
+        )
+        assert collision.status_code == 409
+        assert collision.json()["error"]["code"] == "conflict"
+        assert source.read_text(encoding="utf-8") == "original = 1"
+
+
 @pytest.mark.parametrize(
     "endpoint,payload",
     [

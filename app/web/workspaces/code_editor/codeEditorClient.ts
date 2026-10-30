@@ -22,6 +22,7 @@ export interface EditorTabDto {
 }
 
 export interface WorkspaceInitDto {
+  recovery_warnings?: string[];
   status: string;
   active_file: string | null;
   open_tabs: EditorTabDto[];
@@ -39,6 +40,8 @@ export interface NavigatorItemDto {
   extension?: string;
   path?: string;
   children?: NavigatorItemDto[];
+  protected?: boolean;
+  ownership?: 'builtin' | 'user' | 'host';
 }
 
 export interface SyntaxDiagnosticDto {
@@ -154,6 +157,14 @@ export interface SaveFileResultDto extends SavedFileDto {
   bytes_written: number;
 }
 
+export interface SaveAsResultDto extends SavedFileDto {
+  status: 'saved_as';
+  source_path: string;
+  tab: EditorTabDto;
+  active_file: string;
+  bytes_written: number;
+}
+
 export interface ImportPackResultDto {
   status: 'completed';
   extracted_count: number;
@@ -191,10 +202,36 @@ export interface SearchMatchDto {
   match: string;
 }
 
+export interface SymbolDto { name: string; module: string; file_path: string; kind: 'class' | 'function' | 'variable'; members: string[] }
+export interface IndicatorDto { identity: string; name: string; file_path: string; outputs: string[]; parameters: Record<string, unknown>; protected: boolean }
+export interface CompilationDto { job_id: string; status: string; progress: number; results: CompileResultDto[]; message: string; cancellation_requested: boolean; source_hashes?: Record<string, string> }
+export interface RepairDto { content: string; added: string[]; unresolved: { symbol: string; candidates: string[] }[] }
+export interface FormatDto { format_id: 'python' | 'pseudocode'; name: string; extension: string }
+export interface PathInfoDto { file_path: string; ownership: 'builtin' | 'user' | 'host'; protected: boolean; exists: boolean; clone_target: string }
+export interface SnippetOptions { indicator?: string; order_action_type?: string; mc_type?: string }
+
 export function createCodeEditorClient(config: TransportConfig = {}) {
   const client = createDomainClient('/code-editor', config);
 
   return {
+    reloadDisk(filePath: string, discardDirty: boolean): Promise<{ tab: EditorTabDto; active_file: string }> {
+      return client.post('/file/reload', { file_path: filePath, discard_dirty: discardDirty });
+    },
+    symbols(): Promise<SymbolDto[]> { return client.get('/catalogue/symbols'); },
+    indicators(): Promise<IndicatorDto[]> { return client.get('/catalogue/indicators'); },
+    pathInfo(filePath: string): Promise<PathInfoDto> { return client.get(`/file/info?file_path=${encodeURIComponent(filePath)}`); },
+    repairImports(filePath: string, content: string, selections: Record<string, string> = {}): Promise<RepairDto> {
+      return client.post('/imports/repair', { file_path: filePath, content, selections });
+    },
+    startCompilation(scope: 'file' | 'package' | 'all' | 'registered', filePath?: string, content?: string): Promise<CompilationDto> {
+      return client.post('/compilations', { scope, file_path: filePath, content });
+    },
+    compilation(jobId?: string): Promise<CompilationDto | null> { return client.get(`/compilations${jobId ? `?job_id=${encodeURIComponent(jobId)}` : ''}`); },
+    cancelCompilation(jobId: string): Promise<CompilationDto> { return client.post(`/compilations/${encodeURIComponent(jobId)}/cancel`, {}); },
+    exportFormats(filePath?: string): Promise<FormatDto[]> { return client.get(`/export-formats${filePath ? `?file_path=${encodeURIComponent(filePath)}` : ''}`); },
+    createExportTemplate(sourcePaths: string[], targetPath: string, formatId: string): Promise<SaveFileResultDto> {
+      return client.post('/export-templates', { source_paths: sourcePaths, target_path: targetPath, format_id: formatId });
+    },
     async syncSession(tabs: EditorTabDto[], activeFile: string | null): Promise<WorkspaceInitDto> {
       return client.post('/session', { tabs, active_file: activeFile });
     },
@@ -208,8 +245,9 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       return client.get<WorkspaceInitDto>('/init');
     },
 
-    async fetchNavigator(rootDir?: string): Promise<NavigatorItemDto> {
-      const q = rootDir ? `?root_dir=${encodeURIComponent(rootDir)}` : '';
+    async fetchNavigator(rootDir?: string, ownership = 'all'): Promise<NavigatorItemDto> {
+      const params = [rootDir ? `root_dir=${encodeURIComponent(rootDir)}` : '', ownership !== 'all' ? `ownership=${ownership}` : ''].filter(Boolean);
+      const q = params.length ? '?' + params.join('&') : '';
       return client.get<NavigatorItemDto>(`/navigator${q}`);
     },
 
@@ -227,6 +265,10 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
 
     async saveFile(filePath: string, content: string): Promise<SaveFileResultDto> {
       return client.post('/file/save', { file_path: filePath, content });
+    },
+
+    async saveAsFile(sourcePath: string, targetPath: string, content: string): Promise<SaveAsResultDto> {
+      return client.post('/file/save-as', { source_path: sourcePath, target_path: targetPath, content });
     },
 
     async saveAllFiles(files?: Array<{ file_path: string; content: string }>): Promise<{ status: string; count: number; files: SavedFileDto[] }> {
@@ -274,20 +316,20 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
       return client.post('/compile-all', {});
     },
 
-    async listTemplates(): Promise<SnippetTemplateDto[]> {
-      return client.get<SnippetTemplateDto[]>('/templates');
+    async listTemplates(filePath?: string): Promise<SnippetTemplateDto[]> {
+      return client.get<SnippetTemplateDto[]>(`/templates${filePath ? `?file_path=${encodeURIComponent(filePath)}` : ''}`);
     },
 
-    async renderTemplatePreview(templateId: string, name: string, category?: string): Promise<{ content: string; file_path: string }> {
-      return client.post('/templates/render', { template_id: templateId, name, category });
+    async renderTemplatePreview(templateId: string, name: string, category?: string, options: SnippetOptions = {}): Promise<{ content: string; file_path: string }> {
+      return client.post('/templates/render', { template_id: templateId, name, category, ...options });
     },
 
     async createFromTemplate(
       templateType: string,
       name: string,
-      category = 'custom'
+      category = 'custom', options: SnippetOptions = {},
     ): Promise<{ status: string; template_type: string; name: string; file_path: string; tab: EditorTabDto }> {
-      return client.post('/templates/create', { template_type: templateType, name, category });
+      return client.post('/templates/create', { template_type: templateType, name, category, ...options });
     },
 
     async exportPack(

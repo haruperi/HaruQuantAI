@@ -22,6 +22,8 @@ export function EditorToolbar({ workspace }: { workspace: CodeEditorState }) {
     refreshNavigator,
     activeTab,
     handleSave,
+    handleSaveAs,
+    isDocumentCommandRunning,
     handleSaveAll,
     handleCompile,
   } = workspace;
@@ -55,7 +57,7 @@ export function EditorToolbar({ workspace }: { workspace: CodeEditorState }) {
           {/* Save */}
           <button
             onClick={handleSave}
-            disabled={!activeTab?.is_dirty}
+            disabled={!activeTab?.is_dirty || workspace.activeProtected || isDocumentCommandRunning}
             className="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-slate-100 text-xs font-medium flex items-center gap-1.5 transition-colors border border-slate-700/60 disabled:opacity-40"
           >
             <Save className={`w-3.5 h-3.5 ${activeTab?.is_dirty ? 'text-amber-400' : 'text-slate-400'}`} />
@@ -63,6 +65,14 @@ export function EditorToolbar({ workspace }: { workspace: CodeEditorState }) {
           </button>
 
           {/* Save All */}
+          <button
+            onClick={handleSaveAs}
+            disabled={!activeFilePath || isDocumentCommandRunning}
+            className="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 text-xs border border-slate-700/60 disabled:opacity-40"
+          >
+            {isDocumentCommandRunning ? 'Saving As...' : 'Save As'}
+          </button>
+
           <button
             onClick={handleSaveAll}
             className="px-2.5 py-1.5 rounded-lg hover:bg-slate-800 text-slate-300 hover:text-slate-100 text-xs font-medium flex items-center gap-1.5 transition-colors border border-slate-700/60"
@@ -84,7 +94,7 @@ export function EditorToolbar({ workspace }: { workspace: CodeEditorState }) {
           {/* Compile */}
           <button
             onClick={handleCompile}
-            disabled={!activeFilePath}
+            disabled={!activeFilePath || isDocumentCommandRunning || Boolean(workspace.compilation && !['COMPLETED', 'FAILED', 'CANCELLED', 'INTERRUPTED'].includes(workspace.compilation.status))}
             className="px-3 py-1.5 rounded-lg bg-emerald-600/10 hover:bg-emerald-600/20 text-emerald-400 border border-emerald-500/30 text-xs font-medium flex items-center gap-1.5 transition-colors disabled:opacity-40"
           >
             <Play className="w-3.5 h-3.5 fill-current" />

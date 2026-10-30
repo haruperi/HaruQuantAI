@@ -1,20 +1,40 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Check, Copy, FileCode, Folder, Search, X } from 'lucide-react';
 import { TEMPLATE_METADATA, type TemplateMetadata } from './templateCatalog';
-import { createCodeEditorClient } from './codeEditorClient';
+import { createCodeEditorClient, type IndicatorDto } from './codeEditorClient';
 
 interface CreateFromTemplateModalProps {
+  contextPath?: string;
   onClose: () => void;
   onSnippetCreated: (tabInfo: { file_path: string; title: string; content: string }) => void;
 }
 
-export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFromTemplateModalProps) {
+export function CreateFromTemplateModal({ onClose, onSnippetCreated, contextPath }: CreateFromTemplateModalProps) {
   const client = useMemo(() => createCodeEditorClient(), []);
   const [selectedTemplate, setSelectedTemplate] = useState<TemplateMetadata>(TEMPLATE_METADATA[0]);
   const [snippetName, setSnippetName] = useState<string>(TEMPLATE_METADATA[0].defaultName);
   const [indicatorCategory, setIndicatorCategory] = useState<string>('custom');
   const [customCategory, setCustomCategory] = useState('');
   const [previewPath, setPreviewPath] = useState('');
+  const [catalogue, setCatalogue] = useState(TEMPLATE_METADATA);
+  const [catalogueReady, setCatalogueReady] = useState(false);
+  const [indicators, setIndicators] = useState<IndicatorDto[]>([]);
+  const [indicator, setIndicator] = useState('');
+  const [orderAction, setOrderAction] = useState('Open');
+  useEffect(() => {
+    let active = true;
+    client.listTemplates(contextPath).then(items => { if (active) {
+      const available = items.map(item => ({
+      ...(TEMPLATE_METADATA.find(metadata => metadata.id === item.template_id) ?? TEMPLATE_METADATA[0]),
+      id: item.template_id, name: item.name, description: item.description, targetDir: item.target_subdir,
+      }));
+      setCatalogue(available);
+      if (available.length && !available.some(item => item.id === selectedTemplate.id)) setSelectedTemplate(available[0]);
+      setCatalogueReady(true);
+    } }).catch(error => { if (active) setErrorMsg(String(error)); });
+    client.indicators().then(items => { if (active) setIndicators(items); }).catch(error => { if (active) setErrorMsg(String(error)); });
+    return () => { active = false; };
+  }, [client, contextPath]);
   const targetCategory = indicatorCategory === '__new__' ? customCategory.trim() : indicatorCategory;
   const normalizedName = snippetName.trim().replace(/\.py$/, '') || selectedTemplate.defaultName;
   const [searchQuery, setSearchQuery] = useState<string>('');
@@ -24,7 +44,7 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   // Filter templates
-  const filteredTemplates = TEMPLATE_METADATA.filter(
+  const filteredTemplates = catalogue.filter(
     (t) =>
       t.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
       t.description.toLowerCase().includes(searchQuery.toLowerCase()),
@@ -35,11 +55,13 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
     let active = true;
     setPreviewPath('');
     setErrorMsg(null);
+    if (!catalogueReady || !catalogue.some(item => item.id === selectedTemplate.id)) return;
     client
       .renderTemplatePreview(
         selectedTemplate.id,
         normalizedName,
         selectedTemplate.id === 'BlocksIndicators' ? targetCategory : undefined,
+        { ...(selectedTemplate.id === 'BlocksSignal' && indicator ? { indicator } : {}), ...(selectedTemplate.id === 'BlocksOrder' ? { order_action_type: orderAction } : {}) },
       )
       .then((res) => {
         if (active) {
@@ -56,7 +78,7 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
     return () => {
       active = false;
     };
-  }, [client, selectedTemplate.id, normalizedName, targetCategory]);
+  }, [client, selectedTemplate.id, normalizedName, targetCategory, indicator, orderAction, catalogueReady, catalogue]);
 
   const handleSelectTemplate = (tmpl: TemplateMetadata) => {
     setSelectedTemplate(tmpl);
@@ -84,6 +106,7 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
         selectedTemplate.id,
         snippetName.trim().replace(/\.py$/, ''),
         activeCategory,
+        { ...(selectedTemplate.id === 'BlocksSignal' && indicator ? { indicator } : {}), ...(selectedTemplate.id === 'BlocksOrder' ? { order_action_type: orderAction } : {}) },
       );
       onSnippetCreated({
         file_path: res.file_path,
@@ -267,6 +290,16 @@ export function CreateFromTemplateModal({ onClose, onSnippetCreated }: CreateFro
               </div>
 
               <div>
+                {selectedTemplate.id === 'BlocksSignal' && <label>Derived from indicator
+                  <select aria-label="Signal indicator" value={indicator} onChange={e => setIndicator(e.target.value)}>
+                    <option value="">Generic series signal</option>{indicators.map(item => <option key={item.identity} value={item.identity}>{item.name}</option>)}
+                  </select>
+                </label>}
+                {selectedTemplate.id === 'BlocksOrder' && <label>Order action
+                  <select aria-label="Order action subtype" value={orderAction} onChange={e => setOrderAction(e.target.value)}>
+                    {['Open', 'Modify', 'Close'].map(value => <option key={value}>{value}</option>)}
+                  </select>
+                </label>}
                 <label className="block text-[11px] font-medium text-slate-300 mb-1">Target Path</label>
                 <div className="px-3 py-1.5 text-xs bg-slate-950/70 border border-slate-800 rounded-lg text-slate-400 font-mono flex items-center gap-1.5 truncate">
                   <Folder className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />

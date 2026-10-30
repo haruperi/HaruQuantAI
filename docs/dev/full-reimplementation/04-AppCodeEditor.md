@@ -125,7 +125,7 @@ These orders split the historical full-feature orders below. SPECIFIED means a b
 | `WO-CE-TESTER-REQUEST-LIFECYCLE` (Phase 4.3) | COMPLETE | Ignore stale or unmounted tester requests; follows 4.2 |
 | `WO-CE-PACK-UI-CONTRACT` (Phase 4.4) | COMPLETE | Make existing import/export controls reflect the current Python package API; no new archive format or import destination |
 | `WO-CE-TYPED-WORKSPACE-CONTRACTS` | COMPLETE | Type existing service results and errors, audit host persistence/lifecycle ownership, preserve compatibility before adding commands |
-| `WO-CE-COMMAND-GAPS` | NEEDS-SPEC | Save As, reload, catalogues, template export, import repair, compilation lifecycle and extension reload; exact operation map in audit |
+| `WO-CE-COMMAND-GAPS` | COMPLETE | All fourteen native Python editor command gaps implemented and verified in Phase 4.7; documented cancellation, autocomplete and export-format limits apply |
 | `WO-CE-INDICATOR-SUITE` | NEEDS-SPEC | Batch XML/config mapping, reference-file comparison, row selection, status/errors and cancellation; preserve single-indicator history tester |
 | `WO-CE-IMPORT-SESSION` | NEEDS-SPEC | Per-conflict overwrite/skip/always/cancel, protected files and typed progress; current batch rules are only partial coverage |
 | `WO-CE-TEST-DISTRIBUTION` | NEEDS-SPEC | Offline archive fixtures and host-owned transport policy before any provider download |
@@ -232,6 +232,121 @@ Browser tests intercept package requests; they do not extract archives, mutate a
 | `git diff --check` | Exit 0 |
 
 Backend tests use isolated temporary host stores/history. Browser requests are intercepted; coverage above is scoped to the editor package and does not establish the repository-wide coverage floor or full donor runtime parity. Asynchronous jobs/events, remaining editor commands, batch suites, distribution, calibration and extension reconciliation retain their separate work orders.
+
+### Phase 4.6: Save As — first slice of `WO-CE-COMMAND-GAPS`
+
+**Status:** COMPLETE for Save As; verified 2026-10-30 against shared-checkout
+HEAD `b7197e19`. Included in the owner-authorized consolidated implementation.
+Historical Save As-only slice. The owner subsequently approved consolidated
+iteration 2 covering all fourteen command gaps below.
+
+- [x] Typed `SaveAsRequest`/`SaveAsResult`, `AppCodeEditor.save_as` and
+  `POST /api/v1/code-editor/file/save-as` publish the supplied buffer to a new
+  authorized snippet path. Empty and UTF-8 buffers are supported.
+- [x] Existing files, protected paths, source aliases and another open tab's
+  identity are rejected. Same-directory staging and exclusive publication prevent
+  overwriting a competing destination. No compilation or class rewriting occurs.
+- [x] The destination replaces the source tab in place and becomes active/clean;
+  other dirty buffers and the source disk file are preserved. The candidate
+  session is persisted before publishing the new in-memory identity.
+- [x] A session-persistence failure after file publication explicitly reports
+  that the new file remains while the original session is retained. This is not
+  an atomic filesystem/database transaction.
+- [x] The Save As toolbar action serializes with session synchronization and
+  freezes edits/conflicting actions until completion. Cancellation and errors
+  retain the original buffer. Ownership/semantics are registered in the editor README.
+
+| Exact verification command | Result |
+| --- | --- |
+| `uv run python -m pytest tests/workspace/code_editor --cov=app.workspace.code_editor --cov-branch --cov-report=term-missing --cov-fail-under=80 -q` | Exit 0; 145 tests passed; 87.46% configured branch-aware coverage (editor plus configured grid sources) |
+| `uv run mypy --strict app/workspace/code_editor` | Exit 0; 17 modules passed |
+| `uv run ruff check app/workspace/code_editor tests/workspace/code_editor` | Exit 0 |
+| `uv run ruff format --check app/workspace/code_editor tests/workspace/code_editor` | Exit 0; 32 files formatted |
+| `uv run python scripts/check_architecture.py` | Exit 0; all five gates passed |
+| `npm --prefix app/web run test` | Exit 0; 719 tests passed across 125 files in the shared checkout |
+| `npm --prefix app/web run typecheck` | Exit 0 |
+| `npm --prefix app/web run build` | Exit 0; existing data-manager mixed-import and bundle-size warnings remain |
+| `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts` | Exit 0; 36 browser tests passed, including seven Save As regressions |
+| `git diff --check` | Exit 0 |
+
+Backend tests use isolated temporary stores. Browser requests are intercepted.
+Coverage is scoped evidence, not
+repository-wide acceptance. The remaining command gaps at this historical slice
+were subsequently implemented together under approved iteration 2 in Phase 4.7.
+
+### Phase 4.7: Complete editor command gaps — `WO-CE-COMMAND-GAPS`
+
+**Status:** COMPLETE for all fourteen native editor command gaps; verified 2026-10-30.
+Owner approved iteration 2 as one scope covering all fourteen items; the earlier
+Save As-only boundary was superseded. The owner authorized execution after the
+consolidated walkthrough; this changeset contains the reviewed implementation.
+
+| Owner item | Implemented target behavior |
+| --- | --- |
+| Save As | Typed exclusive publication, collision/protected/open-tab checks, replacement identity and preserved source/other buffers |
+| Explicit disk reload | `/file/reload`, dirty confirmation, persisted candidate before replacement, visible failures with retained buffer |
+| Indicator catalogue/autocomplete | Typed canonical `file_path::ClassName` identities, defaults/outputs/protection; public symbol/member index, live compiled-class overlay, class/alias/simple-instance completions |
+| Code-type/path template catalogues | `/code-types`, twelve generator families, MonteCarlo alias/subtypes and CodeExport formats; path-filtered `/templates` and server-driven modal choices |
+| Snippet subtypes/derived signals | Open/Modify/Close order mapping; Manipulation/Retest mapping; validated indicator-derived signal output and evaluation helper |
+| Code-export templates | Explicit Python `.py.tpl` and pseudocode `.txt.tpl` formats, path-aware format filtering and exclusive new template publication |
+| Python package/plugin compilation | Host job compiles an explicit include package/directory, including initializers and relative imports; per-file diagnostics/registration |
+| Compilation lifecycle | File/package/all/registered scopes; host job identity and progress, typed polling delivery, cooperative cancellation and truthful terminal outcomes |
+| Python import repair | Proposed buffer with unique imports, preserved docstring/future imports, explicit ambiguity selection and rejection of unknown candidates |
+| Diagnostic restoration | Per-job/latest snapshots through host storage; restart interruption, source hashes and stale reconnect/poll protection |
+| Reload registered extensions | Compiles workspace registry paths including tools; removes failed/missing registrations and reports individual results |
+| Search controls | Case sensitivity, regular expression, whole word and directory scope wired to backend; safe regex rejection |
+| Builtin/user protection | Versioned shipped-file inventory, shared path policy, mutation protection, navigator metadata/filtering, readonly builtin buffers and user clone destinations |
+| Missing/corrupt session recovery | Missing files retain dirty buffers with visible Save As warnings; corrupt snapshots fail visibly without reset; duplicate/canonical identity validation |
+
+New implementation contracts and limits are registered in
+`app/workspace/code_editor/README.md`. Host persistence owns additive job/event
+schema installation and compatibility checks; application lifespan owns worker
+shutdown. No workspace SQL, new dependency or active database reset was introduced.
+
+Cancellation waits for the current Python import to return and does not undo
+completed registrations or import side effects. Export templates are source
+authoring, not a claim of SQX/Java or trading-platform compiler parity. Autocomplete
+supports the documented static/simple binding cases rather than full Python type
+inference. Browser tests intercept HTTP; separate tests use real host jobs and
+isolated stores to establish backend lifecycle and restart behavior.
+
+#### Consolidated verification
+
+Concurrent activity temporarily replaced unstaged checkout sources during live
+verification, producing import/browser failures against older source. Final checks
+therefore used a frozen, non-Git source copy at
+`C:/Users/rharu/AppData/Local/Temp/hqa-editor-python-verify-1bocrlre`.
+No branch/worktree/history change or active database copy was made. Only the
+snapshot's Vite cache location was redirected; production source was unchanged.
+
+The 67 relevant source/test files matched the checkout byte-for-byte. Their
+SHA-256 manifest fingerprint is
+`26f9b747fc0f91eeea9c05e506dd38588ea4e4424e4a2a86bf8c3785b8f707b6`.
+The manifest is `editor-candidate-manifest.json` in that temporary directory.
+Backend verification used the repository's `.venv/Scripts/python.exe`, Ruff and
+mypy executables; npm commands ran from the copied `app/web` directory.
+
+| Verification command | Result |
+| --- | --- |
+| `python -m pytest tests/workspace/code_editor --cov=app.workspace.code_editor --cov-branch --cov-report=term-missing --cov-fail-under=80 -q` | Exit 0; 174 passed; 87.13% branch-aware editor package coverage |
+| `python -m pytest tests/core/host/test_editor_job_schema.py tests/core/host/test_persistance.py tests/core/jobs/test_manager.py tests/host/test_main.py -q --no-cov` | Exit 0; 62 passed |
+| `python -m pytest tests/workspace/code_editor/test_commands.py tests/workspace/code_editor/test_http.py tests/host/test_main.py -q --no-cov` | Exit 0; 57 passed after incorporating concurrent AI-router bootstrap registration into the verification snapshot |
+| `mypy --strict app/workspace/code_editor app/core/host/persistence.py app/main.py` | Exit 0; 26 production modules passed |
+| `ruff check app/workspace/code_editor app/core/host/persistence.py app/main.py tests/workspace/code_editor tests/core/host/test_editor_job_schema.py` | Exit 0 |
+| `ruff format --check app/workspace/code_editor app/core/host/persistence.py app/main.py tests/workspace/code_editor tests/core/host/test_editor_job_schema.py` | Exit 0 |
+| `npm run typecheck` | Exit 0 |
+| `npm run test -- tests/workspace/code_editor` | Exit 0; 69 passed across four files |
+| `npm run test:ui -- tests/e2e/code-editor-regressions.spec.ts` | Exit 0; all 51 browser tests passed |
+| `npm run test` | Exit 0; 752 passed across 134 files |
+| `npm run build` | Exit 0; existing data-manager mixed-import and bundle-size warnings remain |
+| `uv run python scripts/check_architecture.py` (shared checkout) | Exit 0; all five gates passed |
+| `git diff --check` (shared checkout) | Exit 0 |
+
+The shared-checkout full frontend unit suite/build also passed, and all five
+architecture gates passed. Final diff review is recorded in the walkthrough.
+Coverage above does not claim the repository-wide Python coverage floor or donor
+runtime parity. Other parent orders, including batch tester suites, distribution,
+calibration and complete extension reconciliation, remain separate.
 
 ## Phase 04.9: Full workspace feature orders — evidence-gated contracts
 
