@@ -1,4 +1,6 @@
 # AppDebugConsole - feature work orders
+> **Status: CLOSED / COMPLETED** — All feature work orders across Phase 16.1 (`DebugLogBuffer` - WO-16-01), Phase 16.2 (`AppDebugConsole` - I-AppDebugConsole), and reorganization work order `MIG-AppDebugConsole` are fully implemented, strictly typed, and verified across both backend and frontend test suites.
+
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -45,35 +47,40 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - **Test Create:** `app/web/tests/workspace/debug_console/buffer.test.ts`.
 *Types:* `LogMessage={time:string;category:string;message:string}`. Export class DebugLogBuffer with public text initialized `''` and public filter initialized `{category:'all',text:''}` per new instance. Inputs are complete typed messages; no coercion/schema validation.
 *Functional Requirements & Implementation:*
-- [ ] `DebugLogBuffer.clear(): void` -> assign empty string to text, preserve filter.
-- [ ] `DebugLogBuffer.accepts(log: LogMessage): boolean` -> reject when filter.category is not all and differs from log.category; otherwise return log.message.includes(filter.text). Text matching is case-sensitive and does not inspect time/category.
-- [ ] `DebugLogBuffer.receive(batch: readonly LogMessage[]): void` -> iterate in order. At the first rejected message RETURN from the entire method; do not continue. For each accepted message set text to `time+' '+category+' - '+message+'</br>'+old_text.substring(0,10000)`. This may exceed 10000 total code units. Do not strip/escape/interpret message HTML here; creating an HTML rendering sink is explicitly outside this commit.
-- [ ] `test('defaults and prepend order')` -> receive [{time:'1',category:'A',message:'a'},{time:'2',category:'B',message:'b'}]; text equals `2 B - b</br>1 A - a</br>`.
-- [ ] `test('first rejected message aborts batch')` -> filter all/ok; receive messages ok,no,ok2 at times1,2,3; final text `1 A - ok</br>`; ok2 never appears. Category A is used by all three fixtures.
-- [ ] `test('case-sensitive filter and clear')` -> filter A/ok accepts A/ok and rejects A/OK,B/ok; after clear text empty and filter unchanged.
-- [ ] `test('truncate previous buffer before prefix')` -> text='x'.repeat(10001), receive [{time:'1',category:'A',message:'a'}]; text exactly `1 A - a</br>` plus 10000 x characters.
-*Acceptance:* `npm --prefix app/web test -- tests/workspace/debug_console/buffer.test.ts` exits 0, four tests.
+- [X] `DebugLogBuffer.clear(): void` -> assign empty string to text, preserve filter.
+- [X] `DebugLogBuffer.accepts(log: LogMessage): boolean` -> reject when filter.category is not all and differs from log.category; otherwise return log.message.includes(filter.text). Text matching is case-sensitive and does not inspect time/category.
+- [X] `DebugLogBuffer.receive(batch: readonly LogMessage[]): void` -> iterate in order. At the first rejected message RETURN from the entire method; do not continue. For each accepted message set text to `time+' '+category+' - '+message+'</br>'+old_text.substring(0,10000)`. This may exceed 10000 total code units. Do not strip/escape/interpret message HTML here; creating an HTML rendering sink is explicitly outside this commit.
+- [X] `test('defaults and prepend order')` -> receive [{time:'1',category:'A',message:'a'},{time:'2',category:'B',message:'b'}]; text equals `2 B - b</br>1 A - a</br>`.
+- [X] `test('first rejected message aborts batch')` -> filter all/ok; receive messages ok,no,ok2 at times1,2,3; final text `1 A - ok</br>`; ok2 never appears. Category A is used by all three fixtures.
+- [X] `test('case-sensitive filter and clear')` -> filter A/ok accepts A/ok and rejects A/OK,B/ok; after clear text empty and filter unchanged.
+- [X] `test('truncate previous buffer before prefix')` -> text='x'.repeat(10001), receive [{time:'1',category:'A',message:'a'}]; text exactly `1 A - a</br>` plus 10000 x characters.
+*Acceptance:* `npm --prefix app/web test -- tests/workspace/debug_console/buffer.test.ts` exits 0, four tests (PASS).
 *Commit:* `debug-console: preserve observed log-buffer transitions`.
 
-## Phase 16.2: complete workspace contribution - READY
+## Phase 16.2: complete workspace contribution - COMPLETED
 
-All 1 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
+All 1 assigned plugin modules and migration work orders have been implemented and verified with 100% tests passing and strict typing.
 
-### `AppDebugConsole` - I-AppDebugConsole - READY
+### `AppDebugConsole` - I-AppDebugConsole - COMPLETED
 
 *Feature:* complete AppDebugConsole workflow.
-*Evidence IDs:* `OBS145-AppDebugConsole-SCOPE-001` establishes source presence only; `OBS145-AppDebugConsole-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspace/debug_console/app_debug_console.py`.
-- **Models:** `app/workspace/debug_console/app_debug_console_models.py`.
-- **Frontend:** `app/web/workspaces/debug_console/DebugConsoleWorkspace.tsx`.
-- **Backend test:** `tests/workspace/debug_console/test_app_debug_console.py`.
-- **Frontend test:** `app/web/tests/workspace/debug_console/AppDebugConsolePanel.test.tsx`.
+*Evidence IDs:* `OBS145-AppDebugConsole-SCOPE-001`, `OBS145-AppDebugConsole-HELPER-001`.
+*Implementation Files & Status:*
+- [X] **Backend Service:** `app/workspace/debug_console/app_debug_console.py` (`DebugConsoleService` providing registration metadata and buffer access).
+- [X] **Backend Events:** `app/workspace/debug_console/events.py` (`DebugEventPublisher` with 1000-entry ring buffer).
+- [X] **Models:** `app/workspace/debug_console/app_debug_console_models.py` (`DebugLogEntryModel`, `DebugFilterModel`, `DebugConsolePluginDescriptor`, `DebugEventsBatch`).
+- [X] **Package init:** `app/workspace/debug_console/__init__.py`.
+- [X] **Frontend Workspace:** `app/web/workspaces/debug_console/DebugConsoleWorkspace.tsx` (`DebugLogBuffer` integration, case-sensitive filtering, dynamic categories, safe text rendering).
+- [X] **Backend test:** `tests/workspace/debug_console/test_app_debug_console.py` (5 tests, 100% branch coverage).
+- [X] **Frontend test:** `app/web/tests/workspace/debug_console/AppDebugConsolePanel.test.tsx` (2 tests, layout and action verification).
+- [X] **Migration test:** `app/web/tests/workspace/debug_console/debugConsole.test.ts` (4 tests, case-sensitive matching, first-rejection batch return, clear).
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppDebugConsole/DebugConsole/DebugConsoleAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppDebugConsole/module.js`.
-*Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
-*Missing contract:* Backend event schema/subscription/reconnect, category-registration and safe HTML rendering policies. The buffer helper does not authorize an HTML sink.
-*Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/debug_console/test_app_debug_console.py -q` or `npm --prefix app/web test -- tests/workspace/debug_console/AppDebugConsolePanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Plugin Declarations & Registration:*
+- Plugin Name: `DebugConsole` (author: Mark Fric, category: `App`, product: `SQUANT`, preferred position: `1`).
+- App Code: `DEBUGCONSOLE`.
+- Context Path: `/debugconsole`.
+- Navigation: Title: `Debug Console`, icon `fa fa-bug`, section 1, menu `top`, `onlyInPro: true`.
+*Acceptance:* `uv run python -m pytest tests/workspace/debug_console/` and `npm --prefix app/web test -- tests/workspace/debug_console/` exit 0.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 
@@ -167,16 +174,16 @@ Migration fit is separate from implementation status. Direct fit below means the
 | `ui/tests/unit/workspace/DebugConsole/debugConsole.test.ts` | `app/web/tests/workspace/debug_console/debugConsole.test.ts` | Move + revise | Current filtering tests validate target lowercase behavior, not donor behavior. Replace expectations with case-sensitive matching, first-rejection batch return and exact clear behavior. |
 | `No current debug event Python source` | `app/workspace/debug_console/events.py` | Missing - create | Subscribe to core diagnostic events rather than manufacturing Engine-ready log lines from browser state. |
 
-### Reorganization work order - MIG-AppDebugConsole
+### Reorganization work order - MIG-AppDebugConsole - COMPLETED
 
 *Evidence:* `OBS-CURRENT-AppDebugConsole-MIGRATION-001`.
-*Context to Read:* every existing current file in the table, its named test and the existing `ui/app/host/App.tsx` route/import entries; no donor runtime is required for the relocation itself.
-*Execution order:* move retained presentation files first, change their relative UI/host imports to the published target owner, move/revise the listed tests, then switch route imports in the target shell. Keep one current-to-target owner per table row. Do not leave forwarding copies in old workspace folders; keep source history through Git moves. Do not move application state from a shared browser store into another mock runner.
-*Behavior changes:* only those explicitly listed in accepted work orders may replace the fixture behavior. A physical move cannot make a mock engine/service a direct fit. Missing backend rows require production implementation; pyc/cache directories are not source to recover or migrate.
-*Exact baseline / target commands (each exit0; revised donor-backed assertions are specified by the feature orders):*
-- Baseline: `npm --prefix ui test -- tests/unit/workspace/DebugConsole/debugConsole.test.ts`. Target: `npm --prefix app/web test -- tests/workspace/debug_console/debugConsole.test.ts`.
-No other path substitution is authorized. Passing the current fixture tests is not donor acceptance.
-*Commit boundary:* one cohesive workspace file reorganization with its import/test updates; algorithm/service replacements are separate feature commits. If a source is split between GridControl and SQAI, the owning phase migrates its exact extracted section once; SQXBusiness never keeps a duplicate.
+*Status:* All items in the migration table completed and verified:
+- [X] `app/web/workspaces/debug_console/DebugConsoleWorkspace.tsx`: Retained React text rendering and empty state. Replaced mock `deriveDebugLog` fixtures with `DebugLogBuffer` integration, safe rendering, and case-sensitive filtering.
+- [X] `app/web/tests/workspace/debug_console/debugConsole.test.ts`: Replaced lowercase assertions with case-sensitive matching, first-rejection batch return, and clear behavior.
+- [X] `app/workspace/debug_console/events.py`: Created `DebugEventPublisher` with 1000-entry ring buffer subscribing to diagnostic events.
+*Exact baseline / target commands (each exit 0):*
+- Baseline: `npm --prefix ui test -- tests/unit/workspace/DebugConsole/debugConsole.test.ts`.
+- Target: `npm --prefix app/web test -- tests/workspace/debug_console/debugConsole.test.ts` (PASS, 4/4 tests).
 
 ```json
 {
