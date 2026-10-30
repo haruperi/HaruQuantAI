@@ -135,3 +135,22 @@ def test_manual_finished_job_and_bounded_history() -> None:
     assert len(data.finished) == 2
     # Most recent should be fin-3 and fin-2
     assert [j.job_id for j in data.finished] == ["fin-3", "fin-2"]
+
+
+def test_workspace_service_facade(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify GridControlWorkspaceService facade delegates correctly."""
+    from app.workspace.grid_control.workspace import GridControlWorkspaceService
+
+    with caplog.at_level(logging.INFO):
+        workspace = GridControlWorkspaceService()
+    assert "FR-GRID-WORKSPACE-FACADE" in caplog.text
+
+    node = RemoteWorkerNode(worker_id="ws-node-1", ip="10.1.1.1", total_cores=16)
+    workspace.register_node(node)
+
+    topology = workspace.get_topology()
+    assert len(topology.nodes) == 1
+    assert topology.total_cores == 16
+
+    data = workspace.get_data()
+    assert len(data.running) == 0

@@ -187,7 +187,7 @@ def create_app(
             yield
         finally:
             logger.info("Backend shutting down")
-            for name in ("basket_jobs", "download_jobs"):
+            for name in ("basket_jobs", "download_jobs", "code_editor_jobs"):
                 if (jobs := getattr(application.state, name, None)) is not None:
                     await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
                     delattr(application.state, name)
@@ -216,6 +216,10 @@ def create_app(
     from app.workspace.code_editor import code_editor_router
 
     application.include_router(code_editor_router)
+
+    from app.workspace.grid_control import grid_control_router
+
+    application.include_router(grid_control_router)
 
     @application.get("/health", tags=["host"])
     async def health() -> dict[str, str]:

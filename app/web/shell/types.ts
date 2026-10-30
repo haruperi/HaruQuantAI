@@ -81,6 +81,10 @@ export interface Job {
   accepted: number;
   rejected: number;
   startedAt?: string;
+  finishedAt?: string;
+  createdAt?: string;
+  jobGroupId?: string;
+  blocking?: boolean;
   message: string;
 }
 

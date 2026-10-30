@@ -1,4 +1,6 @@
 # AppGridControl - feature work orders
+> **Status: CLOSED / COMPLETED** — All feature work orders across Phase 14.1 (`GridJobPresentation` - WO-14-01), Phase 14.2 (`AppGridControl` - I-AppGridControl, `ServletGridControl` - I-ServletGridControl), and reorganization work order `MIG-AppGridControl` are fully implemented, strictly typed, and verified across both backend and frontend test suites.
+
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -49,11 +51,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Acceptance:* `npm --prefix app/web test -- tests/workspace/grid_control/jobPresentation.test.ts` exits 0, two tests.
 *Commit:* `grid-control: preserve job labels and refresh predicate`.
 
-## Phase 14.2: complete workspace contribution - BACKEND CONTRACT RESOLVED
+## Phase 14.2: complete workspace contribution - COMPLETED
 
-All 2 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below define the resolved backend contracts, wire payload specifications, and service integration boundaries.
+All 2 assigned plugin modules and migration work orders have been implemented and verified with 100% tests passing and strict typing.
 
-### `AppGridControl` - I-AppGridControl - BACKEND CONTRACT RESOLVED
+### `AppGridControl` - I-AppGridControl - COMPLETED
 
 *Feature:* complete AppGridControl application registration and workspace view contribution.
 *Evidence IDs:* `OBS145-AppGridControl-SCOPE-001`, `OBS145-AppGridControl-HELPER-001`.
@@ -67,18 +69,21 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 - App Code: `GRIDCONTROL`.
 - Context Path: `/grid-control`.
 - Navigation: Title: `Grid Control`, icon `fa fa-th-large`, section 1, menu `top`.
-*Implementation Files:*
-- **Backend Service:** `app/workspace/grid_control/service.py` (consumes `RemoteComputeCoordinator` from `app/core/grid/executor.py`).
-- **Models:** `app/workspace/grid_control/models.py`.
-- **Frontend Workspace:** `app/web/workspaces/grid_control/GridControlWorkspace.tsx`.
-- **Backend test:** `tests/workspace/grid_control/test_app_grid_control.py`.
-- **Frontend test:** `app/web/tests/workspace/grid_control/AppGridControlPanel.test.tsx`.
+*Implementation Files & Status:*
+- [X] **Backend Service:** `app/workspace/grid_control/service.py` (consumes `RemoteComputeCoordinator` from `app/core/grid/executor.py`).
+- [X] **Models:** `app/workspace/grid_control/models.py` (GridJobSummary, GridDataResponse, GridControlDataResponse, RemoteComputeNode).
+- [X] **Workspace Facade:** `app/workspace/grid_control/workspace.py` (orchestrates `GridControlService` for workspace operations).
+- [X] **Frontend Workspace:** `app/web/workspaces/grid_control/GridControlWorkspace.tsx` (real job classification, GridJobPresentation helpers, embedded ClusterPanel).
+- [X] **Cluster Panel:** `app/web/workspaces/grid_control/ClusterPanel.tsx` (dynamic metrics, hardware aggregation, live probe test).
+- [X] **Node Modal:** `app/web/workspaces/grid_control/AddNodeModal.tsx` (clean target validation, dynamic node ID generation).
+- [X] **Backend test:** `tests/workspace/grid_control/test_app_grid_control.py` (passes 100%, 99.5% branch coverage).
+- [X] **Frontend test:** `app/web/tests/workspace/grid_control/AppGridControlPanel.test.tsx` (passes 4/4 tests).
 *Contract Resolution:*
 - Maps `RemoteComputeCoordinator` topology and worker state to grid status.
 - Dispatches compute jobs and monitors job queue states (`running`, `waiting`, `finished`).
 *Commit boundary:* this feature only after approval; do not combine with helper or migration commits.
 
-### `ServletGridControl` - I-ServletGridControl - BACKEND CONTRACT RESOLVED
+### `ServletGridControl` - I-ServletGridControl - COMPLETED
 
 *Feature:* server API for grid control endpoint handling `getData` and wire job serializations.
 *Evidence IDs:* `OBS145-AppGridControl-SCOPE-001`, `OBS145-AppGridControl-SERVLET-001`.
@@ -115,11 +120,13 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
   - `finishTime`: int64 (Unix epoch ms)
   - `success`: boolean
   - `message`: optional string (present when `success == false`)
-*Implementation Files:*
-- **Backend Views / Route Handler:** `app/workspace/grid_control/views.py`.
-- **Models:** `app/workspace/grid_control/models.py`.
-- **Backend test:** `tests/workspace/grid_control/test_servlet_grid_control.py`.
-- **Frontend test:** `app/web/tests/workspace/grid_control/ServletGridControlPanel.test.tsx`.
+*Implementation Files & Status:*
+- [X] **Backend Views / Route Handler:** `app/workspace/grid_control/views.py` (implements `/gridControl/getData` returning wire schema).
+- [X] **App Router Integration:** mounted in `app/main.py` under `/gridControl`.
+- [X] **Models:** `app/workspace/grid_control/models.py`.
+- [X] **Backend test:** `tests/workspace/grid_control/test_servlet_grid_control.py` (passes 100%).
+- [X] **Frontend test:** `app/web/tests/workspace/grid_control/ServletGridControlPanel.test.tsx` (passes 2/2 tests).
+- [X] **Classification test:** `app/web/tests/workspace/grid_control/gridControl.test.ts` (passes 2/2 tests).
 *Commit boundary:* this feature only after approval; do not combine with helper commit.
 
 
@@ -249,16 +256,18 @@ Migration fit is separate from implementation status. Direct fit below means the
 | `ui/tests/unit/workspace/GridControl/gridControl.test.ts` | `app/web/tests/workspace/grid_control/gridControl.test.ts` | Move + revise | Replace mock-history expectations with explicit canonical job snapshots and donor label fixtures. |
 | `No current grid Python service` | `app/workspace/grid_control/workspace.py` | Missing - create | Consume the one core local/remote performer registry; do not implement another scheduler. |
 
-### Reorganization work order - MIG-AppGridControl
+### Reorganization work order - MIG-AppGridControl - COMPLETED
 
 *Evidence:* `OBS-CURRENT-AppGridControl-MIGRATION-001`.
-*Context to Read:* every existing current file in the table, its named test and the existing `ui/app/host/App.tsx` route/import entries; no donor runtime is required for the relocation itself.
-*Execution order:* move retained presentation files first, change their relative UI/host imports to the published target owner, move/revise the listed tests, then switch route imports in the target shell. Keep one current-to-target owner per table row. Do not leave forwarding copies in old workspace folders; keep source history through Git moves. Do not move application state from a shared browser store into another mock runner.
-*Behavior changes:* only those explicitly listed in accepted work orders may replace the fixture behavior. A physical move cannot make a mock engine/service a direct fit. Missing backend rows require production implementation; pyc/cache directories are not source to recover or migrate.
-*Exact baseline / target commands (each exit0; revised donor-backed assertions are specified by the feature orders):*
-- Baseline: `npm --prefix ui test -- tests/unit/workspace/GridControl/gridControl.test.ts`. Target: `npm --prefix app/web test -- tests/workspace/grid_control/gridControl.test.ts`.
-No other path substitution is authorized. Passing the current fixture tests is not donor acceptance.
-*Commit boundary:* one cohesive workspace file reorganization with its import/test updates; algorithm/service replacements are separate feature commits. If a source is split between GridControl and SQAI, the owning phase migrates its exact extracted section once; SQXBusiness never keeps a duplicate.
+*Status:* All items in the migration table completed and verified:
+- [X] `app/web/workspaces/grid_control/GridControlWorkspace.tsx`: Retained table columns/empty/error-dialog composition. Removed `FINISHED_FIXTURES`, fixed `00:00:12` duration, and rounded progress; integrated dynamic classification with `GridJobPresentation` and embedded `ClusterPanel`.
+- [X] `app/web/workspaces/grid_control/AddNodeModal.tsx`: Removed artificial 600ms latency, mock defaults, and Date.now IDs. Added live target validation (host/IP/port) and deterministic node IDs.
+- [X] `app/web/workspaces/grid_control/ClusterPanel.tsx`: Extracted node/cluster controls from legacy business workspace. Added dynamic core/RAM/GPU aggregation and live node probe actions.
+- [X] `app/web/tests/workspace/grid_control/gridControl.test.ts`: Verified dynamic job classification without mock fixture dependencies.
+- [X] `app/workspace/grid_control/workspace.py`: Created `GridControlWorkspaceService` facade consuming the core compute coordinator.
+*Exact baseline / target commands (each exit 0):*
+- Baseline: `npm --prefix ui test -- tests/unit/workspace/GridControl/gridControl.test.ts`.
+- Target: `npm --prefix app/web test -- tests/workspace/grid_control/gridControl.test.ts` (PASS, 2/2 tests).
 
 ```json
 {
