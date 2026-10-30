@@ -71,10 +71,10 @@ efactor(code-editor): migrate code editor workspace and services.
 *Exact types:* export `IndicatorRowClass = "checked"|"unchecked"|"passed"|"failed"|"other"`; export class `IndicatorTestPresentation` with static methods below. Input strings are not trimmed. All methods are synchronous and side-effect free. No renderer, global grid object, network client or storage is created.
 
 *Functional Requirements & Implementation:*
-- [ ] `IndicatorTestPresentation.format_parameters(indicator_name: string, parameters: string|null, shift: number): string` -> use the portion before the first dot; emit `<name>(<parameters>)[<shift>]`. null, empty string, literal `not set` and literal `undefined` render as empty parameters. Whitespace and string `false` remain literal. Do not add a default shift; every caller supplies it.
-- [ ] `IndicatorTestPresentation.row_class(checked: boolean, result: string|null): IndicatorRowClass` -> null/empty/`not set`/`undefined` returns checked or unchecked. A filled string starting at index 0 with case-sensitive `Passed` returns passed; starting with `Failed` returns failed; any other filled string returns other. Result classification overrides checked state. Do not use contains() or lowercasing.
-- [ ] `IndicatorTestPresentation.raw_parameters(label: string): string|null` -> return the substring between the first `(` and first `)` when both delimiters exist and `)` follows `(`. Return null otherwise. This null return and reversed-delimiter rejection are explicit target helper decisions; no donor undefined value crosses typed client contracts.
-- [ ] `IndicatorTestPresentation.shift_text(label: string): string|null` -> same rule between first `[` and first `]`, retaining text and returning null on missing/reversed delimiters. Do not parse an integer or invent a default.
+- [x] `IndicatorTestPresentation.format_parameters(indicator_name: string, parameters: string|null, shift: number): string` -> use the portion before the first dot; emit `<name>(<parameters>)[<shift>]`. null, empty string, literal `not set` and literal `undefined` render as empty parameters. Whitespace and string `false` remain literal. Do not add a default shift; every caller supplies it.
+- [x] `IndicatorTestPresentation.row_class(checked: boolean, result: string|null): IndicatorRowClass` -> null/empty/`not set`/`undefined` returns checked or unchecked. A filled string starting at index 0 with case-sensitive `Passed` returns passed; starting with `Failed` returns failed; any other filled string returns other. Result classification overrides checked state. Do not use contains() or lowercasing.
+- [x] `IndicatorTestPresentation.raw_parameters(label: string): string|null` -> return the substring between the first `(` and first `)` when both delimiters exist and `)` follows `(`. Return null otherwise. This null return and reversed-delimiter rejection are explicit target helper decisions; no donor undefined value crosses typed client contracts.
+- [x] `IndicatorTestPresentation.shift_text(label: string): string|null` -> same rule between first `[` and first `]`, retaining text and returning null on missing/reversed delimiters. Do not parse an integer or invent a default.
 
 *Exact tests:*
 
@@ -98,6 +98,18 @@ efactor(code-editor): migrate code editor workspace and services.
 
 *Verification:* `npm --prefix app/web test -- tests/workspace/code_editor/indicator_test_presentation.test.ts` exits 0 with the exact parameterized cases above collected. Vitest uses the AppCore node environment; no jsdom dependency is required. Commit exactly the two listed files. Indicator computation/import/config persistence remain blocked in the full feature order below.
 
+
+**Completion — 2026-10-30:** Phase 4.1 is complete in commit `31fc0d35` (`feat(code-editor): implement indicator test row presentation`). The two implementation/test files listed above provide the typed, synchronous presentation helper and 42 tests, including all 15 prescribed examples and additional boundary cases. No renderer integration or indicator computation was added.
+
+| Verification command | Result |
+| --- | --- |
+| `npm --prefix app/web test -- tests/workspace/code_editor/indicator_test_presentation.test.ts` | Exit 0; 42 tests passed |
+| `npm --prefix app/web run typecheck` | Exit 0 |
+| `npm --prefix app/web run test` | Exit 0; 707 tests passed across 124 files |
+| `npm --prefix app/web run build` | Exit 0; data-manager mixed static/dynamic import and bundle-size warnings remain |
+| `git diff --check` | Exit 0 |
+
+These results cover the Phase 4.1 helper slice only. Indicator computation, import and configuration persistence retain the gates documented below.
 
 ## Phase 04.9: Full workspace feature orders — evidence-gated contracts
 
