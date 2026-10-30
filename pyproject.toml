@@ -21,6 +21,7 @@ dependencies = [
     "tzdata>=2025.2,<2028",
     "numpy>=2.5.3",
     "pandas>=3.0.6",
+    "jinja2>=3.1.6",
 ]
 
 [project.optional-dependencies]
@@ -61,7 +62,7 @@ extend-exclude = [
     ".dev",
     "docs",
     "htmlcov",
-    "app/ui",
+    "app/web",
 ]
 
 [tool.ruff.format]
