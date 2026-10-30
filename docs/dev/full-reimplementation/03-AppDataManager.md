@@ -31,7 +31,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ## Current-code migration audit and execution order
 
-*Evidence:* OBS-HARU-DM-REUSE-20261029. HaruQuantAI already possesses a comprehensive implementation of the Market Data Engine (app/workspace/data_manager/ and app/workspace/brokers/ comprising 93 production files) and its interactive UI (ui/app/workspace/DataManager/ and ui/app/plugins/data_source/). This audit establishes the definitive migration mapping to app/workspaces/data_manager/, app/workspaces/data_sources/, and app/web/workspaces/data_manager/.
+*Evidence:* OBS-HARU-DM-REUSE-20261029. HaruQuantAI already possesses a comprehensive implementation of the Market Data Engine (app/workspace/data_manager/ and app/workspace/brokers/ comprising 93 production files) and its interactive UI (ui/app/workspace/DataManager/ and ui/app/plugins/data_source/). This audit establishes the definitive migration mapping to app/workspace/data_manager/, app/workspace/data_sources/, and app/web/workspaces/data_manager/.
 
 ### Work order DM-M01: harmonize and migrate existing Data Manager and Brokers
 
@@ -41,15 +41,15 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 | Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
 |---|---|---|
-| app/workspace/data_manager/data/ | app/workspaces/data_manager/data/ | DIRECT FIT: Historical bar/tick reader, writer, time-gap fillers, and partition file manager |
-| app/workspace/data_manager/instruments/ | app/workspaces/data_manager/instruments/ | DIRECT FIT: Instrument specification repository, pip/point metrics, margin and tick sizing |
-| app/workspace/data_manager/sessions/ | app/workspaces/data_manager/sessions/ | DIRECT FIT: Trading session definitions, holiday calendars, and exchange schedule filters |
-| app/workspace/data_manager/baskets/ | app/workspaces/data_manager/baskets/ | DIRECT FIT: Symbol basket groupings and batch download scheduler |
-| app/workspace/data_manager/sources/ | app/workspaces/data_manager/sources/ | DIRECT FIT: Data source connectors and feed orchestration |
-| app/workspace/data_manager/symbols/ | app/workspaces/data_manager/symbols/ | DIRECT FIT: Master symbol registry and metadata catalog |
-| app/workspace/data_manager/custom_data/ | app/workspaces/data_manager/custom_data/ | DIRECT FIT: Macroeconomic, COT, and custom series importer |
-| app/workspace/data_manager/logs/ | app/workspaces/data_manager/logs/ | DIRECT FIT: Download, import, and data validation audit logger |
-| app/workspace/brokers/ | app/workspaces/data_sources/ | DIRECT FIT: Broker connectors (MetaTrader 5, cTrader, Dukascopy, Darwinex, Yahoo, Binance) |
+| app/workspace/data_manager/data/ | app/workspace/data_manager/data/ | DIRECT FIT: Historical bar/tick reader, writer, time-gap fillers, and partition file manager |
+| app/workspace/data_manager/instruments/ | app/workspace/data_manager/instruments/ | DIRECT FIT: Instrument specification repository, pip/point metrics, margin and tick sizing |
+| app/workspace/data_manager/sessions/ | app/workspace/data_manager/sessions/ | DIRECT FIT: Trading session definitions, holiday calendars, and exchange schedule filters |
+| app/workspace/data_manager/baskets/ | app/workspace/data_manager/baskets/ | DIRECT FIT: Symbol basket groupings and batch download scheduler |
+| app/workspace/data_manager/sources/ | app/workspace/data_manager/sources/ | DIRECT FIT: Data source connectors and feed orchestration |
+| app/workspace/data_manager/symbols/ | app/workspace/data_manager/symbols/ | DIRECT FIT: Master symbol registry and metadata catalog |
+| app/workspace/data_manager/custom_data/ | app/workspace/data_manager/custom_data/ | DIRECT FIT: Macroeconomic, COT, and custom series importer |
+| app/workspace/data_manager/logs/ | app/workspace/data_manager/logs/ | DIRECT FIT: Download, import, and data validation audit logger |
+| app/workspace/brokers/ | app/workspace/data_sources/ | DIRECT FIT: Broker connectors (MetaTrader 5, cTrader, Dukascopy, Darwinex, Yahoo, Binance) |
 | ui/app/workspace/DataManager/DataManager.tsx | app/web/workspaces/data_manager/DataManager.tsx | DIRECT FIT: Main Data Manager workspace container and layout |
 | ui/app/workspace/DataManager/DataManagerChart.tsx | app/web/workspaces/data_manager/DataManagerChart.tsx | DIRECT FIT: Candlestick/tick history viewer and zoomable chart canvas |
 | ui/app/workspace/DataManager/DataManagerDock.tsx | app/web/workspaces/data_manager/DataManagerDock.tsx | DIRECT FIT: Dockable panels container |
@@ -59,9 +59,9 @@ All target names/signatures/error codes below are normative Python/React adaptat
 | ui/app/workspace/DataManager/dataManagerWorkspaceClient.ts | app/web/workspaces/data_manager/dataManagerWorkspaceClient.ts | ADAPT: REST client for data manager queries and commands |
 | ui/app/workspace/DataManager/dataManagerLogClient.ts | app/web/workspaces/data_manager/dataManagerLogClient.ts | ADAPT: WebSocket client for real-time streaming download/import progress |
 | ui/app/plugins/data_source/* | app/web/workspaces/data_manager/plugins/* | ADAPT: Provider-specific connection and credential forms |
-| tests/workspace/data_manager/ | tests/workspaces/data_manager/ | MOVE: Complete data manager backend test suite |
-| tests/workspace/brokers/ | tests/workspaces/data_sources/ | MOVE: Broker and data source connector test suite |
-| tests/examples/test_brokers.py | tests/workspaces/data_sources/test_brokers_example.py | MOVE: Broker example integration tests |
+| tests/workspace/data_manager/ | tests/workspace/data_manager/ | MOVE: Complete data manager backend test suite |
+| tests/workspace/brokers/ | tests/workspace/data_sources/ | MOVE: Broker and data source connector test suite |
+| tests/examples/test_brokers.py | tests/workspace/data_sources/test_brokers_example.py | MOVE: Broker example integration tests |
 
 *Commit:* refactor(data-manager): migrate data manager and broker workspaces.
 
@@ -77,8 +77,8 @@ All target names/signatures/error codes below are normative Python/React adaptat
 - This task, including its test table; do not read the rest of the repository for a replacement design.
 
 *Implementation Files:*
-- **Backend create:** `app/workspaces/data_manager/instrument_clone_defaults.py`.
-- **Backend test create:** `tests/workspaces/data_manager/test_instrument_clone_defaults.py`.
+- **Backend create:** `app/workspace/data_manager/instrument_clone_defaults.py`.
+- **Backend test create:** `tests/workspace/data_manager/test_instrument_clone_defaults.py`.
 - **Frontend:** none in this commit. The subsequent clone-dialog task consumes the result; do not add HTTP or React code here.
 
 *Exact types:* frozen dataclasses `InstrumentBrokerRef(instrument: str, broker_id: int)`, `CloneBroker(id: int, name: str, postfix: str, mt_use: bool)`, `CloneDefaults(source_name: str, clone_name: str, broker_id: int, choices: tuple[CloneBroker, ...])`. No field has an implicit default. `CloneInstrumentDefaults` contains only static method `build`.
@@ -100,7 +100,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 | `test_excludes_unusable_broker_from_choices` | brokers `(8,"No","",False)`, `(7,"Yes","",True)` | IDs [-1,7] |
 | `test_empty_selection_error` | empty sequences | exact DomainError code/message/details above |
 
-*Verification:* `uv run python -m pytest tests/workspaces/data_manager/test_instrument_clone_defaults.py -q` must exit 0 with all six named tests collected. No network, database, clock or random seed is used. Commit only the two listed files after this result.
+*Verification:* `uv run python -m pytest tests/workspace/data_manager/test_instrument_clone_defaults.py -q` must exit 0 with all six named tests collected. No network, database, clock or random seed is used. Commit only the two listed files after this result.
 
 ### Phase 3.2: Clone command orchestration — `DataManagerInstruments`
 
@@ -111,8 +111,8 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Context to Read:* `app/core/lib/responses.py`, `app/core/lib/errors.py`, and `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerInstruments/Instruments/InstrumentsServlet.java#onClone` (readable declaration/body). No other repository file is context.
 
 *Implementation Files:*
-- **Backend create:** `app/workspaces/data_manager/instrument_clone.py`.
-- **Tests create:** `tests/workspaces/data_manager/test_instrument_clone.py`.
+- **Backend create:** `app/workspace/data_manager/instrument_clone.py`.
+- **Tests create:** `tests/workspace/data_manager/test_instrument_clone.py`.
 - **Frontend/routes/persistence adapter:** none in this commit. Do not register this coordinator until a separately specified adapter exists.
 
 *Exact types:* frozen/slotted `CloneInstrumentRequest(source_name: str, clone_name: str, broker_id: int)`; `CloneInstrumentReceipt` is a TypedDict with required keys `instrument: str`, `broker_id: int`, `message: str` (a JSON object, not a dataclass). `InstrumentCloneBackend` is a Protocol declared in this same file with `resolve_name(clone_name: str, broker_id: int)->str`, `exists(name: str)->bool`, `clone_and_add(source_name: str,target_name: str,broker_id: int)->None`, `publish_instruments()->None`. `InstrumentCloneService.__init__(backend: InstrumentCloneBackend)` stores this injected dependency; it creates no database client.
@@ -126,7 +126,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 *Exact tests:* recording fake backend returns resolved `COPY-B`, target absent and source present for request `(SRC,COPY,7)`/request_id `r1`; assert ordered calls `[resolve_name(COPY,7), exists(COPY-B), exists(SRC), clone_and_add(SRC,COPY-B,7), publish_instruments()]` and exact receipt. Additional tests: target exists -> source-name duplicate message and no write; source absent -> exact missing message and no write; parameterize exceptions at resolve/exists/clone_and_add/publish -> exact normalized failure. Inputs are already typed; do not add unsupported instrument-field validation to this coordinator.
 
-*Verification:* `uv run python -m pytest tests/workspaces/data_manager/test_instrument_clone.py -q` exits 0. Assert exact call order, not only the returned message. Commit only the two listed files. This test verifies orchestration, not the unresolved core clone/persistence algorithm.
+*Verification:* `uv run python -m pytest tests/workspace/data_manager/test_instrument_clone.py -q` exits 0. Assert exact call order, not only the returned message. Commit only the two listed files. This test verifies orchestration, not the unresolved core clone/persistence algorithm.
 
 
 ## Phase 03.9: Full workspace feature orders — evidence-gated contracts
@@ -139,16 +139,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `AppDataManager` complete observed workspace contribution. **Task ID:** `I-AppDataManager`. **Readiness:** READY. **Evidence:** `OBS145-AppDataManager-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/workspace.py` → `DataManagerWorkspace`.
-- **Request/result models:** `app/workspaces/data_manager/workspace_models.py`.
+- **Backend:** `app/workspace/data_manager/workspace.py` → `DataManagerWorkspace`.
+- **Request/result models:** `app/workspace/data_manager/workspace_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataManagerWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_workspace.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataManagerWorkspace.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_workspace.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataManagerWorkspace.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/AppDataManager/module.js`, `DONOR_REFERENCE_ROOT/internal/plugins/AppDataManager/DataManager/DataManagerAppPlugin.java`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement.
 - **Function/signature authorization:** none. Do not create `DataManagerWorkspace.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_workspace.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataManagerWorkspace.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_workspace.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataManagerWorkspace.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ConnectionLiveTest`
@@ -159,16 +159,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `ConnectionLiveTest` complete observed workspace contribution. **Task ID:** `I-ConnectionLiveTest`. **Readiness:** READY. **Evidence:** `OBS145-ConnectionLiveTest-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/connections/live_test.py` → `ConnectionLiveTestService`.
-- **Request/result models:** `app/workspaces/data_manager/connections/live_test_models.py`.
+- **Backend:** `app/workspace/data_manager/connections/live_test.py` → `ConnectionLiveTestService`.
+- **Request/result models:** `app/workspace/data_manager/connections/live_test_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/ConnectionLiveTestPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_connections_live_test.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/ConnectionLiveTestPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_connections_live_test.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/ConnectionLiveTestPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ConnectionLiveTest`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `ConnectionLiveTestService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_connections_live_test.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/ConnectionLiveTestPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_connections_live_test.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/ConnectionLiveTestPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ConnectionMT4`
@@ -179,16 +179,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `ConnectionMT4` complete observed workspace contribution. **Task ID:** `I-ConnectionMT4`. **Readiness:** READY. **Evidence:** `OBS145-ConnectionMT4-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/connections/mt4.py` → `ConnectionMT4Service`.
-- **Request/result models:** `app/workspaces/data_manager/connections/mt4_models.py`.
+- **Backend:** `app/workspace/data_manager/connections/mt4.py` → `ConnectionMT4Service`.
+- **Request/result models:** `app/workspace/data_manager/connections/mt4_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/ConnectionMT4Panel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_connections_mt4.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/ConnectionMT4Panel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_connections_mt4.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/ConnectionMT4Panel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ConnectionMT4`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `ConnectionMT4Service.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_connections_mt4.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/ConnectionMT4Panel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_connections_mt4.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/ConnectionMT4Panel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ConnectionTest`
@@ -199,16 +199,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `ConnectionTest` complete observed workspace contribution. **Task ID:** `I-ConnectionTest`. **Readiness:** READY. **Evidence:** `OBS145-ConnectionTest-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/connections/test.py` → `ConnectionTestService`.
-- **Request/result models:** `app/workspaces/data_manager/connections/test_models.py`.
+- **Backend:** `app/workspace/data_manager/connections/test.py` → `ConnectionTestService`.
+- **Request/result models:** `app/workspace/data_manager/connections/test_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/ConnectionTestPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_connections_test.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/ConnectionTestPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_connections_test.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/ConnectionTestPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ConnectionTest`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `ConnectionTestService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_connections_test.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/ConnectionTestPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_connections_test.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/ConnectionTestPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CryptoExchangeBinance`
@@ -219,16 +219,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `CryptoExchangeBinance` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinance`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBinance-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/crypto/binance.py` → `CryptoExchangeBinanceService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/crypto/binance_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/crypto/binance.py` → `CryptoExchangeBinanceService`.
+- **Request/result models:** `app/workspace/data_manager/providers/crypto/binance_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/CryptoExchangeBinancePanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_crypto_binance.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/CryptoExchangeBinancePanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_crypto_binance.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/CryptoExchangeBinancePanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinance/Binance/CryptoExchangeBinancePlugin.java`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `CryptoExchangeBinanceService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_crypto_binance.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/CryptoExchangeBinancePanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_crypto_binance.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/CryptoExchangeBinancePanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CryptoExchangeBinanceCoinM`
@@ -239,16 +239,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `CryptoExchangeBinanceCoinM` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinanceCoinM`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBinanceCoinM-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/crypto/binance_coinm.py` → `CryptoExchangeBinanceCoinMService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/crypto/binance_coinm_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/crypto/binance_coinm.py` → `CryptoExchangeBinanceCoinMService`.
+- **Request/result models:** `app/workspace/data_manager/providers/crypto/binance_coinm_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/CryptoExchangeBinanceCoinMPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_crypto_binance_coinm.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/CryptoExchangeBinanceCoinMPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_crypto_binance_coinm.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/CryptoExchangeBinanceCoinMPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinanceCoinM/BinanceCoinM/CryptoExchangeBinanceCoinMPlugin.java`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `CryptoExchangeBinanceCoinMService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_crypto_binance_coinm.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/CryptoExchangeBinanceCoinMPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_crypto_binance_coinm.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/CryptoExchangeBinanceCoinMPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CryptoExchangeBinanceUsdtM`
@@ -259,16 +259,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `CryptoExchangeBinanceUsdtM` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBinanceUsdtM`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBinanceUsdtM-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/crypto/binance_usdtm.py` → `CryptoExchangeBinanceUsdtMService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/crypto/binance_usdtm_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/crypto/binance_usdtm.py` → `CryptoExchangeBinanceUsdtMService`.
+- **Request/result models:** `app/workspace/data_manager/providers/crypto/binance_usdtm_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/CryptoExchangeBinanceUsdtMPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_crypto_binance_usdtm.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/CryptoExchangeBinanceUsdtMPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_crypto_binance_usdtm.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/CryptoExchangeBinanceUsdtMPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinanceUsdtM/BinanceUsdtM/CryptoExchangeBinanceUsdtMPlugin.java`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `CryptoExchangeBinanceUsdtMService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_crypto_binance_usdtm.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/CryptoExchangeBinanceUsdtMPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_crypto_binance_usdtm.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/CryptoExchangeBinanceUsdtMPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CryptoExchangeBitfinex`
@@ -279,16 +279,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `CryptoExchangeBitfinex` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeBitfinex`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeBitfinex-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/crypto/bitfinex.py` → `CryptoExchangeBitfinexService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/crypto/bitfinex_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/crypto/bitfinex.py` → `CryptoExchangeBitfinexService`.
+- **Request/result models:** `app/workspace/data_manager/providers/crypto/bitfinex_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/CryptoExchangeBitfinexPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_crypto_bitfinex.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/CryptoExchangeBitfinexPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_crypto_bitfinex.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/CryptoExchangeBitfinexPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangeBitfinex/Bitfinex/CryptoExchangeBitfinexPlugin.java`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `CryptoExchangeBitfinexService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_crypto_bitfinex.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/CryptoExchangeBitfinexPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_crypto_bitfinex.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/CryptoExchangeBitfinexPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CryptoExchangeCoinbasePro`
@@ -299,16 +299,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `CryptoExchangeCoinbasePro` complete observed workspace contribution. **Task ID:** `I-CryptoExchangeCoinbasePro`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangeCoinbasePro-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/crypto/coinbase_pro.py` → `CryptoExchangeCoinbaseProService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/crypto/coinbase_pro_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/crypto/coinbase_pro.py` → `CryptoExchangeCoinbaseProService`.
+- **Request/result models:** `app/workspace/data_manager/providers/crypto/coinbase_pro_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/CryptoExchangeCoinbaseProPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_crypto_coinbase_pro.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/CryptoExchangeCoinbaseProPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_crypto_coinbase_pro.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/CryptoExchangeCoinbaseProPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangeCoinbasePro/CoinbasePro/CryptoExchangeCoinbaseProPlugin.java`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `CryptoExchangeCoinbaseProService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_crypto_coinbase_pro.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/CryptoExchangeCoinbaseProPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_crypto_coinbase_pro.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/CryptoExchangeCoinbaseProPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CryptoExchangePoloniex`
@@ -319,16 +319,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `CryptoExchangePoloniex` complete observed workspace contribution. **Task ID:** `I-CryptoExchangePoloniex`. **Readiness:** READY. **Evidence:** `OBS145-CryptoExchangePoloniex-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/crypto/poloniex.py` → `CryptoExchangePoloniexService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/crypto/poloniex_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/crypto/poloniex.py` → `CryptoExchangePoloniexService`.
+- **Request/result models:** `app/workspace/data_manager/providers/crypto/poloniex_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/CryptoExchangePoloniexPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_crypto_poloniex.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/CryptoExchangePoloniexPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_crypto_poloniex.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/CryptoExchangePoloniexPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangePoloniex/Poloniex/CryptoExchangePoloniexPlugin.java`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `CryptoExchangePoloniexService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_crypto_poloniex.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/CryptoExchangePoloniexPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_crypto_poloniex.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/CryptoExchangePoloniexPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerActions`
@@ -339,16 +339,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerActions` complete observed workspace contribution. **Task ID:** `I-DataManagerActions`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerActions-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/data_actions.py` → `DataActionsService`.
-- **Request/result models:** `app/workspaces/data_manager/data_actions_models.py`.
+- **Backend:** `app/workspace/data_manager/data_actions.py` → `DataActionsService`.
+- **Request/result models:** `app/workspace/data_manager/data_actions_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataActionsPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_data_actions.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataActionsPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_data_actions.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataActionsPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerActions/exportToCsv/ExportToCsvService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerActions/exportToMT4/ExportToMT4Service.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerActions/exportToMT5/ExportToMT5Service.js`.
 - **Observed actions:** `/data/exportToCsv`; `/data/exportToCsvAction`; `/data/exportToCsvDeleteFileFormat`; `/data/exportToCsvLoadSettings`; `/data/exportToCsvSaveAsFileFormat`; `/data/exportToCsvSaveFileFormat`; `/data/exportToMT4`; `/data/exportToMT4Action`; `/data/exportToMT4GetDataFolder`; `/data/exportToMT4GetServerNames`; `/data/exportToMT4LoadProperties`; `/data/exportToMT5`; `/data/exportToMT5Action`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataActionsService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_data_actions.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataActionsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_data_actions.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataActionsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerBasket`
@@ -359,16 +359,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerBasket` complete observed workspace contribution. **Task ID:** `I-DataManagerBasket`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerBasket-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/baskets.py` → `BasketService`.
-- **Request/result models:** `app/workspaces/data_manager/baskets_models.py`.
+- **Backend:** `app/workspace/data_manager/baskets.py` → `BasketService`.
+- **Request/result models:** `app/workspace/data_manager/baskets_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/BasketsPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_baskets.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/BasketsPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_baskets.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/BasketsPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerBasket/controllers/BasketsCtrl.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerBasket/service/BasketService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerBasket`.
 - **Observed actions:** `/basketOfStocks/delete`; `/basketOfStocks/editStocks`; `/basketOfStocks/export`; `/basketOfStocks/import`; `/basketOfStocks/listStocks`; `/basketOfStocks/loadXml`; `/basketOfStocks/save`; `/basketOfStocks/saveXml`; `/basketOfStocks/updateData`; `basketOfStocks/list`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `BasketService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_baskets.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/BasketsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_baskets.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/BasketsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerBroker`
@@ -379,16 +379,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerBroker` complete observed workspace contribution. **Task ID:** `I-DataManagerBroker`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerBroker-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/broker_profiles.py` → `BrokerProfileService`.
-- **Request/result models:** `app/workspaces/data_manager/broker_profiles_models.py`.
+- **Backend:** `app/workspace/data_manager/broker_profiles.py` → `BrokerProfileService`.
+- **Request/result models:** `app/workspace/data_manager/broker_profiles_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/BrokerProfilesPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_broker_profiles.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/BrokerProfilesPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_broker_profiles.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/BrokerProfilesPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerBroker/controllers/BrokersCtrl.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerBroker/service/BrokerService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerBroker`.
 - **Observed actions:** `/brokers/delete`; `/brokers/editStocks`; `/brokers/export`; `/brokers/import`; `/brokers/importGetOverview`; `/brokers/importSessionInstrument`; `/brokers/listStocks`; `/brokers/loadXml`; `/brokers/save`; `/brokers/saveXml`; `/brokers/updateData`; `brokers/list`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `BrokerProfileService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_broker_profiles.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/BrokerProfilesPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_broker_profiles.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/BrokerProfilesPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerConnections`
@@ -399,16 +399,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerConnections` complete observed workspace contribution. **Task ID:** `I-DataManagerConnections`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerConnections-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/connections.py` → `ConnectionService`.
-- **Request/result models:** `app/workspaces/data_manager/connections_models.py`.
+- **Backend:** `app/workspace/data_manager/connections.py` → `ConnectionService`.
+- **Request/result models:** `app/workspace/data_manager/connections_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/ConnectionsPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_connections.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/ConnectionsPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_connections.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/ConnectionsPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerConnections`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement.
 - **Function/signature authorization:** none. Do not create `ConnectionService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_connections.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/ConnectionsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_connections.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/ConnectionsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerCustomData`
@@ -419,16 +419,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerCustomData` complete observed workspace contribution. **Task ID:** `I-DataManagerCustomData`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerCustomData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/custom_data.py` → `CustomDataService`.
-- **Request/result models:** `app/workspaces/data_manager/custom_data_models.py`.
+- **Backend:** `app/workspace/data_manager/custom_data.py` → `CustomDataService`.
+- **Request/result models:** `app/workspace/data_manager/custom_data_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/CustomDataPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_custom_data.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/CustomDataPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_custom_data.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/CustomDataPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerCustomData/DMCustomDataService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerCustomData`.
 - **Observed actions:** `/customdata/add`; `/customdata/clear`; `/customdata/edit`; `/customdata/import`; `/customdata/importAction`; `/customdata/importDeleteDataFormat`; `/customdata/importGetInfo`; `/customdata/importGetOverview`; `/customdata/importSaveNewDataFormat`; `/customdata/importUpdateDataFormat`; `/customdata/load`; `/customdata/recognizeFromFile`; `/customdata/remove`; `/customdata/save`; `/customdata/updateCot`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `CustomDataService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_custom_data.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/CustomDataPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_custom_data.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/CustomDataPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerData`
@@ -439,16 +439,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerData` complete observed workspace contribution. **Task ID:** `I-DataManagerData`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/datasets.py` → `DataService`.
-- **Request/result models:** `app/workspaces/data_manager/datasets_models.py`.
+- **Backend:** `app/workspace/data_manager/datasets.py` → `DataService`.
+- **Request/result models:** `app/workspace/data_manager/datasets_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DatasetsPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_datasets.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DatasetsPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_datasets.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DatasetsPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerData/DMDataService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerData`.
 - **Observed actions:** `/connections/listConnections`; `/data/cancelDataOperation`; `/data/checkQualitySummary`; `/data/clearData`; `/data/cloneToTimezone`; `/data/cloneToTimezoneAction`; `/data/editData`; `/data/getIndexForDate`; `/data/load`; `/data/pauseAll`; `/data/removeData`; `/data/resumeAll`; `/data/save`; `/data/saveDataChanges`; `/data/stopAll`; `/data/updateAll`; `/data/updateSelected`; `data/reviewChart`; `data/showData`; `dataSourceDukascopy/getParallelDownload`; `dataSourceDukascopy/setParallelDownload`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_datasets.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DatasetsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_datasets.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DatasetsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerHelp`
@@ -459,16 +459,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerHelp` complete observed workspace contribution. **Task ID:** `I-DataManagerHelp`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerHelp-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/help.py` → `DataHelpService`.
-- **Request/result models:** `app/workspaces/data_manager/help_models.py`.
+- **Backend:** `app/workspace/data_manager/help.py` → `DataHelpService`.
+- **Request/result models:** `app/workspace/data_manager/help_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataHelpPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_help.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataHelpPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_help.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataHelpPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerHelp/module.js`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement.
 - **Function/signature authorization:** none. Do not create `DataHelpService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_help.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataHelpPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_help.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataHelpPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerHome`
@@ -479,16 +479,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerHome` complete observed workspace contribution. **Task ID:** `I-DataManagerHome`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerHome-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/home.py` → `DataHomeService`.
-- **Request/result models:** `app/workspaces/data_manager/home_models.py`.
+- **Backend:** `app/workspace/data_manager/home.py` → `DataHomeService`.
+- **Request/result models:** `app/workspace/data_manager/home_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataHomePanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_home.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataHomePanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_home.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataHomePanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerHome/DMHomeService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerHome`.
 - **Observed actions:** `/main/appconfig`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataHomeService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_home.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataHomePanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_home.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataHomePanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerInstruments`
@@ -499,16 +499,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerInstruments` complete observed workspace contribution. **Task ID:** `I-DataManagerInstruments`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerInstruments-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/instruments.py` → `InstrumentService`.
-- **Request/result models:** `app/workspaces/data_manager/instruments_models.py`.
+- **Backend:** `app/workspace/data_manager/instruments.py` → `InstrumentService`.
+- **Request/result models:** `app/workspace/data_manager/instruments_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/InstrumentsPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_instruments.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/InstrumentsPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_instruments.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/InstrumentsPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerInstruments/controllers/InstrumentsCtrl.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerInstruments/services/InstrumentService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerInstruments`.
 - **Observed actions:** `/instruments/addInstrument`; `/instruments/clone`; `/instruments/editInstrument`; `/instruments/load`; `/instruments/massEditInstrument`; `/instruments/removeInstrument`; `/instruments/save`; `instruments/list?type=`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `InstrumentService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_instruments.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/InstrumentsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_instruments.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/InstrumentsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerLog`
@@ -519,16 +519,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerLog` complete observed workspace contribution. **Task ID:** `I-DataManagerLog`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerLog-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/log.py` → `DataLogService`.
-- **Request/result models:** `app/workspaces/data_manager/log_models.py`.
+- **Backend:** `app/workspace/data_manager/log.py` → `DataLogService`.
+- **Request/result models:** `app/workspace/data_manager/log_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataLogPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_log.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataLogPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_log.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataLogPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerLog/module.js`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement.
 - **Function/signature authorization:** none. Do not create `DataLogService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_log.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataLogPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_log.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataLogPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataManagerSessions`
@@ -539,16 +539,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataManagerSessions` complete observed workspace contribution. **Task ID:** `I-DataManagerSessions`. **Readiness:** READY. **Evidence:** `OBS145-DataManagerSessions-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/sessions.py` → `SessionService`.
-- **Request/result models:** `app/workspaces/data_manager/sessions_models.py`.
+- **Backend:** `app/workspace/data_manager/sessions.py` → `SessionService`.
+- **Request/result models:** `app/workspace/data_manager/sessions_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/SessionsPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_sessions.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/SessionsPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_sessions.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/SessionsPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerSessions/services/SessionService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataManagerSessions`.
 - **Observed actions:** `/sessions/addSession`; `/sessions/clone`; `/sessions/load`; `/sessions/removeSession`; `/sessions/save`; `/sessions/updateSession`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `SessionService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_sessions.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/SessionsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_sessions.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/SessionsPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceCrypto`
@@ -559,16 +559,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceCrypto` complete observed workspace contribution. **Task ID:** `I-DataSourceCrypto`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceCrypto-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/crypto.py` → `DataSourceCryptoService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/crypto_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/crypto.py` → `DataSourceCryptoService`.
+- **Request/result models:** `app/workspace/data_manager/providers/crypto_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceCryptoPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_crypto.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceCryptoPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_crypto.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceCryptoPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCryptoService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceCrypto`.
 - **Observed actions:** `/dataSourceCrypto/add`; `/dataSourceCrypto/addCancel`; `/dataSourceCrypto/getExchanges`; `/dataSourceCrypto/getSymbols`; `dataSourceCrypto/importData`; `dataSourceCrypto/importDataAction`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceCryptoService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_crypto.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceCryptoPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_crypto.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceCryptoPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceDarwinex`
@@ -579,16 +579,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceDarwinex` complete observed workspace contribution. **Task ID:** `I-DataSourceDarwinex`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceDarwinex-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/darwinex.py` → `DataSourceDarwinexService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/darwinex_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/darwinex.py` → `DataSourceDarwinexService`.
+- **Request/result models:** `app/workspace/data_manager/providers/darwinex_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceDarwinexPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_darwinex.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceDarwinexPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_darwinex.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceDarwinexPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex/DarwinexService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceDarwinex`.
 - **Observed actions:** `/darwinex/importDataCancel`; `darwinex/downloadAddData`; `darwinex/downloadData`; `darwinex/downloadDataAction`; `darwinex/downloadGetDataList`; `darwinex/importData`; `darwinex/importDataAction`; `darwinex/importDataCancel`; `darwinex/importLoadAvailableSymbols`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceDarwinexService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_darwinex.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceDarwinexPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_darwinex.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceDarwinexPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceDukascopy`
@@ -599,16 +599,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceDukascopy` complete observed workspace contribution. **Task ID:** `I-DataSourceDukascopy`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceDukascopy-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/dukascopy.py` → `DataSourceDukascopyService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/dukascopy_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/dukascopy.py` → `DataSourceDukascopyService`.
+- **Request/result models:** `app/workspace/data_manager/providers/dukascopy_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceDukascopyPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_dukascopy.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceDukascopyPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_dukascopy.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceDukascopyPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy/DukascopyService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceDukascopy`.
 - **Observed actions:** `/dataSourceDukascopy/addCancel`; `dataSourceDukascopy/addData`; `dataSourceDukascopy/getDataList`; `dataSourceDukascopy/importData`; `dataSourceDukascopy/importDataAction`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceDukascopyService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_dukascopy.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceDukascopyPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_dukascopy.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceDukascopyPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceFiles`
@@ -619,16 +619,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceFiles` complete observed workspace contribution. **Task ID:** `I-DataSourceFiles`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceFiles-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/files.py` → `DataSourceFilesService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/files_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/files.py` → `DataSourceFilesService`.
+- **Request/result models:** `app/workspace/data_manager/providers/files_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceFilesPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_files.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceFilesPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_files.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceFilesPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceFiles/DataSourceFilesService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceFiles`.
 - **Observed actions:** `/dataSourceFiles/add`; `/dataSourceFiles/appImport`; `/dataSourceFiles/cancelAppImport`; `/dataSourceFiles/import`; `/dataSourceFiles/importAction`; `/dataSourceFiles/importDeleteDataFormat`; `/dataSourceFiles/importGetInfo`; `/dataSourceFiles/importGetOverview`; `/dataSourceFiles/importSaveNewDataFormat`; `/dataSourceFiles/importUpdateDataFormat`; `/dataSourceFiles/massImport`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceFilesService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_files.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceFilesPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_files.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceFilesPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceMt5Api`
@@ -639,16 +639,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceMt5Api` complete observed workspace contribution. **Task ID:** `I-DataSourceMt5Api`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceMt5Api-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/mt5_api.py` → `DataSourceMt5ApiService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/mt5_api_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/mt5_api.py` → `DataSourceMt5ApiService`.
+- **Request/result models:** `app/workspace/data_manager/providers/mt5_api_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceMt5ApiPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_mt5_api.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceMt5ApiPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_mt5_api.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceMt5ApiPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api/DataSourceMt5Api.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceMt5Api`.
 - **Observed actions:** `dataSourceMt5Api/importData`; `dataSourceMt5Api/importDataAction`; `dataSourceMt5Api/loadAvailableSymbols`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceMt5ApiService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_mt5_api.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceMt5ApiPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_mt5_api.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceMt5ApiPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceSQEquityData`
@@ -659,16 +659,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceSQEquityData` complete observed workspace contribution. **Task ID:** `I-DataSourceSQEquityData`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceSQEquityData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/sq_equity_data.py` → `DataSourceSQEquityDataService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/sq_equity_data_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/sq_equity_data.py` → `DataSourceSQEquityDataService`.
+- **Request/result models:** `app/workspace/data_manager/providers/sq_equity_data_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceSQEquityDataPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_sq_equity_data.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceSQEquityDataPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_sq_equity_data.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceSQEquityDataPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData/SQEquityDataService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceSQEquityData`.
 - **Observed actions:** `/sqEquityData/add`; `/sqEquityData/addCancel`; `/sqEquityData/getExchanges`; `/sqEquityData/lookup`; `/sqEquityData/update`; `/sqEquityData/verifySubscription`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceSQEquityDataService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_sq_equity_data.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceSQEquityDataPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_sq_equity_data.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceSQEquityDataPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceSQFuturesData`
@@ -679,16 +679,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceSQFuturesData` complete observed workspace contribution. **Task ID:** `I-DataSourceSQFuturesData`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceSQFuturesData-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/sq_futures_data.py` → `DataSourceSQFuturesDataService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/sq_futures_data_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/sq_futures_data.py` → `DataSourceSQFuturesDataService`.
+- **Request/result models:** `app/workspace/data_manager/providers/sq_futures_data_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceSQFuturesDataPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_sq_futures_data.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceSQFuturesDataPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_sq_futures_data.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceSQFuturesDataPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData/SQFuturesDataService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceSQFuturesData`.
 - **Observed actions:** `/sqFuturesData/add`; `/sqFuturesData/addCancel`; `/sqFuturesData/getExchanges`; `/sqFuturesData/lookup`; `/sqFuturesData/update`; `/sqFuturesData/updateBr`; `/sqFuturesData/verifySubscription`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceSQFuturesDataService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_sq_futures_data.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceSQFuturesDataPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_sq_futures_data.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceSQFuturesDataPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceTD`
@@ -699,16 +699,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceTD` complete observed workspace contribution. **Task ID:** `I-DataSourceTD`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceTD-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/td.py` → `DataSourceTDService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/td_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/td.py` → `DataSourceTDService`.
+- **Request/result models:** `app/workspace/data_manager/providers/td_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceTDPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_td.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceTDPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_td.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceTDPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTDService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD`.
 - **Observed actions:** `dataSourceTD/importData`; `dataSourceTD/importDataAction`; `dataSourceTD/loadAvailableSymbols`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceTDService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_td.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceTDPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_td.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceTDPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `DataSourceYahoo`
@@ -719,16 +719,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `DataSourceYahoo` complete observed workspace contribution. **Task ID:** `I-DataSourceYahoo`. **Readiness:** READY. **Evidence:** `OBS145-DataSourceYahoo-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/providers/yahoo.py` → `DataSourceYahooService`.
-- **Request/result models:** `app/workspaces/data_manager/providers/yahoo_models.py`.
+- **Backend:** `app/workspace/data_manager/providers/yahoo.py` → `DataSourceYahooService`.
+- **Request/result models:** `app/workspace/data_manager/providers/yahoo_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/DataSourceYahooPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_providers_yahoo.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/DataSourceYahooPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_providers_yahoo.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/DataSourceYahooPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceYahoo/YahooService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceYahoo`.
 - **Observed actions:** `/dataSourceYahoo/addCancel`; `dataSourceYahoo/add`; `dataSourceYahoo/importData`; `dataSourceYahoo/importDataAction`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `DataSourceYahooService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_providers_yahoo.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/DataSourceYahooPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_providers_yahoo.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/DataSourceYahooPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletConnection`
@@ -739,16 +739,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Feature:* `ServletConnection` complete observed workspace contribution. **Task ID:** `I-ServletConnection`. **Readiness:** READY. **Evidence:** `OBS145-ServletConnection-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/data_manager/servlet_connection.py` → `ServletConnectionService`.
-- **Request/result models:** `app/workspaces/data_manager/servlet_connection_models.py`.
+- **Backend:** `app/workspace/data_manager/servlet_connection.py` → `ServletConnectionService`.
+- **Request/result models:** `app/workspace/data_manager/servlet_connection_models.py`.
 - **Frontend:** `app/web/workspaces/data_manager/ServletConnectionPanel.tsx`.
-- **Backend test:** `tests/workspaces/data_manager/test_servlet_connection.py`.
-- **Frontend test:** `app/web/tests/workspaces/data_manager/ServletConnectionPanel.test.tsx`.
+- **Backend test:** `tests/workspace/data_manager/test_servlet_connection.py`.
+- **Frontend test:** `app/web/tests/workspace/data_manager/ServletConnectionPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletConnection`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. External endpoint/authentication/rate-limit/cancellation and instrument/timeframe mapping contracts also require evidence; no network endpoint or broker execution feature is approved by this order.
 - **Function/signature authorization:** none. Do not create `ServletConnectionService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/data_manager/test_servlet_connection.py -q`; `npm --prefix app/web test -- tests/workspaces/data_manager/ServletConnectionPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/data_manager/test_servlet_connection.py -q`; `npm --prefix app/web test -- tests/workspace/data_manager/ServletConnectionPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ## Evidence records used by these work orders
@@ -770,7 +770,7 @@ Original historical objects below are retained without modification; new static 
     "DONOR_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCrypto.jar",
     "DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar"
   ],
-  "target_domain": "app/workspaces/data_manager/data_sources/crypto; app/core shared contracts",
+  "target_domain": "app/workspace/data_manager/data_sources/crypto; app/core shared contracts",
   "feature_ids": [
     "FEAT-UI-CRYPTO-TRACEABILITY"
   ],
@@ -872,7 +872,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -918,7 +918,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -964,7 +964,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1010,7 +1010,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1056,7 +1056,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1102,7 +1102,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1148,7 +1148,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1194,7 +1194,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1240,7 +1240,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1286,7 +1286,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1340,7 +1340,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1392,7 +1392,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1443,7 +1443,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1490,7 +1490,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1536,7 +1536,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1582,7 +1582,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1628,7 +1628,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1674,7 +1674,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1724,7 +1724,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1771,7 +1771,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1817,7 +1817,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1863,7 +1863,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1909,7 +1909,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -1955,7 +1955,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2001,7 +2001,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2047,7 +2047,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2093,7 +2093,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2139,7 +2139,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2185,7 +2185,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2231,7 +2231,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2277,7 +2277,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/data_manager",
+  "target_domain": "app/workspace/data_manager",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -2323,7 +2323,7 @@ Original historical objects below are retained without modification; new static 
       "sha256": "dccffddc1f7773b1128ef495b4fceb4691690b9406c10ad07309cf9832d84d93"
     }
   ],
-  "target_domain": "app/workspaces/data_manager/instrument_clone.py",
+  "target_domain": "app/workspace/data_manager/instrument_clone.py",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],

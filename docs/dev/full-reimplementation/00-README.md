@@ -177,7 +177,7 @@ test to claim the engine is ready.
 
 ## Full-scope and donor rules
 
-Target roots remain app/core, app/workspaces, app/extend and app/web. Concrete
+Target roots remain app/core, app/workspace, app/extend and app/web. Concrete
 plugins stay under their owning workspace. No Electron, Java compiler or Java
 class-loader reproduction. Internal runtimes/dependencies receive explicit target
 capability replacements rather than source ports. main.py and cli.py use the same
@@ -351,11 +351,11 @@ The following original record objects are retained unchanged. Their historical a
   "id": "MAP-004",
   "classification": "normative",
   "confidence": "high",
-  "claim": "Keep core responsibilities under app/core, plugin backend implementations under their owning app/workspaces workspace, plugin UI under app/web/workspaces, and concrete extensions under app/extend. Retain user-requested project/strategy placement and main/CLI entrypoints.",
+  "claim": "Keep core responsibilities under app/core, plugin backend implementations under their owning app/workspace workspace, plugin UI under app/web/workspaces, and concrete extensions under app/extend. Retain user-requested project/strategy placement and main/CLI entrypoints.",
   "sources": [
     "User architecture instructions in current chat"
   ],
-  "target_domain": "app/core; app/workspaces; app/extend; app/web",
+  "target_domain": "app/core; app/workspace; app/extend; app/web",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -400,7 +400,7 @@ The following original record objects are retained unchanged. Their historical a
     "User fallback instruction in current chat",
     "previous-version-map.md"
   ],
-  "target_domain": "app/core; app/workspaces; app/extend; app/web; app/main.py; app/cli.py",
+  "target_domain": "app/core; app/workspace; app/extend; app/web; app/main.py; app/cli.py",
   "related_records": [
     "MAP-004",
     "RECOVERY-002",

@@ -164,15 +164,15 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 | `ui/app/plugins/databank/ResultsDatabankViews/DatabankViewsService.ts` | `app/web/workspaces/results/databank/ResultsDatabankViews/DatabankViewsService.ts` | DIRECT FIT menu/form presentation; ADAPT commands to result repository; no fixture success receipt |
 | `ui/app/plugins/databank/ResultsDatabankViews/module.ts` | `app/web/workspaces/results/databank/ResultsDatabankViews/module.ts` | DIRECT FIT menu/form presentation; ADAPT commands to result repository; no fixture success receipt |
 | `ui/app/plugins/databank/ResultsDatabankViews/styles.css` | `app/web/workspaces/results/databank/ResultsDatabankViews/styles.css` | DIRECT FIT menu/form presentation; ADAPT commands to result repository; no fixture success receipt |
-| `ui/tests/unit/workspace/Results/portfolioCorrelation.test.ts` | `app/web/tests/workspaces/results/portfolioCorrelation.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
-| `ui/tests/unit/workspace/Results/tradeAnalysis.test.ts` | `app/web/tests/workspaces/results/tradeAnalysis.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
-| `ui/tests/unit/workspace/Results/tradesOnChart.test.ts` | `app/web/tests/workspaces/results/tradesOnChart.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Results/portfolioCorrelation.test.ts` | `app/web/tests/workspace/results/portfolioCorrelation.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Results/tradeAnalysis.test.ts` | `app/web/tests/workspace/results/tradeAnalysis.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Results/tradesOnChart.test.ts` | `app/web/tests/workspace/results/tradesOnChart.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
 
 *Functional Requirements & Implementation:*
 - [ ] `ResultsWorkspace()` -> Retain component exports, props, rendered labels, keyboard actions, cancellation/unmount cleanup and CSS behavior from each current source row. Rewrite relative imports to the table targets. Consume shared Home and Results through their `public.ts` exports; do not import another workspace's private module or copy ProjectWorkbench.
 - [ ] `ResultsWorkspace()` -> Keep fixture/timer execution explicitly in the existing preview mode until its replacement service work order passes. Moving a screen does not authorize reporting a generated strategy, finished retest, optimized parameter or saved portfolio as a real backend result. The current clients using fixed RSI/demoInputs and `/executions` are adaptation candidates, not verified workspace APIs.
 - [ ] `migration import guard` -> Run `rg -n 'ui/app/workspace/Results|plugins/project/ProjectWorkbench' app/web/workspaces/results`. Expected exit `1` and no lines. Rewrite migrated tests to their exact target imports; preserve current assertions and test names.
-- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Results` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspaces/results` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
+- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Results` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspace/results` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
 *Commit:* `refactor(results): move owned workspace presentation`. This single commit includes only the listed moves, direct import rewrites and registration change. UI integration work is separate from implementing donor engines.
 
 *Shared results ownership:* ProjectResults and all Results* contribution implementations are owned by AppResults. Builder, Retester, Optimizer and portfolio workspaces register configured contributions; none gets a private copy of trade lists, overview, source-code rendering, correlation or shared engine progress. Shared base workbench remains AppHome.
@@ -190,7 +190,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
       "sha256": "348b01406669da68ca4d8b6332171ef0279537f83fa0fbbca34c7dc8ee04cee1"
     }
   ],
-  "target_domain": "app/workspaces/results",
+  "target_domain": "app/workspace/results",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -223,9 +223,9 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 *Feature:* Select the same initial overview template as the inspected controller. **READY after test bootstrap.** This commit does not implement report HTML or its API.
 *Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js`.
-- **Backend CREATE:** `app/workspaces/results/overview_template_policy.py`.
+- **Backend CREATE:** `app/workspace/results/overview_template_policy.py`.
 - **Frontend:** no file created or edited; result views consume this policy through the later overview service, not a second TypeScript implementation.
-- **Tests CREATE:** `tests/workspaces/results/test_overview_template_policy.py`.
+- **Tests CREATE:** `tests/workspace/results/test_overview_template_policy.py`.
 *Context to Read:* this feature text; the donor file above; `pyproject.toml` for the existing pytest dependency. Read no other workspace.
 *Evidence ID:* `OBS-145-OVERVIEW-TEMPLATE-001`. The class name and type guards are target helper decisions; the selection branches are observed.
 *Functional Requirements & Implementation:*
@@ -233,7 +233,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 - [ ] `OverviewTemplatePolicy.select(values)` -> Raise `TypeError("values must be a tuple of strings")` when the outer object is not a tuple or any item is not `str`. This is a helper guard, not an asserted SQX validation rule.
 - [ ] `TestOverviewTemplatePolicy.test_selection()` -> Assert `() -> "SQDefault"`, `("A", "SQDefault") -> "SQDefault"`, `("A", "B") -> "A"`, and `("sqdefault",) -> "sqdefault"`.
 - [ ] `TestOverviewTemplatePolicy.test_type_error()` -> Assert `[]` and `(None,)` raise the exact TypeError above; assert the input tuple is unchanged after a valid call.
-*Done command:* `uv run python -m pytest tests/workspaces/results/test_overview_template_policy.py -q` -> exit `0`, four parameterized selection rows and two invalid rows pass. No HTTP server or donor process is started.
+*Done command:* `uv run python -m pytest tests/workspace/results/test_overview_template_policy.py -q` -> exit `0`, four parameterized selection rows and two invalid rows pass. No HTTP server or donor process is started.
 *Commit:* `feat(results): add overview template selection policy`. Only the two CREATE files belong in this commit.
 
 ## Phase 2: complete module scope — READY
@@ -247,9 +247,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `AppResults` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppResults`.
-- **Backend:** `app/workspaces/results/app_results.py`.
+- **Backend:** `app/workspace/results/app_results.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsWorkspace.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_app_results.py`.
+- **Backend tests:** `tests/workspace/results/test_app_results.py`.
 - **Frontend tests:** `app/web/tests/results/AppResults.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppResults/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `project/getDataItems`
@@ -264,9 +264,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CustomDatabankActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions`.
-- **Backend:** `app/workspaces/results/custom_databank_actions.py`.
+- **Backend:** `app/workspace/results/custom_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomDatabankActions.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_custom_databank_actions.py`.
+- **Backend tests:** `tests/workspace/results/test_custom_databank_actions.py`.
 - **Frontend tests:** `app/web/tests/results/CustomDatabankActions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveLeft/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveRight/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveToPosition/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -281,9 +281,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CustomResultsPluginActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions`.
-- **Backend:** `app/workspaces/results/custom_results_plugin_actions.py`.
+- **Backend:** `app/workspace/results/custom_results_plugin_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomResultsPluginActions.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_custom_results_plugin_actions.py`.
+- **Backend tests:** `tests/workspace/results/test_custom_results_plugin_actions.py`.
 - **Frontend tests:** `app/web/tests/results/CustomResultsPluginActions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/rename/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -298,9 +298,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `DatabankFilterByCorrelation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation`.
-- **Backend:** `app/workspaces/results/databank_filter_by_correlation.py`.
+- **Backend:** `app/workspace/results/databank_filter_by_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankFilterByCorrelation.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_databank_filter_by_correlation.py`.
+- **Backend tests:** `tests/workspace/results/test_databank_filter_by_correlation.py`.
 - **Frontend tests:** `app/web/tests/results/DatabankFilterByCorrelation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -315,9 +315,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `DatabankRename` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename`.
-- **Backend:** `app/workspaces/results/databank_rename.py`.
+- **Backend:** `app/workspace/results/databank_rename.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankRename.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_databank_rename.py`.
+- **Backend tests:** `tests/workspace/results/test_databank_rename.py`.
 - **Frontend tests:** `app/web/tests/results/DatabankRename.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/databank/rename`
@@ -332,9 +332,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `EquityChartBenchmark` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark`.
-- **Backend:** `app/workspaces/results/equity_chart_benchmark.py`.
+- **Backend:** `app/workspace/results/equity_chart_benchmark.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartBenchmark.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_equity_chart_benchmark.py`.
+- **Backend tests:** `tests/workspace/results/test_equity_chart_benchmark.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartBenchmark.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/Benchmark/Benchmark.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -349,9 +349,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `EquityChartDailyChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart`.
-- **Backend:** `app/workspaces/results/equity_chart_daily_chart.py`.
+- **Backend:** `app/workspace/results/equity_chart_daily_chart.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDailyChart.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_equity_chart_daily_chart.py`.
+- **Backend tests:** `tests/workspace/results/test_equity_chart_daily_chart.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartDailyChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart/DailyChart/DailyChart.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -366,9 +366,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `EquityChartDrawdown` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown`.
-- **Backend:** `app/workspaces/results/equity_chart_drawdown.py`.
+- **Backend:** `app/workspace/results/equity_chart_drawdown.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDrawdown.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_equity_chart_drawdown.py`.
+- **Backend tests:** `tests/workspace/results/test_equity_chart_drawdown.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartDrawdown.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown/Drawdown/EquityChartDrawdown.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -383,9 +383,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `EquityChartVolatility` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility`.
-- **Backend:** `app/workspaces/results/equity_chart_volatility.py`.
+- **Backend:** `app/workspace/results/equity_chart_volatility.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolatility.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_equity_chart_volatility.py`.
+- **Backend tests:** `tests/workspace/results/test_equity_chart_volatility.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartVolatility.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility/Volatility/Volatility.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -400,9 +400,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `EquityChartVolume` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume`.
-- **Backend:** `app/workspaces/results/equity_chart_volume.py`.
+- **Backend:** `app/workspace/results/equity_chart_volume.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolume.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_equity_chart_volume.py`.
+- **Backend tests:** `tests/workspace/results/test_equity_chart_volume.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartVolume.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume/Volume/EquityChartVolume.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -417,9 +417,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `LoaderSQ3` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
-- **Backend:** `app/workspaces/results/loader_s_q3.py`.
+- **Backend:** `app/workspace/results/loader_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ3.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_loader_s_q3.py`.
+- **Backend tests:** `tests/workspace/results/test_loader_s_q3.py`.
 - **Frontend tests:** `app/web/tests/results/LoaderSQ3.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -434,9 +434,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `LoaderSQ4` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4`.
-- **Backend:** `app/workspaces/results/loader_s_q4.py`.
+- **Backend:** `app/workspace/results/loader_s_q4.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ4.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_loader_s_q4.py`.
+- **Backend tests:** `tests/workspace/results/test_loader_s_q4.py`.
 - **Frontend tests:** `app/web/tests/results/LoaderSQ4.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4/SQ4/SQ4LoaderPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -451,9 +451,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart`.
-- **Backend:** `app/workspaces/results/results_chart.py`.
+- **Backend:** `app/workspace/results/results_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsChart.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_chart.py`.
+- **Backend tests:** `tests/workspace/results/test_results_chart.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsCharts/cancelLoading` `resultsCharts/loadChartData`
@@ -468,9 +468,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsDatabankActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`.
-- **Backend:** `app/workspaces/results/results_databank_actions.py`.
+- **Backend:** `app/workspace/results/results_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankActions.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_databank_actions.py`.
+- **Backend tests:** `tests/workspace/results/test_results_databank_actions.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsDatabankActions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsDatabankActions/getStrategyXml` `/instruments/addAlias` `/instruments/addInstrument` `/project/instrumentSelected` `project/retest` `resultsDatabankActions/exportDatabankToCSV` `project/saveReports` `project/saveSingleFileJava` `dirs/setLastFolderUsed` `project/synchronizeDatabank` `project/setDatabankSynchronization` `resultsDatabankActions/compareStrategies` `resultsDatabankActions/getStrategyParameters` `resultsDatabankActions/setStrategyParameters`
@@ -485,9 +485,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsDatabankViews` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews`.
-- **Backend:** `app/workspaces/results/results_databank_views.py`.
+- **Backend:** `app/workspace/results/results_databank_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankViews.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_databank_views.py`.
+- **Backend tests:** `tests/workspace/results/test_results_databank_views.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsDatabankViews.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/dbviews/removeView` `/dbviews/addView` `/dbviews/updateView` `/dbviews/changeView`
@@ -502,9 +502,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsEquityChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`.
-- **Backend:** `app/workspaces/results/results_equity_chart.py`.
+- **Backend:** `app/workspace/results/results_equity_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsEquityChart.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_equity_chart.py`.
+- **Backend tests:** `tests/workspace/results/test_results_equity_chart.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsEquityChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/main/openlink` `equitychart/print`
@@ -519,9 +519,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsExplore` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore`.
-- **Backend:** `app/workspaces/results/results_explore.py`.
+- **Backend:** `app/workspace/results/results_explore.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsExplore.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_explore.py`.
+- **Backend tests:** `tests/workspace/results/test_results_explore.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsExplore.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `explore/info`
@@ -536,9 +536,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsOverview` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview`.
-- **Backend:** `app/workspaces/results/results_overview.py`.
+- **Backend:** `app/workspace/results/results_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsOverview.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_overview.py`.
+- **Backend tests:** `tests/workspace/results/test_results_overview.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsOverview.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -553,9 +553,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsPlugins` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins`.
-- **Backend:** `app/workspaces/results/results_plugins.py`.
+- **Backend:** `app/workspace/results/results_plugins.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPlugins.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_plugins.py`.
+- **Backend tests:** `tests/workspace/results/test_results_plugins.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsPlugins.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/ResultsPluginsService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsPlugins/list` `resultsPlugins/create` `resultsPlugins/rename` `resultsPlugins/delete` `resultsPlugins/stats` `resultsPlugins/orders` `resultsPlugins/settings` `sourcecode/print` `resultsPlugins/databankStrategies` `resultsPlugins/strategyStats` `resultsPlugins/strategyOrders` `resultsPlugins/strategyResultKeys` `resultsPlugins/candles` `resultsPlugins/dataSymbols` `sqai/complete`
@@ -570,9 +570,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsPortfolioCorrelation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation`.
-- **Backend:** `app/workspaces/results/results_portfolio_correlation.py`.
+- **Backend:** `app/workspace/results/results_portfolio_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPortfolioCorrelation.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_portfolio_correlation.py`.
+- **Backend tests:** `tests/workspace/results/test_results_portfolio_correlation.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsPortfolioCorrelation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocorrelation/compute` `portfoliocorrelation/stop` `portfoliocorrelation/correlationSave`
@@ -587,9 +587,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsProfileChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart`.
-- **Backend:** `app/workspaces/results/results_profile_chart.py`.
+- **Backend:** `app/workspace/results/results_profile_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsProfileChart.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_profile_chart.py`.
+- **Backend tests:** `tests/workspace/results/test_results_profile_chart.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsProfileChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `profilechart/paths`
@@ -604,9 +604,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsReport` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport`.
-- **Backend:** `app/workspaces/results/results_report.py`.
+- **Backend:** `app/workspace/results/results_report.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsReport.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_report.py`.
+- **Backend tests:** `tests/workspace/results/test_results_report.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsReport.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -621,9 +621,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsSourceCode` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode`.
-- **Backend:** `app/workspaces/results/results_source_code.py`.
+- **Backend:** `app/workspace/results/results_source_code.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSourceCode.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_source_code.py`.
+- **Backend tests:** `tests/workspace/results/test_results_source_code.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsSourceCode.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sourcecode/print` `sourcecode/getDataPath` `sourcecode/saveMTPaths` `sourcecode/saveEA` `sourcecode/saveWFCalendar`
@@ -638,9 +638,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsSPOverview` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview`.
-- **Backend:** `app/workspaces/results/results_s_p_overview.py`.
+- **Backend:** `app/workspace/results/results_s_p_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSPOverview.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_s_p_overview.py`.
+- **Backend tests:** `tests/workspace/results/test_results_s_p_overview.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsSPOverview.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `spoverview/print`
@@ -655,9 +655,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsStockpicker` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker`.
-- **Backend:** `app/workspaces/results/results_stockpicker.py`.
+- **Backend:** `app/workspace/results/results_stockpicker.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStockpicker.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_stockpicker.py`.
+- **Backend tests:** `tests/workspace/results/test_results_stockpicker.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsStockpicker.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `stockpicker/print`
@@ -672,9 +672,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsStrategyConfig` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig`.
-- **Backend:** `app/workspaces/results/results_strategy_config.py`.
+- **Backend:** `app/workspace/results/results_strategy_config.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStrategyConfig.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_strategy_config.py`.
+- **Backend tests:** `tests/workspace/results/test_results_strategy_config.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsStrategyConfig.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `strategyconfig/print` `strategyconfig/loadStrategySettings`
@@ -689,9 +689,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsTradeAnalysis` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis`.
-- **Backend:** `app/workspaces/results/results_trade_analysis.py`.
+- **Backend:** `app/workspace/results/results_trade_analysis.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeAnalysis.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_trade_analysis.py`.
+- **Backend tests:** `tests/workspace/results/test_results_trade_analysis.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsTradeAnalysis.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `tradeanalysis/print`
@@ -706,9 +706,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsTradeList` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList`.
-- **Backend:** `app/workspaces/results/results_trade_list.py`.
+- **Backend:** `app/workspace/results/results_trade_list.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeList.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_trade_list.py`.
+- **Backend tests:** `tests/workspace/results/test_results_trade_list.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsTradeList.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -723,9 +723,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsTradelistViews` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews`.
-- **Backend:** `app/workspaces/results/results_tradelist_views.py`.
+- **Backend:** `app/workspace/results/results_tradelist_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradelistViews.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_results_tradelist_views.py`.
+- **Backend tests:** `tests/workspace/results/test_results_tradelist_views.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsTradelistViews.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/tradelistviews/removeView` `/tradelistviews/addView` `/tradelistviews/updateView` `/tradelistviews/changeView`
@@ -740,9 +740,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SaverHTML` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML`.
-- **Backend:** `app/workspaces/results/saver_h_t_m_l.py`.
+- **Backend:** `app/workspace/results/saver_h_t_m_l.py`.
 - **Frontend:** `app/web/workspaces/results/SaverHTML.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_saver_h_t_m_l.py`.
+- **Backend tests:** `tests/workspace/results/test_saver_h_t_m_l.py`.
 - **Frontend tests:** `app/web/tests/results/SaverHTML.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML/HTML/HTMLReportPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -757,9 +757,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SaverPDF` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF`.
-- **Backend:** `app/workspaces/results/saver_p_d_f.py`.
+- **Backend:** `app/workspace/results/saver_p_d_f.py`.
 - **Frontend:** `app/web/workspaces/results/SaverPDF.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_saver_p_d_f.py`.
+- **Backend tests:** `tests/workspace/results/test_saver_p_d_f.py`.
 - **Frontend tests:** `app/web/tests/results/SaverPDF.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF/PDF/PDFReportPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -774,9 +774,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SaverSQ3` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
-- **Backend:** `app/workspaces/results/saver_s_q3.py`.
+- **Backend:** `app/workspace/results/saver_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/SaverSQ3.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_saver_s_q3.py`.
+- **Backend tests:** `tests/workspace/results/test_saver_s_q3.py`.
 - **Frontend tests:** `app/web/tests/results/SaverSQ3.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -791,9 +791,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SaverStrategyTrades` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades`.
-- **Backend:** `app/workspaces/results/saver_strategy_trades.py`.
+- **Backend:** `app/workspace/results/saver_strategy_trades.py`.
 - **Frontend:** `app/web/workspaces/results/SaverStrategyTrades.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_saver_strategy_trades.py`.
+- **Backend tests:** `tests/workspace/results/test_saver_strategy_trades.py`.
 - **Frontend tests:** `app/web/tests/results/SaverStrategyTrades.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades/StrategyTrades/StrategyTradesSaverPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -808,9 +808,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ServletRenameTool` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
-- **Backend:** `app/workspaces/results/servlet_rename_tool.py`.
+- **Backend:** `app/workspace/results/servlet_rename_tool.py`.
 - **Frontend:** `app/web/workspaces/results/ServletRenameTool.tsx`.
-- **Backend tests:** `tests/workspaces/results/test_servlet_rename_tool.py`.
+- **Backend tests:** `tests/workspace/results/test_servlet_rename_tool.py`.
 - **Frontend tests:** `app/web/tests/results/ServletRenameTool.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -859,7 +859,7 @@ New evidence record; fields are retained verbatim for future supersession:
       "sha256": "339dd052800cfc1360946d7253ffe3b91b12cf3591c395474cf607e9eb23e245"
     }
   ],
-  "target_domain": "app/workspaces/results",
+  "target_domain": "app/workspace/results",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],

@@ -27,7 +27,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ## Current-code migration audit and execution order
 
-*Evidence:* OBS-HARU-CE-REUSE-20261029. HaruQuantAI possesses an existing, fully functional Code Editor engine (app/workspace/code_editor/ comprising 14 production files) and its interactive React workspace (ui/app/workspace/CodeEditor/). This audit defines the exact relocation to app/workspaces/code_editor/ and app/web/workspaces/code_editor/.
+*Evidence:* OBS-HARU-CE-REUSE-20261029. HaruQuantAI possesses an existing, fully functional Code Editor engine (app/workspace/code_editor/ comprising 14 production files) and its interactive React workspace (ui/app/workspace/CodeEditor/). This audit defines the exact relocation to app/workspace/code_editor/ and app/web/workspaces/code_editor/.
 
 ### Work order CE-M01: migrate existing Code Editor workspace and testing services
 
@@ -37,16 +37,16 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 | Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
 |---|---|---|
-| app/workspace/code_editor/editor.py | app/workspaces/code_editor/editor.py | DIRECT FIT: Buffer management, file tree, syntax checking, and code navigation |
-| app/workspace/code_editor/indicator_tester.py | app/workspaces/code_editor/indicator_tester.py | DIRECT FIT: Indicator test execution against historical bar data |
-| app/workspace/code_editor/registry.py | app/workspaces/code_editor/registry.py | DIRECT FIT: Dynamic snippet compilation, importlib registration, and reload |
-| app/workspace/code_editor/templates.py | app/workspaces/code_editor/templates.py | DIRECT FIT: Boilerplate code generation for indicators, building blocks, and metrics |
-| app/workspace/code_editor/import_export.py | app/workspaces/code_editor/import_export.py | DIRECT FIT: Snippet archive packaging and export (.zip / .sqb) |
-| app/workspace/code_editor/mcp.py | app/workspaces/code_editor/mcp.py | DIRECT FIT: Model Context Protocol (MCP) server endpoints for external AI tools |
-| app/workspace/code_editor/routes.py | app/workspaces/code_editor/routes.py | DIRECT FIT: FastAPI endpoints for editor operations and file persistence |
+| app/workspace/code_editor/editor.py | app/workspace/code_editor/editor.py | DIRECT FIT: Buffer management, file tree, syntax checking, and code navigation |
+| app/workspace/code_editor/indicator_tester.py | app/workspace/code_editor/indicator_tester.py | DIRECT FIT: Indicator test execution against historical bar data |
+| app/workspace/code_editor/registry.py | app/workspace/code_editor/registry.py | DIRECT FIT: Dynamic snippet compilation, importlib registration, and reload |
+| app/workspace/code_editor/templates.py | app/workspace/code_editor/templates.py | DIRECT FIT: Boilerplate code generation for indicators, building blocks, and metrics |
+| app/workspace/code_editor/import_export.py | app/workspace/code_editor/import_export.py | DIRECT FIT: Snippet archive packaging and export (.zip / .sqb) |
+| app/workspace/code_editor/mcp.py | app/workspace/code_editor/mcp.py | DIRECT FIT: Model Context Protocol (MCP) server endpoints for external AI tools |
+| app/workspace/code_editor/routes.py | app/workspace/code_editor/routes.py | DIRECT FIT: FastAPI endpoints for editor operations and file persistence |
 | ui/app/workspace/CodeEditor/CodeEditorWorkspace.tsx | app/web/workspaces/code_editor/CodeEditorWorkspace.tsx | DIRECT FIT: Split-pane code editor layout (file browser, Monaco editor, test results) |
 | ui/app/workspace/CodeEditor/codeEditorClient.ts | app/web/workspaces/code_editor/codeEditorClient.ts | ADAPT: REST client for editor actions, compilation, and test execution |
-| tests/workspace/code_editor/ | tests/workspaces/code_editor/ | MOVE: Code editor and indicator tester test suite |
+| tests/workspace/code_editor/ | tests/workspace/code_editor/ | MOVE: Code editor and indicator tester test suite |
 
 *Commit:*
 efactor(code-editor): migrate code editor workspace and services.
@@ -61,7 +61,7 @@ efactor(code-editor): migrate code editor workspace and services.
 
 *Implementation Files:*
 - **Frontend create:** `app/web/workspaces/code_editor/indicator_test_presentation.ts`.
-- **Frontend tests create:** `app/web/tests/workspaces/code_editor/indicator_test_presentation.test.ts`.
+- **Frontend tests create:** `app/web/tests/workspace/code_editor/indicator_test_presentation.test.ts`.
 - **Backend:** none. This is display logic only, not a second indicator engine.
 
 *Exact types:* export `IndicatorRowClass = "checked"|"unchecked"|"passed"|"failed"|"other"`; export class `IndicatorTestPresentation` with static methods below. Input strings are not trimmed. All methods are synchronous and side-effect free. No renderer, global grid object, network client or storage is created.
@@ -92,7 +92,7 @@ efactor(code-editor): migrate code editor workspace and services.
 | shift_text(`RSI(14)[01]`) | `01` |
 | shift_text(`RSI(14)`) | null |
 
-*Verification:* `npm --prefix app/web test -- tests/workspaces/code_editor/indicator_test_presentation.test.ts` exits 0 with the exact parameterized cases above collected. Vitest uses the AppCore node environment; no jsdom dependency is required. Commit exactly the two listed files. Indicator computation/import/config persistence remain blocked in the full feature order below.
+*Verification:* `npm --prefix app/web test -- tests/workspace/code_editor/indicator_test_presentation.test.ts` exits 0 with the exact parameterized cases above collected. Vitest uses the AppCore node environment; no jsdom dependency is required. Commit exactly the two listed files. Indicator computation/import/config persistence remain blocked in the full feature order below.
 
 
 ## Phase 04.9: Full workspace feature orders — evidence-gated contracts
@@ -105,16 +105,16 @@ efactor(code-editor): migrate code editor workspace and services.
 *Feature:* `AppCodeEditor` complete observed workspace contribution. **Task ID:** `I-AppCodeEditor`. **Readiness:** READY. **Evidence:** `OBS145-AppCodeEditor-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/code_editor/workspace.py` → `CodeEditorService`.
-- **Request/result models:** `app/workspaces/code_editor/workspace_models.py`.
+- **Backend:** `app/workspace/code_editor/workspace.py` → `CodeEditorService`.
+- **Request/result models:** `app/workspace/code_editor/workspace_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/CodeEditorWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/code_editor/test_workspace.py`.
-- **Frontend test:** `app/web/tests/workspaces/code_editor/CodeEditorWorkspace.test.tsx`.
+- **Backend test:** `tests/workspace/code_editor/test_workspace.py`.
+- **Frontend test:** `app/web/tests/workspace/code_editor/CodeEditorWorkspace.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js`, `DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement.
 - **Function/signature authorization:** none. Do not create `CodeEditorService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/code_editor/test_workspace.py -q`; `npm --prefix app/web test -- tests/workspaces/code_editor/CodeEditorWorkspace.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/code_editor/test_workspace.py -q`; `npm --prefix app/web test -- tests/workspace/code_editor/CodeEditorWorkspace.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CodeEditorImportExport`
@@ -125,16 +125,16 @@ efactor(code-editor): migrate code editor workspace and services.
 *Feature:* `CodeEditorImportExport` complete observed workspace contribution. **Task ID:** `I-CodeEditorImportExport`. **Readiness:** READY. **Evidence:** `OBS145-CodeEditorImportExport-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/code_editor/import_export.py` → `ExtensionPackageService`.
-- **Request/result models:** `app/workspaces/code_editor/import_export_models.py`.
+- **Backend:** `app/workspace/code_editor/import_export.py` → `ExtensionPackageService`.
+- **Request/result models:** `app/workspace/code_editor/import_export_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/ImportExportPanel.tsx`.
-- **Backend test:** `tests/workspaces/code_editor/test_import_export.py`.
-- **Frontend test:** `app/web/tests/workspaces/code_editor/ImportExportPanel.test.tsx`.
+- **Backend test:** `tests/workspace/code_editor/test_import_export.py`.
+- **Frontend test:** `app/web/tests/workspace/code_editor/ImportExportPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport`.
 - **Observed actions:** `/importexport/cancel`; `/importexport/export`; `/importexport/import`; `/importexport/list`; `/importexport/overwrite`; `/importexport/overwriteAlways`; `/importexport/skip`; `/importexport/skipAlways`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `ExtensionPackageService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/code_editor/test_import_export.py -q`; `npm --prefix app/web test -- tests/workspaces/code_editor/ImportExportPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/code_editor/test_import_export.py -q`; `npm --prefix app/web test -- tests/workspace/code_editor/ImportExportPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CodeEditorIndicatorTester`
@@ -145,16 +145,16 @@ efactor(code-editor): migrate code editor workspace and services.
 *Feature:* `CodeEditorIndicatorTester` complete observed workspace contribution. **Task ID:** `I-CodeEditorIndicatorTester`. **Readiness:** READY. **Evidence:** `OBS145-CodeEditorIndicatorTester-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/code_editor/indicator_tester.py` → `IndicatorTestService`.
-- **Request/result models:** `app/workspaces/code_editor/indicator_tester_models.py`.
+- **Backend:** `app/workspace/code_editor/indicator_tester.py` → `IndicatorTestService`.
+- **Request/result models:** `app/workspace/code_editor/indicator_tester_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/IndicatorTesterPanel.tsx`.
-- **Backend test:** `tests/workspaces/code_editor/test_indicator_tester.py`.
-- **Frontend test:** `app/web/tests/workspaces/code_editor/IndicatorTesterPanel.test.tsx`.
+- **Backend test:** `tests/workspace/code_editor/test_indicator_tester.py`.
+- **Frontend test:** `app/web/tests/workspace/code_editor/IndicatorTesterPanel.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester`.
 - **Observed actions:** `indyTester/addTests`; `indyTester/createNewConfig`; `indyTester/downloadTests`; `indyTester/listIndicators`; `indyTester/loadConfig`; `indyTester/saveConfig`; `indyTester/startTesting`; `indyTester/stopTesting`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `IndicatorTestService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/code_editor/test_indicator_tester.py -q`; `npm --prefix app/web test -- tests/workspaces/code_editor/IndicatorTesterPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/code_editor/test_indicator_tester.py -q`; `npm --prefix app/web test -- tests/workspace/code_editor/IndicatorTesterPanel.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletCodeEditor`
@@ -165,16 +165,16 @@ efactor(code-editor): migrate code editor workspace and services.
 *Feature:* `ServletCodeEditor` complete observed workspace contribution. **Task ID:** `I-ServletCodeEditor`. **Readiness:** READY. **Evidence:** `OBS145-ServletCodeEditor-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
-- **Backend:** `app/workspaces/code_editor/commands.py` → `CodeEditorCommandService`.
-- **Request/result models:** `app/workspaces/code_editor/commands_models.py`.
+- **Backend:** `app/workspace/code_editor/commands.py` → `CodeEditorCommandService`.
+- **Request/result models:** `app/workspace/code_editor/commands_models.py`.
 - **Frontend:** `app/web/workspaces/code_editor/SourceEditor.tsx`.
-- **Backend test:** `tests/workspaces/code_editor/test_commands.py`.
-- **Frontend test:** `app/web/tests/workspaces/code_editor/SourceEditor.test.tsx`.
+- **Backend test:** `tests/workspace/code_editor/test_commands.py`.
+- **Frontend test:** `app/web/tests/workspace/code_editor/SourceEditor.test.tsx`.
 - **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`.
 - **Observed actions:** `codeeditor/clone`; `codeeditor/compile`; `codeeditor/compileAll`; `codeeditor/compilePlugin`; `codeeditor/createNew`; `codeeditor/createNewDir`; `codeeditor/createNewFile`; `codeeditor/createNewTemplate`; `codeeditor/delete`; `codeeditor/editorAutocomplete`; `codeeditor/findInFiles`; `codeeditor/fixImports`; `codeeditor/getContent`; `codeeditor/listCodeTypes`; `codeeditor/listIndicators`; `codeeditor/listTemplates`; `codeeditor/loadLastOpenedFiles`; `codeeditor/reload`; `codeeditor/reloadApp`; `codeeditor/rename`; `codeeditor/save`; `codeeditor/saveAs`; `codeeditor/saveLastOpenedFiles`; `codeeditor/stopCompilation`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `CodeEditorCommandService.execute(payload: dict)` or infer CRUD methods from the feature name.
-- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspaces/code_editor/test_commands.py -q`; `npm --prefix app/web test -- tests/workspaces/code_editor/SourceEditor.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
+- **Acceptance commands reserved for the completed senior specification:** `uv run python -m pytest tests/workspace/code_editor/test_commands.py -q`; `npm --prefix app/web test -- tests/workspace/code_editor/SourceEditor.test.tsx`. These are not acceptance now: fixtures/assertions and the method contracts remain unset, so no commit may claim this task complete.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ## Phase 4.10: Owned executable extension categories
@@ -316,7 +316,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/code_editor",
+  "target_domain": "app/workspace/code_editor",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -362,7 +362,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/code_editor",
+  "target_domain": "app/workspace/code_editor",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -408,7 +408,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/code_editor",
+  "target_domain": "app/workspace/code_editor",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -454,7 +454,7 @@ Original historical objects below are retained without modification; new static 
     }
   ],
   "limitations": "Request literals or carrier presence do not establish complete payload fields, defaults, persistence, numerical algorithms, remote protocol compatibility or runtime success. Static inspection only.",
-  "target_domain": "app/workspaces/code_editor",
+  "target_domain": "app/workspace/code_editor",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],

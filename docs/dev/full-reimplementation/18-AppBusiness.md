@@ -33,15 +33,15 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Feature:* fixed-size build attribute projection only, not generation/compilation or license enforcement.
 *Dependencies:* WO-C00 Python package foundation.
 *Implementation Files:*
-- **Backend Create:** `app/workspaces/business/__init__.py` (empty), `app/workspaces/business/build_defaults.py`.
-- **Test Create:** `tests/workspaces/business/test_build_defaults.py`.
+- **Backend Create:** `app/workspace/business/__init__.py` (empty), `app/workspace/business/build_defaults.py`.
+- **Test Create:** `tests/workspace/business/test_build_defaults.py`.
 - **Frontend:** none for this projection; editor/persistence workflows remain blocked.
 *Types:* frozen/slotted `FixedSizeBuildSettings(enabled:bool,name:str,lots:str,platform:str)` with no field defaults. All fields are mandatory when settings exists; the caller contract must validate untyped input separately. Output is a new dict[str,str] for the LockedToFixedSize node's attributes.
 *Functional Requirements & Implementation:*
 - [ ] `FixedSizeBuildProjection.attributes(settings: FixedSizeBuildSettings | None) -> dict[str,str]` -> exported static method. None gives exactly `{'use':'false','name':'-fixedSize','lots':'0.01','platform':'mql4'}`. Present settings gives use true/false as lowercase strings and unchanged name/lots/platform. Do not parse lots, clamp values, replace blank names or choose another platform.
 - [ ] `test('absent settings defaults')` -> exact default dictionary above; mutate returned dictionary and call again to prove no shared mutation.
 - [ ] `test('provided attributes remain literal')` -> enabledTrue,name ' custom ',lots '0.20',platform 'mql5' yields use 'true', name ' custom ',lots '0.20',platform 'mql5'.
-*Acceptance:* `uv run python -m pytest tests/workspaces/business/test_build_defaults.py -q` exits 0, two tests.
+*Acceptance:* `uv run python -m pytest tests/workspace/business/test_build_defaults.py -q` exits 0, two tests.
 *Commit:* `business: preserve fixed-size build attributes`.
 
 ## Phase 18.2: complete workspace contribution - READY
@@ -53,16 +53,16 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Feature:* complete AppSQXBusiness workflow.
 *Evidence IDs:* `OBS145-AppSQXBusiness-SCOPE-001` establishes source presence only; `OBS145-AppSQXBusiness-HELPER-001` establishes only the separately scoped helper.
 *Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/business/business.py`.
-- **Models:** `app/workspaces/business/business_models.py`.
+- **Backend:** `app/workspace/business/business.py`.
+- **Models:** `app/workspace/business/business_models.py`.
 - **Frontend:** `app/web/workspaces/business/BusinessWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/business/test_business.py`.
-- **Frontend test:** `app/web/tests/workspaces/business/BusinessWorkspacePanel.test.tsx`.
+- **Backend test:** `tests/workspace/business/test_business.py`.
+- **Frontend test:** `app/web/tests/workspace/business/BusinessWorkspacePanel.test.tsx`.
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppSQXBusiness`, `DONOR_REFERENCE_ROOT/internal/plugins/AppSQXBusiness/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Complete project/input/settings schema, target build variants, lock/export/compile behavior, allowed platform mappings and error fixtures.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/business/test_business.py -q` or `npm --prefix app/web test -- tests/workspaces/business/BusinessWorkspacePanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/business/test_business.py -q` or `npm --prefix app/web test -- tests/workspace/business/BusinessWorkspacePanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 External vendor protocols/account data are not inferred from client action names. A legitimate provider/toolchain or a source-established protocol is required; a fake success response cannot close an external integration.
@@ -81,7 +81,7 @@ External vendor protocols/account data are not inferred from client action names
   "sources": [
     "DONOR_REFERENCE_ROOT/internal/web/SQXBUSINESS/src/components/XMLUtil.js"
   ],
-  "target_domain": "app/workspaces/business; app/web/workspaces/business",
+  "target_domain": "app/workspace/business; app/web/workspaces/business",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -120,7 +120,7 @@ External vendor protocols/account data are not inferred from client action names
   "sources": [
     "DONOR_REFERENCE_ROOT/internal/plugins/AppSQXBusiness"
   ],
-  "target_domain": "app/workspaces/business; app/web/workspaces/business",
+  "target_domain": "app/workspace/business; app/web/workspaces/business",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -157,9 +157,9 @@ Migration fit is separate from implementation status. Direct fit below means the
 | `ui/app/workspace/Business/BusinessWorkspace.tsx` | `app/web/workspaces/business/BusinessWorkspace.tsx` | Replace donor-mismatched feature surface | Current component is node/user/MCP management; primary SQXBusiness is product/project/EA options/resources/build. Do not call current Business component a direct-fit donor workspace. |
 | `ui/app/workspace/Business/AddNodeModal.tsx` | `app/web/workspaces/grid_control/AddNodeModal.tsx` | Reassign - owned by AppGridControl | No second copy under sqx_business. See GridControl migration order for source changes. |
 | `ui/app/workspace/Business/ConfigureMcpModal.tsx` | `app/web/workspaces/sqai/ConfigureMcpModal.tsx` | Reassign - owned by AppSQAI | No second copy under sqx_business; replace fake connected/authenticated responses through the accepted service contract. |
-| `ui/app/workspace/Business/fixtures.ts` | `app/web/tests/workspaces/business/fixtures.ts` | Retire production fixtures | Current4node/user/MCP fixtures are not SQXBusiness product-build examples. Keep only test cases assigned to the actual owner; create product-build fixtures from inspected XML. |
-| `ui/tests/unit/workspace/Business/business.test.ts` | `app/web/tests/workspaces/grid_control/cluster.test.ts` | Split test ownership | Compute aggregation/node-state assertions belong GridControl; MCP settings cases move to app/web/tests/workspaces/sqai/mcpConnections.test.ts. Do not duplicate source tests under Business. |
-| `No current product-build Python source` | `app/workspaces/business/build.py` | Missing - create | Target product-build orchestration consumes Wizard exporters. Current cluster UI is not an implementation of product locking/export/compilation. |
+| `ui/app/workspace/Business/fixtures.ts` | `app/web/tests/workspace/business/fixtures.ts` | Retire production fixtures | Current4node/user/MCP fixtures are not SQXBusiness product-build examples. Keep only test cases assigned to the actual owner; create product-build fixtures from inspected XML. |
+| `ui/tests/unit/workspace/Business/business.test.ts` | `app/web/tests/workspace/grid_control/cluster.test.ts` | Split test ownership | Compute aggregation/node-state assertions belong GridControl; MCP settings cases move to app/web/tests/workspace/sqai/mcpConnections.test.ts. Do not duplicate source tests under Business. |
+| `No current product-build Python source` | `app/workspace/business/build.py` | Missing - create | Target product-build orchestration consumes Wizard exporters. Current cluster UI is not an implementation of product locking/export/compilation. |
 
 ### Reorganization work order - MIG-AppSQXBusiness
 
@@ -168,7 +168,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 *Execution order:* move retained presentation files first, change their relative UI/host imports to the published target owner, move/revise the listed tests, then switch route imports in the target shell. Keep one current-to-target owner per table row. Do not leave forwarding copies in old workspace folders; keep source history through Git moves. Do not move application state from a shared browser store into another mock runner.
 *Behavior changes:* only those explicitly listed in accepted work orders may replace the fixture behavior. A physical move cannot make a mock engine/service a direct fit. Missing backend rows require production implementation; pyc/cache directories are not source to recover or migrate.
 *Exact baseline / target commands (each exit0; revised donor-backed assertions are specified by the feature orders):*
-- Baseline: `npm --prefix ui test -- tests/unit/workspace/Business/business.test.ts`. Target: `npm --prefix app/web test -- tests/workspaces/grid_control/cluster.test.ts`.
+- Baseline: `npm --prefix ui test -- tests/unit/workspace/Business/business.test.ts`. Target: `npm --prefix app/web test -- tests/workspace/grid_control/cluster.test.ts`.
 No other path substitution is authorized. Passing the current fixture tests is not donor acceptance.
 *Commit boundary:* one cohesive workspace file reorganization with its import/test updates; algorithm/service replacements are separate feature commits. If a source is split between GridControl and SQAI, the owning phase migrates its exact extracted section once; Business never keeps a duplicate.
 

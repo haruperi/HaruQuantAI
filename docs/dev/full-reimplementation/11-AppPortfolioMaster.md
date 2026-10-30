@@ -33,18 +33,18 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 | Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
 |---|---|---|
 | `ui/app/workspace/PortfolioMaster/PortfolioMasterDialogs.tsx` | `app/web/workspaces/portfolio_master/PortfolioMasterDialogs.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
-| `ui/app/workspace/PortfolioMaster/portfolioMasterFixtures.ts` | `app/web/tests/workspaces/portfolio_master/fixtures/portfolioMasterFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
+| `ui/app/workspace/PortfolioMaster/portfolioMasterFixtures.ts` | `app/web/tests/workspace/portfolio_master/fixtures/portfolioMasterFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
 | `ui/app/workspace/PortfolioMaster/portfolioMasterModel.ts` | `app/web/workspaces/portfolio_master/portfolioMasterModel.ts` | ADAPT: retain pure draft operations; preview serialization/defaults are not SQX persistence or engine settings |
 | `ui/app/workspace/PortfolioMaster/PortfolioMasterProgress.tsx` | `app/web/workspaces/portfolio_master/PortfolioMasterProgress.tsx` | ADAPT: reuse layout; replace timer/mock metrics with owned run/result projection |
 | `ui/app/workspace/PortfolioMaster/PortfolioMasterSettings.tsx` | `app/web/workspaces/portfolio_master/PortfolioMasterSettings.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/PortfolioMaster/PortfolioMasterWorkspace.tsx` | `app/web/workspaces/portfolio_master/PortfolioMasterWorkspace.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
-| `ui/tests/unit/workspace/Portfolio/portfolioMaster.test.ts` | `app/web/tests/workspaces/portfolio_master/portfolioMaster.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Portfolio/portfolioMaster.test.ts` | `app/web/tests/workspace/portfolio_master/portfolioMaster.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
 
 *Functional Requirements & Implementation:*
 - [ ] `PortfolioMasterWorkspace()` -> Retain component exports, props, rendered labels, keyboard actions, cancellation/unmount cleanup and CSS behavior from each current source row. Rewrite relative imports to the table targets. Consume shared Home and Results through their `public.ts` exports; do not import another workspace's private module or copy ProjectWorkbench.
 - [ ] `PortfolioMasterWorkspace()` -> Keep fixture/timer execution explicitly in the existing preview mode until its replacement service work order passes. Moving a screen does not authorize reporting a generated strategy, finished retest, optimized parameter or saved portfolio as a real backend result. The current clients using fixed RSI/demoInputs and `/executions` are adaptation candidates, not verified workspace APIs.
 - [ ] `migration import guard` -> Run `rg -n 'ui/app/workspace/PortfolioMaster|plugins/project/ProjectWorkbench' app/web/workspaces/portfolio_master`. Expected exit `1` and no lines. Rewrite migrated tests to their exact target imports; preserve current assertions and test names.
-- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/PortfolioMaster` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspaces/portfolio_master` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
+- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/PortfolioMaster` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspace/portfolio_master` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
 *Commit:* `refactor(portfolio-master): move owned workspace presentation`. This single commit includes only the listed moves, direct import rewrites and registration change. UI integration work is separate from implementing donor engines.
 
 *Shared results ownership:* ProjectResults and all Results* contribution implementations are owned by AppResults. Builder, Retester, Optimizer and portfolio workspaces register configured contributions; none gets a private copy of trade lists, overview, source-code rendering, correlation or shared engine progress. Shared base workbench remains AppHome.
@@ -62,7 +62,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
       "sha256": "afbb3193d68a41b700b574e88ef455d67ee42c377226011578113767381782f4"
     }
   ],
-  "target_domain": "app/workspaces/portfolio_master",
+  "target_domain": "app/workspace/portfolio_master",
   "feature_ids": [
     "FEAT-UI-PORTFOLIO_MASTER_WORKSPACE"
   ],
@@ -97,9 +97,9 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Feature:* Enable/disable the target field with the observed reset-to-zero behavior. **READY after test bootstrap.** This helper does not calculate fitness or optimize weights.
 *Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioCtrl.js` (`checkColumns`).
-- **Backend CREATE:** `app/workspaces/portfolio_master/fitness_target.py`.
+- **Backend CREATE:** `app/workspace/portfolio_master/fitness_target.py`.
 - **Frontend:** no file changed; the future fitness view model consumes the resulting target state.
-- **Tests CREATE:** `tests/workspaces/portfolio_master/test_fitness_target.py`.
+- **Tests CREATE:** `tests/workspace/portfolio_master/test_fitness_target.py`.
 *Context to Read:* this feature text; the donor file above; `pyproject.toml`.
 *Evidence ID:* `OBS-145-FITNESS-TARGET-001`. The approximate-type integer is injected; this task makes no assumption about its numeric donor value.
 *Functional Requirements & Implementation:*
@@ -107,7 +107,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - [ ] `FitnessTarget.apply(...)` -> Require exact int types for the first two arguments, excluding bool, otherwise raise `TypeError("value_type and approximate_type must be integers")`; require `type(target) is float` otherwise raise `TypeError("target must be a float")`. These guards apply only to the typed helper boundary, not claimed donor validation.
 - [ ] `TestFitnessTarget.test_target_state()` -> Assert `(value_type=7, approximate_type=7,target=12.5) -> (True,12.5)` and `(value_type=8,approximate_type=7,target=12.5) -> (False,0.0)`. The integer `7` is a fixture-injected constant. A second call after disabled state can re-enable with target `4.0` and returns a new state.
 - [ ] `TestFitnessTarget.test_type_errors()` -> Assert `value_type=True` raises the first exact TypeError and `target=1` raises the second. Do not add fitness-score or weight validations in this helper.
-*Done command:* `uv run python -m pytest tests/workspaces/portfolio_master/test_fitness_target.py -q` -> exit `0`; equal/different/re-enabled and two type-error cases pass.
+*Done command:* `uv run python -m pytest tests/workspace/portfolio_master/test_fitness_target.py -q` -> exit `0`; equal/different/re-enabled and two type-error cases pass.
 *Commit:* `feat(portfolio-master): define fitness target-field state`. Only the two CREATE files belong in this commit.
 
 ## Phase 2: complete module scope — READY
@@ -118,9 +118,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `AppPortfolioMaster` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`.
-- **Backend:** `app/workspaces/portfolio_master/app_portfolio_master.py`.
+- **Backend:** `app/workspace/portfolio_master/app_portfolio_master.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/PortfolioMasterWorkspace.tsx`.
-- **Backend tests:** `tests/workspaces/portfolio_master/test_app_portfolio_master.py`.
+- **Backend tests:** `tests/workspace/portfolio_master/test_app_portfolio_master.py`.
 - **Frontend tests:** `app/web/tests/portfolio_master/AppPortfolioMaster.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`.
 *Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -135,9 +135,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `FitnessMethodExistingPortfolio` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio`.
-- **Backend:** `app/workspaces/portfolio_master/fitness_method_existing_portfolio.py`.
+- **Backend:** `app/workspace/portfolio_master/fitness_method_existing_portfolio.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/FitnessMethodExistingPortfolio.tsx`.
-- **Backend tests:** `tests/workspaces/portfolio_master/test_fitness_method_existing_portfolio.py`.
+- **Backend tests:** `tests/workspace/portfolio_master/test_fitness_method_existing_portfolio.py`.
 - **Frontend tests:** `app/web/tests/portfolio_master/FitnessMethodExistingPortfolio.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/module.js`.
 *Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `fitnessExistingPortfolio/list`
@@ -212,7 +212,7 @@ New evidence record; fields are retained verbatim for future supersession:
       "sha256": "6fd8bdb5719e302bb8946ac6cb2d6553b51313870d172e21fe3798810251cef3"
     }
   ],
-  "target_domain": "app/workspaces/portfolio_master",
+  "target_domain": "app/workspace/portfolio_master",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],

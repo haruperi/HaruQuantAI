@@ -37,12 +37,12 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 | `ui/app/workspace/Builder/EngineCharts.tsx` | `app/web/workspaces/builder/EngineCharts.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/EnginePanel.tsx` | `app/web/workspaces/builder/EnginePanel.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/FitnessEvolutionModal.tsx` | `app/web/workspaces/builder/FitnessEvolutionModal.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
-| `ui/app/workspace/Builder/fixtures.ts` | `app/web/tests/workspaces/builder/fixtures/fixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
+| `ui/app/workspace/Builder/fixtures.ts` | `app/web/tests/workspace/builder/fixtures/fixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
 | `ui/app/workspace/Builder/FullSettingsView.tsx` | `app/web/workspaces/builder/FullSettingsView.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/ProgressDashboard.tsx` | `app/web/workspaces/builder/ProgressDashboard.tsx` | ADAPT: reuse layout; replace timer/mock metrics with owned run/result projection |
 | `ui/app/workspace/Builder/results/ResultsCharts.tsx` | `app/web/workspaces/builder/results/ResultsCharts.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/results/ResultsChrome.tsx` | `app/web/workspaces/builder/results/ResultsChrome.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
-| `ui/app/workspace/Builder/results/resultsFixtures.ts` | `app/web/tests/workspaces/builder/fixtures/results/resultsFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
+| `ui/app/workspace/Builder/results/resultsFixtures.ts` | `app/web/tests/workspace/builder/fixtures/results/resultsFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
 | `ui/app/workspace/Builder/results/ResultsModals.tsx` | `app/web/workspaces/builder/results/ResultsModals.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/results/resultsModel.ts` | `app/web/workspaces/builder/results/resultsModel.ts` | ADAPT: retain pure draft operations; preview serialization/defaults are not SQX persistence or engine settings |
 | `ui/app/workspace/Builder/results/tabs/ConditionalTabs.tsx` | `app/web/workspaces/builder/results/tabs/ConditionalTabs.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
@@ -64,7 +64,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 | `ui/app/workspace/Builder/settings/PartsToImproveTab.tsx` | `app/web/workspaces/builder/settings/PartsToImproveTab.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/settings/RankingTab.tsx` | `app/web/workspaces/builder/settings/RankingTab.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/settings/SettingsControls.tsx` | `app/web/workspaces/builder/settings/SettingsControls.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
-| `ui/app/workspace/Builder/settings/settingsFixtures.ts` | `app/web/tests/workspaces/builder/fixtures/settings/settingsFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
+| `ui/app/workspace/Builder/settings/settingsFixtures.ts` | `app/web/tests/workspace/builder/fixtures/settings/settingsFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
 | `ui/app/workspace/Builder/settings/TradingOptionsTab.tsx` | `app/web/workspaces/builder/settings/TradingOptionsTab.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/settings/WhatToBuildTab.tsx` | `app/web/workspaces/builder/settings/WhatToBuildTab.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Builder/SettingsSummary.tsx` | `app/web/workspaces/builder/SettingsSummary.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
@@ -74,16 +74,16 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 | `ui/app/plugins/project/SettingsRankings/RankingCtrl.ts` | `app/web/workspaces/builder/SettingsRankings/RankingCtrl.ts` | DIRECT FIT presentation; ADAPT controller services to canonical result/run projection; preserve local relative imports |
 | `ui/app/plugins/project/SettingsRankings/styles.css` | `app/web/workspaces/builder/SettingsRankings/styles.css` | DIRECT FIT presentation; ADAPT controller services to canonical result/run projection; preserve local relative imports |
 | `ui/app/plugins/project/SettingsRankings/views/ranking.tsx` | `app/web/workspaces/builder/SettingsRankings/views/ranking.tsx` | DIRECT FIT presentation; ADAPT controller services to canonical result/run projection; preserve local relative imports |
-| `ui/tests/unit/workspace/Builder/fullSettings.test.ts` | `app/web/tests/workspaces/builder/fullSettings.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
-| `ui/tests/unit/workspace/Builder/progressDashboard.test.ts` | `app/web/tests/workspaces/builder/progressDashboard.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
-| `ui/tests/unit/workspace/Builder/resultsModel.test.ts` | `app/web/tests/workspaces/builder/resultsModel.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
-| `ui/tests/unit/workspace/Builder/resultsView.test.ts` | `app/web/tests/workspaces/builder/resultsView.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Builder/fullSettings.test.ts` | `app/web/tests/workspace/builder/fullSettings.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Builder/progressDashboard.test.ts` | `app/web/tests/workspace/builder/progressDashboard.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Builder/resultsModel.test.ts` | `app/web/tests/workspace/builder/resultsModel.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Builder/resultsView.test.ts` | `app/web/tests/workspace/builder/resultsView.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
 
 *Functional Requirements & Implementation:*
 - [ ] `BuilderWorkspace()` -> Retain component exports, props, rendered labels, keyboard actions, cancellation/unmount cleanup and CSS behavior from each current source row. Rewrite relative imports to the table targets. Consume shared Home and Results through their `public.ts` exports; do not import another workspace's private module or copy ProjectWorkbench.
 - [ ] `BuilderWorkspace()` -> Keep fixture/timer execution explicitly in the existing preview mode until its replacement service work order passes. Moving a screen does not authorize reporting a generated strategy, finished retest, optimized parameter or saved portfolio as a real backend result. The current clients using fixed RSI/demoInputs and `/executions` are adaptation candidates, not verified workspace APIs.
 - [ ] `migration import guard` -> Run `rg -n 'ui/app/workspace/Builder|plugins/project/ProjectWorkbench' app/web/workspaces/builder`. Expected exit `1` and no lines. Rewrite migrated tests to their exact target imports; preserve current assertions and test names.
-- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Builder` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspaces/builder` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
+- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Builder` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspace/builder` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
 *Commit:* `refactor(builder): move owned workspace presentation`. This single commit includes only the listed moves, direct import rewrites and registration change. UI integration work is separate from implementing donor engines.
 
 *Shared results ownership:* ProjectResults and all Results* contribution implementations are owned by AppResults. Builder, Retester, Optimizer and portfolio workspaces register configured contributions; none gets a private copy of trade lists, overview, source-code rendering, correlation or shared engine progress. Shared base workbench remains AppHome.
@@ -101,7 +101,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
       "sha256": "45bbd996c5d92f59d7a100284dab1cc9a91b9af3a10cff98161a37927b616f67"
     }
   ],
-  "target_domain": "app/workspaces/builder",
+  "target_domain": "app/workspace/builder",
   "feature_ids": [
     "FEAT-UI-BUILDER_PROGRESS_TAB",
     "FEAT-UI-BUILDER_FULLSETTINGS_TAB",
@@ -138,9 +138,9 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 *Feature:* Construct the observed initial GUI configuration as a typed backend value. **READY after test bootstrap.** It is not evidence for GP algorithm behavior or valid parameter bounds.
 *Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js` (`this.config`).
-- **Backend CREATE:** `app/workspaces/builder/genetic_defaults.py`.
+- **Backend CREATE:** `app/workspace/builder/genetic_defaults.py`.
 - **Frontend:** no file changed; no duplicate constants table is permitted in React.
-- **Tests CREATE:** `tests/workspaces/builder/test_genetic_defaults.py`.
+- **Tests CREATE:** `tests/workspace/builder/test_genetic_defaults.py`.
 *Context to Read:* this feature text; the donor file above; `pyproject.toml`.
 *Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`. Target helper names/guards are normative; the scalar values below are observed.
 *Functional Requirements & Implementation:*
@@ -175,7 +175,7 @@ Exact fixture for `in_sample_type=7`:
 }
 ```
 The donor's `condGridInstance` is a runtime widget reference and is deliberately absent from this serializable defaults helper; it is not a persisted strategy field. No other observed scalar field may be dropped or renamed differently.
-*Done command:* `uv run python -m pytest tests/workspaces/builder/test_genetic_defaults.py -q` -> exit `0`; exact-value, fresh-instance, frozen-instance and two invalid-type cases pass.
+*Done command:* `uv run python -m pytest tests/workspace/builder/test_genetic_defaults.py -q` -> exit `0`; exact-value, fresh-instance, frozen-instance and two invalid-type cases pass.
 *Commit:* `feat(builder): define observed genetic option defaults`. Only the two CREATE files belong in this commit.
 
 ## Phase 2: complete module scope — READY
@@ -189,9 +189,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `AppBuilder` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder`.
-- **Backend:** `app/workspaces/builder/app_builder.py`.
+- **Backend:** `app/workspace/builder/app_builder.py`.
 - **Frontend:** `app/web/workspaces/builder/BuilderWorkspace.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_app_builder.py`.
+- **Backend tests:** `tests/workspace/builder/test_app_builder.py`.
 - **Frontend tests:** `app/web/tests/builder/AppBuilder.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -206,9 +206,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `FitnessMethodStrategyResult` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult`.
-- **Backend:** `app/workspaces/builder/fitness_method_strategy_result.py`.
+- **Backend:** `app/workspace/builder/fitness_method_strategy_result.py`.
 - **Frontend:** `app/web/workspaces/builder/FitnessMethodStrategyResult.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_fitness_method_strategy_result.py`.
+- **Backend tests:** `tests/workspace/builder/test_fitness_method_strategy_result.py`.
 - **Frontend tests:** `app/web/tests/builder/FitnessMethodStrategyResult.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `fitnessMethodStrategyResult/list`
@@ -223,9 +223,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ServletBuilder` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder`.
-- **Backend:** `app/workspaces/builder/servlet_builder.py`.
+- **Backend:** `app/workspace/builder/servlet_builder.py`.
 - **Frontend:** `app/web/workspaces/builder/ServletBuilder.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_servlet_builder.py`.
+- **Backend tests:** `tests/workspace/builder/test_servlet_builder.py`.
 - **Frontend tests:** `app/web/tests/builder/ServletBuilder.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -240,9 +240,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsBlocks` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks`.
-- **Backend:** `app/workspaces/builder/settings_blocks.py`.
+- **Backend:** `app/workspace/builder/settings_blocks.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsBlocks.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_settings_blocks.py`.
+- **Backend tests:** `tests/workspace/builder/test_settings_blocks.py`.
 - **Frontend tests:** `app/web/tests/builder/SettingsBlocks.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `blocks/list` `blocks/loadFromFile` `blocks/saveToFile`
@@ -257,9 +257,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsGeneticOptions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions`.
-- **Backend:** `app/workspaces/builder/settings_genetic_options.py`.
+- **Backend:** `app/workspace/builder/settings_genetic_options.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsGeneticOptions.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_settings_genetic_options.py`.
+- **Backend tests:** `tests/workspace/builder/test_settings_genetic_options.py`.
 - **Frontend tests:** `app/web/tests/builder/SettingsGeneticOptions.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -274,9 +274,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsPartsToImprove` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove`.
-- **Backend:** `app/workspaces/builder/settings_parts_to_improve.py`.
+- **Backend:** `app/workspace/builder/settings_parts_to_improve.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsPartsToImprove.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_settings_parts_to_improve.py`.
+- **Backend tests:** `tests/workspace/builder/test_settings_parts_to_improve.py`.
 - **Frontend tests:** `app/web/tests/builder/SettingsPartsToImprove.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -291,9 +291,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsRankings` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings`.
-- **Backend:** `app/workspaces/builder/settings_rankings.py`.
+- **Backend:** `app/workspace/builder/settings_rankings.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsRankings.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_settings_rankings.py`.
+- **Backend tests:** `tests/workspace/builder/test_settings_rankings.py`.
 - **Frontend tests:** `app/web/tests/builder/SettingsRankings.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/FitnessFunction/FitnessFunctionService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rankingsettings/getDefaultWFConditions` `project/changeMaxRecords`
@@ -308,9 +308,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsWhatToBuild` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild`.
-- **Backend:** `app/workspaces/builder/settings_what_to_build.py`.
+- **Backend:** `app/workspace/builder/settings_what_to_build.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsWhatToBuild.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_settings_what_to_build.py`.
+- **Backend tests:** `tests/workspace/builder/test_settings_what_to_build.py`.
 - **Frontend tests:** `app/web/tests/builder/SettingsWhatToBuild.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/BuildModeService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/conditionsAndPeriods/ConditionsAndPeriodsService.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `buildType/listFiles` `buildType/getTemplateConfig` `project/checkTemplateResources`
@@ -325,9 +325,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `TaskBuild` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild`.
-- **Backend:** `app/workspaces/builder/task_build.py`.
+- **Backend:** `app/workspace/builder/task_build.py`.
 - **Frontend:** `app/web/workspaces/builder/TaskBuild.tsx`.
-- **Backend tests:** `tests/workspaces/builder/test_task_build.py`.
+- **Backend tests:** `tests/workspace/builder/test_task_build.py`.
 - **Frontend tests:** `app/web/tests/builder/TaskBuild.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/BuildTaskService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/module.js`.
 *Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `indyTester/calibrate`
@@ -366,13 +366,13 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 *Evidence:* source-body inspection `OBS-SOURCE-BLD-IMPROVEMENT-LABEL-20261030`; Context: `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js#getConditionText`. This releases only pure label selection, not the XML writer or improvement engine.
 
-*Create only:* `app/workspaces/builder/improvement_labels.py`; `tests/workspaces/builder/test_improvement_labels.py`. Define `improvement_label(*, use: bool, action: str | None) -> str`; normalized target action IDs are `add_or_replace`, `add`, `replace` (a target decision; do not equate these strings with donor numeric constants). Do not localize in this helper.
+*Create only:* `app/workspace/builder/improvement_labels.py`; `tests/workspace/builder/test_improvement_labels.py`. Define `improvement_label(*, use: bool, action: str | None) -> str`; normalized target action IDs are `add_or_replace`, `add`, `replace` (a target decision; do not equate these strings with donor numeric constants). Do not localize in this helper.
 
 - [ ] When use is false return `Keep existing` for every action.
 - [ ] Otherwise `add_or_replace` returns `Keep existing or generate randomly`; `add` returns `Keep existing + generate randomly`; `replace`, None, an empty string and unrecognized actions return `Generate randomly`.
 - [ ] Tests `test_disabled_keeps_existing`, `test_add_or_replace`, `test_add`, `test_other_actions_generate` assert these exact strings, with the last test parameterized over replace/None/empty/unknown.
 
-*Acceptance:* `uv run python -m pytest tests/workspaces/builder/test_improvement_labels.py -q` exits 0 and collects seven cases across the four named test functions. One commit: `feat(builder): define improvement condition labels`.
+*Acceptance:* `uv run python -m pytest tests/workspace/builder/test_improvement_labels.py -q` exits 0 and collects seven cases across the four named test functions. One commit: `feat(builder): define improvement condition labels`.
 
 ## Embedded evidence
 
@@ -390,7 +390,7 @@ New evidence record; fields are retained verbatim for future supersession:
       "sha256": "2368c266a4530174fd25896efa96a9ee598892121344db34836fb481beb1a72c"
     }
   ],
-  "target_domain": "app/workspaces/builder",
+  "target_domain": "app/workspace/builder",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -430,7 +430,7 @@ New evidence record; fields are retained verbatim for future supersession:
     "DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest/TaskRetest.jar",
     "DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize/TaskOptimize.jar"
   ],
-  "target_domain": "app/workspaces/builder; app/workspaces/retester; app/workspaces/optimizer",
+  "target_domain": "app/workspace/builder; app/workspace/retester; app/workspace/optimizer",
   "feature_ids": [
     "FEAT-UI-BUILDER_PROGRESS_TAB"
   ],

@@ -35,19 +35,19 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 | `ui/app/workspace/Optimizer/OptimizationDialogs.tsx` | `app/web/workspaces/optimizer/OptimizationDialogs.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Optimizer/OptimizationParameters.tsx` | `app/web/workspaces/optimizer/OptimizationParameters.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Optimizer/optimizerClient.ts` | `app/web/workspaces/optimizer/optimizerClient.ts` | ADAPT: retain transport/cancellation; replace fixed demo graph, demoInputs and provisional /executions mapping after typed run contract is locked |
-| `ui/app/workspace/Optimizer/optimizerFixtures.ts` | `app/web/tests/workspaces/optimizer/fixtures/optimizerFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
+| `ui/app/workspace/Optimizer/optimizerFixtures.ts` | `app/web/tests/workspace/optimizer/fixtures/optimizerFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
 | `ui/app/workspace/Optimizer/OptimizerProgress.tsx` | `app/web/workspaces/optimizer/OptimizerProgress.tsx` | ADAPT: reuse layout; replace timer/mock metrics with owned run/result projection |
 | `ui/app/workspace/Optimizer/OptimizerResults.tsx` | `app/web/workspaces/optimizer/OptimizerResults.tsx` | ADAPT: reuse layout; replace timer/mock metrics with owned run/result projection |
 | `ui/app/workspace/Optimizer/OptimizerSettings.tsx` | `app/web/workspaces/optimizer/OptimizerSettings.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Optimizer/OptimizerWorkspace.tsx` | `app/web/workspaces/optimizer/OptimizerWorkspace.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Optimizer/WalkForwardMatrixView.tsx` | `app/web/workspaces/optimizer/WalkForwardMatrixView.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
-| `ui/tests/unit/workspace/Optimizer/optimizerModes.test.ts` | `app/web/tests/workspaces/optimizer/optimizerModes.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Optimizer/optimizerModes.test.ts` | `app/web/tests/workspace/optimizer/optimizerModes.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
 
 *Functional Requirements & Implementation:*
 - [ ] `OptimizerWorkspace()` -> Retain component exports, props, rendered labels, keyboard actions, cancellation/unmount cleanup and CSS behavior from each current source row. Rewrite relative imports to the table targets. Consume shared Home and Results through their `public.ts` exports; do not import another workspace's private module or copy ProjectWorkbench.
 - [ ] `OptimizerWorkspace()` -> Keep fixture/timer execution explicitly in the existing preview mode until its replacement service work order passes. Moving a screen does not authorize reporting a generated strategy, finished retest, optimized parameter or saved portfolio as a real backend result. The current clients using fixed RSI/demoInputs and `/executions` are adaptation candidates, not verified workspace APIs.
 - [ ] `migration import guard` -> Run `rg -n 'ui/app/workspace/Optimizer|plugins/project/ProjectWorkbench' app/web/workspaces/optimizer`. Expected exit `1` and no lines. Rewrite migrated tests to their exact target imports; preserve current assertions and test names.
-- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Optimizer` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspaces/optimizer` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
+- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Optimizer` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspace/optimizer` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
 *Commit:* `refactor(optimizer): move owned workspace presentation`. This single commit includes only the listed moves, direct import rewrites and registration change. UI integration work is separate from implementing donor engines.
 
 *Shared results ownership:* ProjectResults and all Results* contribution implementations are owned by AppResults. Builder, Retester, Optimizer and portfolio workspaces register configured contributions; none gets a private copy of trade lists, overview, source-code rendering, correlation or shared engine progress. Shared base workbench remains AppHome.
@@ -65,7 +65,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
       "sha256": "68d997c96225968fe07287ae97385a3aea2e0cb5dd958a05368bc1753fc2e8b9"
     }
   ],
-  "target_domain": "app/workspaces/optimizer",
+  "target_domain": "app/workspace/optimizer",
   "feature_ids": [
     "FEAT-UI-OPTIMIZER_WORKSPACE"
   ],
@@ -100,9 +100,9 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Feature:* Produce the observed maximum-test and period-parameter labels. **READY after test bootstrap.** It does not select windows or run an optimizer.
 *Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js` (`maxOptimizationValues`, `printMaxTestsLabel`, `printParamLabel`).
-- **Backend CREATE:** `app/workspaces/optimizer/labels.py`.
+- **Backend CREATE:** `app/workspace/optimizer/labels.py`.
 - **Frontend:** no file changed; later workspace projection returns these labels.
-- **Tests CREATE:** `tests/workspaces/optimizer/test_labels.py`.
+- **Tests CREATE:** `tests/workspace/optimizer/test_labels.py`.
 *Context to Read:* this feature text; the donor file above; `pyproject.toml`.
 *Evidence ID:* `OBS-145-OPTIMIZATION-LABELS-001`. Target string identifiers `percent`, `days`, `bars` replace unexposed donor enum integers; do not infer their donor integer values.
 *Functional Requirements & Implementation:*
@@ -111,7 +111,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - [ ] `OptimizationLabels.max_tests(value)` -> Reject non-integer types, including bool, with `TypeError("value must be an integer")`. `period_parameter` rejects non-int parameter with `TypeError("parameter must be an integer")` and non-str period_type with `TypeError("period_type must be a string")`; these are target helper guards.
 - [ ] `TestOptimizationLabels.test_max_tests()` -> Parameterize all 16 map rows and add `42 -> 42`; comparison is type-sensitive. No locale formatting is applied.
 - [ ] `TestOptimizationLabels.test_period_parameter()` -> Parameterize all three types for parameters `1`, `2`, `0`; assert the exact strings above and `period_type="unknown" -> None`. Assert the three exact error strings using `True`, `True`, and `None` as the respective invalid arguments.
-*Done command:* `uv run python -m pytest tests/workspaces/optimizer/test_labels.py -q` -> exit `0`; all 17 maximum rows, nine period rows, unknown-period and three type-error cases pass.
+*Done command:* `uv run python -m pytest tests/workspace/optimizer/test_labels.py -q` -> exit `0`; all 17 maximum rows, nine period rows, unknown-period and three type-error cases pass.
 *Commit:* `feat(optimizer): define observed optimization labels`. Only the two CREATE files belong in this commit.
 
 ## Phase 1b: source-resolved walk-forward metric projection
@@ -121,14 +121,14 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Feature:* select one metric from the first walk-forward result. This bounded order resolves the missing/empty-result branch of `FitnessMethodWFResult`; it does not implement column transforms, weighted fitness or optimization.
 *Evidence:* `SRC-20261030-WF-METRIC`; the [hashed primary source record](research/workspaces-09-19-source-review.md#fitnessmethodwfresult), specifically `FitnessMethodWFResult.java#getMetricValue`, and the donor `SQTradingLib/.../optimization/WalkForwardMatrixResult.java#getResultList`. The primary plugin reads only the first list element's statistics and defaults a missing metric to zero. Direction and sample arguments do not alter that lookup.
 *Context to Read:* the two named source methods; `app/core/lib/errors.py`; this order. The surrounding caller validates a metric through its column registry before this projection; adapters must retain that validation, rather than treating any unknown metric as a registered column.
-*Implementation Files:* CREATE `app/workspaces/optimizer/wf_metric.py` and `tests/workspaces/optimizer/test_wf_metric.py`. No frontend, optimizer or stats-formula edits.
+*Implementation Files:* CREATE `app/workspace/optimizer/wf_metric.py` and `tests/workspace/optimizer/test_wf_metric.py`. No frontend, optimizer or stats-formula edits.
 *Target contract:* `first_wf_metric(results: Sequence[Mapping[str, float]] | None, metric: str) -> float`. This pure function receives already decoded WF statistics and a validated metric name. The adapter owns resolving `mainResult().get("WalkForwardResult")`; missing matrix maps to None. Do not sort the sequence, search later results, aggregate across runs or compute a mean.
 *Requirements:*
 - [ ] None or an empty sequence returns 0.0.
 - [ ] For a nonempty sequence return `float(results[0].get(metric, 0.0))`; this permits negative and nonfinite existing numerical values because the donor lookup does not clamp here. Fitness transformation/clamping belongs to the later caller. Do not mutate input records.
 - [ ] `metric` must be a nonempty string or raise `ValueError('metric must be non-empty')`; this is an explicit target guard, not an observed donor validation rule. Input sequence/mapping/value types are enforced by the typed caller; do not add coercion from strings or arbitrary JSON.
 *Acceptance fixtures:* None and [] each yield 0.0; [{}] yields 0.0; [{'NetProfit':12.5},{'NetProfit':99.0}] yields 12.5; [{'Other':1.0},{'NetProfit':99.0}] yields 0.0; negative metric -4.0 remains -4.0. Verify inputs remain unchanged. Empty-string and None metric raise the exact target guard. Preserve IEEE NaN/infinity in this internal projection; JSON serialization retains its existing finite-number policy.
-*Acceptance command:* `uv run python -m pytest tests/workspaces/optimizer/test_wf_metric.py -q` exits 0 and exercises every listed branch. Tests use literal dictionaries; they do not mock an optimizer or claim fitness formula parity.
+*Acceptance command:* `uv run python -m pytest tests/workspace/optimizer/test_wf_metric.py -q` exits 0 and exercises every listed branch. Tests use literal dictionaries; they do not mock an optimizer or claim fitness formula parity.
 *Commit:* `optimizer: project the first walk-forward metric`. Completing this helper does not complete I-FitnessMethodWFResult.
 
 ## Phase 2: complete module scope — READY
@@ -139,9 +139,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `AppOptimizer` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer`.
-- **Backend:** `app/workspaces/optimizer/app_optimizer.py`.
+- **Backend:** `app/workspace/optimizer/app_optimizer.py`.
 - **Frontend:** `app/web/workspaces/optimizer/OptimizerWorkspace.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_app_optimizer.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_app_optimizer.py`.
 - **Frontend tests:** `app/web/tests/optimizer/AppOptimizer.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer/module.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -156,9 +156,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `FitnessMethodWFResult` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult`.
-- **Backend:** `app/workspaces/optimizer/fitness_method_w_f_result.py`.
+- **Backend:** `app/workspace/optimizer/fitness_method_w_f_result.py`.
 - **Frontend:** `app/web/workspaces/optimizer/FitnessMethodWFResult.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_fitness_method_w_f_result.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_fitness_method_w_f_result.py`.
 - **Frontend tests:** `app/web/tests/optimizer/FitnessMethodWFResult.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult/WFResult/FitnessMethodWFResult.java`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -173,9 +173,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsOptimizationProfile` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile`.
-- **Backend:** `app/workspaces/optimizer/results_optimization_profile.py`.
+- **Backend:** `app/workspace/optimizer/results_optimization_profile.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsOptimizationProfile.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_results_optimization_profile.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_results_optimization_profile.py`.
 - **Frontend tests:** `app/web/tests/optimizer/ResultsOptimizationProfile.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `optimprof/viewsGetViews` `optimprof/viewsRemoveView` `optimprof/viewsAddView` `optimprof/viewsUpdateView` `optimprof/print` `optimprof/getAvailableParams` `optimprof/printChart` `optimprof/printResults` `optimprof/export`
@@ -190,9 +190,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsSequentialOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization`.
-- **Backend:** `app/workspaces/optimizer/results_sequential_optimization.py`.
+- **Backend:** `app/workspace/optimizer/results_sequential_optimization.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsSequentialOptimization.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_results_sequential_optimization.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_results_sequential_optimization.py`.
 - **Frontend tests:** `app/web/tests/optimizer/ResultsSequentialOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/module.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sequentialoptimization/applyParams` `sequentialoptimization/print`
@@ -207,9 +207,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsSysParamPermutation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation`.
-- **Backend:** `app/workspaces/optimizer/results_sys_param_permutation.py`.
+- **Backend:** `app/workspace/optimizer/results_sys_param_permutation.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsSysParamPermutation.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_results_sys_param_permutation.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_results_sys_param_permutation.py`.
 - **Frontend tests:** `app/web/tests/optimizer/ResultsSysParamPermutation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/services/SysParamPermutationService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sysParamPermutation/print` `sysParamPermutation/printTable`
@@ -224,9 +224,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsWalkForward` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward`.
-- **Backend:** `app/workspaces/optimizer/results_walk_forward.py`.
+- **Backend:** `app/workspace/optimizer/results_walk_forward.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsWalkForward.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_results_walk_forward.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_results_walk_forward.py`.
 - **Frontend tests:** `app/web/tests/optimizer/ResultsWalkForward.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/directives/manageviews/ManageViewsServiceWF.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/WFResultsService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `walkforward/viewsGetViews` `walkforward/viewsRemoveView` `walkforward/viewsAddView` `walkforward/viewsUpdateView` `/main/openlink` `walkforward/print` `walkforward/getConditions` `walkforward/printTable` `resultsDatabankActions/setStrategyParameters` `walkforward/export`
@@ -241,9 +241,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization`.
-- **Backend:** `app/workspaces/optimizer/settings_optimization.py`.
+- **Backend:** `app/workspace/optimizer/settings_optimization.py`.
 - **Frontend:** `app/web/workspaces/optimizer/SettingsOptimization.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_settings_optimization.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_settings_optimization.py`.
 - **Frontend tests:** `app/web/tests/optimizer/SettingsOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `main/checkFileExists` `optimization/loadStrategyToOptimize` `optimization/getNumberOfTests`
@@ -258,9 +258,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `TaskOptimize` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize`.
-- **Backend:** `app/workspaces/optimizer/task_optimize.py`.
+- **Backend:** `app/workspace/optimizer/task_optimize.py`.
 - **Frontend:** `app/web/workspaces/optimizer/TaskOptimize.tsx`.
-- **Backend tests:** `tests/workspaces/optimizer/test_task_optimize.py`.
+- **Backend tests:** `tests/workspace/optimizer/test_task_optimize.py`.
 - **Frontend tests:** `app/web/tests/optimizer/TaskOptimize.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize/module.js`.
 *Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -287,7 +287,7 @@ New evidence record; fields are retained verbatim for future supersession:
       "sha256": "98a8c8ebf2676a2d58f92cd0fb59baa9b1c5f9c8c5335959508b2e0990b94b0e"
     }
   ],
-  "target_domain": "app/workspaces/optimizer",
+  "target_domain": "app/workspace/optimizer",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],

@@ -43,7 +43,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 | Current HaruQuantAI location | Target proposed location | Fit / action (migration audit) |
 |---|---|---|
 | `ui/app/workspace/Retester/retesterClient.ts` | `app/web/workspaces/retester/retesterClient.ts` | ADAPT: retain transport/cancellation; replace fixed demo graph, demoInputs and provisional /executions mapping after typed run contract is locked |
-| `ui/app/workspace/Retester/retesterFixtures.ts` | `app/web/tests/workspaces/retester/fixtures/retesterFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
+| `ui/app/workspace/Retester/retesterFixtures.ts` | `app/web/tests/workspace/retester/fixtures/retesterFixtures.ts` | TEST-ONLY: move to fixtures; remove production imports during service integration |
 | `ui/app/workspace/Retester/RetesterProgress.tsx` | `app/web/workspaces/retester/RetesterProgress.tsx` | ADAPT: reuse layout; replace timer/mock metrics with owned run/result projection |
 | `ui/app/workspace/Retester/RetesterSettings.tsx` | `app/web/workspaces/retester/RetesterSettings.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
 | `ui/app/workspace/Retester/RetesterWorkspace.tsx` | `app/web/workspaces/retester/RetesterWorkspace.tsx` | DIRECT FIT for presentation; move with local imports rewritten; source parity and backend behavior remain separately qualified |
@@ -53,13 +53,13 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 | `ui/app/plugins/project/SettingsCrossChecks/crossCheckSettingsDialog.tsx` | `app/web/workspaces/retester/SettingsCrossChecks/crossCheckSettingsDialog.tsx` | DIRECT FIT presentation; ADAPT controller services to canonical result/run projection; preserve local relative imports |
 | `ui/app/plugins/project/SettingsCrossChecks/module.ts` | `app/web/workspaces/retester/SettingsCrossChecks/module.ts` | DIRECT FIT presentation; ADAPT controller services to canonical result/run projection; preserve local relative imports |
 | `ui/app/plugins/project/SettingsCrossChecks/styles.css` | `app/web/workspaces/retester/SettingsCrossChecks/styles.css` | DIRECT FIT presentation; ADAPT controller services to canonical result/run projection; preserve local relative imports |
-| `ui/tests/unit/workspace/Retester/retesterWorkflow.test.ts` | `app/web/tests/workspaces/retester/retesterWorkflow.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
+| `ui/tests/unit/workspace/Retester/retesterWorkflow.test.ts` | `app/web/tests/workspace/retester/retesterWorkflow.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
 
 *Functional Requirements & Implementation:*
 - [ ] `RetesterWorkspace()` -> Retain component exports, props, rendered labels, keyboard actions, cancellation/unmount cleanup and CSS behavior from each current source row. Rewrite relative imports to the table targets. Consume shared Home and Results through their `public.ts` exports; do not import another workspace's private module or copy ProjectWorkbench.
 - [ ] `RetesterWorkspace()` -> Keep fixture/timer execution explicitly in the existing preview mode until its replacement service work order passes. Moving a screen does not authorize reporting a generated strategy, finished retest, optimized parameter or saved portfolio as a real backend result. The current clients using fixed RSI/demoInputs and `/executions` are adaptation candidates, not verified workspace APIs.
 - [ ] `migration import guard` -> Run `rg -n 'ui/app/workspace/Retester|plugins/project/ProjectWorkbench' app/web/workspaces/retester`. Expected exit `1` and no lines. Rewrite migrated tests to their exact target imports; preserve current assertions and test names.
-- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Retester` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspaces/retester` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
+- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Retester` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspace/retester` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
 *Commit:* `refactor(retester): move owned workspace presentation`. This single commit includes only the listed moves, direct import rewrites and registration change. UI integration work is separate from implementing donor engines.
 
 *Shared results ownership:* ProjectResults and all Results* contribution implementations are owned by AppResults. Builder, Retester, Optimizer and portfolio workspaces register configured contributions; none gets a private copy of trade lists, overview, source-code rendering, correlation or shared engine progress. Shared base workbench remains AppHome.
@@ -77,7 +77,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
       "sha256": "8b5303a08a1df0422d5ea99bac0eccce0f6ebf6abc529a13a84b95d4bfd36841"
     }
   ],
-  "target_domain": "app/workspaces/retester",
+  "target_domain": "app/workspace/retester",
   "feature_ids": [
     "FEAT-UI-RETESTER_WORKSPACE"
   ],
@@ -112,9 +112,9 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 *Feature:* Adapt legacy value-source flags without changing already named sources. **READY after test bootstrap.** This commit does not implement retesting or data overrides.
 *Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/AutoRetestDataService.js` (`getUseCustomAttribute`).
-- **Backend CREATE:** `app/workspaces/retester/value_source.py`.
+- **Backend CREATE:** `app/workspace/retester/value_source.py`.
 - **Frontend:** no file changed; the future request-loading service invokes this backend policy once.
-- **Tests CREATE:** `tests/workspaces/retester/test_value_source.py`.
+- **Tests CREATE:** `tests/workspace/retester/test_value_source.py`.
 *Context to Read:* this feature text; the donor file above; `pyproject.toml`.
 *Evidence ID:* `OBS-145-AUTO-RETEST-SOURCE-001`; Python `None` is the target representation of an absent/null source, not a new source choice.
 *Functional Requirements & Implementation:*
@@ -122,7 +122,7 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 - [ ] `RetestValueSource.normalize(value)` -> Raise `TypeError("value must be str or None")` for every other type, including booleans. The typed helper guard is a target decision.
 - [ ] `TestRetestValueSource.test_mapping()` -> Assert `"false" -> "custom"`, `"true" -> "strategy"`, `"custom" -> "custom"`, `"strategy" -> "strategy"`, `"False" -> "False"`, `"" -> ""`, and `None -> None`.
 - [ ] `TestRetestValueSource.test_type_error()` -> Assert `False` and `1` raise the exact TypeError; no configuration store is read or modified.
-*Done command:* `uv run python -m pytest tests/workspaces/retester/test_value_source.py -q` -> exit `0`; seven mapping rows and two invalid rows pass.
+*Done command:* `uv run python -m pytest tests/workspace/retester/test_value_source.py -q` -> exit `0`; seven mapping rows and two invalid rows pass.
 *Commit:* `feat(retester): normalize legacy value-source flags`. Only the two CREATE files belong in this commit.
 
 ## Phase 2: complete module scope — READY
@@ -136,9 +136,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `AppRetester` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppRetester`.
-- **Backend:** `app/workspaces/retester/app_retester.py`.
+- **Backend:** `app/workspace/retester/app_retester.py`.
 - **Frontend:** `app/web/workspaces/retester/RetesterWorkspace.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_app_retester.py`.
+- **Backend tests:** `tests/workspace/retester/test_app_retester.py`.
 - **Frontend tests:** `app/web/tests/retester/AppRetester.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppRetester/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -153,9 +153,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckMonteCarloManipulation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation`.
-- **Backend:** `app/workspaces/retester/cross_check_monte_carlo_manipulation.py`.
+- **Backend:** `app/workspace/retester/cross_check_monte_carlo_manipulation.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckMonteCarloManipulation.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_monte_carlo_manipulation.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_monte_carlo_manipulation.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckMonteCarloManipulation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/FitnessFunction/MCManipulationFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/MonteCarloManipulationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `monteCarloManipulation/fitnessList` `monteCarloManipulation/fitnessGetConfidenceLevels` `monteCarloManipulation/list`
@@ -170,9 +170,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckMonteCarloRetest` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest`.
-- **Backend:** `app/workspaces/retester/cross_check_monte_carlo_retest.py`.
+- **Backend:** `app/workspace/retester/cross_check_monte_carlo_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckMonteCarloRetest.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_monte_carlo_retest.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_monte_carlo_retest.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckMonteCarloRetest.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/FitnessFunction/MCRetestFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/MonteCarloRetestService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `monteCarloRetest/fitnessList` `monteCarloRetest/fitnessGetConfidenceLevels` `monteCarloRetest/list`
@@ -187,9 +187,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckOptProfileSysParamPermutation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation`.
-- **Backend:** `app/workspaces/retester/cross_check_opt_profile_sys_param_permutation.py`.
+- **Backend:** `app/workspace/retester/cross_check_opt_profile_sys_param_permutation.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckOptProfileSysParamPermutation.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_opt_profile_sys_param_permutation.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_opt_profile_sys_param_permutation.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckOptProfileSysParamPermutation.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/OptProfileSysParamPermutationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -204,9 +204,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckRetestOnAdditionalMarkets` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets`.
-- **Backend:** `app/workspaces/retester/cross_check_retest_on_additional_markets.py`.
+- **Backend:** `app/workspace/retester/cross_check_retest_on_additional_markets.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckRetestOnAdditionalMarkets.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_retest_on_additional_markets.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_retest_on_additional_markets.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckRetestOnAdditionalMarkets.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/FitnessFunction/PortfolioFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/RetestOnAdditionalMarketsService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `retestOnAdditionalMarkets/list`
@@ -221,9 +221,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckRetestWithHigherPrecision` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision`.
-- **Backend:** `app/workspaces/retester/cross_check_retest_with_higher_precision.py`.
+- **Backend:** `app/workspace/retester/cross_check_retest_with_higher_precision.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckRetestWithHigherPrecision.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_retest_with_higher_precision.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_retest_with_higher_precision.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckRetestWithHigherPrecision.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/FitnessFunction/CCHigherPrecisionService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/RetestWithHigherPrecisionService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `retestWithHigherPrecision/list`
@@ -238,9 +238,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckSequentialOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization`.
-- **Backend:** `app/workspaces/retester/cross_check_sequential_optimization.py`.
+- **Backend:** `app/workspace/retester/cross_check_sequential_optimization.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckSequentialOptimization.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_sequential_optimization.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_sequential_optimization.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckSequentialOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/SequentialOptimizationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -255,9 +255,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckWalkForwardMatrix` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix`.
-- **Backend:** `app/workspaces/retester/cross_check_walk_forward_matrix.py`.
+- **Backend:** `app/workspace/retester/cross_check_walk_forward_matrix.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWalkForwardMatrix.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_walk_forward_matrix.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_walk_forward_matrix.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckWalkForwardMatrix.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/WalkForwardMatrixService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -272,9 +272,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckWalkForwardOptimization` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization`.
-- **Backend:** `app/workspaces/retester/cross_check_walk_forward_optimization.py`.
+- **Backend:** `app/workspace/retester/cross_check_walk_forward_optimization.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWalkForwardOptimization.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_walk_forward_optimization.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_walk_forward_optimization.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckWalkForwardOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/WalkForwardOptimizationService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -289,9 +289,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `CrossCheckWhatIf` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf`.
-- **Backend:** `app/workspaces/retester/cross_check_what_if.py`.
+- **Backend:** `app/workspace/retester/cross_check_what_if.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWhatIf.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_cross_check_what_if.py`.
+- **Backend tests:** `tests/workspace/retester/test_cross_check_what_if.py`.
 - **Frontend tests:** `app/web/tests/retester/CrossCheckWhatIf.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/WhatIfService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `whatIf/list`
@@ -306,9 +306,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `ResultsRobustnessTests` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests`.
-- **Backend:** `app/workspaces/retester/results_robustness_tests.py`.
+- **Backend:** `app/workspace/retester/results_robustness_tests.py`.
 - **Frontend:** `app/web/workspaces/retester/ResultsRobustnessTests.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_results_robustness_tests.py`.
+- **Backend tests:** `tests/workspace/retester/test_results_robustness_tests.py`.
 - **Frontend tests:** `app/web/tests/retester/ResultsRobustnessTests.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/services/RTService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rtresults/viewsGetViews` `rtresults/viewsRemoveView` `rtresults/viewsAddView` `rtresults/viewsUpdateView` `rtresults/printChart` `rtresults/printConfLevels` `rtresults/getMethods`
@@ -323,9 +323,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsAutoRetestData` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData`.
-- **Backend:** `app/workspaces/retester/settings_auto_retest_data.py`.
+- **Backend:** `app/workspace/retester/settings_auto_retest_data.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsAutoRetestData.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_settings_auto_retest_data.py`.
+- **Backend tests:** `tests/workspace/retester/test_settings_auto_retest_data.py`.
 - **Frontend tests:** `app/web/tests/retester/SettingsAutoRetestData.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/AutoRetestDataService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -340,9 +340,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsCrossChecks` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`.
-- **Backend:** `app/workspaces/retester/settings_cross_checks.py`.
+- **Backend:** `app/workspace/retester/settings_cross_checks.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsCrossChecks.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_settings_cross_checks.py`.
+- **Backend tests:** `tests/workspace/retester/test_settings_cross_checks.py`.
 - **Frontend tests:** `app/web/tests/retester/SettingsCrossChecks.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rankingsettings/getDefaultWFConditions` `optProfileSysParamPerm/getDefaultSPPConditions`
@@ -357,9 +357,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `SettingsWhatToRetest` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest`.
-- **Backend:** `app/workspaces/retester/settings_what_to_retest.py`.
+- **Backend:** `app/workspace/retester/settings_what_to_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsWhatToRetest.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_settings_what_to_retest.py`.
+- **Backend tests:** `tests/workspace/retester/test_settings_what_to_retest.py`.
 - **Frontend tests:** `app/web/tests/retester/SettingsWhatToRetest.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/SettingsWhatToRetestService.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -374,9 +374,9 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 *Feature:* Full `TaskRetest` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest`.
-- **Backend:** `app/workspaces/retester/task_retest.py`.
+- **Backend:** `app/workspace/retester/task_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/TaskRetest.tsx`.
-- **Backend tests:** `tests/workspaces/retester/test_task_retest.py`.
+- **Backend tests:** `tests/workspace/retester/test_task_retest.py`.
 - **Frontend tests:** `app/web/tests/retester/TaskRetest.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest/module.js`.
 *Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
@@ -413,13 +413,13 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 
 ### Work order RET-002: selected-record and backtest-mode policy
 *Feature:* Extract the two observed preflight branches without inventing a grid runner. **READY after Python test bootstrap.**
-*Implementation Files:* CREATE `app/workspaces/retester/preflight.py`; CREATE `tests/workspaces/retester/test_preflight.py`.
+*Implementation Files:* CREATE `app/workspace/retester/preflight.py`; CREATE `tests/workspace/retester/test_preflight.py`.
 *Context to Read:* this work order; `OBS-145-RETEST-PREFLIGHT-002`; shared core task/result contracts when later integrating. No endpoint is created here.
 *Functional Requirements & Implementation:*
 - [ ] `RetestPreflight.record_keys(*, databank_keys: tuple[str, ...], selected_keys: tuple[str, ...] | None) -> tuple[str, ...]` -> Return selected_keys when it is not None, even when empty; otherwise return databank_keys. Preserve order and duplicates. No fallback from explicit empty selection to all records. Require a tuple of strings for databank_keys and either None or tuple of strings for selected_keys; otherwise raise `TypeError("record keys must be tuples of strings")`.
 - [ ] `RetestPreflight.mode(*, cross_checks_enabled: bool, creates_subjobs: tuple[bool, ...]) -> int` -> Return0 only when cross_checks_enabled is True and any creates_subjobs item is True; return1 otherwise. Require exact bool and tuple of exact bool values; otherwise raise `TypeError("cross-check mode requires booleans")`.
 - [ ] `test_preflight` -> `databank_keys=("a","b")` with selection None returns all; selection() returns(); selection("b","b") preserves repeats. Mode(False,(True,))->1; mode(True,(False,True))->0; mode(True,())->1. Test list keys and bool-like integer flags fail with exact errors.
-*Done command:* `uv run python -m pytest tests/workspaces/retester/test_preflight.py -q` -> exit0.
+*Done command:* `uv run python -m pytest tests/workspace/retester/test_preflight.py -q` -> exit0.
 *Commit:* `feat(retester): define observed preflight policies`.
 
 **Observed integration ordering:** reject non-startable running status before starting progress; select source and target databanks; load explicit StrategiesToRetest when key is present, otherwise all source keys; empty selection logs `No strategies to retest` and returns false. If source and target are the same databank, clear only selected results when StrategiesToRetest is present, otherwise clear all results. Only then allocate task resources, snapshot settings, initialize checks/backtest data. Do not turn same-databank result clearing into deleting strategy records. These orchestration effects await core repository/task contracts; the exact policy above is independently executable.
@@ -484,7 +484,7 @@ The original extension inventory remains the full-scope checklist. RET-003 resol
       "sha256": "a7957f8d46aa6b01be420af5970a63fed5b8ac9600beac6af95a28eab5cb5437"
     }
   ],
-  "target_domain": "app/workspaces/retester",
+  "target_domain": "app/workspace/retester",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -587,7 +587,7 @@ The original extension inventory remains the full-scope checklist. RET-003 resol
       "sha256": "ec8c90541c5cf878a6e5f6f5a91ca80d2abd297d1491bee9f67ed6db91ac8e63"
     }
   ],
-  "target_domain": "app/workspaces/retester",
+  "target_domain": "app/workspace/retester",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -642,7 +642,7 @@ The original extension inventory remains the full-scope checklist. RET-003 resol
       "sha256": "43131ff457f6dd10bd4f6d7ac65d63c0192040d6f435164336ba04b1bff8e2f6"
     }
   ],
-  "target_domain": "app/workspaces/retester",
+  "target_domain": "app/workspace/retester",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -685,7 +685,7 @@ New evidence record; fields are retained verbatim for future supersession:
       "sha256": "c8716e98c56e79c1892f423a6640d91b02b2bf502c7433ca23e79b0830891505"
     }
   ],
-  "target_domain": "app/workspaces/retester",
+  "target_domain": "app/workspace/retester",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],

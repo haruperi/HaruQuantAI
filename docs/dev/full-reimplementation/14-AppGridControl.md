@@ -32,7 +32,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Implementation Files:*
 - **Backend:** none. Do not add a fabricated gridControl/getData endpoint.
 - **Frontend Create:** `app/web/workspaces/grid_control/jobPresentation.ts`.
-- **Test Create:** `app/web/tests/workspaces/grid_control/jobPresentation.test.ts`.
+- **Test Create:** `app/web/tests/workspace/grid_control/jobPresentation.test.ts`.
 *Types:* exported class GridJobPresentation with static methods; inputs are typed scalar values, not unvalidated provider responses.
 *Functional Requirements & Implementation:*
 - [ ] `GridJobPresentation.kind(blocking: boolean): 'Continuous' | 'One time'` -> true returns Continuous; false One time.
@@ -42,7 +42,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - [ ] `GridJobPresentation.interval_ms(): 3000` -> literal 3000; do not create a timer in this pure helper.
 - [ ] `test('grid labels')` -> kind(true/false) = Continuous/One time; state(true/false)=Waiting/Running; progress(-1/0/12.5/-2)=N/A/0%/12.5%/-2%.
 - [ ] `test('active-only refresh metadata')` -> GRIDCONTROL true; gridcontrol and BUILDER false; interval_ms=3000.
-*Acceptance:* `npm --prefix app/web test -- tests/workspaces/grid_control/jobPresentation.test.ts` exits 0, two tests.
+*Acceptance:* `npm --prefix app/web test -- tests/workspace/grid_control/jobPresentation.test.ts` exits 0, two tests.
 *Commit:* `grid-control: preserve job labels and refresh predicate`.
 
 ## Phase 14.2: complete workspace contribution - READY
@@ -54,16 +54,16 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Feature:* complete AppGridControl workflow.
 *Evidence IDs:* `OBS145-AppGridControl-SCOPE-001` establishes source presence only; `OBS145-AppGridControl-HELPER-001` establishes only the separately scoped helper.
 *Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/grid_control/app_grid_control.py`.
-- **Models:** `app/workspaces/grid_control/app_grid_control_models.py`.
+- **Backend:** `app/workspace/grid_control/app_grid_control.py`.
+- **Models:** `app/workspace/grid_control/app_grid_control_models.py`.
 - **Frontend:** `app/web/workspaces/grid_control/GridControlWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/grid_control/test_app_grid_control.py`.
-- **Frontend test:** `app/web/tests/workspaces/grid_control/AppGridControlPanel.test.tsx`.
+- **Backend test:** `tests/workspace/grid_control/test_app_grid_control.py`.
+- **Frontend test:** `app/web/tests/workspace/grid_control/AppGridControlPanel.test.tsx`.
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/GridControl/GridControlAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Complete getData response, worker/node states, identity/time/size units, remote protocol/authorization and job lifecycle error contracts.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/grid_control/test_app_grid_control.py -q` or `npm --prefix app/web test -- tests/workspaces/grid_control/AppGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/grid_control/test_app_grid_control.py -q` or `npm --prefix app/web test -- tests/workspace/grid_control/AppGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 
@@ -74,16 +74,16 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Feature:* complete ServletGridControl workflow.
 *Evidence IDs:* `OBS145-AppGridControl-SCOPE-001` establishes source presence only; `OBS145-AppGridControl-HELPER-001` establishes only the separately scoped helper.
 *Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/grid_control/servlet_grid_control.py`.
-- **Models:** `app/workspaces/grid_control/servlet_grid_control_models.py`.
+- **Backend:** `app/workspace/grid_control/servlet_grid_control.py`.
+- **Models:** `app/workspace/grid_control/servlet_grid_control_models.py`.
 - **Frontend:** `app/web/workspaces/grid_control/ServletGridControlPanel.tsx`.
-- **Backend test:** `tests/workspaces/grid_control/test_servlet_grid_control.py`.
-- **Frontend test:** `app/web/tests/workspaces/grid_control/ServletGridControlPanel.test.tsx`.
+- **Backend test:** `tests/workspace/grid_control/test_servlet_grid_control.py`.
+- **Frontend test:** `app/web/tests/workspace/grid_control/ServletGridControlPanel.test.tsx`.
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Every servlet action payload/result/error and shared grid call side effect, including unavailable workers and partial results.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/grid_control/test_servlet_grid_control.py -q` or `npm --prefix app/web test -- tests/workspaces/grid_control/ServletGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/grid_control/test_servlet_grid_control.py -q` or `npm --prefix app/web test -- tests/workspace/grid_control/ServletGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 
@@ -100,7 +100,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
   "sources": [
     "DONOR_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js"
   ],
-  "target_domain": "app/workspaces/grid_control; app/web/workspaces/grid_control",
+  "target_domain": "app/workspace/grid_control; app/web/workspaces/grid_control",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -140,7 +140,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
     "DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl",
     "DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl"
   ],
-  "target_domain": "app/workspaces/grid_control; app/web/workspaces/grid_control",
+  "target_domain": "app/workspace/grid_control; app/web/workspaces/grid_control",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -177,8 +177,8 @@ Migration fit is separate from implementation status. Direct fit below means the
 | `ui/app/workspace/GridControl/GridControlWorkspace.tsx` | `app/web/workspaces/grid_control/GridControlWorkspace.tsx` | Move + adapt | Retain table columns/empty/error-dialog composition. Remove FINISHED_FIXTURES, fixed00:00:12 duration and rounded progress; use actual running/waiting/finished server projection and observed no-rounding display. |
 | `ui/app/workspace/Business/AddNodeModal.tsx` | `app/web/workspaces/grid_control/AddNodeModal.tsx` | Reassign + replace fake handshake | Node UI belongs with grid backend. Remove fake600ms success, invented node host/port/hardware defaults and Date.now identity assignment; display server capabilities/identity. |
 | `ui/app/workspace/Business/BusinessWorkspace.tsx (compute-node section only)` | `app/web/workspaces/grid_control/ClusterPanel.tsx` | Extract + adapt | Move only node/cluster controls. Delete hardcoded All4nodes/18ms success claim; network metrics come from actual backend probes. Do not retain duplicate cluster management under SQXBusiness. |
-| `ui/tests/unit/workspace/GridControl/gridControl.test.ts` | `app/web/tests/workspaces/grid_control/gridControl.test.ts` | Move + revise | Replace mock-history expectations with explicit canonical job snapshots and donor label fixtures. |
-| `No current grid Python service` | `app/workspaces/grid_control/workspace.py` | Missing - create | Consume the one core local/remote performer registry; do not implement another scheduler. |
+| `ui/tests/unit/workspace/GridControl/gridControl.test.ts` | `app/web/tests/workspace/grid_control/gridControl.test.ts` | Move + revise | Replace mock-history expectations with explicit canonical job snapshots and donor label fixtures. |
+| `No current grid Python service` | `app/workspace/grid_control/workspace.py` | Missing - create | Consume the one core local/remote performer registry; do not implement another scheduler. |
 
 ### Reorganization work order - MIG-AppGridControl
 
@@ -187,7 +187,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 *Execution order:* move retained presentation files first, change their relative UI/host imports to the published target owner, move/revise the listed tests, then switch route imports in the target shell. Keep one current-to-target owner per table row. Do not leave forwarding copies in old workspace folders; keep source history through Git moves. Do not move application state from a shared browser store into another mock runner.
 *Behavior changes:* only those explicitly listed in accepted work orders may replace the fixture behavior. A physical move cannot make a mock engine/service a direct fit. Missing backend rows require production implementation; pyc/cache directories are not source to recover or migrate.
 *Exact baseline / target commands (each exit0; revised donor-backed assertions are specified by the feature orders):*
-- Baseline: `npm --prefix ui test -- tests/unit/workspace/GridControl/gridControl.test.ts`. Target: `npm --prefix app/web test -- tests/workspaces/grid_control/gridControl.test.ts`.
+- Baseline: `npm --prefix ui test -- tests/unit/workspace/GridControl/gridControl.test.ts`. Target: `npm --prefix app/web test -- tests/workspace/grid_control/gridControl.test.ts`.
 No other path substitution is authorized. Passing the current fixture tests is not donor acceptance.
 *Commit boundary:* one cohesive workspace file reorganization with its import/test updates; algorithm/service replacements are separate feature commits. If a source is split between GridControl and SQAI, the owning phase migrates its exact extracted section once; SQXBusiness never keeps a duplicate.
 

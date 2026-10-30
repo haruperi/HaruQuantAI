@@ -1,6 +1,6 @@
 """Tests for HomeNavigation metadata."""
 
-from app.workspaces.home.navigation import HomeNavigation
+from app.workspace.home.navigation import HomeNavigation
 
 
 def test_navigation_entry() -> None:

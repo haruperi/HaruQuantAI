@@ -28,11 +28,11 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Implementation Files:*
 - **Backend:** none; memory provider/persistence and tool execution remain blocked.
 - **Frontend Create:** `app/web/workspaces/ai/memoryFlushLabel.ts`.
-- **Test Create:** `app/web/tests/workspaces/ai/memoryFlushLabel.test.ts`.
+- **Test Create:** `app/web/tests/workspace/ai/memoryFlushLabel.test.ts`.
 *Functional Requirements & Implementation:*
 - [ ] `MemoryFlushLabel.describe(memory_enabled: boolean, minutes: number): string` -> exported static method; false or negative minutes gives off; enabled+zero gives after every turn; all other values use native JavaScript string conversion in `every <minutes> min at most`. Do not substitute a default, round fractional values or start a timer.
 - [ ] `test('memory flush labels')` -> (false,5)=off; (true,-1)=off; (true,0)=after every turn; (true,5)=every 5 min at most; (true,1.5)=every 1.5 min at most; (true,NaN)=every NaN min at most. NaN case preserves this display helper's source behavior, not a valid backend scheduling interval.
-*Acceptance:* `npm --prefix app/web test -- tests/workspaces/ai/memoryFlushLabel.test.ts` exits 0, six parameter rows.
+*Acceptance:* `npm --prefix app/web test -- tests/workspace/ai/memoryFlushLabel.test.ts` exits 0, six parameter rows.
 *Commit:* `ai: preserve memory-flush description text`.
 
 ## Phase 19.2: complete workspace contribution - READY
@@ -44,16 +44,16 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Feature:* complete ServletMCP workflow.
 *Evidence IDs:* `OBS145-AppSQAI-SCOPE-001` establishes source presence only; `OBS145-AppSQAI-HELPER-001` establishes only the separately scoped helper.
 *Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/ai/mcp.py`.
-- **Models:** `app/workspaces/ai/mcp_models.py`.
+- **Backend:** `app/workspace/ai/mcp.py`.
+- **Models:** `app/workspace/ai/mcp_models.py`.
 - **Frontend:** `app/web/workspaces/ai/AIAssistantWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/ai/test_mcp.py`.
-- **Frontend test:** `app/web/tests/workspaces/ai/MCPPanel.test.tsx`.
+- **Backend test:** `tests/workspace/ai/test_mcp.py`.
+- **Frontend test:** `app/web/tests/workspace/ai/MCPPanel.test.tsx`.
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/web/SQAI`. (copied AI resource context; original ServletMCP Java body is not present in this donor tree).
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Negotiated protocol/version/capability schemas, tool catalogue/arguments/result/errors, auth/session/resource policy and fixture wire messages.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/ai/test_mcp.py -q` or `npm --prefix app/web test -- tests/workspaces/ai/MCPPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/ai/test_mcp.py -q` or `npm --prefix app/web test -- tests/workspace/ai/MCPPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 
@@ -64,16 +64,16 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Feature:* complete ServletSQAI workflow.
 *Evidence IDs:* `OBS145-AppSQAI-SCOPE-001` establishes source presence only; `OBS145-AppSQAI-HELPER-001` establishes only the separately scoped helper.
 *Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/ai/assistant.py`.
-- **Models:** `app/workspaces/ai/assistant_models.py`.
+- **Backend:** `app/workspace/ai/assistant.py`.
+- **Models:** `app/workspace/ai/assistant_models.py`.
 - **Frontend:** `app/web/workspaces/ai/AIAssistantWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/ai/test_assistant.py`.
-- **Frontend test:** `app/web/tests/workspaces/ai/AssistantPanel.test.tsx`.
+- **Backend test:** `tests/workspace/ai/test_assistant.py`.
+- **Frontend test:** `app/web/tests/workspace/ai/AssistantPanel.test.tsx`.
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI/module.js`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI/SQAIChatService.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Model/provider request/result/stream/tool/memory schemas, cancellation/recovery/error behavior, authorization and exact fixture events.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/ai/test_assistant.py -q` or `npm --prefix app/web test -- tests/workspaces/ai/AssistantPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/ai/test_assistant.py -q` or `npm --prefix app/web test -- tests/workspace/ai/AssistantPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 External vendor protocols/account data are not inferred from client action names. A legitimate provider/toolchain or a source-established protocol is required; a fake success response cannot close an external integration.
@@ -92,7 +92,7 @@ External vendor protocols/account data are not inferred from client action names
   "sources": [
     "DONOR_REFERENCE_ROOT/internal/web/SQAI/workspace-panel.js"
   ],
-  "target_domain": "app/workspaces/ai; app/web/workspaces/ai",
+  "target_domain": "app/workspace/ai; app/web/workspaces/ai",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -132,7 +132,7 @@ External vendor protocols/account data are not inferred from client action names
     "DONOR_REFERENCE_ROOT/internal/plugins/ServletMCP",
     "DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI"
   ],
-  "target_domain": "app/workspaces/ai; app/web/workspaces/ai",
+  "target_domain": "app/workspace/ai; app/web/workspaces/ai",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -174,7 +174,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 | `ui/app/workspace/AIAssistant/README.md` | `app/web/workspaces/ai/README.md` | Move + update owner links | Retain authoritative scope/status and existing decisions; update target paths after actual migration rather than copying a second status registry into this plan. |
 | `ui/app/workspace/Business/ConfigureMcpModal.tsx` | `app/web/workspaces/ai/ConfigureMcpModal.tsx` | Reassign + adapt | Reuse form layout; replace fake test/Connected status and hardcoded capabilities. Runtime/session/auth data comes from the MCP backend. |
 | `ui/tests/e2e/ai-assistant-parity.spec.ts` | `app/web/tests/e2e/ai-assistant-parity.spec.ts` | Move + revise route setup | Retain browser presentation tests, change route harness to the new shell; provider/message execution assertions need separate real service fixtures. |
-| `No current AI/MCP Python workspace source` | `app/workspaces/ai/assistant.py; app/workspaces/ai/mcp.py` | Missing - create | Implement one server tool registry and assistant service; avoid duplicating core project/run operations in tool handlers. |
+| `No current AI/MCP Python workspace source` | `app/workspace/ai/assistant.py; app/workspace/ai/mcp.py` | Missing - create | Implement one server tool registry and assistant service; avoid duplicating core project/run operations in tool handlers. |
 
 ### Reorganization work order - MIG-AppSQAI
 

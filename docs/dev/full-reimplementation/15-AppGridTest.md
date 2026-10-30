@@ -31,7 +31,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Implementation Files:*
 - **Backend:** none. No server or worker endpoint is required by this row helper.
 - **Frontend Create:** `app/web/workspaces/grid_test/rows.ts`.
-- **Test Create:** `app/web/tests/workspaces/grid_test/rows.test.ts`.
+- **Test Create:** `app/web/tests/workspace/grid_test/rows.test.ts`.
 *Types:* `GridTestRow = readonly [number, number, string]`; `TimedRow = {row: GridTestRow; next_counter: number; change_count: 0}`. Methods below are exported static methods of GridTestRows.
 *Functional Requirements & Implementation:*
 - [ ] `GridTestRows.manual_batch(): GridTestRow[]` -> create exactly 100 fresh triples `[i, i*2, String(i)+'-text']` for i 0..99. It takes no global counter and does not initialize user metadata.
@@ -40,7 +40,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - [ ] `test('manual row boundaries')` -> length100, first `[0,0,'0-text']`, last `[99,198,'99-text']`; mutating one returned batch does not affect another.
 - [ ] `test('timed counter independent of manual rows')` -> timed_row(1) gives `[1,2,'1-text']`, next2, change_count0; calling manual_batch then timed_row(1) produces the same object values.
 - [ ] `test('timer metadata')` -> exact periods20/30/40/50.
-*Acceptance:* `npm --prefix app/web test -- tests/workspaces/grid_test/rows.test.ts` exits 0, three tests.
+*Acceptance:* `npm --prefix app/web test -- tests/workspace/grid_test/rows.test.ts` exits 0, three tests.
 *Commit:* `grid-test: preserve deterministic row generation`.
 *Remaining blockers:* full sqGrid user-data defaults, random removal/change, selection and rendering are not closed by this order.
 
@@ -53,16 +53,16 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Feature:* complete AppGridTest workflow.
 *Evidence IDs:* `OBS145-AppGridTest-SCOPE-001` establishes source presence only; `OBS145-AppGridTest-HELPER-001` establishes only the separately scoped helper.
 *Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/grid_test/app_grid_test.py`.
-- **Models:** `app/workspaces/grid_test/app_grid_test_models.py`.
+- **Backend:** `app/workspace/grid_test/app_grid_test.py`.
+- **Models:** `app/workspace/grid_test/app_grid_test_models.py`.
 - **Frontend:** `app/web/workspaces/grid_test/GridTestWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/grid_test/test_app_grid_test.py`.
-- **Frontend test:** `app/web/tests/workspaces/grid_test/AppGridTestPanel.test.tsx`.
+- **Backend test:** `tests/workspace/grid_test/test_app_grid_test.py`.
+- **Frontend test:** `app/web/tests/workspace/grid_test/AppGridTestPanel.test.tsx`.
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppGridTest/GridTest/GridTestAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppGridTest/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Full grid row identity/user-data defaults, random selection scheduling, selection/cell-event semantics and renderer/DOM tests.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/grid_test/test_app_grid_test.py -q` or `npm --prefix app/web test -- tests/workspaces/grid_test/AppGridTestPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/grid_test/test_app_grid_test.py -q` or `npm --prefix app/web test -- tests/workspace/grid_test/AppGridTestPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 
@@ -79,7 +79,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
   "sources": [
     "DONOR_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js"
   ],
-  "target_domain": "app/workspaces/grid_test; app/web/workspaces/grid_test",
+  "target_domain": "app/workspace/grid_test; app/web/workspaces/grid_test",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -118,7 +118,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
   "sources": [
     "DONOR_REFERENCE_ROOT/internal/plugins/AppGridTest"
   ],
-  "target_domain": "app/workspaces/grid_test; app/web/workspaces/grid_test",
+  "target_domain": "app/workspace/grid_test; app/web/workspaces/grid_test",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -153,7 +153,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 | Current HaruQuantAI location | Exact target proposed location | Fit / action | Required change and verification boundary |
 | --- | --- | --- | --- |
 | `ui/app/workspace/GridTest/GridTestWorkspace.tsx` | `app/web/workspaces/grid_test/GridTestWorkspace.tsx` | Replace row model; retain table primitives | Current8-column forex quote fixture with LCG seed42/max1000 differs from donor3-column add/remove/change harness. Reuse common React table primitives, not buildGridTestRows algorithm/columns. |
-| `ui/tests/unit/workspace/GridTest/gridTest.test.ts` | `app/web/tests/workspaces/grid_test/gridTest.test.ts` | Replace incompatible assertions | Replace8-column/seeded quote tests with the exact3-column/manual100/timed-counter/selection fixtures specified by this phase. |
+| `ui/tests/unit/workspace/GridTest/gridTest.test.ts` | `app/web/tests/workspace/grid_test/gridTest.test.ts` | Replace incompatible assertions | Replace8-column/seeded quote tests with the exact3-column/manual100/timed-counter/selection fixtures specified by this phase. |
 | `No backend required for donor local table harness` | `app/web/workspaces/grid_test/rows.ts` | Frontend-only owner | Do not create a grid_test Python scheduler just to mirror the folder; the local table harness has no proven backend operation. |
 
 ### Reorganization work order - MIG-AppGridTest
@@ -163,7 +163,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 *Execution order:* move retained presentation files first, change their relative UI/host imports to the published target owner, move/revise the listed tests, then switch route imports in the target shell. Keep one current-to-target owner per table row. Do not leave forwarding copies in old workspace folders; keep source history through Git moves. Do not move application state from a shared browser store into another mock runner.
 *Behavior changes:* only those explicitly listed in accepted work orders may replace the fixture behavior. A physical move cannot make a mock engine/service a direct fit. Missing backend rows require production implementation; pyc/cache directories are not source to recover or migrate.
 *Exact baseline / target commands (each exit0; revised donor-backed assertions are specified by the feature orders):*
-- Baseline: `npm --prefix ui test -- tests/unit/workspace/GridTest/gridTest.test.ts`. Target: `npm --prefix app/web test -- tests/workspaces/grid_test/gridTest.test.ts`.
+- Baseline: `npm --prefix ui test -- tests/unit/workspace/GridTest/gridTest.test.ts`. Target: `npm --prefix app/web test -- tests/workspace/grid_test/gridTest.test.ts`.
 No other path substitution is authorized. Passing the current fixture tests is not donor acceptance.
 *Commit boundary:* one cohesive workspace file reorganization with its import/test updates; algorithm/service replacements are separate feature commits. If a source is split between GridControl and SQAI, the owning phase migrates its exact extracted section once; SQXBusiness never keeps a duplicate.
 

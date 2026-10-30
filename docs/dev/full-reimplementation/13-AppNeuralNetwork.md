@@ -27,14 +27,14 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 *Feature:* expose observed navigation metadata only, without inventing a training algorithm.
 *Dependencies:* WO-C02 StandardResponse.
 *Implementation Files:*
-- **Backend Create:** `app/workspaces/neural_network/__init__.py` (empty), `app/workspaces/neural_network/navigation.py`.
-- **Test Create:** `tests/workspaces/neural_network/test_navigation.py`.
+- **Backend Create:** `app/workspace/neural_network/__init__.py` (empty), `app/workspace/neural_network/navigation.py`.
+- **Test Create:** `tests/workspace/neural_network/test_navigation.py`.
 - **Frontend:** none; no trainer page or model IO is authorized by this order.
 *Functional Requirements & Implementation:*
 - [ ] `NeuralNavigation.get(self, *, request_id: str) -> StandardResponse[dict[str, JSONValue]]` -> constructor has no args; return exactly `{'app_code':'NEURALNETWORK','title':'Neural Network Trainer','order':50,'section':0,'hidden':True}` and revision None. Do not expose hidden=False or add unobserved train/evaluate endpoints.
 - [ ] `test_hidden_navigation()` -> request_id n1; assert exact to_dict payload above with wrapper request_id n1 and revision None.
 - [ ] `test_navigation_detached()` -> mutate one returned descriptor, call again and assert hidden True/order50 remain unchanged.
-*Acceptance:* `uv run python -m pytest tests/workspaces/neural_network/test_navigation.py -q` exits 0, two tests.
+*Acceptance:* `uv run python -m pytest tests/workspace/neural_network/test_navigation.py -q` exits 0, two tests.
 *Commit:* `neural-network: expose observed hidden navigation metadata`.
 
 ## Phase 13.2: complete workspace contribution - READY
@@ -46,16 +46,16 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Feature:* complete AppNeuralNetwork workflow.
 *Evidence IDs:* `OBS145-AppNeuralNetwork-SCOPE-001` establishes source presence only; `OBS145-AppNeuralNetwork-HELPER-001` establishes only the separately scoped helper.
 *Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/neural_network/app_neural_network.py`.
-- **Models:** `app/workspaces/neural_network/app_neural_network_models.py`.
+- **Backend:** `app/workspace/neural_network/app_neural_network.py`.
+- **Models:** `app/workspace/neural_network/app_neural_network_models.py`.
 - **Frontend:** `app/web/workspaces/neural_network/NeuralNetworkWorkspace.tsx`.
-- **Backend test:** `tests/workspaces/neural_network/test_app_neural_network.py`.
-- **Frontend test:** `app/web/tests/workspaces/neural_network/AppNeuralNetworkPanel.test.tsx`.
+- **Backend test:** `tests/workspace/neural_network/test_app_neural_network.py`.
+- **Frontend test:** `app/web/tests/workspace/neural_network/AppNeuralNetworkPanel.test.tsx`.
 - **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/NeuralNetwork/NeuralNetworkAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Training method/model topology/features/target/split/defaults, model artifact format, scheduler contract and independent expected outputs; the hidden navigation registration does not specify these.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/neural_network/test_app_neural_network.py -q` or `npm --prefix app/web test -- tests/workspaces/neural_network/AppNeuralNetworkPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
+*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspace/neural_network/test_app_neural_network.py -q` or `npm --prefix app/web test -- tests/workspace/neural_network/AppNeuralNetworkPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 
@@ -81,7 +81,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
   "sources": [
     "DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js"
   ],
-  "target_domain": "app/workspaces/neural_network; app/web/workspaces/neural_network",
+  "target_domain": "app/workspace/neural_network; app/web/workspaces/neural_network",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -121,7 +121,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
     "DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork",
     "DONOR_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer"
   ],
-  "target_domain": "app/workspaces/neural_network; app/web/workspaces/neural_network",
+  "target_domain": "app/workspace/neural_network; app/web/workspaces/neural_network",
   "feature_ids": [],
   "requirement_ids": [],
   "decision_ids": [],
@@ -157,8 +157,8 @@ Migration fit is separate from implementation status. Direct fit below means the
 | --- | --- | --- | --- |
 | `ui/app/workspace/NeuralNetwork/NeuralNetworkTrainer.tsx` | `app/web/workspaces/neural_network/NeuralNetworkWorkspace.tsx` | Move + adapt | Retain layout/forms as presentation candidates; remove the120ms training simulation loop. Component function becomes NeuralNetworkWorkspace, called by the workspace route. |
 | `ui/app/workspace/NeuralNetwork/neuralNetStore.ts` | `app/web/workspaces/neural_network/neuralNetStore.ts` | Retain editing state; replace computation | Keep typed editor actions only after schema matching. Replace synthetic loss/accuracy, hardcoded confusion matrix and generated Java strategy text with real backend receipts and Wizard export capability. |
-| `ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts` | `app/web/tests/workspaces/neural_network/neuralNet.test.ts` | Move + revise | Keep explicit config editing tests; remove fake-training-success as parity evidence and test job-driven states once backend training is source-specified. |
-| `No current neural Python service` | `app/workspaces/neural_network/training.py` | Missing - create | Provider/model/split/training implementation is absent; frontend layers and epochs do not prove a donor neural algorithm. |
+| `ui/tests/unit/workspace/NeuralNetwork/neuralNet.test.ts` | `app/web/tests/workspace/neural_network/neuralNet.test.ts` | Move + revise | Keep explicit config editing tests; remove fake-training-success as parity evidence and test job-driven states once backend training is source-specified. |
+| `No current neural Python service` | `app/workspace/neural_network/training.py` | Missing - create | Provider/model/split/training implementation is absent; frontend layers and epochs do not prove a donor neural algorithm. |
 
 ### Reorganization work order - MIG-AppNeuralNetwork
 
@@ -167,7 +167,7 @@ Migration fit is separate from implementation status. Direct fit below means the
 *Execution order:* move retained presentation files first, change their relative UI/host imports to the published target owner, move/revise the listed tests, then switch route imports in the target shell. Keep one current-to-target owner per table row. Do not leave forwarding copies in old workspace folders; keep source history through Git moves. Do not move application state from a shared browser store into another mock runner.
 *Behavior changes:* only those explicitly listed in accepted work orders may replace the fixture behavior. A physical move cannot make a mock engine/service a direct fit. Missing backend rows require production implementation; pyc/cache directories are not source to recover or migrate.
 *Exact baseline / target commands (each exit0; revised donor-backed assertions are specified by the feature orders):*
-- Baseline: `npm --prefix ui test -- tests/unit/workspace/NeuralNetwork/neuralNet.test.ts`. Target: `npm --prefix app/web test -- tests/workspaces/neural_network/neuralNet.test.ts`.
+- Baseline: `npm --prefix ui test -- tests/unit/workspace/NeuralNetwork/neuralNet.test.ts`. Target: `npm --prefix app/web test -- tests/workspace/neural_network/neuralNet.test.ts`.
 No other path substitution is authorized. Passing the current fixture tests is not donor acceptance.
 *Commit boundary:* one cohesive workspace file reorganization with its import/test updates; algorithm/service replacements are separate feature commits. If a source is split between GridControl and SQAI, the owning phase migrates its exact extracted section once; SQXBusiness never keeps a duplicate.
 
