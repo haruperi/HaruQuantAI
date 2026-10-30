@@ -1,4 +1,5 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Page, type Route } from '@playwright/test';
+import type { IndicatorTestResultDto } from '../../workspaces/code_editor/codeEditorClient';
 
 async function mockEditor(page: Page, source = 'value = 1\n') {
   await page.addInitScript(() => {
@@ -307,4 +308,182 @@ test('save shortcut writes the current CodeMirror buffer', async ({ page }) => {
   await editor.press('Control+s');
   await expect.poll(() => mock.saves.length).toBe(1);
   expect(mock.saves[0].content).toBe('value = 8');
+});
+
+type TesterResponseWindow = Window & { testerResponsesConsumed: number };
+
+function testerModal(page: Page) {
+  return page.locator('div.fixed.inset-0').filter({
+    has: page.getByRole('heading', { name: 'Indicator Test Studio', exact: true }),
+  });
+}
+
+function indicatorResult(value: number): IndicatorTestResultDto {
+  const candle = { time: 1735689600, open: 1, high: 2, low: 0.5, close: 1.5, volume: 100 };
+  return {
+    test_id: `result-${value}`,
+    status: 'success',
+    symbol: 'EURUSD',
+    timeframe: 'H1',
+    bars_calculated: 1,
+    candlesticks: [candle],
+    indicator_plots: [{ time: candle.time, value }],
+    table_rows: [{ ...candle, indicator_val: value }],
+    discrepancies: [],
+  };
+}
+
+async function pendingTester(page: Page, holdDefaults = false) {
+  await mockEditor(page);
+  // Observe body consumption so negative assertions cannot race an unread response.
+  await page.addInitScript(() => {
+    const state = window as TesterResponseWindow;
+    state.testerResponsesConsumed = 0;
+    const originalFetch = window.fetch.bind(window);
+    window.fetch = async (...args) => {
+      const response = await originalFetch(...args);
+      if (String(args[0]).includes('/indicator-test/')) {
+        const originalJson = response.json.bind(response);
+        response.json = async () => {
+          try {
+            return await originalJson();
+          } finally {
+            state.testerResponsesConsumed++;
+          }
+        };
+      }
+      return response;
+    };
+  });
+  const runs: Route[] = [];
+  const defaults: Route[] = [];
+  await page.route('**/code-editor/indicator-test/run', (route) => { runs.push(route); });
+  if (holdDefaults) {
+    await page.route('**/code-editor/indicator-test/new', (route) => { defaults.push(route); });
+  }
+  await page.goto('/codeeditor');
+  await expect(page.getByRole('textbox', { name: 'Source code editor', exact: true })).toBeVisible();
+  await page.clock.install({ time: new Date('2026-10-30T12:00:00Z') });
+  await page.clock.pauseAt(new Date('2026-10-30T12:00:01Z'));
+  await page.getByRole('button', { name: 'Test Indicator', exact: true }).click();
+  await expect(testerModal(page)).toBeVisible();
+  if (holdDefaults) {
+    // The development shell uses StrictMode: retire its discarded first effect.
+    await expect.poll(() => defaults.length).toBe(2);
+    await consumeTesterResponse(page, defaults.shift()!, { params: { period: 14 } });
+  }
+  return { runs, defaults };
+}
+
+async function consumeTesterResponse(page: Page, route: Route, data: unknown, error = false) {
+  const before = await page.evaluate(() => (window as TesterResponseWindow).testerResponsesConsumed);
+  await route.fulfill({
+    status: error ? 422 : 200,
+    json: error
+      ? { status: 'error', error: { code: 'validation', message: String(data) } }
+      : { status: 'success', data },
+  });
+  await expect.poll(() => page.evaluate(() => (window as TesterResponseWindow).testerResponsesConsumed)).toBeGreaterThan(before);
+}
+
+for (const outcome of ['success', 'failure'] as const) {
+  test(`input change ignores an old ${outcome} inside the debounce window`, async ({ page }) => {
+    const { runs } = await pendingTester(page);
+    const modal = testerModal(page);
+    await expect(modal.getByLabel('period', { exact: true })).toHaveValue('14');
+    await page.clock.runFor(250);
+    await expect.poll(() => runs.length).toBe(1);
+    await modal.getByLabel('period', { exact: true }).fill('20');
+    await consumeTesterResponse(page, runs[0], outcome === 'success' ? indicatorResult(777) : 'obsolete run', outcome === 'failure');
+    expect(runs).toHaveLength(1);
+    await expect(modal.getByRole('alert')).toHaveCount(0);
+    await expect(modal.getByText('777.00000', { exact: true })).toHaveCount(0);
+    await expect(modal.locator('canvas')).toHaveCount(0);
+    await expect(modal.getByRole('button', { name: 'Execution Logs (0)', exact: true })).toBeVisible();
+    await page.clock.runFor(250);
+    await expect.poll(() => runs.length).toBe(2);
+    expect(runs[1].request().postDataJSON().params).toEqual({ period: 20 });
+    await consumeTesterResponse(page, runs[1], indicatorResult(123));
+    await expect(modal.getByText('123.00000', { exact: true })).toBeVisible();
+    await expect(modal.locator('canvas').first()).toBeVisible();
+    await expect(modal.getByRole('button', { name: 'Run Test', exact: true })).toBeEnabled();
+    await expect(modal.getByRole('button', { name: 'Execution Logs (1)', exact: true })).toBeVisible();
+  });
+}
+
+test('an old failure cannot clear the running state or overwrite a newer run', async ({ page }) => {
+  const { runs } = await pendingTester(page);
+  const modal = testerModal(page);
+  await expect(modal.getByLabel('period', { exact: true })).toBeVisible();
+  await page.clock.runFor(250);
+  await expect.poll(() => runs.length).toBe(1);
+  await modal.getByRole('combobox').selectOption('M5');
+  await modal.getByRole('textbox').fill('GBPUSD');
+  await page.clock.runFor(250);
+  await expect.poll(() => runs.length).toBe(2);
+  expect(runs[1].request().postDataJSON()).toMatchObject({ symbol: 'GBPUSD', timeframe: 'M5' });
+  await consumeTesterResponse(page, runs[0], 'obsolete failure', true);
+  await expect(modal.getByRole('button', { name: 'Running...', exact: true })).toBeDisabled();
+  await expect(modal.getByRole('alert')).toHaveCount(0);
+  await expect(modal.getByRole('button', { name: 'Execution Logs (0)', exact: true })).toBeVisible();
+  await consumeTesterResponse(page, runs[1], indicatorResult(456));
+  await expect(modal.getByText('456.00000', { exact: true })).toBeVisible();
+  await expect(modal.getByRole('button', { name: 'Run Test', exact: true })).toBeEnabled();
+});
+
+test('changing indicator through a saved configuration ignores obsolete defaults failure', async ({ page }) => {
+  const { runs, defaults } = await pendingTester(page, true);
+  const modal = testerModal(page);
+  await expect.poll(() => defaults.length).toBe(1);
+  await page.route('**/code-editor/indicator-test/load?*', (route) => route.fulfill({
+    json: { status: 'success', data: { config: {
+      indicator_name: 'RSI', symbol: 'GBPUSD', timeframe: 'M5', params: { period: 9 }, bars_to_reserve: 0, bar_count: 2,
+    } } },
+  }));
+  page.once('dialog', (dialog) => dialog.accept('saved-rsi'));
+  await modal.getByRole('button', { name: 'Load Test Configuration', exact: true }).click();
+  await expect.poll(() => defaults.length).toBe(2);
+  expect(defaults[1].request().postDataJSON().indicator_name).toBe('RSI');
+  await consumeTesterResponse(page, defaults[1], { params: { period: 14 } });
+  await expect(modal.getByLabel('period', { exact: true })).toHaveValue('9');
+  await consumeTesterResponse(page, defaults[0], 'obsolete defaults', true);
+  await expect(modal.getByRole('alert')).toHaveCount(0);
+  await expect(modal.getByRole('button', { name: 'Execution Logs (0)', exact: true })).toBeVisible();
+  await page.clock.runFor(250);
+  await expect.poll(() => runs.length).toBe(1);
+  expect(runs[0].request().postDataJSON()).toMatchObject({
+    indicator_name: 'RSI', symbol: 'GBPUSD', timeframe: 'M5', params: { period: 9 }, bars_to_reserve: 0, bar_count: 2,
+  });
+  await consumeTesterResponse(page, runs[0], indicatorResult(321));
+  await expect(modal.getByText('321.00000', { exact: true })).toBeVisible();
+});
+
+test('closing the tester with pending defaults and a run leaves a reopened tester clean', async ({ page }) => {
+  const pageErrors: string[] = [];
+  page.on('pageerror', (error) => pageErrors.push(error.message));
+  const { runs, defaults } = await pendingTester(page, true);
+  let modal = testerModal(page);
+  await expect.poll(() => defaults.length).toBe(1);
+  // Manual execution can precede the defaults response.
+  await modal.getByRole('button', { name: 'Run Test', exact: true }).click();
+  await expect.poll(() => runs.length).toBe(1);
+  await modal.locator('button').filter({ has: page.locator('svg.lucide-x') }).click();
+  await expect(testerModal(page)).toHaveCount(0);
+  await page.clock.runFor(1000);
+  expect(runs).toHaveLength(1);
+  await page.getByRole('button', { name: 'Test Indicator', exact: true }).click();
+  modal = testerModal(page);
+  await expect.poll(() => defaults.length).toBe(3);
+  await consumeTesterResponse(page, defaults[1], { params: { period: 14 } });
+  await consumeTesterResponse(page, defaults[2], { params: { period: 21 } });
+  await consumeTesterResponse(page, defaults[0], 'closed defaults', true);
+  await consumeTesterResponse(page, runs[0], 'closed run', true);
+  await expect(modal.getByLabel('period', { exact: true })).toHaveValue('21');
+  await expect(modal.getByRole('alert')).toHaveCount(0);
+  await expect(modal.getByRole('button', { name: 'Execution Logs (0)', exact: true })).toBeVisible();
+  await page.clock.runFor(250);
+  await expect.poll(() => runs.length).toBe(2);
+  await consumeTesterResponse(page, runs[1], indicatorResult(654));
+  await expect(modal.getByText('654.00000', { exact: true })).toBeVisible();
+  expect(pageErrors).toEqual([]);
 });

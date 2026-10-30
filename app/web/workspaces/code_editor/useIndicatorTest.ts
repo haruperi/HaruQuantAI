@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react';
 import { createCodeEditorClient, type IndicatorTestResultDto } from './codeEditorClient';
 
 export function useIndicatorTest(indicatorName: string) {
@@ -26,6 +26,15 @@ export function useIndicatorTest(indicatorName: string) {
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [rowsPerPage, setRowsPerPage] = useState<number>(10);
   const [logs, setLogs] = useState<string[]>([]);
+
+  useLayoutEffect(() => {
+    setIsRunning(false);
+    // Invalidate at commit, before an old response can win the debounce window.
+    // Cleanup also retires every in-flight run when this tester unmounts.
+    return () => {
+      requestNumber.current++;
+    };
+  }, [selectedIndicator, parameters, symbol, timeframe, testWindow, parametersReady]);
 
   const runTest = async (inputs = parameters) => {
     const request = ++requestNumber.current;
@@ -77,6 +86,7 @@ export function useIndicatorTest(indicatorName: string) {
         setParametersReady(true);
       })
       .catch((error) => {
+        if (cancelled) return;
         setError(String(error));
         setLogs((prev) => [String(error), ...prev]);
       });

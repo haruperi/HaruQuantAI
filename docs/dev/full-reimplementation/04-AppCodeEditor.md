@@ -122,7 +122,7 @@ These orders split the historical full-feature orders below. SPECIFIED means a b
 | Order | Status | Scope and dependency |
 | --- | --- | --- |
 | `WO-CE-CLIENT-DEFAULTS` (Phase 4.2) | COMPLETE | Preserve omitted, null and explicit indicator parameters across the existing client boundary; no backend changes |
-| `WO-CE-TESTER-REQUEST-LIFECYCLE` (Phase 4.3) | SPECIFIED | Ignore stale or unmounted tester requests; follows 4.2 |
+| `WO-CE-TESTER-REQUEST-LIFECYCLE` (Phase 4.3) | COMPLETE | Ignore stale or unmounted tester requests; follows 4.2 |
 | `WO-CE-PACK-UI-CONTRACT` (Phase 4.4) | SPECIFIED | Make existing import/export controls reflect the current Python package API; no new archive format or import destination |
 | `WO-CE-TYPED-WORKSPACE-CONTRACTS` | NEEDS-SPEC | Type existing service results and errors, audit host persistence/lifecycle ownership, preserve compatibility before adding commands |
 | `WO-CE-COMMAND-GAPS` | NEEDS-SPEC | Save As, reload, catalogues, template export, import repair, compilation lifecycle and extension reload; exact operation map in audit |
@@ -159,16 +159,26 @@ These orders split the historical full-feature orders below. SPECIFIED means a b
 
 ### Phase 4.3: Tester request lifecycle — `WO-CE-TESTER-REQUEST-LIFECYCLE`
 
-**Status:** SPECIFIED; implementation pending. *Context to Read:* this order; `useIndicatorTest.ts`, `IndicatorTesterModal.tsx`, `codeEditorClient.ts` under `app/web/workspaces/code_editor`; `app/web/tests/e2e/code-editor-regressions.spec.ts`; `app/web/playwright.config.ts`.
+**Status:** COMPLETE; verified 2026-10-30. *Context to Read:* this order; `useIndicatorTest.ts`, `IndicatorTesterModal.tsx`, `codeEditorClient.ts` under `app/web/workspaces/code_editor`; `app/web/tests/e2e/code-editor-regressions.spec.ts`; `app/web/playwright.config.ts`.
 
 *Allowed implementation/test paths:* `app/web/workspaces/code_editor/useIndicatorTest.ts`; `app/web/tests/e2e/code-editor-regressions.spec.ts`.
 
-- [ ] `useIndicatorTest`: invalidate the current run when the selected indicator, parameters, symbol, timeframe or test window changes and on unmount, before the debounce starts another request. A response for the old inputs must never replace the current result/error/log/running state during that interval.
-- [ ] The defaults request effect must guard both success and failure using its existing cleanup flag. An old defaults failure must not set the new indicator's error or append a stale log entry.
-- [ ] Keep the current 250 ms debounce and public hook return shape. Cleanup clears the scheduled timer. This is client response ownership only; do not claim that it cancels Python computation or implements `stopTesting`.
-- [ ] Browser acceptance with controlled delayed responses: old run resolves within the debounce interval after an input change; old run rejects after a newer run; defaults request rejects after indicator change; modal closes while requests are pending. No stale chart, error or log update may be applied. Verify normal current-input results and missing-history errors still render.
+- [x] `useIndicatorTest`: invalidate the current run when the selected indicator, parameters, symbol, timeframe or test window changes and on unmount, before the debounce starts another request. A response for the old inputs must never replace the current result/error/log/running state during that interval.
+- [x] The defaults request effect must guard both success and failure using its existing cleanup flag. An old defaults failure must not set the new indicator's error or append a stale log entry.
+- [x] Keep the current 250 ms debounce and public hook return shape. Cleanup clears the scheduled timer. This is client response ownership only; do not claim that it cancels Python computation or implements `stopTesting`.
+- [x] Browser acceptance with controlled delayed responses: old run resolves within the debounce interval after an input change; old run rejects after a newer run; defaults request rejects after indicator change; modal closes while requests are pending. No stale chart, error or log update may be applied. Verify normal current-input results and missing-history errors still render.
 
 *Acceptance:* `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts`; `npm --prefix app/web run typecheck`; scoped unit checks plus package test/build under the owner plan. Existing intercepted browser tests prove UI behavior, not Python integration. Proposed commit: `fix(code-editor): discard stale indicator tester responses`.
+
+**Completion evidence — 2026-10-30:** Approved Phase 4.3 plan, iteration 1, executed against HEAD `7c54ed12`. A layout-effect cleanup invalidates in-flight run identities at input-change commits and unmount; effect setup retires the obsolete running state. Defaults-request rejection now respects the existing cancellation flag. The 250 ms debounce, public hook return shape and backend execution remain unchanged. Five browser regressions cover stale success/failure within debounce, failure while a newer run is active, obsolete defaults after configuration loading, and close/reopen with defaults/run requests pending. The stale debounce and defaults cases reproduced the defects before the fix. Browser tests account for the development shell's StrictMode effect replay and use intercepted responses plus a controlled clock; they do not prove backend cancellation.
+
+| Verification command | Result |
+| --- | --- |
+| `npm --prefix app/web run test:ui -- tests/e2e/code-editor-regressions.spec.ts` | Exit 0; 17 browser tests passed, including five new lifecycle cases |
+| `npm --prefix app/web run typecheck` | Exit 0 |
+| `npm --prefix app/web run test` | Exit 0; 714 tests passed across 124 files |
+| `npm --prefix app/web run build` | Exit 0; existing data-manager mixed import and bundle-size warnings remain |
+| `git diff --check` | Exit 0 |
 
 ### Phase 4.4: Existing package UI contract — `WO-CE-PACK-UI-CONTRACT`
 
