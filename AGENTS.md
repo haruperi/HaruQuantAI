@@ -32,7 +32,7 @@ iteration and renewed approval when they materially expand scope.
 
 - Ruff formatting: four spaces, 88-character lines, Google-style docstrings.
 - Standardized top-of-file docstrings and non-silent requirement logging: every
-  concrete Python module must follow `docs/templates/PYTHON_MODULE.md` declaring
+  concrete Python module must have
   `Description:` (business logic and internal/external workflows), `Purpose:`
   (`FEAT-*`), `Key Capabilities:` (descriptive kebab-case `FR-*` labels, never
   numbered, with zero silent executions and explicit log verification), `Python API Usage:`, and `CLI Usage:`.
