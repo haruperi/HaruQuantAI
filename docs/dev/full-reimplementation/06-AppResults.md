@@ -12,9 +12,13 @@ classDiagram
 - **Outputs / Downstream Role:** Result projections, rendered result tabs and export receipts.
 - **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
 - **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
-- **Shared response contract:** API adapters preserve `StandardResponse.success(*, message, metadata, data)` and `StandardResponse.failure(*, message, metadata, error)` from the current `app/host/response.py`, including `ResponseMetadata` and `StandardError`. The host phase owns its exact migration target. Pure helpers return their declared values. Do not introduce a second generic response envelope; adapt legacy UI transport at its client boundary.
+- **Shared response contract:** existing legacy API adapters preserve `StandardResponse.success(*, message, metadata, data)` and `StandardResponse.failure(*, message, metadata, error)`, `ResponseMetadata` and `StandardError` from canonical `app/core/lib/responses.py`. New instance envelopes use `StandardResponse[T](request_id: str, data: T, revision: int | None = None)` only where the individual order specifies that contract; structured new errors use `app/core/lib/errors.py::DomainError`. Pure helpers return their declared values. Preserve existing callers and translate envelopes only at an explicitly specified compatibility boundary.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
+
+## Source reassessment authority — 2026-10-30
+
+The [workspace source review](research/workspaces-03-08-source-review.md) adds exact readable context to every blocked complete-contribution order in this file. Its source paths supplement the old Context to Read lists. Shared libraries are available locally; plugin bodies, UI consumers, templates and per-definition fixtures remain separate evidence. A complete-contribution order retains its status until its exact target contract and acceptance cases are specified. New bounded READY suborders below supersede only their named portion.
 
 ## Current-code migration audit and execution order
 
@@ -218,7 +222,7 @@ classDiagram
 ### Work order RES-001: overview-template selection helper
 *Feature:* Select the same initial overview template as the inspected controller. **READY after test bootstrap.** This commit does not implement report HTML or its API.
 *Implementation Files:*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js`.
 - **Backend CREATE:** `app/workspaces/results/overview_template_policy.py`.
 - **Frontend:** no file created or edited; result views consume this policy through the later overview service, not a second TypeScript implementation.
 - **Tests CREATE:** `tests/workspaces/results/test_overview_template_policy.py`.
@@ -237,500 +241,604 @@ classDiagram
 Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
 
 ### `AppResults` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appresults). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `AppResults`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `AppResults` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/AppResults/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppResults`.
 - **Backend:** `app/workspaces/results/app_results.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsWorkspace.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_app_results.py`.
 - **Frontend tests:** `app/web/tests/results/AppResults.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/AppResults/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppResults/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `project/getDataItems`
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `AppResults`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `CustomDatabankActions` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customdatabankactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 0 previously recovered primary Java files for `CustomDatabankActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `CustomDatabankActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions`.
 - **Backend:** `app/workspaces/results/custom_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomDatabankActions.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_custom_databank_actions.py`.
 - **Frontend tests:** `app/web/tests/results/CustomDatabankActions.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/delete/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveLeft/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveRight/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveToPosition/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveLeft/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveRight/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveToPosition/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CustomDatabankActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `CustomResultsPluginActions` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customresultspluginactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `CustomResultsPluginActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `CustomResultsPluginActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions`.
 - **Backend:** `app/workspaces/results/custom_results_plugin_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomResultsPluginActions.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_custom_results_plugin_actions.py`.
 - **Frontend tests:** `app/web/tests/results/CustomResultsPluginActions.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/delete/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/rename/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/rename/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `CustomResultsPluginActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `DatabankFilterByCorrelation` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankfilterbycorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `DatabankFilterByCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `DatabankFilterByCorrelation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation`.
 - **Backend:** `app/workspaces/results/databank_filter_by_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankFilterByCorrelation.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_databank_filter_by_correlation.py`.
 - **Frontend tests:** `app/web/tests/results/DatabankFilterByCorrelation.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `DatabankFilterByCorrelation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `DatabankRename` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankrename). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 2 previously recovered primary Java files for `DatabankRename`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `DatabankRename` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename`.
 - **Backend:** `app/workspaces/results/databank_rename.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankRename.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_databank_rename.py`.
 - **Frontend tests:** `app/web/tests/results/DatabankRename.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/databank/rename`
 *Exact unresolved contract:* Conflict/collision behavior and transaction semantics of the shared databank store are not yet pinned; source per-item log-and-continue behavior must be reconciled with the target receipt/error contract.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `DatabankRename`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `EquityChartBenchmark` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartbenchmark). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartBenchmark`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `EquityChartBenchmark` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark`.
 - **Backend:** `app/workspaces/results/equity_chart_benchmark.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartBenchmark.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_equity_chart_benchmark.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartBenchmark.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/EquityChartBenchmark.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/Benchmark/Benchmark.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartBenchmark`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `EquityChartDailyChart` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdailychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartDailyChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `EquityChartDailyChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart`.
 - **Backend:** `app/workspaces/results/equity_chart_daily_chart.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDailyChart.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_equity_chart_daily_chart.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartDailyChart.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart/EquityChartDailyChart.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart/DailyChart/DailyChart.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartDailyChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `EquityChartDrawdown` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdrawdown). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartDrawdown`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `EquityChartDrawdown` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown`.
 - **Backend:** `app/workspaces/results/equity_chart_drawdown.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDrawdown.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_equity_chart_drawdown.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartDrawdown.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown/EquityChartDrawdown.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown/Drawdown/EquityChartDrawdown.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartDrawdown`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `EquityChartVolatility` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolatility). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartVolatility`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `EquityChartVolatility` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartVolatility/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility`.
 - **Backend:** `app/workspaces/results/equity_chart_volatility.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolatility.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_equity_chart_volatility.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartVolatility.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/EquityChartVolatility/EquityChartVolatility.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility/Volatility/Volatility.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartVolatility`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `EquityChartVolume` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolume). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `EquityChartVolume`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `EquityChartVolume` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/EquityChartVolume/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume`.
 - **Backend:** `app/workspaces/results/equity_chart_volume.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolume.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_equity_chart_volume.py`.
 - **Frontend tests:** `app/web/tests/results/EquityChartVolume.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/EquityChartVolume/EquityChartVolume.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume/Volume/EquityChartVolume.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartVolume`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `LoaderSQ3` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `LoaderSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `LoaderSQ3` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/LoaderSQ3/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
 - **Backend:** `app/workspaces/results/loader_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ3.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_loader_s_q3.py`.
 - **Frontend tests:** `app/web/tests/results/LoaderSQ3.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/LoaderSQ3/LoaderSQ3.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `LoaderSQ3`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `LoaderSQ4` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq4). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `LoaderSQ4`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `LoaderSQ4` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/LoaderSQ4/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4`.
 - **Backend:** `app/workspaces/results/loader_s_q4.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ4.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_loader_s_q4.py`.
 - **Frontend tests:** `app/web/tests/results/LoaderSQ4.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/LoaderSQ4/LoaderSQ4.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4/SQ4/SQ4LoaderPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `LoaderSQ4`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsChart` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultschart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart`.
 - **Backend:** `app/workspaces/results/results_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsChart.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_chart.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsChart.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsCharts/cancelLoading` `resultsCharts/loadChartData`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsDatabankActions` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 63 current plugin JavaScript files and 2 previously recovered primary Java files for `ResultsDatabankActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsDatabankActions` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`.
 - **Backend:** `app/workspaces/results/results_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankActions.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_databank_actions.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsDatabankActions.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsDatabankActions/getStrategyXml` `/instruments/addAlias` `/instruments/addInstrument` `/project/instrumentSelected` `project/retest` `resultsDatabankActions/exportDatabankToCSV` `project/saveReports` `project/saveSingleFileJava` `dirs/setLastFolderUsed` `project/synchronizeDatabank` `project/setDatabankSynchronization` `resultsDatabankActions/compareStrategies` `resultsDatabankActions/getStrategyParameters` `resultsDatabankActions/setStrategyParameters`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsDatabankActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsDatabankViews` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsDatabankViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsDatabankViews` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews`.
 - **Backend:** `app/workspaces/results/results_databank_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankViews.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_databank_views.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsDatabankViews.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/dbviews/removeView` `/dbviews/addView` `/dbviews/updateView` `/dbviews/changeView`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsDatabankViews`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsEquityChart` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsequitychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsEquityChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsEquityChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`.
 - **Backend:** `app/workspaces/results/results_equity_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsEquityChart.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_equity_chart.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsEquityChart.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/main/openlink` `equitychart/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsEquityChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsExplore` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsexplore). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsExplore`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsExplore` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsExplore/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore`.
 - **Backend:** `app/workspaces/results/results_explore.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsExplore.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_explore.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsExplore.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreService.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsExplore/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `explore/info`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsExplore`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsOverview` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsoverview). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 2 previously recovered primary Java files for `ResultsOverview`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsOverview` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview`.
 - **Backend:** `app/workspaces/results/results_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsOverview.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_overview.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsOverview.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsOverview`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsPlugins` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsplugins). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsPlugins`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsPlugins` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPlugins/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins`.
 - **Backend:** `app/workspaces/results/results_plugins.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPlugins.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_plugins.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsPlugins.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsPlugins/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPlugins/ResultsPluginsService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/ResultsPluginsService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsPlugins/list` `resultsPlugins/create` `resultsPlugins/rename` `resultsPlugins/delete` `resultsPlugins/stats` `resultsPlugins/orders` `resultsPlugins/settings` `sourcecode/print` `resultsPlugins/databankStrategies` `resultsPlugins/strategyStats` `resultsPlugins/strategyOrders` `resultsPlugins/strategyResultKeys` `resultsPlugins/candles` `resultsPlugins/dataSymbols` `sqai/complete`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPlugins`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsPortfolioCorrelation` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsportfoliocorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsPortfolioCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsPortfolioCorrelation` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation`.
 - **Backend:** `app/workspaces/results/results_portfolio_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPortfolioCorrelation.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_portfolio_correlation.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsPortfolioCorrelation.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocorrelation/compute` `portfoliocorrelation/stop` `portfoliocorrelation/correlationSave`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPortfolioCorrelation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsProfileChart` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsprofilechart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsProfileChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsProfileChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart`.
 - **Backend:** `app/workspaces/results/results_profile_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsProfileChart.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_profile_chart.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsProfileChart.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `profilechart/paths`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsProfileChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsReport` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsreport). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsReport`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsReport` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsReport/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport`.
 - **Backend:** `app/workspaces/results/results_report.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsReport.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_report.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsReport.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsReport`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsSourceCode` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultssourcecode). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsSourceCode`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsSourceCode` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode`.
 - **Backend:** `app/workspaces/results/results_source_code.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSourceCode.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_source_code.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsSourceCode.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sourcecode/print` `sourcecode/getDataPath` `sourcecode/saveMTPaths` `sourcecode/saveEA` `sourcecode/saveWFCalendar`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSourceCode`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsSPOverview` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsspoverview). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 11 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsSPOverview`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsSPOverview` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview`.
 - **Backend:** `app/workspaces/results/results_s_p_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSPOverview.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_s_p_overview.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsSPOverview.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `spoverview/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSPOverview`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsStockpicker` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstockpicker). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsStockpicker`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsStockpicker` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker`.
 - **Backend:** `app/workspaces/results/results_stockpicker.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStockpicker.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_stockpicker.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsStockpicker.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `stockpicker/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsStockpicker`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsStrategyConfig` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstrategyconfig). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsStrategyConfig`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsStrategyConfig` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig`.
 - **Backend:** `app/workspaces/results/results_strategy_config.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStrategyConfig.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_strategy_config.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsStrategyConfig.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `strategyconfig/print` `strategyconfig/loadStrategySettings`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsStrategyConfig`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsTradeAnalysis` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradeanalysis). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsTradeAnalysis`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsTradeAnalysis` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis`.
 - **Backend:** `app/workspaces/results/results_trade_analysis.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeAnalysis.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_trade_analysis.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsTradeAnalysis.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `tradeanalysis/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradeAnalysis`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsTradeList` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelist). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsTradeList`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsTradeList` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeList/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList`.
 - **Backend:** `app/workspaces/results/results_trade_list.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeList.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_trade_list.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsTradeList.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradeList/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList/module.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradeList`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ResultsTradelistViews` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelistviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 0 previously recovered primary Java files for `ResultsTradelistViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ResultsTradelistViews` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews`.
 - **Backend:** `app/workspaces/results/results_tradelist_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradelistViews.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_results_tradelist_views.py`.
 - **Frontend tests:** `app/web/tests/results/ResultsTradelistViews.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/tradelistviews/removeView` `/tradelistviews/addView` `/tradelistviews/updateView` `/tradelistviews/changeView`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradelistViews`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `SaverHTML` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverhtml). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverHTML`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `SaverHTML` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SaverHTML/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML`.
 - **Backend:** `app/workspaces/results/saver_h_t_m_l.py`.
 - **Frontend:** `app/web/workspaces/results/SaverHTML.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_saver_h_t_m_l.py`.
 - **Frontend tests:** `app/web/tests/results/SaverHTML.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/SaverHTML/SaverHTML.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML/HTML/HTMLReportPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverHTML`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `SaverPDF` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverpdf). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverPDF`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `SaverPDF` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SaverPDF/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF`.
 - **Backend:** `app/workspaces/results/saver_p_d_f.py`.
 - **Frontend:** `app/web/workspaces/results/SaverPDF.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_saver_p_d_f.py`.
 - **Frontend tests:** `app/web/tests/results/SaverPDF.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/SaverPDF/SaverPDF.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF/PDF/PDFReportPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverPDF`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `SaverSQ3` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saversq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `SaverSQ3` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SaverSQ3/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
 - **Backend:** `app/workspaces/results/saver_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/SaverSQ3.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_saver_s_q3.py`.
 - **Frontend tests:** `app/web/tests/results/SaverSQ3.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/SaverSQ3/SaverSQ3.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverSQ3`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `SaverStrategyTrades` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverstrategytrades). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `SaverStrategyTrades`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `SaverStrategyTrades` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades`.
 - **Backend:** `app/workspaces/results/saver_strategy_trades.py`.
 - **Frontend:** `app/web/workspaces/results/SaverStrategyTrades.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_saver_strategy_trades.py`.
 - **Frontend tests:** `app/web/tests/results/SaverStrategyTrades.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades/SaverStrategyTrades.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades/StrategyTrades/StrategyTradesSaverPlugin.java`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverStrategyTrades`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ### `ServletRenameTool` — BLOCKED-NOT-EXECUTABLE
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletrenametool). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 0 previously recovered primary Java files for `ServletRenameTool`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 *Feature:* Full `ServletRenameTool` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ServletRenameTool/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
 - **Backend:** `app/workspaces/results/servlet_rename_tool.py`.
 - **Frontend:** `app/web/workspaces/results/ServletRenameTool.tsx`.
 - **Backend tests:** `tests/workspaces/results/test_servlet_rename_tool.py`.
 - **Frontend tests:** `app/web/tests/results/ServletRenameTool.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ServletRenameTool/ServletRenameTool.jar`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
 *Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Conflict/collision behavior and transaction semantics of the shared databank store are not yet pinned; source per-item log-and-continue behavior must be reconciled with the target receipt/error contract.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ServletRenameTool`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
 ## Phase 3: concrete extension definition work orders — BLOCKED-NOT-EXECUTABLE
+*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. Source file counts do not establish completion or parity.
+
 
 ### `Columns`
-- **Context:** `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Columns/`; exact current definition count: 160.
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Columns`; exact current definition count: 160.
 - **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
 - **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
 - **Definition IDs to account for:** `Databanks/AHPR.java`, `Databanks/ActualDD.java`, `Databanks/ActualDrawdownPct.java`, `Databanks/AmbiguousTrades.java`, `Databanks/AmbiguousTradesPct.java`, `Databanks/AnnualPctReturn.java`, `Databanks/AnnualPctReturnDDRatio.java`, `Databanks/AvgAbsTrade.java`, `Databanks/AvgBarsInTrade.java`, `Databanks/AvgBarsLoss.java`, `Databanks/AvgBarsWin.java`, `Databanks/AvgConsecLosses.java`, `Databanks/AvgConsecWins.java`, `Databanks/AvgDrawdown.java`, `Databanks/AvgLoss.java`, `Databanks/AvgParametersStability.java`, `Databanks/AvgPctDrawdown.java`, `Databanks/AvgPctProfitPerYear.java`, `Databanks/AvgProfitPerDay.java`, `Databanks/AvgProfitPerMonth.java`, `Databanks/AvgProfitPerYear.java`, `Databanks/AvgTrStddevRatio.java`, `Databanks/AvgTrade.java`, `Databanks/AvgTradesPerDay.java`, `Databanks/AvgTradesPerMonth.java`, `Databanks/AvgTradesPerYear.java`, `Databanks/AvgWin.java`, `Databanks/BacktestDuration.java`, `Databanks/BestWF.java`, `Databanks/BiggestMAE.java`, `Databanks/CAGR.java`, `Databanks/CalmarRatio.java`, `Databanks/Commission.java`, `Databanks/Complexity.java`, `Databanks/DateGenerated.java`, `Databanks/DateLastModified.java`, `Databanks/DegreesOfFreedom.java`, `Databanks/Drawdown.java`, `Databanks/DrawdownPct.java`, `Databanks/DrawdownPips.java`, `Databanks/EdgeRatioInPips.java`, `Databanks/Efficiency.java`, `Databanks/EntryIndicators.java`, `Databanks/EquityAngle.java`, `Databanks/EquitySlope.java`, `Databanks/ExitIndicators.java`, `Databanks/ExitQuality.java`, `Databanks/Expectancy.java`, `Databanks/Exposure.java`, `Databanks/ExposurePosition.java`, `Databanks/FiltersResult.java`, `Databanks/Fitness.java`, `Databanks/GrossLoss.java`, `Databanks/GrossProfit.java`, `Databanks/InitialDeposit.java`, `Databanks/KellyFormula.java`, `Databanks/LongestTrade.java`, `Databanks/MagicNumber.java`, `Databanks/MaxConsecLosses.java`, `Databanks/MaxConsecWins.java`, `Databanks/MaxIntradayDrawdown.java`, `Databanks/MaxLoss.java`, `Databanks/MaxNewHighDuration.java`, `Databanks/MaxProfit.java`, `Databanks/MaxTSIntradayDrawdown.java`, `Databanks/MiniEquityChart.java`, `Databanks/NSymmetry.java`, `Databanks/NetProfit.java`, `Databanks/NetProfitInPct.java`, `Databanks/NetProfitInPips.java`, `Databanks/Note.java`, `Databanks/NumberOfCanceled.java`, `Databanks/NumberOfLosses.java`, `Databanks/NumberOfProfits.java`, `Databanks/NumberOfTrades.java`, `Databanks/OpenDrawdown.java`, `Databanks/OpenDrawdownPct.java`, `Databanks/Outlier2.java`, `Databanks/Parameters.java`, `Databanks/PayoutRatio.java`, `Databanks/PriceIndicators.java`, `Databanks/ProfitFactor.java`, `Databanks/ProfitableMonths.java`, `Databanks/ProfitableMonthsPct.java`, `Databanks/RExpectancy.java`, `Databanks/RExpectancyScore.java`, `Databanks/RSquared.java`, `Databanks/RecoveryFactor.java`, `Databanks/ResultsName.java`, `Databanks/ReturnDDRatio.java`, `Databanks/ReturnOpenDDRatio.java`, `Databanks/SQN.java`, `Databanks/SQNScore.java`, `Databanks/SharpeRatio.java`, `Databanks/SlippageInMoney.java`, `Databanks/Stability.java`, `Databanks/StabilitySQ3.java`, `Databanks/Stagnation.java`, `Databanks/StagnationPct.java`, `Databanks/StandardDev.java`, `Databanks/Symbol.java`, `Databanks/Symmetry.java`, `Databanks/TSIndex.java`, `Databanks/TSWinLossRatio.java`, `Databanks/TimeFrame.java`, `Databanks/TotalDataDays.java`, `Databanks/TotalDataMonths.java`, `Databanks/TotalDataYears.java`, `Databanks/TotalMFE.java`, `Databanks/TotalTradingDays.java`, `Databanks/TotalTradingMonths.java`, `Databanks/TotalTradingYears.java`, `Databanks/TradesSymmetry.java`, `Databanks/UlcerIndex.java`, `Databanks/UlcerPerformanceIndex.java`, `Databanks/WinLossRatio.java`, `Databanks/WinningPct.java`, `Databanks/WorstParametersStability.java`, `Databanks/WorstYearProfit.java`, `Databanks/ZProbability.java`, `Databanks/ZScore.java`, `Trades/Balance.java`, `Trades/BarsInTrade.java`, `Trades/ClosePrice.java`, `Trades/CloseTime.java`, `Trades/CloseType.java`, `Trades/CommSwap.java`, `Trades/Comment.java`, `Trades/Drawdown.java`, `Trades/MAE.java`, `Trades/MAEPips.java`, `Trades/MFE.java`, `Trades/MFEPips.java`, `Trades/NumberOfTrade.java`, `Trades/OpenPrice.java`, `Trades/OpenTime.java`, `Trades/OriginalOpenPrice.java`, `Trades/OriginalOpenTime.java`, `Trades/PTLevel.java`, `Trades/PctDrawdown.java`, `Trades/ProfitLoss.java`, `Trades/ProfitLossPct.java`, `Trades/ProfitLossPips.java`, `Trades/ResultName.java`, `Trades/SLLevel.java`, `Trades/SampleType.java`, `Trades/Size.java`, `Trades/SlippageInMoney.java`, `Trades/Symbol.java`, `Trades/Ticket.java`, `Trades/TimeInTrade.java`, `Trades/Type.java`, `WalkForward/WFMaxDDbyRun.java`, `WalkForward/WFMaxPctDDbyRun.java`, `WalkForward/WFMaxProfitByRun.java`, `WalkForward/WFMaxProfitByRunInPct.java`, `WalkForward/WFMaxStagnationInPct.java`, `WalkForward/WFMinTradesInRun.java`, `WalkForward/WFPctOfProfitableRuns.java`, `WalkForward/WFScore.java`.
 ### `Stats`
-- **Context:** `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/Stats/`; exact current definition count: 7.
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Stats`; exact current definition count: 7.
 - **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
 - **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
 - **Definition IDs to account for:** `Overview/AWSharedDefault.java`, `Overview/DefaultOpenDD.java`, `Overview/SQDefault.java`, `Overview/SQDefaultPct.java`, `Overview/SQDefaultWithPortfolio.java`, `Overview/SQDefaultWithPortfolioPct.java`, `Overview/TSOverview.java`.
 ### `EngineCharts`
-- **Context:** `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/EngineCharts/`; exact current definition count: 14.
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/EngineCharts`; exact current definition count: 14.
 - **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
 - **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
 - **Definition IDs to account for:** `AcceptedStrategiesPerHour.java`, `AverageStrategiesPerHourChart.java`, `DatabankFitnessIS.java`, `DatabankFitnessIST.java`, `DatabankFitnessISV.java`, `DatabankFitnessOOS.java`, `GenEvoFitnessIS.java`, `GenEvoFitnessIST.java`, `GenEvoFitnessISV.java`, `GenEvoFitnessOOS.java`, `GeneticEvolutionInfo.java`, `HeapMemoryChart.java`, `OffHeapMemoryChart.java`, `OffHeapMemoryInfoChart.java`.
 ### `CustomAnalysis`
-- **Context:** `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/CustomAnalysis/`; exact current definition count: 2.
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/CustomAnalysis`; exact current definition count: 2.
 - **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
 - **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
 - **Definition IDs to account for:** `CorrelationFilter.java`, `OutlierTrade.java`.
@@ -747,7 +855,7 @@ New evidence record; fields are retained verbatim for future supersession:
   "claim": "Overview controller starts with SQDefault, retains SQDefault when that value exists in the available templates, otherwise selects the first available template; empty availability leaves SQDefault.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js",
       "sha256": "339dd052800cfc1360946d7253ffe3b91b12cf3591c395474cf607e9eb23e245"
     }
   ],

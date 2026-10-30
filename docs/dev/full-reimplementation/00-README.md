@@ -23,19 +23,63 @@ classDiagram
 - **Dependencies:** none to read this dispatch; code starts only after the exact prerequisite work-order commits listed in a READY feature exist.
 - **Outputs / Downstream Role:** accepted feature commits, not independently invented interfaces or placeholder implementations.
 
-## Current readiness - investigation and unblocking status
+## Current readiness — source-backed revision of 2026-10-30
 
-This package contains exactly 20 Markdown files. All 183 primary plugin modules remain assigned across 19 phases. Following the disassembly and static analysis of the unencrypted donor reference (C:/SQX/internal/libs/SQTradingLib.jar, SQDataLib.jar, SQJobsLib.jar, SQPluginLib.jar, SQGridLib2.jar, SQWebGUILib.jar), the foundational library contracts preventing implementation have been resolved:
+Read the [review result and remaining work](research/2026-10-30-reimplementation-review.md)
+for the exact scope, released slices and validation.
 
-1. **Core Data Contracts (WO-C06)**: Unblocked via `com.strategyquant.datalib.TimeframeManager` and `DataSeries`. Timeframe constants, millisecond mappings, precision flags, and OHLCV vectors.
-2. **Strategy Runtime & Orders (WO-C08)**: Unblocked via `com.strategyquant.tradinglib.strategy.LiveOrderObj` and `ATMExit`. Order lifecycle, Stop-Loss / Profit-Target modifications, Trailing Stops, Break-Even, and MAE/MFE metrics.
-3. **Simulation Engine (WO-C09)**: Unblocked via `com.strategyquant.tradinglib.simulator.impl.AbstractTradingSimulator`. MT4, MT5 Hedged/Netted, TradeStation engines, gap handling, and fill price logic.
-4. **Statistics Pipeline (WO-C10)**: Unblocked via `com.strategyquant.tradinglib.results.stats.StatsComputer`. Order sorting (`OrderComparatorByCloseTime`), IS/OOS splits, and metric dependency DAG.
-5. **Project Container & Persistence (WO-C11)**: Unblocked via `com.strategyquant.tradinglib.file.SQFileManager`. Flat `.cfx` container structure, `config.xml` task graph, and `<TaskType>-Task<N>.xml` schemas.
-6. **Job Execution Model (WO-C13)**: Unblocked via `com.strategyquant.jobs`. Concurrency thread pools, job cancellation tokens, and progress dispatch.
+There are 20 top-level dispatch/phase Markdown files; supporting research lives in `research/`.
+The historical allocation assigns 183 primary plugin modules across 19 phases. Assignment
+coverage is not implementation readiness.
 
-**Complete Migration Audits Across All 19 Phases**:
-Every phase file (`01-AppCore.md` through `19-AppAI.md`) now contains an explicit current-codebase migration audit table (`Current HaruQuantAI location` -> `Target proposed location` -> `Fit / action`). Much of the existing codebase (`app/host/`, `app/include/`, `app/workspace/data_manager/`, `app/workspace/code_editor/`, `app/workspace/algo_wizard/`) is qualified as **DIRECT FIT**, with UI presentation components mapped to target modular React workspaces.
+## Canonical donor layout
+
+**`DONOR_REFERENCE_ROOT` = `data\reference-donor`**, relative to the repository root.
+This is the sole donor-root alias throughout this documentation. A path such as
+`DONOR_REFERENCE_ROOT/internal/libs/lib/qdm/QDM.java` resolves directly to
+`data\reference-donor\internal\libs\lib\qdm\QDM.java`.
+Forward slashes in documented locators are equivalent to Windows backslashes.
+Clickable links and machine-readable source manifests retain concrete filesystem paths.
+
+All active donor context uses `DONOR_REFERENCE_ROOT/`, preserving the SQX `internal/`
+layout. Read Java files and folders directly; no JAR extraction or decompilation is required.
+
+- Shared libraries: `DONOR_REFERENCE_ROOT/internal/libs/` (`lib`, `tradinglib`, `datalib`, `gridlib`, `jobslib`, `pluginlib`, `business`, `consolestarter`).
+- Plugins: `DONOR_REFERENCE_ROOT/internal/plugins/<module>/`.
+- Extension Java: `DONOR_REFERENCE_ROOT/internal/extend/`.
+- Export templates: `DONOR_REFERENCE_ROOT/internal/ctemplate/` and `DONOR_REFERENCE_ROOT/internal/extend/Code/`.
+- Web resources: `DONOR_REFERENCE_ROOT/internal/web/`.
+
+For example: `DONOR_REFERENCE_ROOT/internal/libs/lib/qdm/QDM.java` or
+`DONOR_REFERENCE_ROOT/internal/libs/lib/qdm/`. DONOR and Context to Read paths refer to
+these direct sources, not `.jar!package/Class.class` archive-member syntax.
+
+The [current source manifest](research/donor-source-manifest.json) indexes 2,819 Java
+files: 1,356 in libraries, 412 in plugins and 1,051 in extensions. The earlier audit counts
+and no-match findings describe the pre-consolidation search; they are not a current source
+inventory. Source consolidation changes locators, not accepted behavior or work-order readiness.
+Historical evidence retains carrier suffixes, sizes and hashes under the same root alias;
+those are provenance records, not instructions to open an installed SQX copy or a current archive.
+
+The earlier blanket assertion that WO-C06/C08/C09/C10/C11/C13 were unblocked is withdrawn.
+Those labels group several capabilities; readable classes expose implementation details but
+do not alone define a complete Python service API, numerical acceptance fixtures, concurrency
+rules, project migrations or React workflow. The exact revised suborder controls readiness.
+An unavailable-source blocker must be replaced by its verified source locator; a remaining
+contract gap must be named, not silently converted to READY.
+
+Original archive identities and encrypted-carrier observations remain in historical
+evidence. Do not compare an old archive hash to a relocated source folder or infer current
+build equivalence from a folder name.
+
+Migration tables remain proposals, subject to each phase's source review and prerequisite
+contracts. A DIRECT FIT label is not proof of donor equivalence or permission to move the
+entire current implementation. Keep existing accepted host/core APIs unless a specific order
+explicitly changes them.
+
+**New independently specified Home slices:** WO-H05 dashboard panel selection and WO-H06
+advanced money-management tab visibility require only WO-C00. They do not authorize full
+Home workflow completion. Other revised bounded orders are listed in their owning phases.
 
 ## Executor contract - applies to every assigned feature
 
@@ -71,13 +115,18 @@ entries have been implemented by writing this package.
 
 ## Bootstrap and shared contract decisions
 
-The only runnable shared response/error definitions presently specified are
-WO-C01 and WO-C02 in the Core file:
+The canonical shared response/error implementations already exist under `app/core/lib/`.
+WO-C01 and WO-C02 specify the instance contracts; the Core baseline also explicitly
+retains the legacy static builders used by current host callers:
 
 - `app/core/lib/errors.py`: keyword-only DomainError and JSONValue/copy_json.
 - `app/core/lib/responses.py`: keyword-only StandardResponse[T], to_dict and to_json;
-  data must already be JSON-compatible. Dataclass payloads require an explicitly
-  specified conversion; a TypedDict is already a JSON object.
+  data must already be JSON-compatible. Existing `success`/`failure` builders,
+  `ResponseMetadata` and `StandardError` remain in that same canonical module for
+  migrated callers. Do not replace their wire dictionaries during relocation.
+  New adapters use only the envelope explicitly named by their work order.
+  Dataclass payloads require an explicitly specified conversion; a TypedDict is
+  already a JSON object.
 - `app/web/package.json` and `app/web/vitest.config.ts`: WO-C00 owns the node-based
   frontend test harness. Frontend orders use `npm --prefix app/web test -- tests/<literal>.test.ts`;
   the feature replaces the placeholder with its exact path. Do not change the runner.
@@ -114,7 +163,7 @@ A class name appearing in a diagram is not permission to invent its fields.
 
 1. WO-C00 frontend/Python package bootstrap.
 2. WO-C01 DomainError, followed by WO-C02 StandardResponse.
-3. WO-C03 previous-version ProgramRegistry; the four Home helper orders may then
+3. WO-C03 previous-version ProgramRegistry; the six Home helper orders may then
    run according to their own dependencies (frontend-only orders require only C00).
 4. Assign the exact READY-AFTER-* slice in each later phase only after its named
    helper/core prerequisite exists. These slices do not release that phase's blocked
@@ -134,9 +183,10 @@ capability replacements rather than source ports. main.py and cli.py use the sam
 accepted application services. Project/strategy ownership remains under extend;
 data retains existing contents. No user data is deleted by a work order.
 
-Primary evidence is SQX_REFERENCE_ROOT; the user-authorized readable fallback is
-SQX_PREVIOUS_REFERENCE_ROOT. Static older definitions never establish build-145
-parity. New findings retain source locators/hashes, classification, confidence,
+The sole donor root is `DONOR_REFERENCE_ROOT`. Retained historical evidence also uses
+this alias for consistency. Historical archive/executable suffixes describe original carriers,
+not current files to open; active Context to Read paths select direct copied sources.
+Relocation alone does not establish build-145 parity. New findings retain source locators/hashes, classification, confidence,
 limitations, domain/ID ownership or registration gap, commit/review state, concrete
 validation, actual timestamps and all four clean-room flags. Original historical
 record objects remain unchanged below their owning phase. Revised decisions add

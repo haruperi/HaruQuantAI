@@ -34,7 +34,7 @@ classDiagram
   class BlockSpec
   class BaseBlock
   class BlockRegistry {
-    <<migration specification pending>>
+    <<concrete extension relocation pending>>
   }
   class ConditionComparator
   class BaseMetric
@@ -49,7 +49,7 @@ classDiagram
     <<blocked behavior>>
   }
   class StatisticsService {
-    <<blocked formulas>>
+    <<metric formulas pending; dependency helper specified>>
   }
   class ResultStore {
     <<blocked schema>>
@@ -82,6 +82,25 @@ classDiagram
 - **Dependencies:** none for C00-C01; the named prerequisites in each subsequent order are mandatory.
 - **Outputs / Downstream Role:** exact shared errors/responses, program lookup, test harness and subsequently accepted data/compute/trading contracts.
 - **Rule:** one numbered ready work order is one commit. BLOCKED orders authorize no production code or placeholder tests. The historical findings at the end retain their original claims and limits.
+
+## Donor source review — 2026-10-30
+
+Readable donor source is now available under `DONOR_REFERENCE_ROOT/internal/libs/`; signature dumps are under `DONOR_REFERENCE_ROOT/internal/libs/signatures/`. The source paths in the review notes below supersede earlier instructions to recover or decompile those same classes. They do not supersede the historical observations embedded later in this file. `DONOR_REFERENCE_ROOT/internal/libs/tradinglib` is byte-identical to the previous readable `DONOR_REFERENCE_ROOT/internal/libs/tradinglib`; current build-145 SQAppLib carrier attribution remains unverified.
+
+`OBS-CORE-SOURCE-20261030` denotes static inspection of the named source bodies, not a runtime parity test. The reviewed implementations expose orchestration, extension dependencies, empty job bodies and decompiler ambiguities. Thus source-access blockers are resolved for the named classes; target schema, migration and fixture gates remain where stated. Newly specified independent slices below may proceed without claiming the enclosing capability is complete. No donor implementation bodies are copied into this plan.
+
+| Existing obligation | Source-review outcome | Remaining gate / ready slice |
+|---|---|---|
+| WO-C05.02 registry migration | Python import/metadata coupling identified; Java discovery source readable | Concrete extension relocation and resolver edits remain; no donor decryption needed |
+| WO-C08.02 runtime | StrategyBase lifecycle and generated-class boundary identified | Accepted strategy document and event/effect schemas |
+| WO-C09.01 simulator migration | Generic/provider coupling is in existing Python base, not missing Java source | Exact provider-factory separation |
+| WO-C09.02 historical runner | Main test, fitness, cross-check and stop flow readable | Precision/fill mode selection and numeric fixtures |
+| WO-C10.02 statistics | Dependency sorting and plugin dispatch readable | Metric bodies and result schema; independent WO-C10.03 is READY |
+| WO-C11.02 stores | Project ZIP member operations readable | Full strategy/result schema; independent WO-C11.03 is READY |
+| WO-C12.02 research engines | GP selection and optimization candidates readable | Selected algorithms, genotype and deterministic acceptance |
+| WO-C13.02 databank jobs | Add/load orchestration readable; delete/move run bodies empty | Store transaction contract; empty methods cannot supply move/delete semantics |
+| WO-C15 transformation | FreeMarker pipeline and template discovery readable | Actual template resources, strategy mapping and output fixtures |
+| WO-C17.02 web serving | Haru integration decision specified below | READY after shell prerequisites; does not depend on Java source |
 
 ## Current-code baseline and migration authority
 
@@ -206,8 +225,8 @@ The earlier COR-M01 sketch below is retained for provenance only. It is supersed
 *Evidence IDs:* `OBS-CORE-PROGRAM-001`, `PREVIOUS-005` (embedded below). Current build-145 equivalence is not asserted.
 *Dependencies:* WO-C01.
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/program/Program.class`; `ProgramDoesntExistException.class` in the same archive.
-- **Context to Read:** those two donor classes using javap; `app/core/lib/errors.py`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/pluginlib/program/Program.java`; `DONOR_REFERENCE_ROOT/internal/libs/pluginlib/program/ProgramDoesntExistException.java` in the same source tree.
+- **Context to Read:** those two donor classes using the readable Java source; `app/core/lib/errors.py`.
 - **Create:** `app/core/lib/programs.py`; `tests/core/lib/test_programs.py`.
 - **Frontend:** none. No filesystem discovery or API routes.
 *Types:* `Program` is a Python Protocol declaring `call(self, operation: str, *args: JSONValue) -> JSONValue`. ProgramRegistry constructor takes no arguments and creates one empty instance-local dictionary. It does not auto-register built-ins.
@@ -241,7 +260,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `PREVIOUS-009` establishes a shared fallback runtime, not SQLite semantics. `OBS-HARU-CORE-BASELINE-20261029` establishes the Python implementation and tests. `DEC-CORE-MIGRATION-20261029` owns reuse and API preservation.
 *Dependencies:* WO-C02 and WO-C11.01 (HostPersistence).
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe!embedded-resource-1` (shared-runtime boundary only).
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/lib` (recovered shared-runtime Java source; original carrier recorded in historical evidence) (shared-runtime boundary only).
 - **Context to Read:** `app/core/host/settings.py`, `app/core/host/persistence.py`, `app/core/lib/responses.py`, `tests/core/host/test_settings.py`, `tests/core/host/test_persistance.py`.
 - **Backend / edit:** `app/core/host/settings.py` only if an outstanding import still names the deleted `app.host` package. Replace that import prefix with `app.core.host`; preserve the imported symbol.
 - **Frontend / create:** none. Settings forms belong to AppHome.
@@ -270,7 +289,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `PREVIOUS-005` establishes plugin metadata/registration responsibility; `OBS-HARU-CORE-BASELINE-20261029` and `DEC-CORE-MIGRATION-20261029` establish the Python reuse boundary. Python decorators and Pydantic are target choices.
 *Dependencies:* WO-C00. No dependency on concrete indicators or a workspace router.
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/SQPluginManager.class` (responsibility only).
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/pluginlib/SQPluginManager.java` (responsibility only).
 - **Context to Read:** `app/include/blocks/base.py`, `app/include/blocks/metadata.py`, `tests/include/blocks/test_blocks_phase1.py`, `pyproject.toml`.
 - **Create:** `app/core/trading/__init__.py`, `app/core/trading/blocks/__init__.py` (empty, unless present); `app/core/trading/blocks/base.py`, `app/core/trading/blocks/metadata.py`, `tests/core/lib/test_block_contract_imports.py`.
 - **Edit:** the two source modules below into temporary bridges. No frontend files.
@@ -303,6 +322,8 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Required senior completion before READY:* specify every concrete import replacement, exact metadata-file target and resolver, staged rollback behavior when one module fails, duplicate-ID policy, snapshot pinning and concurrent reload fixtures. The acceptance must execute the current registry/composition tests against the relocated implementation, including a failed reload that leaves the prior snapshot usable. No coding agent is authorized to choose those missing changes.
 *Commit:* none until replaced by a complete READY order. This obligation is not discharged by WO-C05.01.
 
+*Source review — OBS-CORE-SOURCE-20261030:* Read `DONOR_REFERENCE_ROOT/internal/libs/lib/snippets/CustomClassesLoader.java` and `CustomClassesLoaderCache.java`; discovery uses `SQ.<category>`, cache enumeration and Java class instantiation. These do not define Python staged snapshots. The actual remaining migration edges are observable in the named Python files: `composition.py` reads `indicators/donor_compositions.json` relative to its own file; `composition_runtime.py` imports six concrete comparison functions; `runtime_inputs.py` imports concrete `TPOProfile` and `VolumeProfile`; `series.py` imports `BarPrice`. AppCodeEditor must own those concrete extension locations and metadata publication before the generic move. This gate is a target ownership decision, not unavailable donor code.
+
 ## Phase C05: SQDataLib responsibilities
 
 ### `DomainContracts` - WO-C06.01 - READY
@@ -311,7 +332,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `PREVIOUS-002` establishes shared trading/data responsibility; `OBS-HARU-CORE-BASELINE-20261029` establishes the actual Python names; `DEC-CORE-MIGRATION-20261029` owns the move. No Java double-array layout is imposed on Python.
 *Dependencies:* WO-C00.
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar` and `SQTradingLib.jar` (shared-type responsibility only).
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/datalib` and `DONOR_REFERENCE_ROOT/internal/libs/tradinglib` (shared-type responsibility only).
 - **Context to Read:** `app/include/enums.py`, `app/include/contracts.py`, `tests/workspace/brokers/test_symbol_contracts.py`.
 - **Create:** `app/core/data/__init__.py` (empty unless present); `app/core/enums.py`, `app/core/data/contracts.py`, `tests/core/data/test_contract_imports.py`.
 - **Edit:** `app/include/enums.py`, `app/include/contracts.py` into the specified temporary bridges. No UI files or database migrations.
@@ -361,7 +382,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `PREVIOUS-001`, `PREVIOUS-002`, `OBS-CORE-DATA-001`, `OBS-CORE-DATA-CATALOG-20261029`, `OBS-HARU-CORE-BASELINE-20261029`.
 *Dependencies:* WO-C06.01, WO-C06.02, WO-C00, WO-C04 (SettingsManager/HostPersistence).
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar` (`ChartDef.class`, `DataInfo.class`, `DataManager.class`, `TimeframeManager.class`, `data/io/IDataLoader.class`, `data/io/VersatileData.class`); `SQTradingLib.jar` (`backtest/BacktestDataFeed.class`, `strategy/MarketData.class`).
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/datalib` (`DONOR_REFERENCE_ROOT/internal/libs/datalib/ChartDef.java`, `DONOR_REFERENCE_ROOT/internal/libs/datalib/DataInfo.java`, `DONOR_REFERENCE_ROOT/internal/libs/datalib/data/DataManager.java`, `DONOR_REFERENCE_ROOT/internal/libs/datalib/TimeframeManager.java`, `DONOR_REFERENCE_ROOT/internal/libs/datalib/data/io/IDataLoader.java`, `DONOR_REFERENCE_ROOT/internal/libs/datalib/data/io/VersatileData.java`); `DONOR_REFERENCE_ROOT/internal/libs/tradinglib` (`DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtest/BacktestDataFeed.java`, `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/strategy/MarketData.java`).
 - **Context to Read:** `app/core/data/contracts.py`, `app/core/data/market_storage.py`, `app/core/host/persistence.py`, `app/workspace/data_manager/data/feature.py`, `app/workspace/data_manager/data/storage.py`, `app/workspace/data_manager/data/history.py`, `app/workspace/brokers/canonical_history.py`.
 - **Create:** `app/core/data/catalog.py`, `app/core/data/io.py`, `tests/core/data/test_catalog.py`, `tests/core/data/test_io.py`.
 - **Edit:** `app/core/data/__init__.py`.
@@ -404,7 +425,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `PREVIOUS-003` observes `com.strategyquant.gridlib.client.Compute` and local/JMS performers; `OBS-HARU-CORE-BASELINE-20261029` and `DEC-CORE-MIGRATION-20261029` own the Python reuse.
 *Dependencies:* WO-C13.01. This order follows, rather than precedes, canonical job-manager verification.
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class`; `compute/performer/MultithreadComputePerformer.class` in the same archive.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/gridlib/client/Compute.java`; `DONOR_REFERENCE_ROOT/internal/libs/gridlib/compute/performer/MultithreadComputePerformer.java` in the same source tree.
 - **Context to Read:** `app/core/jobs/manager.py`, `tests/core/jobs/test_manager.py`, `app/core/host/resources.py`.
 - **Backend target:** `app/core/jobs/manager.py` (retain); **test target:** `tests/core/jobs/test_manager.py` (retain). **Create / frontend:** none.
 *Current -> target / action:* both exact target files already exist; DIRECT FIT for the existing local scheduling behavior only. Do not create `app/core/grid/executor.py` just to forward `submit_job`.
@@ -423,7 +444,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `PREVIOUS-003`, `OBS-CORE-GRID-REMOTE-20261029`.
 *Dependencies:* WO-C07.01, WO-C00, WO-C04 (SettingsManager/JobManager).
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class`, `compute/performer/JmsComputePerformer.class`, `client/GridJob.class`, `compute/JobResult.class`, `topology/NodeInfo.class`, `topology/GridTopology.class`, `message/MessageProperties.class`, `message/MessageKind.class`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/gridlib/client/Compute.java`, `DONOR_REFERENCE_ROOT/internal/libs/gridlib/compute/performer/JmsComputePerformer.java`, `DONOR_REFERENCE_ROOT/internal/libs/gridlib/client/GridJob.java`, `DONOR_REFERENCE_ROOT/internal/libs/gridlib/compute/JobResult.java`, `DONOR_REFERENCE_ROOT/internal/libs/gridlib/topology/NodeInfo.java`, `DONOR_REFERENCE_ROOT/internal/libs/gridlib/topology/GridTopology.java`, `DONOR_REFERENCE_ROOT/internal/libs/gridlib/message/MessageProperties.java`, `DONOR_REFERENCE_ROOT/internal/libs/gridlib/message/MessageKind.java`.
 - **Context to Read:** `app/core/jobs/manager.py`, `app/core/host/resources.py`.
 - **Create:** `app/core/grid/__init__.py`, `app/core/grid/contracts.py`, `app/core/grid/executor.py`, `tests/core/grid/test_executor.py`.
 - **Frontend:** none in Core (UI belongs to AppGridControl / AppGridTest).
@@ -462,7 +483,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `OBS-PREVIOUS-CONDITION-20261029` (embedded below); Python validation errors are normative under `DEC-CORE-MIGRATION-20261029`.
 *Dependencies:* WO-C00.
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/conditions/Condition.class#validate(double,String)`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/conditions/Condition.java#validate(double,String)`.
 - **Context to Read:** this order's complete truth table; `pyproject.toml`.
 - **Create:** `app/core/trading/conditions.py`, `tests/core/trading/test_conditions.py`; empty `app/core/trading/__init__.py` if absent. **Frontend:** none.
 *Current -> target / action:* no shared scalar comparator is established by the audited tree; CREATE the named helper. Do not alter vectorized comparison blocks in this commit.
@@ -489,10 +510,12 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Feature:* the complete strategy-document evaluator and effects boundary; retained after the scalar-helper slice.
 *Evidence IDs:* `PREVIOUS-002` establishes the responsibility, not an executable Python schema or all rule semantics.
 *Dependencies:* WO-C05.02, WO-C06.03, WO-C08.01, WO-C09.02; AppWizard document/schema order.
-*Context to Read:* `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/backtestrunner/BacktestRunner.class`; `app/include/blocks/composition_runtime.py`, `app/include/blocks/order/runtime.py`, `app/include/blocks/order/types.py`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`; `app/include/blocks/composition_runtime.py`, `app/include/blocks/order/runtime.py`, `app/include/blocks/order/types.py`.
 *Exact reserved targets:* `app/core/trading/strategy/contracts.py`, `app/core/trading/strategy/runtime.py`, `tests/core/trading/strategy/test_runtime.py`.
 *Current -> target / action:* block composition/order protocols are reusable parts, not a complete strategy engine. Do not replace them with a second evaluator or infer a full runtime from `LiveOrderObj`/`ATMExit` names.
 *Required senior completion before READY:* define the complete StrategyDocument and event/effect variants, block-state ownership/lifetime, event ordering across symbols/timeframes, warm-up/no-value behavior, rule ordering, position/order ownership and exact evaluation errors. Include deterministic fixtures for conflicting entry rules, exit plus entry on one event, insufficient history, multi-series alignment and rejected order effects. `StrategyRuntime.evaluate` must not be published until its parameter and return fields and these observations are explicit. No executable stubs are authorized.
+
+*Source review — OBS-CORE-SOURCE-20261030:* Add `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/StrategyBase.java`, `strategy/MarketData.java`, `strategy/LiveOrderObj.java` and `backtest/SQBacktester.java` to Context. `StrategyBase` declares `Initialize()`, `OnBarUpdate()` and `callOnInit(TradingSetup)`; `Deinitialize()` and `OnEvent(ITradingEvent)` have default empty bodies. `setUpdateEventType` and `setReservedBars` enforce initialization-time use. This is a generated/subclass strategy lifecycle, not proof of a generic XML-tree `evaluate(document,event)` interpreter. Retain the target evaluator decision as explicit Haru design; the now-readable donor does not remove the need to specify its document/event/effect fields. Acceptance must distinguish initial setup, first eligible bar, subsequent updates and teardown; never equate an empty default event method with support for every event.
 
 ## Phase C08: SQTradingLib simulation and backtesting responsibilities
 
@@ -517,15 +540,19 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Retained callables:* `SimulatorClient.add_symbol`, `feed_tick`, `set_clock`, `order_check`, `order_send`, `seed_bar_history`, `seed_tick_history`, `get_bars`, `get_ticks`; signatures/defaults remain those of the Context source. No web component in Core.
 *Required senior completion before READY:* specify the exact factory/alias functions moved out of `base.py`, their provider registration owner, every direct generic dependency and compatibility import edit. Core must not acquire a dependency on a concrete exchange workspace. Preserve current simulator fixtures for spread, order execution, SL/PT and seeded history; add no assumed donor fill priority. The current table's blanket DIRECT FIT does not settle this split.
 
+*Source review — OBS-CORE-SOURCE-20261030:* The blocker is entirely in target Python ownership. `base.py` combines `BrokerClient`, `TradingClient`, HTTP/rate-limit helpers and dynamic provider imports; source availability in the donor tree does not perform this split. The already named simulator tests remain the authoritative migration checks. Readable `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/simulator/impl/AbstractTradingSimulator.java` may inform later historical semantics, but must not change existing live/tick simulator behavior during this relocation.
+
 ### `BacktestRunner` - WO-C09.02 - BLOCKED-NOT-EXECUTABLE
 
 *Feature:* historical backtest orchestration with explicit strategy, event sequence and result contracts.
 *Evidence IDs:* `PREVIOUS-002`; existing source-class availability is not a complete algorithm specification.
 *Dependencies:* WO-C06.03 and WO-C09.01. The runner supplies events to WO-C08.02 through a separately specified interface; do not create a mutual import between the strategy evaluator and runner.
-*Context to Read:* `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/backtestrunner/BacktestRunner.class`; the same archive's simulator and settings bodies selected by that runner.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`; the same source tree's simulator and settings bodies selected by that runner.
 *Exact reserved targets:* `app/core/trading/backtest/contracts.py`, `app/core/trading/backtest/runner.py`, `app/core/trading/simulation/engine.py`, `tests/core/trading/backtest/test_runner.py`.
 *Current -> target / action:* no existing module has been established as a direct-fit full BacktestRunner. SimulatorClient is an input to this implementation, not evidence that it already exists.
 *Required senior completion before READY:* specify RunSpec/RunResult fields, bar/tick precision modes, open/high/low/close event order, bid/ask/spread, pending-order trigger and fill rules, gaps, commissions/swaps, margin/stop-out, sessions/timezones, netting/hedging and MAE/MFE measurement. Every mode must have a numeric fixture; one bar touching both SL and PT requires a literal expected first fill. Inspect readable previous bodies wherever build-145 bodies are inaccessible. No claim of MT4/MT5/TradeStation equivalence is authorized by class inventory alone.
+
+*Source review — OBS-CORE-SOURCE-20261030:* Replace the binary-only Context with `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/backtestrunner/BacktestRunner.java`, `BacktestSettings.java`, `BacktestResult.java`, plus `backtest/SQBacktester.java` and `simulator/impl/AbstractTradingSimulator.java`. `execute()` delegates to mode `3`; `execute(int)` runs the main setup, applies fitness/dismissal handling, conditionally runs cross-checks in mode 3, and clears partial results when stopped with reason 10002. `runBacktestOnMainSetup` invokes the first configured chart setup and then main-data fitness/global conditions. This settles orchestration source access. It does not turn mode 3 into a tick-precision constant: the precision and simulator classes selected by `SQBacktester` must be followed separately. Literal fill/gap fixtures remain required for each selected simulator.
 
 ## Phase C09: SQTradingLib statistics responsibilities
 
@@ -551,10 +578,24 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Feature:* compute the supported result-statistics set with exact metric dependencies and IS/OOS partitioning.
 *Evidence IDs:* `PREVIOUS-002`.
 *Dependencies:* WO-C10.01 and the accepted WO-C09.02 result/order contract.
-*Context to Read:* `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/results/stats/StatsComputer.class`; each metric implementation selected by that class, using primary readable extension source first when available.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/results/stats/StatsComputer.java`; each metric implementation selected by that class, using primary readable extension source first when available.
 *Exact reserved targets:* `app/core/trading/statistics/contracts.py`, `app/core/trading/statistics/service.py`, `tests/core/trading/statistics/test_service.py`.
 *Current -> target / action:* no direct-fit full statistics implementation was established in `app/include/metrics`; CREATE only after the complete formula specification below exists. Do not create the alternate `app/core/statistics/metrics.py` from COR-M01.
 *Required senior completion before READY:* enumerate metric IDs and formula bodies, dependency DAG, input trade ordering/ties, currency versus percentage versus R units, initial equity, costs, IS/OOS boundaries, sample/population denominators, annualization, zero-trade/zero-variance/zero-denominator behavior and output precision. Specify literal expected values for empty trades, one gain, one loss, all losses, flat equity and a known drawdown sequence. Reject an unsupported metric ID with a specified error; do not silently substitute a formula. A generic Sharpe or Sortino formula chosen by the executor is forbidden.
+
+*Source review — OBS-CORE-SOURCE-20261030:* Use `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/results/stats/StatsComputer.java`, `results/stats/comparator/OrderComparatorByCloseTime.java`, `DatabankColumn.java` and `OrdersList.java`. `initializeWithOrders` stores original/filtered lists; `filterBy` delegates to `OrdersList.filter`; sorting, statistics computation and filtered-list access require the filtered flag. Orders sort ascending by CloseTime; equal timestamps compare equal. Metrics are registered DatabankColumn extensions and ordered by their simple-class-name dependencies, rather than formulas embedded in StatsComputer. Per-column compute exceptions store -1; P/L restrictions can skip computation. The decompiled direction-restriction branch contains an empty conditional: verify bytecode before assigning direction-restriction behavior. Therefore the default production error policy cannot be inferred as universally fail-fast or silently -1. The independent dependency-order helper WO-C10.03 below is fully specified; the full metric service remains gated by selected formulas and order schema.
+
+### `MetricDependencyOrder` - WO-C10.03 - READY (bounded source-backed slice)
+
+*Feature:* order registered metric descriptors before statistics evaluation, independently of trade/order/result schemas. This does not complete WO-C10.02.
+*Evidence:* `OBS-CORE-SOURCE-20261030`; `StatsComputer.createDependencyGraph(ArrayList)` and `checkColumnDependsOnExistingColumn` in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/results/stats/StatsComputer.java`.
+*Dependencies:* WO-C01.
+*Create:* `app/core/trading/statistics/dependencies.py`, `tests/core/trading/statistics/test_dependencies.py`; create an empty package initializer only if absent. No metric implementations, registration side effects or formula changes.
+*Target types:* `MetricDependency` is a frozen, slotted dataclass with `metric_id: str` and `depends_on: tuple[str,...] = ()`; public `order_metrics(metrics: Sequence[MetricDependency]) -> tuple[MetricDependency,...]`. IDs are the selected Haru identifiers; they replace donor simple Java class names, and must be nonempty strings.
+*Behavior:* operate on a detached pending list; scan pending descriptors in input order, append any descriptor whose dependencies already occur in the ordered output, and remove it from pending. Dependencies appended earlier in the same scan are immediately visible. Continue scans until pending is empty. If a complete scan makes no progress, raise `DomainError(code='UNRESOLVED_METRIC_DEPENDENCY', message='Metric dependencies cannot be resolved', details={'pending_ids':[...]} )` with unresolved IDs in original input order. Missing IDs and cycles both take this unresolved path, matching the donor's inability to resolve either case. Validate duplicate/empty IDs before sorting and raise `DomainError(code='INVALID_METRIC_REGISTRY', message='Metric identifiers must be unique and non-empty')`; this explicit validation is Haru policy because the donor source does not define duplicate registration safety. Do not mutate descriptors, caller sequence or dependency tuples; do not import concrete metrics.
+*Exact fixtures:* input `[B(depends_on A), C(), A()]` yields `[C,A,B]`; `[A(),B(A),C(B)]` yields `[A,B,C]`; empty input yields `()`; `[A(B),B(A)]` raises unresolved with pending_ids `['A','B']`; `[B(Missing)]` raises unresolved with pending_ids `['B']`; duplicate A raises invalid-registry; verify the input list order remains unchanged after success and failure. No RNG or runtime donor execution is required for this helper.
+*Acceptance:* `uv run python -m pytest tests/core/trading/statistics/test_dependencies.py -q` exits 0 and collects exactly eight tests: stable multi-pass order, same-pass dependencies, empty registry, cycle, missing dependency, duplicate ID, empty ID, and unchanged inputs on success/failure. Empty ID raises the stated invalid-registry error. Use the exact expected orders and error details above; a generic graph library is unnecessary.
+*Commit:* `core: order metric dependencies with stable source-backed scanning`.
 
 ## Phase C10: shared persistence and project/result containers
 
@@ -581,10 +622,26 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Feature:* shared project/strategy/result serialization and databank persistence, distinct from the existing metadata gateway.
 *Evidence IDs:* `PREVIOUS-002`; a `.cfx` project observation must not be generalized to strategy/results containers.
 *Dependencies:* WO-C11.01, WO-C08.02 document contract, WO-C09.02 result contract; AppTaskManager project/task schema.
-*Context to Read:* `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/file/SQFileManager.class`; inspected primary project/strategy samples selected for the relevant container type. Exclude personal strategy data from committed fixtures.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`; inspected primary project/strategy samples selected for the relevant container type. Exclude personal strategy data from committed fixtures.
 *Exact reserved targets:* `app/core/trading/project/contracts.py`, `app/core/trading/project/store.py`, `app/core/trading/results/contracts.py`, `app/core/trading/results/store.py`, `tests/core/trading/project/test_store.py`, `tests/core/trading/results/test_store.py`.
 *Current -> target / action:* HostPersistence is reusable infrastructure, not an existing ProjectStore/ResultStore. No current direct-fit source has been established for these two stores.
 *Required senior completion before READY:* separately specify each accepted container type, member names, XML/JSON root/field mappings, version/migration policy, unknown-field handling, reference identity, atomic replacement, corrupt/missing-member failures and databank transaction boundaries. Supply synthetic round-trip and corrupt-container fixtures with exact expected outputs/errors. The former flat-ZIP/`config.xml` statement is not a complete schema and does not authorize guessed `ProjectDocument` or `RunResult` fields.
+
+*Source review — OBS-CORE-SOURCE-20261030:* Use `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java` and `results/file/` sources. `loadProjectConfig(File)` reads `config.xml`; `loadTaskConfigs(File)` reads every other ZIP entry as nonempty XML and wraps malformed task failures with the member name. `saveProjectFile(SQProject,File)` requires the config Tasks count to equal task-object count, then writes config and each task's named XML using UTF-8. `createProjectFile(File,Element,HashMap)` exposes a lower-level config-plus-task-documents writer. It does not prove strategy/result schemas or atomic cross-databank moves. WO-C11.03 below now supplies a bounded project-envelope adapter independent of those schemas. Preserve the larger ProjectStore/ResultStore gate rather than applying project ZIP assumptions to result binaries.
+
+### `ProjectEnvelope` - WO-C11.03 - READY (bounded source-backed slice)
+
+*Feature:* read/write a project config XML document plus named task XML documents without interpreting the full project/strategy schema. This does not complete WO-C11.02 or authorize result-container support.
+*Evidence:* `OBS-CORE-SOURCE-20261030`; `SQFileManager.createProjectFile`, `loadProjectConfig` and `loadTaskConfigs` in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`.
+*Dependencies:* WO-C01. No dependency on StrategyDocument or RunResult, since XML is opaque at this boundary.
+*Create:* `app/core/trading/project/envelope.py`, `tests/core/trading/project/test_envelope.py`; create an empty package initializer only if absent.
+*Target API:* frozen/slotted `ProjectEnvelope(config_xml: str, task_xml: Mapping[str,str])`; `read_project_envelope(path: Path) -> ProjectEnvelope`; `write_project_envelope(path: Path, envelope: ProjectEnvelope) -> None`. Constructor detaches task_xml into a read-only mapping. Preserve XML strings semantically and retain text on successful read/write; this helper performs validation without reserializing trees. No namespace, root name, task filename pattern, task count or strategy version is invented here.
+*Container contract:* one `config.xml` UTF-8 XML member and zero or more other UTF-8 XML members. Validate every document is nonempty and well-formed. Reject duplicate ZIP names, directory entries, absolute names, drive-prefixed names, backslashes, `.`/`..` segments and any task key equal to config.xml. Paths are ZIP member keys only; never extract to disk. This strict admission policy is an explicit Haru decision; the donor loader does not provide these protections.
+*Error contract:* missing path raises `DomainError(code='PROJECT_FILE_NOT_FOUND', message='Project file not found')`; malformed ZIP, absent config.xml, non-UTF-8 member, empty/malformed XML or rejected member name raises `DomainError(code='INVALID_PROJECT_CONTAINER', message='Invalid project container', details={'member':name})`, with member `''` for failures without a known member. I/O failures other than missing input propagate as OSError. Reject XML containing a DOCTYPE declaration, using the same invalid-container error; no external entity resolution is permitted.
+*Write policy:* validate the entire envelope before opening a destination; encode UTF-8; write config.xml first and tasks in sorted key order to a temporary sibling ZIP, close successfully, then `os.replace` it over path. Parent directory must already exist. On any pre-replacement failure retain the prior destination unchanged and remove the temporary file. Atomic replacement and sorted output order are explicit Haru decisions; do not describe them as observed donor guarantees. This helper does not update a databank or emit project events.
+*Exact fixtures:* round-trip config `<Project><Tasks/></Project>` plus `TaskBuild-Task1.xml` containing `<TaskSettings><Value>7</Value></TaskSettings>` and assert identical strings and member keys. Config-only archive round-trips. Missing config, duplicate task member, empty task member, malformed XML, non-UTF-8 bytes and `../escape.xml` each raise the stated code with the offending member. Monkeypatch replacement to fail and assert the previous destination bytes remain unchanged and no temporary file remains. A rejected envelope must never truncate the prior archive.
+*Acceptance:* `uv run python -m pytest tests/core/trading/project/test_envelope.py -q` exits 0. Fixtures contain only synthetic XML. ZIP byte identity is not required; member names and XML text are.
+*Commit:* `core: add a validated project XML envelope adapter`.
 
 ## Phase C11: shared generation, optimization and portfolio primitives
 
@@ -612,10 +669,12 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Feature:* retain full shared generation/optimization responsibilities and determine the reusable portfolio boundary without duplicating concrete workspace algorithms.
 *Evidence IDs:* `PREVIOUS-002`, `PREVIOUS-010`.
 *Dependencies:* WO-C12.01, WO-C05.02, WO-C08.02, WO-C09.02, WO-C10.02 and accepted strategy/result contracts.
-*Context to Read:* `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar` generation/optimization implementations; `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/` source selected by the AppPortfolioComposer order. The latter is primary workspace evidence, not proof that its concrete algorithm belongs in Core.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/tradinglib` generation/optimization implementations; `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer` source selected by the AppPortfolioComposer order. The latter is primary workspace evidence, not proof that its concrete algorithm belongs in Core.
 *Exact reserved targets:* `app/core/trading/generation/engine.py`, `app/core/trading/optimization/engine.py`, `tests/core/trading/test_research_engines.py`. `app/core/trading/portfolio/engine.py` is a proposed target only if a shared primitive is established; it is not authorized as a duplicate Composer.
 *Current -> target / action:* RNG and existing block/composition infrastructure are reusable primitives. No direct-fit complete genetic/random builder, optimizer or portfolio engine is established by the current audit.
 *Required senior completion before READY:* state genotype/parameter schemas, seeded selection/crossover/mutation, population/island lifecycle, duplicate identity, acceptance/ranking/ties, stop conditions, checkpoint/resume, candidate/result persistence and progress/cancellation. Optimization also needs exact grid ordering, walk-forward windows and clustering math. Portfolio algorithms proven to be concrete plugins remain in their owning workspace. Each algorithm requires small numeric fixtures and deterministic seeded expected outputs; decompiler reconstruction must be checked against bytecode where ambiguous. Do not combine these engines into one implementation commit.
+
+*Source review — OBS-CORE-SOURCE-20261030:* Read `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/generator/StrategyGenerator.java`, `gp/TournamentSelection.java`, `gp/GPGenerationalEngine.java`, `optimization/OptimizationIndexes.java`, `optimization/OptimizationEngineSimple.java` and `optimization/OptimizationEngineWF.java`. Tournament selection samples three candidates with replacement, sorts with GPFitnessComparator, and uses probability 0.8 for ranked picks; non-natural fitness is rejected by its public select method. The outer method mutates the supplied population when duplicate GPIDs exceed its threshold, so a generic non-mutating textbook tournament is not equivalent. OptimizationIndexes carries a short-index vector, fitness, GPIDs and optional result; clones copy vector and result. These bodies settle where to research, not an accepted Python genotype, search policy or seed-equivalence contract. Select algorithms separately; no entire-engine READY claim follows from source presence.
 
 ## Phase C12: SQJobsLib lifecycle and databank jobs
 
@@ -625,7 +684,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `PREVIOUS-004`, `OBS-HARU-CORE-BASELINE-20261029`, `DEC-CORE-MIGRATION-20261029`. Donor namespace is `com.strategyquant.jobslib`, not `com.strategyquant.jobs`.
 *Dependencies:* WO-C11.01; `app/core/host/events.py` and `app/core/host/resources.py` already exist.
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar!com/strategyquant/jobslib/SQJob.class`; `JobEngine.class` in that namespace.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/jobslib/SQJob.java`; `DONOR_REFERENCE_ROOT/internal/libs/jobslib/JobEngine.java` in that source namespace.
 - **Context to Read:** `app/core/jobs/manager.py`, `app/core/host/events.py`, `app/core/host/resources.py`, `tests/core/jobs/test_manager.py`.
 - **Backend / test targets:** `app/core/jobs/manager.py`, `tests/core/jobs/test_manager.py` (RETAIN). **Create / frontend:** none.
 *Current -> target / action:* historical `app/host/jobs.py` -> existing `app/core/jobs/manager.py`; preserve that completed move. Do not create another manager under `app/core/grid`.
@@ -642,10 +701,12 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Feature:* asynchronous add/delete/load/move databank operations over the accepted result store.
 *Evidence IDs:* `PREVIOUS-004` identifies the four concrete previous classes.
 *Dependencies:* WO-C13.01 and WO-C11.02; AppResults databank identity/selection contract.
-*Context to Read:* `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar!com/strategyquant/jobslib/databank/AddToDatabankJob.class`, `DeleteFromDatabankJob.class`, `LoadFileToDatabankJob.class`, `MoveToDatabankJob.class` in that directory.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/AddToDatabankJob.java`, `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/DeleteFromDatabankJob.java`, `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/LoadFileToDatabankJob.java`, `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank/MoveToDatabankJob.java` in that directory.
 *Exact reserved targets:* `app/core/jobs/databank.py`, `tests/core/jobs/test_databank.py`.
 *Current -> target / action:* no existing DatabankJobs facade established. Reuse JobManager for scheduling and ResultStore for writes; do not create another pool or database gateway.
 *Required senior completion before READY:* define each request/response, duplicate identity policy, move atomicity across banks, progress totals, cancellation boundary, partial-failure/result summary and conflict errors. Give fixtures for duplicate add, corrupt import, cancel during multi-item move and destination failure; identify exact final source/destination contents. `DatabankJobs.move(MoveRequest)` is not executable until these fields and outputs are specified.
+
+*Source review — OBS-CORE-SOURCE-20261030:* Context is now the four `.java` files under `DONOR_REFERENCE_ROOT/internal/libs/jobslib/databank`. `AddToDatabankJob.run()` clones the ResultsGroup, calls `databank.add(clone,true)`, then updates best results. `LoadFileToDatabankJob.run()` resolves Program `Loader`, calls `loadFile` with the absolute filename, then adds and updates best results. Crucially, `DeleteFromDatabankJob.run()` and `MoveToDatabankJob.run()` are empty in this supplied reference. No progress, cancellation or transaction contract is supplied by these jobs. A functional Python delete/move requires the stated explicit Haru store/atomicity design and tests; copying an empty donor body or declaring transactional behavior verified would both be wrong.
 
 ## Phase C13: SQWebGUILib responsibilities adapted to FastAPI
 
@@ -655,7 +716,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `OBS-HARU-CORE-BASELINE-20261029`, `DEC-CORE-MIGRATION-20261029`; donor web carrier inventory is not evidence that SQX uses FastAPI.
 *Dependencies:* WO-C04, WO-C11.01, WO-C13.01; existing session/vault/event services.
 *Implementation Files:*
-- **Donor:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWebGUILib.jar` (responsibility boundary only).
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/lib/app/webserver` (responsibility boundary only).
 - **Context to Read:** `app/core/host/transport.py`, `app/core/host/session.py`, `app/core/host/events.py`, `app/core/host/vault.py`, `app/core/lib/responses.py`, `tests/core/host/test_transport.py`.
 - **Backend / test targets:** `app/core/host/transport.py`, `tests/core/host/test_transport.py` (RETAIN). **Create / frontend:** none.
 *Current -> target / action:* old `app/host/transport.py` -> existing `app/core/host/transport.py`; retain it rather than adding competing `host/app.py` or `host/errors.py` adapters.
@@ -677,11 +738,13 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `OBS-CORE-CARRIER-INVENTORY-20261029` establishes previous class members; `OBS-HARU-CORE-BASELINE-20261029` records that the proposed current source directory contains no Python source files.
 *Dependencies:* accepted WO-C08.02 strategy document; AppWizard transformation/template specification; AppCodeEditor extension metadata.
 *Implementation Files:*
-- **Donor / Context to Read:** `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar!com/strategyquant/wizard/desktop/loader/TransformEngineLoader.class`, `loader/engines/Engine.class`, `loader/engines/Engines.class`, `loader/StrategyLoader.class` in the same archive; primary readable transformation resources assigned to AppWizard.
+- **Donor / Context to Read:** `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java`, `DONOR_REFERENCE_ROOT/internal/libs/business/loader/engines/Engine.java`, `DONOR_REFERENCE_ROOT/internal/libs/business/loader/engines/Engines.java`, `DONOR_REFERENCE_ROOT/internal/libs/business/loader/StrategyLoader.java` in the same source tree; primary readable transformation resources assigned to AppWizard.
 - **Reserved backend:** `app/core/wizard/transform.py`; **reserved test:** `tests/core/wizard/test_transform.py`. **Frontend:** belongs to AppWizard, none in Core.
 *Current -> target / action:* `app/workspace/algo_wizard/` is not a direct-fit implementation: no `.py` source was found. Ignored bytecode directories are not migration sources. No established Jinja2 exporter exists there.
 *Required senior completion before READY:* enumerate actual supported engine/platform IDs and versions, loader inputs and template lookup, AST import/export field mappings, custom indicator parameter conversion, unsupported-node behavior, exact output line-ending/formatting policy and round-trip loss limits. Supply synthetic strategy input and complete expected output for each supported target. Do not invent an MQL5/cTrader/EasyLanguage renderer from the carrier's name, or add Jinja2 without a concrete target decision.
 *Commit:* none until a complete READY transform order replaces this gate. This retains the full capability rather than treating the source inventory as its implementation.
+
+*Source review — OBS-CORE-SOURCE-20261030:* Replace binary-only Context with `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java`, `StrategyLoader.java`, `Template.java`, `engines/Engine.java`, `engines/Engines.java` and `utils/FileUtils.java`. Template discovery accepts directories containing `Main.tpl`; ID is the directory name, while name/extension/description/form come from tags in that template. `performTransformCode(String,String)` fixes renamed action parameters, normalizes indicator attributes, normalizes XML whitespace, loads `<template-id>/Main.tpl` using FreeMarker, and renders with `doc` plus `blockFileExists` template helpers. Engine/Engines are name/URL DTOs and do not enumerate a supported-platform catalogue. The wrapper getResult emits duplicate JSON result keys in the decompiled source: do not reproduce that as a new Haru response contract. Actual template files and golden output still need review; Jinja2 equivalence is not established by this FreeMarker pipeline.
 
 ## Phase C15: SQAppLib carrier attribution
 
@@ -691,7 +754,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Evidence IDs:* `LIB-002`, `RECOVERY-001`, `RECOVERY-002`, `PREVIOUS-002`, `OBS-CORE-ORDER-CORRECTION-001`.
 *Dependencies:* none for using previous-build behavioral evidence. Exact build-145 carrier verification requires independently readable current bytes.
 *Implementation Files:*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/libs/SQAppLib.jar.enc`; fallback `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/libs/lib`; fallback `DONOR_REFERENCE_ROOT/internal/libs/tradinglib`.
 - **Context to Read:** the named embedded evidence records in this file.
 - **Edit:** `docs/dev/full-reimplementation/01-AppCore.md` only, when new observations exist. **Production / tests / frontend:** none.
 *Current -> target / action:* encrypted carrier -> evidence-backed shared responsibilities under `app/core`; fallback class ownership does not establish the contents of the current encrypted carrier.
@@ -720,13 +783,20 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit if changes are required:* `core: preserve application and headless entrypoint contracts`.
 *Limitations:* current factory/router verification does not prove the migrated React production build is served; that integration is retained below.
 
-### `WebBuildServing` - WO-C17.02 - BLOCKED-NOT-EXECUTABLE
+### `WebBuildServing` - WO-C17.02 - READY (Haru integration decision)
 
 *Feature:* serve the single `app/web` React/Vite build through the Python application entrypoint after AppHome shell migration; no Electron process.
-*Evidence:* the user's explicit architecture decision; `DEC-CORE-MIGRATION-20261029`.
-*Dependencies:* WO-C17.01, AppHome shell/router migration and the finalized React route catalogue.
-*Context to Read / exact proposed edits:* `app/main.py`, `app/web/vite.config.ts`, `app/web/index.html`, `tests/host/test_main.py`; target output is `app/web/dist/index.html` produced by Vite, not committed source.
-*Required senior completion before READY:* pin static mount paths, SPA fallback exclusions for API/events/health, absent-build behavior, development server integration and cache headers. Specify acceptance requests for a real client route, a missing asset, an unknown API route and an absent build with exact status/content types. Do not add a catch-all route that masks API errors. No serving code is authorized by the bootstrap-only WO-C00.
+*Evidence:* user's architecture decision and `OBS-CORE-SOURCE-20261030` target review; this is a Haru serving contract, not donor servlet parity.
+*Dependencies:* WO-C17.01; AppHome shell/router migration must exist. Source specification is ready; execute only after those prerequisites land.
+*Context to Read:* `app/main.py`, `app/web/vite.config.ts`, `app/web/index.html`, `tests/host/test_main.py`, AppHome's finalized client routes.
+*Edit:* `app/main.py`; *create:* `tests/host/test_web_build.py`. Do not commit Vite `dist` output or alter host API routes.
+*Exact target contract:* add `install_web_build(application: FastAPI, build_dir: Path) -> None` and invoke it once in `create_app`, using `Path(__file__).resolve().parent / 'web' / 'dist'`. Register all API/health routes before the web routes. If build_dir/index.html is absent, register a final GET/HEAD fallback returning status 503, JSON `{'detail':'Web build unavailable'}`, `Cache-Control: no-store`; reserved paths retain ordinary API 404 behavior below. Do not silently create a development proxy.
+- Serve existing files inside the resolved build directory with their MIME type, denying path escapes. `/assets/*` missing files return 404; paths with a suffix requesting a nonexistent file return 404. Every existing file under `/assets/` receives `Cache-Control: public, max-age=31536000, immutable`; other files receive `no-cache`. This is a target build-layout policy: the build must place versioned assets there; the server does not guess whether a filename contains a hash.
+- GET/HEAD `/` and extensionless client paths return index.html as text/html with `Cache-Control: no-cache`, provided the build exists. Unknown extensionless paths may reach the client router's own not-found screen; this is an explicit Haru SPA choice.
+- Exclude `/api`, `/api/*`, `/events`, `/events/*`, `/health`, `/health/*` from the fallback, independent of build existence. Unknown reserved paths return the normal 404 JSON response; methods other than GET/HEAD are not SPA-routed. Preserve existing `/health` handler.
+- Development remains the existing Vite command run separately; production serving introduces no dev-server subprocess or new dependency.
+*Acceptance:* use TestClient and a synthetic temporary build containing index.html plus assets/app-123.js. Assert `/` and `/builder` return 200 text/html containing the synthetic marker; `/assets/app-123.js` returns 200 JavaScript with immutable caching; missing `/assets/missing.js` and `/missing.css` return 404; `/api/unknown` returns 404 JSON and contains no HTML marker. With absent build, `/builder` returns the specified 503 JSON while `/api/unknown` remains 404. Test HEAD returns no body, `/health` remains successful, and a traversal attempt does not expose a file outside build_dir. Run `uv run python -m pytest tests/host/test_web_build.py tests/host/test_main.py -q`, then the existing app/web build command.
+*Commit:* `core: serve the migrated web build with explicit SPA boundaries`.
 
 ## Phase C17: CodeEditor carrier ownership
 
@@ -814,7 +884,7 @@ These records preserve the historical claim and its correction. They do not chan
   ],
   "target_domain": "app/core",
   "limitations": "The historical table mixed fallback inventories, unregistered observation labels, target designs and unsupported claims of complete algorithms/current-carrier attribution. Its original observation labels do not become validated records through this snapshot.",
-  "historical_table": "\u2014 evidence-gated & unblocked specifications\n\nFollowing the successful disassembly and investigation of unencrypted donor libraries in SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/ (SQTradingLib.jar, SQDataLib.jar, SQJobsLib.jar, SQPluginLib.jar, SQGridLib2.jar), the contracts below are fully unblocked with literal donor class and method evidence.\n\n| Order / feature | Verbatim evidence ID | Exact target files (create only after READY) | Verified callable & signatures | Concrete donor evidence & behavioral specifications |\n| --- | --- | --- | --- | --- |\n| WO-C04 SQLib settings/persistence | PREVIOUS-009 / OBS-CORE-SETTINGS-001 | app/core/host/settings.py; tests/core/host/test_settings.py | SettingsStore.read(scope: str) -> SettingsSnapshot; SettingsStore.patch(scope: str, values: dict, expected_revision: int) -> SettingsSnapshot | Verified against com.strategyquant.lib.SettingsMap: scopes stored in SQLite/JSON; optimistic concurrency via revision integer; atomic patch with rollbacks. |\n| WO-C05 extension discovery/reload | PREVIOUS-005 / OBS-CORE-EXT-001 | app/core/lib/registry.py; tests/core/lib/test_registry.py | ExtensionRegistry.register(descriptor: ExtensionDescriptor) -> None; ExtensionRegistry.reload(extension_id: str) -> ReloadResult | Verified against com.strategyquant.lib.snippets.CustomClassesLoader: dynamic inspection of decorated classes (@BuildingBlock, @Parameter, @Output); runtime hot-reload. |\n| WO-C06 SQDataLib catalogue and IO | PREVIOUS-001 / OBS-CORE-DATA-001 | app/core/data/contracts.py; app/core/data/catalog.py; app/core/data/io.py; tests/core/data/test_catalog.py; tests/core/data/test_io.py | DataCatalog.read(ref: DatasetRef, start: int, end: int) -> DataBatch | Verified against com.strategyquant.datalib.TimeframeManager & DataSeries: millisecond UTC timestamps; standard intervals (TF_M1=60k ms, TF_H1=3.6M ms, TF_D1=86.4M ms); OHLCV double arrays; zero-copy Polars partition batches. |\n| WO-C07 SQGridLib2 performers | PREVIOUS-003 / OBS-CORE-GRID-001 | app/core/grid/contracts.py; app/core/grid/executor.py; tests/core/grid/test_executor.py | JobExecutor.submit(operation_id: str, payload: dict) -> JobHandle | Verified against com.strategyquant.grid.JobExecutor: async job queue; cancellation token support; worker node heartbeats and payload dispatch. |\n| WO-C08 SQTradingLib strategy runtime | PREVIOUS-002 / OBS-CORE-STRAT-001 | app/core/trading/strategy/contracts.py; app/core/trading/strategy/runtime.py; tests/core/trading/strategy/test_runtime.py | StrategyRuntime.evaluate(strategy: StrategyDocument, event: EvaluationEvent) -> StrategyEffects | Verified against com.strategyquant.tradinglib.strategy.LiveOrderObj & ATMExit: rule conditions, signal evaluations, order modification brackets (SL, PT, trailing stop, break-even). |\n| WO-C09 SQTradingLib simulation/backtest | PREVIOUS-002 / OBS-CORE-SIM-001 | app/core/trading/backtest/contracts.py; app/core/trading/backtest/runner.py; app/core/trading/simulation/engine.py; tests/core/trading/backtest/test_runner.py | BacktestRunner.run(spec: RunSpec) -> RunResult | Verified against com.strategyquant.tradinglib.simulator.impl.AbstractTradingSimulator: MT4, MT5 Hedged, MT5 Netted, TradeStation engines; gap handling; realistic SL/PT fill checks; MAE/MFE tracking. |\n| WO-C10 SQTradingLib statistics | PREVIOUS-002 / OBS-CORE-STATS-001 | app/core/trading/statistics/contracts.py; app/core/trading/statistics/service.py; tests/core/trading/statistics/test_service.py | StatisticsService.compute(result: RunResult, metric_ids: tuple[str,...]) -> MetricResults | Verified against com.strategyquant.tradinglib.results.stats.StatsComputer: order sorting (OrderComparatorByCloseTime); IS/OOS splits; Net Profit, Drawdown, Sharpe, Sortino, SQN, Stability $R^2$. |\n| WO-C11 project/databank persistence | PREVIOUS-002 / OBS-CORE-CFX-001 | app/core/trading/project/contracts.py; app/core/trading/project/store.py; app/core/trading/results/contracts.py; app/core/trading/results/store.py; tests/core/trading/project/test_store.py | ProjectStore.load(project_id: str) -> ProjectDocument; ResultStore.commit(result: RunResult) -> str | Verified against com.strategyquant.tradinglib.file.SQFileManager: .cfx container specification (flat ZIP with config.xml task graph and <TaskType>-Task<N>.xml settings documents). |\n| WO-C12 generation/optimization/portfolio | PREVIOUS-002 / OBS-CORE-GEN-001 | app/core/trading/generation/engine.py; app/core/trading/optimization/engine.py; app/core/trading/portfolio/engine.py; tests/core/trading/test_research_engines.py | GenerationEngine.run(spec: GenerationSpec) -> CandidateStream; OptimizationEngine.run(spec: OptimizationSpec) -> VariantStream; PortfolioEngine.evaluate(spec: PortfolioSpec) -> PortfolioResult | Verified against com.strategyquant.tradinglib.generator & optimization: Random & Genetic generation; island evolution; walk-forward parameter matrix clustering. |\n| WO-C13 SQJobsLib jobs | PREVIOUS-004 / OBS-CORE-JOBS-001 | app/core/jobs/databank.py; tests/core/jobs/test_databank.py | DatabankJobs.move(request: MoveRequest) -> JobHandle | Verified against com.strategyquant.jobs: background thread pool operations, progress event listener dispatch, cancellation tokens. |\n| WO-C14 SQWebGUILib / FastAPI | PREVIOUS-006 / OBS-CORE-WEB-001 | app/core/host/app.py; app/core/host/errors.py; app/core/host/events.py; tests/core/host/test_app.py | create_app(services: CoreServices) -> FastAPI | Verified against app/host/transport.py: FastAPI server setup with WebSocket streaming, CORS middleware, session guards. |\n| WO-C15 SQWizardBusiness | PREVIOUS-007 / OBS-CORE-WIZ-001 | app/core/wizard/transform.py; tests/core/wizard/test_transform.py | StrategyTransformer.transform(document: StrategyDocument, platform: str) -> ExportResult | Verified against app/workspace/algo_wizard/: rule AST serialization and Jinja2 code generation templates for MQL5, cTrader, EasyLanguage. |\n| WO-C16 SQAppLib 145 | LIB-002 | docs/dev/full-reimplementation/01-AppCore.md | Verification completed | SQAppLib.jar.enc bundles tradinglib, stats, simulator, and file packages; verified mapped to app/core/ and app/workspaces/. |\n| WO-C17 StrategyQuant entrypoint | LIB-009 / OBS-CORE-ENTRY-001 | app/main.py; app/cli.py; tests/core/test_entrypoints.py | main() -> int; cli_main(argv: list[str]) -> int | Headless CLI commands and FastAPI application launcher verified. |\n| WO-C18 CodeEditor carrier | LIB-008 / OBS-CORE-CE-001 | app/workspaces/code_editor/; tests/workspaces/code_editor/ | CodeEditorService.compile(source: str) -> CompileResult | Verified against app/workspace/code_editor/editor.py and dynamic Python AST compilation. |\n| WO-C19 Snippets artifact | PREVIOUS-008 / OBS-CORE-SNIP-001 | app/extend/blocks/; app/core/lib/registry.py | ExtensionCatalog.list() -> tuple[ExtensionDescriptor,...] | 233+ registered blocks in app/include/blocks/ verified; catalog exposure unblocked. |\n| WO-C20 runtime/dependency replacement | LIB-001 / OBS-CORE-DEP-001 | pyproject.toml; uv.lock | Runtime verification completed | Python 3.14 + FastAPI + Polars + DuckDB + PyArrow + NumPy verified in pyproject.toml. |\n\n*Context to Read:* The verified donor classes in SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar and SQDataLib.jar, and the target contracts in app/core/data/contracts.py.",
+  "historical_table": "\u2014 evidence-gated & unblocked specifications\n\nFollowing the successful disassembly and investigation of unencrypted donor libraries in DONOR_REFERENCE_ROOT/internal/libs/ (SQTradingLib.jar, SQDataLib.jar, SQJobsLib.jar, SQPluginLib.jar, SQGridLib2.jar), the contracts below are fully unblocked with literal donor class and method evidence.\n\n| Order / feature | Verbatim evidence ID | Exact target files (create only after READY) | Verified callable & signatures | Concrete donor evidence & behavioral specifications |\n| --- | --- | --- | --- | --- |\n| WO-C04 SQLib settings/persistence | PREVIOUS-009 / OBS-CORE-SETTINGS-001 | app/core/host/settings.py; tests/core/host/test_settings.py | SettingsStore.read(scope: str) -> SettingsSnapshot; SettingsStore.patch(scope: str, values: dict, expected_revision: int) -> SettingsSnapshot | Verified against com.strategyquant.lib.SettingsMap: scopes stored in SQLite/JSON; optimistic concurrency via revision integer; atomic patch with rollbacks. |\n| WO-C05 extension discovery/reload | PREVIOUS-005 / OBS-CORE-EXT-001 | app/core/lib/registry.py; tests/core/lib/test_registry.py | ExtensionRegistry.register(descriptor: ExtensionDescriptor) -> None; ExtensionRegistry.reload(extension_id: str) -> ReloadResult | Verified against com.strategyquant.lib.snippets.CustomClassesLoader: dynamic inspection of decorated classes (@BuildingBlock, @Parameter, @Output); runtime hot-reload. |\n| WO-C06 SQDataLib catalogue and IO | PREVIOUS-001 / OBS-CORE-DATA-001 | app/core/data/contracts.py; app/core/data/catalog.py; app/core/data/io.py; tests/core/data/test_catalog.py; tests/core/data/test_io.py | DataCatalog.read(ref: DatasetRef, start: int, end: int) -> DataBatch | Verified against com.strategyquant.datalib.TimeframeManager & DataSeries: millisecond UTC timestamps; standard intervals (TF_M1=60k ms, TF_H1=3.6M ms, TF_D1=86.4M ms); OHLCV double arrays; zero-copy Polars partition batches. |\n| WO-C07 SQGridLib2 performers | PREVIOUS-003 / OBS-CORE-GRID-001 | app/core/grid/contracts.py; app/core/grid/executor.py; tests/core/grid/test_executor.py | JobExecutor.submit(operation_id: str, payload: dict) -> JobHandle | Verified against com.strategyquant.grid.JobExecutor: async job queue; cancellation token support; worker node heartbeats and payload dispatch. |\n| WO-C08 SQTradingLib strategy runtime | PREVIOUS-002 / OBS-CORE-STRAT-001 | app/core/trading/strategy/contracts.py; app/core/trading/strategy/runtime.py; tests/core/trading/strategy/test_runtime.py | StrategyRuntime.evaluate(strategy: StrategyDocument, event: EvaluationEvent) -> StrategyEffects | Verified against com.strategyquant.tradinglib.strategy.LiveOrderObj & ATMExit: rule conditions, signal evaluations, order modification brackets (SL, PT, trailing stop, break-even). |\n| WO-C09 SQTradingLib simulation/backtest | PREVIOUS-002 / OBS-CORE-SIM-001 | app/core/trading/backtest/contracts.py; app/core/trading/backtest/runner.py; app/core/trading/simulation/engine.py; tests/core/trading/backtest/test_runner.py | BacktestRunner.run(spec: RunSpec) -> RunResult | Verified against com.strategyquant.tradinglib.simulator.impl.AbstractTradingSimulator: MT4, MT5 Hedged, MT5 Netted, TradeStation engines; gap handling; realistic SL/PT fill checks; MAE/MFE tracking. |\n| WO-C10 SQTradingLib statistics | PREVIOUS-002 / OBS-CORE-STATS-001 | app/core/trading/statistics/contracts.py; app/core/trading/statistics/service.py; tests/core/trading/statistics/test_service.py | StatisticsService.compute(result: RunResult, metric_ids: tuple[str,...]) -> MetricResults | Verified against com.strategyquant.tradinglib.results.stats.StatsComputer: order sorting (OrderComparatorByCloseTime); IS/OOS splits; Net Profit, Drawdown, Sharpe, Sortino, SQN, Stability $R^2$. |\n| WO-C11 project/databank persistence | PREVIOUS-002 / OBS-CORE-CFX-001 | app/core/trading/project/contracts.py; app/core/trading/project/store.py; app/core/trading/results/contracts.py; app/core/trading/results/store.py; tests/core/trading/project/test_store.py | ProjectStore.load(project_id: str) -> ProjectDocument; ResultStore.commit(result: RunResult) -> str | Verified against com.strategyquant.tradinglib.file.SQFileManager: .cfx container specification (flat ZIP with config.xml task graph and <TaskType>-Task<N>.xml settings documents). |\n| WO-C12 generation/optimization/portfolio | PREVIOUS-002 / OBS-CORE-GEN-001 | app/core/trading/generation/engine.py; app/core/trading/optimization/engine.py; app/core/trading/portfolio/engine.py; tests/core/trading/test_research_engines.py | GenerationEngine.run(spec: GenerationSpec) -> CandidateStream; OptimizationEngine.run(spec: OptimizationSpec) -> VariantStream; PortfolioEngine.evaluate(spec: PortfolioSpec) -> PortfolioResult | Verified against com.strategyquant.tradinglib.generator & optimization: Random & Genetic generation; island evolution; walk-forward parameter matrix clustering. |\n| WO-C13 SQJobsLib jobs | PREVIOUS-004 / OBS-CORE-JOBS-001 | app/core/jobs/databank.py; tests/core/jobs/test_databank.py | DatabankJobs.move(request: MoveRequest) -> JobHandle | Verified against com.strategyquant.jobs: background thread pool operations, progress event listener dispatch, cancellation tokens. |\n| WO-C14 SQWebGUILib / FastAPI | PREVIOUS-006 / OBS-CORE-WEB-001 | app/core/host/app.py; app/core/host/errors.py; app/core/host/events.py; tests/core/host/test_app.py | create_app(services: CoreServices) -> FastAPI | Verified against app/host/transport.py: FastAPI server setup with WebSocket streaming, CORS middleware, session guards. |\n| WO-C15 SQWizardBusiness | PREVIOUS-007 / OBS-CORE-WIZ-001 | app/core/wizard/transform.py; tests/core/wizard/test_transform.py | StrategyTransformer.transform(document: StrategyDocument, platform: str) -> ExportResult | Verified against app/workspace/algo_wizard/: rule AST serialization and Jinja2 code generation templates for MQL5, cTrader, EasyLanguage. |\n| WO-C16 SQAppLib 145 | LIB-002 | docs/dev/full-reimplementation/01-AppCore.md | Verification completed | SQAppLib.jar.enc bundles tradinglib, stats, simulator, and file packages; verified mapped to app/core/ and app/workspaces/. |\n| WO-C17 StrategyQuant entrypoint | LIB-009 / OBS-CORE-ENTRY-001 | app/main.py; app/cli.py; tests/core/test_entrypoints.py | main() -> int; cli_main(argv: list[str]) -> int | Headless CLI commands and FastAPI application launcher verified. |\n| WO-C18 CodeEditor carrier | LIB-008 / OBS-CORE-CE-001 | app/workspaces/code_editor/; tests/workspaces/code_editor/ | CodeEditorService.compile(source: str) -> CompileResult | Verified against app/workspace/code_editor/editor.py and dynamic Python AST compilation. |\n| WO-C19 Snippets artifact | PREVIOUS-008 / OBS-CORE-SNIP-001 | app/extend/blocks/; app/core/lib/registry.py | ExtensionCatalog.list() -> tuple[ExtensionDescriptor,...] | 233+ registered blocks in app/include/blocks/ verified; catalog exposure unblocked. |\n| WO-C20 runtime/dependency replacement | LIB-001 / OBS-CORE-DEP-001 | pyproject.toml; uv.lock | Runtime verification completed | Python 3.14 + FastAPI + Polars + DuckDB + PyArrow + NumPy verified in pyproject.toml. |\n\n*Context to Read:* The verified donor classes in DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar and SQDataLib.jar, and the target contracts in app/core/data/contracts.py.",
   "validation": {
     "status": "not-passed",
     "procedure": "Check each former callable, source location and verification assertion against inspected current source and donor records.",
@@ -854,8 +924,8 @@ These records preserve the historical claim and its correction. They do not chan
     "app/include/metrics/base.py",
     "app/include/generators.py",
     "app/workspace/algo_wizard/",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar",
     "LIB-002",
     "PREVIOUS-002",
     "PREVIOUS-003",
@@ -882,8 +952,8 @@ These records preserve the historical claim and its correction. They do not chan
     "artifacts": [
       "app/include/metrics/base.py",
       "app/include/generators.py",
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar"
+      "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
+      "DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar"
     ]
   },
   "supersedes_records": [
@@ -1021,14 +1091,14 @@ These records preserve the historical claim and its correction. They do not chan
   "confidence": "confirmed",
   "claim": "Previous Condition.validate compares a scalar delta with zero using the six specified operators. For NaN, only <> is true. This is corroborated by static method inspection and a standalone call to the actual previous Java method.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/conditions/Condition.class#validate(double,String)"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/conditions/Condition.class#validate(double,String)"
   ],
   "target_domain": "app/core/trading/conditions.py",
   "limitations": "Confirmation is limited to this previous-build method and the 24 probed cases. It does not establish build-145 parity or full strategy/task execution. Python ValueError and the literal English unknown-operator message are target decisions. Donor/decompiled source remains outside the repository.",
   "validation": {
     "status": "passed",
     "executed_at": "2026-10-29T16:45:37+00:00",
-    "procedure": "Run the external standalone ConditionProbe against the actual previous SQTradingLib and recovered common classes; no target class bytes are replaced. Reproduce with Java classpath ANALYSIS_SESSION_ROOT;PREVIOUS_SHARED_CLASSES;SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/* and main class ConditionProbe. The adapter invokes Condition.validate(delta, operator) for the input/operator Cartesian product below.",
+    "procedure": "Run the external standalone ConditionProbe against the actual previous SQTradingLib and recovered common classes; no target class bytes are replaced. Reproduce with Java classpath ANALYSIS_SESSION_ROOT;PREVIOUS_SHARED_CLASSES;DONOR_REFERENCE_ROOT/internal/libs/* and main class ConditionProbe. The adapter invokes Condition.validate(delta, operator) for the input/operator Cartesian product below.",
     "actual_observation": {
       "operators": [
         ">",
@@ -1088,7 +1158,7 @@ These records preserve the historical claim and its correction. They do not chan
     },
     "expected_observation": "The actual donor method returns exactly the WO-C08.01 truth table.",
     "artifacts": [
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar",
+      "DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar",
       "ANALYSIS_SESSION_ROOT/ConditionProbe.class",
       "ANALYSIS_SESSION_ROOT/ConditionProbe.java"
     ]
@@ -1122,9 +1192,9 @@ These records preserve the historical claim and its correction. They do not chan
   "confidence": "high",
   "claim": "The readable previous grid/jobs/wizard carriers contain the named gridlib performers, jobslib databank jobs and wizard transform/strategy loaders. Member names establish investigation entrypoints, not complete algorithms or Python contracts.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar"
   ],
   "target_domain": "app/core/grid; app/core/jobs; app/core/wizard",
   "limitations": "ZIP member inventory only. Methods, schemas, defaults, failure behavior and build-145 equivalence are not established by names.",
@@ -1154,9 +1224,9 @@ These records preserve the historical claim and its correction. They do not chan
     },
     "expected_observation": "All named carrier members are present; no nonexistent com.strategyquant.grid.JobExecutor or com.strategyquant.jobs namespace is required.",
     "artifacts": [
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar",
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar"
+      "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar",
+      "DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar",
+      "DONOR_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar"
     ]
   },
   "feature_ids": [],
@@ -1185,8 +1255,8 @@ These records preserve the historical claim and its correction. They do not chan
   "confidence": "high",
   "claim": "The readable previous Program implementation performs exact-name lookup, retains the first duplicate registration with an error log, and throws a missing-program exception whose message includes the requested name.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/program/Program.class#register,get,isRegistered",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/program/ProgramDoesntExistException.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/program/Program.class#register,get,isRegistered",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/program/ProgramDoesntExistException.class"
   ],
   "target_domain": "app/core/lib",
   "feature_ids": [],
@@ -1201,7 +1271,7 @@ These records preserve the historical claim and its correction. They do not chan
     "actual_observation": "containsKey guards put; duplicate branch logs and returns; absent get constructs exception with name; exception composes the specified missing message.",
     "expected_observation": "Direct bodies establish first-wins and missing-name behavior.",
     "artifacts": [
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar"
+      "DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -1227,13 +1297,13 @@ These records preserve the historical claim and its correction. They do not chan
   "confidence": "confirmed",
   "claim": "SQDataLib and SQTradingLib decouple query specifications (ChartDef) from catalog persistence (DataInfo / DataManager). ChartDef defines connection, symbol, timeframe, date bounds (historyFrom, historyTo as epoch ms), spread, and session. IDataLoader / VersatileData streams OHLCV/tick observations. Resampling higher timeframes (canBeComputedFrom) occurs dynamically from base minute data. Queries returning empty intervals within valid datasets yield empty data series; invalid or nonexistent datasets throw exceptions.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/ChartDef.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/DataInfo.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/TimeframeManager.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/DataManager.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/io/IDataLoader.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/io/VersatileData.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/backtest/BacktestDataFeed.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/ChartDef.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/DataInfo.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/TimeframeManager.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/DataManager.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/io/IDataLoader.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar!com/strategyquant/datalib/data/io/VersatileData.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/backtest/BacktestDataFeed.class"
   ],
   "target_domain": "app/core/data",
   "feature_ids": ["WO-C06.03"],
@@ -1247,8 +1317,8 @@ These records preserve the historical claim and its correction. They do not chan
     "actual_observation": "ChartDef encapsulates symbol, timeframe, connectionName, historyFrom, historyTo, spread, session, canBeComputedFrom; DataInfo encapsulates id, connection, symbol, timeframe, dateFrom, dateTo, rows, decimals, fileHash; DataManager provides getDataLoader, _computeData, getHistoryData; BacktestDataFeed consumes ChartDef setups to build MarketData.",
     "expected_observation": "Clean separation of dataset query descriptors from catalog metadata; dynamic resampling from base M1; inclusive time bounds; empty range tolerance.",
     "artifacts": [
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar",
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar",
+      "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar",
+      "DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar",
       "C:/SQX-145/docs/overview/data-manager.md"
     ]
   },
@@ -1276,12 +1346,12 @@ These records preserve the historical claim and its correction. They do not chan
   "confidence": "confirmed",
   "claim": "SQGridLib2 defines distributed execution with JMS transport and local multithread fallback. Compute initializes JmsComputePerformer over registerTaskTopic, taskResultsTopic, messagesTopic, and statisticsTopic; if JMS connection fails, it falls back to MultithreadComputePerformer and sets isLocalMode=true. GridJob encapsulates jobId, jobGroupId, parameters, blocking flag, and priority. NodeInfo models remote workers with ip, lastHeartBeat, runningThreads, cores, memory, and cpuUsage. JobResult encapsulates success, data, duration, errorMessage, and stopped flag.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/compute/performer/JmsComputePerformer.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/GridJob.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/compute/JobResult.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/topology/NodeInfo.class",
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/topology/GridTopology.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/compute/performer/JmsComputePerformer.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/GridJob.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/compute/JobResult.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/topology/NodeInfo.class",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/topology/GridTopology.class"
   ],
   "target_domain": "app/core/grid",
   "feature_ids": ["WO-C07.02"],
@@ -1295,7 +1365,7 @@ These records preserve the historical claim and its correction. They do not chan
     "actual_observation": "Compute.createPerformers catches connection exceptions and falls back to MultithreadComputePerformer; JmsComputePerformer handles taskResultsTopic messages, extracting jobId, jobGroupId, and JobResult; topology updates via statisticsTopic.",
     "expected_observation": "Explicit separation of remote job descriptors, worker node health, first-wins deduplication, and graceful local fallback.",
     "artifacts": [
-      "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar"
+      "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar"
     ]
   },
   "review_state": "confirmed",
@@ -1310,24 +1380,24 @@ These records preserve the historical claim and its correction. They do not chan
 
 </details>
 
-## Consolidated donor baseline
+## Historical consolidated donor baseline (original carrier locators)
 
-Primary donor remains SQX_REFERENCE_ROOT (145). The readable SQX_PREVIOUS_REFERENCE_ROOT fallback was explicitly authorized by the user; its product build label is unestablished. Previous-version definitions do not prove build-145 packaging or behavioral parity.
+All donor research now uses DONOR_REFERENCE_ROOT. This historical baseline distinguishes original build-145 observations from older readable carrier observations; those version distinctions remain provenance, not separate filesystem roots. Previous-version definitions do not prove build-145 packaging or behavioral parity. Historical carrier suffixes in the tables below describe the original artifacts rather than current copied-source paths.
 
 | Readable previous carrier | Class definitions |
 | --- | ---: |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar` | 195 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar` | 81 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar` | 11 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar` | 18 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar` | 945 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWebGUILib.jar` | 34 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar` | 24 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/Snippets.jar` | 948 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe!embedded-resource-0` | 15 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe!embedded-resource-1` | 254 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-0` | 4 |
-| `SQX_PREVIOUS_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-1` | 254 |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar` | 195 |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar` | 81 |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar` | 11 |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar` | 18 |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar` | 945 |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQWebGUILib.jar` | 34 |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar` | 24 |
+| `DONOR_REFERENCE_ROOT/internal/libs/Snippets.jar` | 948 |
+| `DONOR_REFERENCE_ROOT/sqcli.exe!embedded-resource-0` | 15 |
+| `DONOR_REFERENCE_ROOT/sqcli.exe!embedded-resource-1` | 254 |
+| `DONOR_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-0` | 4 |
+| `DONOR_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-1` | 254 |
 
 The two recovered common-runtime archives are byte-identical. Numeric embedded-resource indices are observed carrier identities, not proof of an original SQLib.jar filename. The primary eight encrypted libraries were not decrypted. Bootstrap analysis established AES-256-GCM staged loading after licensing; normal startup stopped at the missing-license prerequisite. No license check was bypassed.
 
@@ -1362,51 +1432,51 @@ These preserve the relevant source identity without keeping bulk file/class inve
 
 | Logical artifact | Bytes | SHA-256 |
 | --- | ---: | --- |
-| `SQX_REFERENCE_ROOT/internal/libs/CodeEditor.jar.enc` | 9326 | `ace2ac233be21ca23c5bc9e5144b5921ae26d992982dae6130af2403b7a65dd5` |
-| `SQX_REFERENCE_ROOT/internal/libs/SQAppLib.jar.enc` | 3269104 | `55f1e44829b6d6a73d85ff5996d480dccbaebd8495807aa3fe2aef19d9358223` |
-| `SQX_REFERENCE_ROOT/internal/libs/SQDataLib.jar.enc` | 458054 | `e21440db6854577d0c64da04831d5187549f9769a673044877d131f4b6d4642c` |
-| `SQX_REFERENCE_ROOT/internal/libs/SQGridLib2.jar.enc` | 128365 | `fb3fbf5508a2399179860472211c1e99ba0a2a48ef85fc6482473c5ce04c74a4` |
-| `SQX_REFERENCE_ROOT/internal/libs/SQJobsLib.jar.enc` | 9961 | `e05eca793825100f434399acbff931d22a54873b107badaa4c09a272070ad4b7` |
-| `SQX_REFERENCE_ROOT/internal/libs/SQLib.jar.enc` | 399394 | `e516dadc26dd4ec36539a7f610e017cfade679b161032ee54267c96316a74848` |
-| `SQX_REFERENCE_ROOT/internal/libs/SQPluginLib.jar.enc` | 17995 | `df7f45942c8749c6ab8be1645ed035b063b400816fbdac44c98e0b89c623da7e` |
-| `SQX_REFERENCE_ROOT/internal/libs/StrategyQuant.jar.enc` | 35978 | `3d57ff0916d0cac21fd4471c6b8b3cbf984ad7254423a68b24da8eb7b29f0442` |
-| `SQX_REFERENCE_ROOT/StrategyQuantX.config` | 270 | `fc1b6de40f29090a61892ae161f9daca80e277366c7bfae0f4396248ee58799d` |
-| `SQX_REFERENCE_ROOT/sqcli.config` | 303 | `cc75c454d24a45214728ccffd926e279351ff721ced0f31ea4d700ff6dcc4b35` |
-| `SQX_REFERENCE_ROOT/docs/algocloud/stockpicker-engine.md` | 6999 | `f78e531829d032c4c2b8fa0e199feae1704db8c42b7b2f4149fa1bcf4c183403` |
-| `SQX_REFERENCE_ROOT/docs/custom-projects/cfx-format.md` | 6656 | `0022ea66ad8bbbef128e2b2d9a47e7728cfadcaf019af36e13dbe371e54f838c` |
-| `SQX_REFERENCE_ROOT/docs/overview/stats-metrics.md` | 11826 | `cf952d341e5894d0d50743a1fcb3de2368704a0a9b9f8fb0e3ede3f111a59df6` |
-| `SQX_REFERENCE_ROOT/docs/overview/results-tabs/equity-chart.md` | 4189 | `acb0b9d903923d09c3e68e15b17c9e9529c82a9330edd87e1b5c590a1033a644` |
-| `SQX_REFERENCE_ROOT/docs/overview/snippets/money-management.md` | 11709 | `2e9ad79bf5eb3bafcc3885884f04e9e8561fe8202fbde52216ba70b61349f191` |
-| `SQX_REFERENCE_ROOT/docs/overview/snippets/exit-methods.md` | 5705 | `8cd65723ae679c77533e9a2856bcad0496279bcf3f07983bdc052e48564488fc` |
-| `SQX_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js` | 404 | `f3535d9c8d1378043e64ca82f137634a72a03755dfad87470f14bc1af8ca0d7e` |
-| `SQX_REFERENCE_ROOT/internal/plugins/AppStrategyQuant/AppStrategyQuant.jar` | 2180 | `f2b8b5c7c6c6ceb047228bf8d479ce7420985f8e5832ba5332f8bf613bde3a01` |
-| `SQX_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar` | 47830 | `a5621dd934fcbc8a69f6177820463214bdfc056d62ea732ba9425a46961881e6` |
-| `SQX_REFERENCE_ROOT/internal/plugins/TaskRetest/TaskRetest.jar` | 19021 | `a7957f8d46aa6b01be420af5970a63fed5b8ac9600beac6af95a28eab5cb5437` |
-| `SQX_REFERENCE_ROOT/internal/plugins/TaskOptimize/TaskOptimize.jar` | 29445 | `026673159e7365b15e877ecd9123bf4187f49218d4db3855a6c0fed6a3735bc5` |
-| `SQX_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCrypto.jar` | 12151 | `0fc7ef50935978a05bd392601a7a22eb1a1a67e541300eae56386acfb3790d79` |
-| `SQX_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar` | 6329 | `f61657cfd2d188cba920a733bdf0810138e8aa702fc8e38d47bf55b352646edb` |
-| `SQX_REFERENCE_ROOT/StrategyQuantX.exe` | 7443312 | `d2eeddc193dc48b915a530eb9e45ad9e7837c8085b562f3f52f756366265f1ba` |
-| `SQX_REFERENCE_ROOT/sqcli.exe` | 7795568 | `6910dfcdc6d840a49271e2c9ff43d851b342aa8cb195b418e063c95b811e2888` |
+| `DONOR_REFERENCE_ROOT/internal/libs/CodeEditor.jar.enc` | 9326 | `ace2ac233be21ca23c5bc9e5144b5921ae26d992982dae6130af2403b7a65dd5` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQAppLib.jar.enc` | 3269104 | `55f1e44829b6d6a73d85ff5996d480dccbaebd8495807aa3fe2aef19d9358223` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar.enc` | 458054 | `e21440db6854577d0c64da04831d5187549f9769a673044877d131f4b6d4642c` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar.enc` | 128365 | `fb3fbf5508a2399179860472211c1e99ba0a2a48ef85fc6482473c5ce04c74a4` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar.enc` | 9961 | `e05eca793825100f434399acbff931d22a54873b107badaa4c09a272070ad4b7` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQLib.jar.enc` | 399394 | `e516dadc26dd4ec36539a7f610e017cfade679b161032ee54267c96316a74848` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar.enc` | 17995 | `df7f45942c8749c6ab8be1645ed035b063b400816fbdac44c98e0b89c623da7e` |
+| `DONOR_REFERENCE_ROOT/internal/libs/StrategyQuant.jar.enc` | 35978 | `3d57ff0916d0cac21fd4471c6b8b3cbf984ad7254423a68b24da8eb7b29f0442` |
+| `DONOR_REFERENCE_ROOT/StrategyQuantX.config` | 270 | `fc1b6de40f29090a61892ae161f9daca80e277366c7bfae0f4396248ee58799d` |
+| `DONOR_REFERENCE_ROOT/sqcli.config` | 303 | `cc75c454d24a45214728ccffd926e279351ff721ced0f31ea4d700ff6dcc4b35` |
+| `DONOR_REFERENCE_ROOT/docs/algocloud/stockpicker-engine.md` | 6999 | `f78e531829d032c4c2b8fa0e199feae1704db8c42b7b2f4149fa1bcf4c183403` |
+| `DONOR_REFERENCE_ROOT/docs/custom-projects/cfx-format.md` | 6656 | `0022ea66ad8bbbef128e2b2d9a47e7728cfadcaf019af36e13dbe371e54f838c` |
+| `DONOR_REFERENCE_ROOT/docs/overview/stats-metrics.md` | 11826 | `cf952d341e5894d0d50743a1fcb3de2368704a0a9b9f8fb0e3ede3f111a59df6` |
+| `DONOR_REFERENCE_ROOT/docs/overview/results-tabs/equity-chart.md` | 4189 | `acb0b9d903923d09c3e68e15b17c9e9529c82a9330edd87e1b5c590a1033a644` |
+| `DONOR_REFERENCE_ROOT/docs/overview/snippets/money-management.md` | 11709 | `2e9ad79bf5eb3bafcc3885884f04e9e8561fe8202fbde52216ba70b61349f191` |
+| `DONOR_REFERENCE_ROOT/docs/overview/snippets/exit-methods.md` | 5705 | `8cd65723ae679c77533e9a2856bcad0496279bcf3f07983bdc052e48564488fc` |
+| `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js` | 404 | `f3535d9c8d1378043e64ca82f137634a72a03755dfad87470f14bc1af8ca0d7e` |
+| `DONOR_REFERENCE_ROOT/internal/plugins/AppStrategyQuant/AppStrategyQuant.jar` | 2180 | `f2b8b5c7c6c6ceb047228bf8d479ce7420985f8e5832ba5332f8bf613bde3a01` |
+| `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/TaskBuild.jar` | 47830 | `a5621dd934fcbc8a69f6177820463214bdfc056d62ea732ba9425a46961881e6` |
+| `DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest/TaskRetest.jar` | 19021 | `a7957f8d46aa6b01be420af5970a63fed5b8ac9600beac6af95a28eab5cb5437` |
+| `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize/TaskOptimize.jar` | 29445 | `026673159e7365b15e877ecd9123bf4187f49218d4db3855a6c0fed6a3735bc5` |
+| `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceCrypto/DataSourceCrypto.jar` | 12151 | `0fc7ef50935978a05bd392601a7a22eb1a1a67e541300eae56386acfb3790d79` |
+| `DONOR_REFERENCE_ROOT/internal/plugins/CryptoExchangeBinance/CryptoExchangeBinance.jar` | 6329 | `f61657cfd2d188cba920a733bdf0810138e8aa702fc8e38d47bf55b352646edb` |
+| `DONOR_REFERENCE_ROOT/StrategyQuantX.exe` | 7443312 | `d2eeddc193dc48b915a530eb9e45ad9e7837c8085b562f3f52f756366265f1ba` |
+| `DONOR_REFERENCE_ROOT/sqcli.exe` | 7795568 | `6910dfcdc6d840a49271e2c9ff43d851b342aa8cb195b418e063c95b811e2888` |
 | `ANALYSIS_TEMP_ROOT/probe.jar` | 4588 | `aba6b939f51f65c91aed2fb6c7d35acdc005ddc3e3f1a8b361eeefc48d68b092` |
 | `ANALYSIS_TEMP_ROOT/OriginProbe.java` | 3063 | `d0cd668c11b336a49ea0c0ddb5c6aeacd203f39b93cfc9b421b6f9e2e6019d87` |
 | `ANALYSIS_TEMP_ROOT/embedded/resource-0.bin` | 244969 | `17e9939849426870a442c11552c8ac7b3c7c4ff98e34ac46d5840c54072f7ad5` |
 | `ANALYSIS_TEMP_ROOT/mapped-classes/com/strategyquant/boot/SQAppBoot.class` | 7182 | `c271f0fd4fdb6bcf4fc727eb14d824a0574fee70cbc0bf20cc1e6b853128c332` |
 | `ANALYSIS_TEMP_ROOT/mapped-classes/com/strategyquant/boot/StagedEngineLoader.class` | 4586 | `7609f607420d1a2708da1799477fb0c765510f8a1216ca889b63a2f546d8d364` |
 | `ANALYSIS_TEMP_ROOT/mapped-classes/com/strategyquant/lib/launcher/StagedDecryptor.class` | 3175 | `855a696193966e556872b65dd7fd32276a8c68963000646364481308e402fbad` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQDataLib.jar` | 309974 | `8bf892b35becda5070dc153f4a5fed955d9d724c78686ebb354776fd3a408829` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar` | 102356 | `dd1851fada0ebe511c16fd422472d938465b0d3a971a5718d4448ee9c4183673` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar` | 8167 | `90a7d687dd4df30964512d8cd2cebf865f0bdcd9798b1310ed54007bf388ab5e` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar` | 14068 | `40c962d2087d68aadb4bc4a3b9bb2363a453cb57830fd672c50716d502e771c3` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar` | 1833107 | `9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWebGUILib.jar` | 82693 | `3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar` | 33322 | `3f908f6dc5c057d204e7688d093f89f9c0cf6bc5f55891e044993cb7098d71ee` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/Snippets.jar` | 1316367 | `d6dcad795f670b1b12cbbe772ec6f15d98c2fb5ab265f0f63505eb0e589229a0` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe!embedded-resource-0` | 39016 | `53e2f9ca9d00fc9b08af7ee3eeb414ecfcaed42af4eeb159b1c9a5ab000018e8` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe!embedded-resource-1` | 450476 | `40be384480b4ae8c062fec8be37e657579e31c0750730949c086eac58de6c849` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-0` | 6914 | `f58860ca6bbc353d37f2a0cf028ea7ba1dea800f54bf1599367f269881538f91` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-1` | 450476 | `40be384480b4ae8c062fec8be37e657579e31c0750730949c086eac58de6c849` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe` | 3029856 | `42f52683898311db2b2a9c79a485138065d9ba36b56b437214de603b9f83f2f2` |
-| `SQX_PREVIOUS_REFERENCE_ROOT/CodeEditor.exe` | 2899296 | `575a6a279a8571eefb77486bc19bdee91d23b6627e7fe16165f203b9ae2431b5` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar` | 309974 | `8bf892b35becda5070dc153f4a5fed955d9d724c78686ebb354776fd3a408829` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar` | 102356 | `dd1851fada0ebe511c16fd422472d938465b0d3a971a5718d4448ee9c4183673` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar` | 8167 | `90a7d687dd4df30964512d8cd2cebf865f0bdcd9798b1310ed54007bf388ab5e` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar` | 14068 | `40c962d2087d68aadb4bc4a3b9bb2363a453cb57830fd672c50716d502e771c3` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar` | 1833107 | `9796578273f36ced388b977bf08ff67c149a8897805b0bce00f7b8d3de6241f3` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQWebGUILib.jar` | 82693 | `3a319dc358d46207a0e4520c6dacb694039a3d5c35b0069c08a7e869aa6fd0af` |
+| `DONOR_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar` | 33322 | `3f908f6dc5c057d204e7688d093f89f9c0cf6bc5f55891e044993cb7098d71ee` |
+| `DONOR_REFERENCE_ROOT/internal/libs/Snippets.jar` | 1316367 | `d6dcad795f670b1b12cbbe772ec6f15d98c2fb5ab265f0f63505eb0e589229a0` |
+| `DONOR_REFERENCE_ROOT/sqcli.exe!embedded-resource-0` | 39016 | `53e2f9ca9d00fc9b08af7ee3eeb414ecfcaed42af4eeb159b1c9a5ab000018e8` |
+| `DONOR_REFERENCE_ROOT/sqcli.exe!embedded-resource-1` | 450476 | `40be384480b4ae8c062fec8be37e657579e31c0750730949c086eac58de6c849` |
+| `DONOR_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-0` | 6914 | `f58860ca6bbc353d37f2a0cf028ea7ba1dea800f54bf1599367f269881538f91` |
+| `DONOR_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-1` | 450476 | `40be384480b4ae8c062fec8be37e657579e31c0750730949c086eac58de6c849` |
+| `DONOR_REFERENCE_ROOT/sqcli.exe` | 3029856 | `42f52683898311db2b2a9c79a485138065d9ba36b56b437214de603b9f83f2f2` |
+| `DONOR_REFERENCE_ROOT/CodeEditor.exe` | 2899296 | `575a6a279a8571eefb77486bc19bdee91d23b6627e7fe16165f203b9ae2431b5` |
 
 Class inventories and source copies were construction inputs, not target implementation files. No proprietary class/source bytes are retained. Relevant definitions and selected observed branches are already captured by the implementation tasks and original finding records below.
 
@@ -1426,14 +1496,14 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "Eight encrypted library artifacts exist; all have non-ZIP leading bytes. StrategyQuant and CodeEditor are additional encrypted libraries beyond the six initially discussed.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/libs/CodeEditor.jar.enc",
-    "SQX_REFERENCE_ROOT/internal/libs/SQAppLib.jar.enc",
-    "SQX_REFERENCE_ROOT/internal/libs/SQDataLib.jar.enc",
-    "SQX_REFERENCE_ROOT/internal/libs/SQGridLib2.jar.enc",
-    "SQX_REFERENCE_ROOT/internal/libs/SQJobsLib.jar.enc",
-    "SQX_REFERENCE_ROOT/internal/libs/SQLib.jar.enc",
-    "SQX_REFERENCE_ROOT/internal/libs/SQPluginLib.jar.enc",
-    "SQX_REFERENCE_ROOT/internal/libs/StrategyQuant.jar.enc"
+    "DONOR_REFERENCE_ROOT/internal/libs/CodeEditor.jar.enc",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQAppLib.jar.enc",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQDataLib.jar.enc",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar.enc",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar.enc",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQLib.jar.enc",
+    "DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar.enc",
+    "DONOR_REFERENCE_ROOT/internal/libs/StrategyQuant.jar.enc"
   ],
   "target_domain": "app/core",
   "feature_ids": [],
@@ -1477,10 +1547,10 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "Bundled documentation attributes project archive IO, strategy generation, simulator identities, statistics and equity-chart computation to SQAppLib source-project paths.",
   "sources": [
-    "SQX_REFERENCE_ROOT/docs/custom-projects/cfx-format.md",
-    "SQX_REFERENCE_ROOT/docs/algocloud/stockpicker-engine.md",
-    "SQX_REFERENCE_ROOT/docs/overview/stats-metrics.md",
-    "SQX_REFERENCE_ROOT/docs/overview/results-tabs/equity-chart.md"
+    "DONOR_REFERENCE_ROOT/docs/custom-projects/cfx-format.md",
+    "DONOR_REFERENCE_ROOT/docs/algocloud/stockpicker-engine.md",
+    "DONOR_REFERENCE_ROOT/docs/overview/stats-metrics.md",
+    "DONOR_REFERENCE_ROOT/docs/overview/results-tabs/equity-chart.md"
   ],
   "target_domain": "app/core/app; app/core/trading",
   "feature_ids": [],
@@ -1522,7 +1592,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "Bundled documentation attributes dated stock-universe membership management to SQDataLib source-project paths.",
   "sources": [
-    "SQX_REFERENCE_ROOT/docs/algocloud/stockpicker-engine.md"
+    "DONOR_REFERENCE_ROOT/docs/algocloud/stockpicker-engine.md"
   ],
   "target_domain": "app/core/data",
   "feature_ids": [],
@@ -1564,7 +1634,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "unverified",
   "claim": "Exact responsibility of SQLib.jar.enc is unresolved.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/libs/SQLib.jar.enc"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQLib.jar.enc"
   ],
   "target_domain": "app/core/lib (reserved proposal)",
   "feature_ids": [],
@@ -1608,7 +1678,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "unverified",
   "claim": "Exact responsibility of SQPluginLib.jar.enc is unresolved.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/libs/SQPluginLib.jar.enc"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar.enc"
   ],
   "target_domain": "app/core/lib (reserved proposal)",
   "feature_ids": [],
@@ -1652,7 +1722,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "unverified",
   "claim": "Exact responsibility of SQJobsLib.jar.enc is unresolved.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/libs/SQJobsLib.jar.enc"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar.enc"
   ],
   "target_domain": "app/core/jobs (reserved proposal)",
   "feature_ids": [],
@@ -1696,7 +1766,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "unverified",
   "claim": "Exact responsibility of SQGridLib2.jar.enc is unresolved.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/libs/SQGridLib2.jar.enc"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar.enc"
   ],
   "target_domain": "app/core/grid (reserved proposal)",
   "feature_ids": [],
@@ -1740,7 +1810,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "unverified",
   "claim": "Exact responsibility of CodeEditor.jar.enc is unresolved.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/libs/CodeEditor.jar.enc"
+    "DONOR_REFERENCE_ROOT/internal/libs/CodeEditor.jar.enc"
   ],
   "target_domain": "app/core/code_editor (reserved proposal)",
   "feature_ids": [],
@@ -1784,9 +1854,9 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "unverified",
   "claim": "All com.strategyquant.tradinglib definitions being bundled in SQAppLib is unresolved.",
   "sources": [
-    "SQX_REFERENCE_ROOT/docs/custom-projects/cfx-format.md",
-    "SQX_REFERENCE_ROOT/docs/overview/snippets/money-management.md",
-    "SQX_REFERENCE_ROOT/docs/overview/snippets/exit-methods.md"
+    "DONOR_REFERENCE_ROOT/docs/custom-projects/cfx-format.md",
+    "DONOR_REFERENCE_ROOT/docs/overview/snippets/money-management.md",
+    "DONOR_REFERENCE_ROOT/docs/overview/snippets/exit-methods.md"
   ],
   "target_domain": "app/core/trading",
   "feature_ids": [],
@@ -1938,7 +2008,7 @@ The following original record objects are retained unchanged. Their historical a
     ]
   },
   "sources": [
-    "SQX_REFERENCE_ROOT/sqcli.exe",
+    "DONOR_REFERENCE_ROOT/sqcli.exe",
     "ANALYSIS_TEMP_ROOT/embedded/resource-0.bin"
   ],
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -1985,7 +2055,7 @@ The following original record objects are retained unchanged. Their historical a
     ]
   },
   "sources": [
-    "SQX_REFERENCE_ROOT/sqcli.exe",
+    "DONOR_REFERENCE_ROOT/sqcli.exe",
     "ANALYSIS_TEMP_ROOT/embedded/resource-0.bin"
   ],
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -2032,7 +2102,7 @@ The following original record objects are retained unchanged. Their historical a
     ]
   },
   "sources": [
-    "SQX_REFERENCE_ROOT/sqcli.exe",
+    "DONOR_REFERENCE_ROOT/sqcli.exe",
     "ANALYSIS_TEMP_ROOT/embedded/resource-0.bin"
   ],
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -2068,7 +2138,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "945 definitions establish shared strategy/block contracts, backtest/simulation, GP/generation, optimization, projects/databanks/statistics/charts, and exchange/download infrastructure.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/backtestrunner/BacktestRunner.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQTradingLib.jar!com/strategyquant/tradinglib/backtestrunner/BacktestRunner.class"
   ],
   "target_domain": "app/core/trading",
   "related_records": [
@@ -2122,7 +2192,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "81 definitions include local multithread and JMS remote execution, grid jobs/queues and synchronization. The inspected performer selector falls back to local execution after JMS initialization failure.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQGridLib2.jar!com/strategyquant/gridlib/client/Compute.class"
   ],
   "target_domain": "app/core/grid",
   "related_records": [
@@ -2169,7 +2239,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "11 definitions implement job lifecycle/thread-pool/completion and four databank jobs; static dependencies resolve to TradingLib and PluginLib.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQJobsLib.jar!com/strategyquant/jobslib/SQJob.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQJobsLib.jar!com/strategyquant/jobslib/SQJob.class"
   ],
   "target_domain": "app/core/jobs",
   "related_records": [
@@ -2216,7 +2286,7 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "18 definitions implement plugin discovery/metadata and named Program registration/dispatch.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/program/Program.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQPluginLib.jar!com/strategyquant/pluginlib/program/Program.class"
   ],
   "target_domain": "app/core/lib",
   "related_records": [
@@ -2263,10 +2333,10 @@ The following original record objects are retained unchanged. Their historical a
   "confidence": "high",
   "claim": "Previous CLI contains a 15-class product archive and a 254-class common archive. Code Editor contains a 4-class editor archive and a byte-identical common archive.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe!embedded-resource-0",
-    "SQX_PREVIOUS_REFERENCE_ROOT/sqcli.exe!embedded-resource-1",
-    "SQX_PREVIOUS_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-0",
-    "SQX_PREVIOUS_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-1"
+    "DONOR_REFERENCE_ROOT/sqcli.exe!embedded-resource-0",
+    "DONOR_REFERENCE_ROOT/sqcli.exe!embedded-resource-1",
+    "DONOR_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-0",
+    "DONOR_REFERENCE_ROOT/CodeEditor.exe!embedded-resource-1"
   ],
   "target_domain": "app/main.py; app/cli.py; app/core/lib; app/workspaces/code_editor",
   "related_records": [

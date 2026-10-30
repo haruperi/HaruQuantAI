@@ -15,12 +15,16 @@ classDiagram
 - **Outputs / Downstream Role:** the specified helper output only until the full workflow contracts below are made executable.
 - **Commit rule:** one READY feature, one commit, only listed files. Blocked rows authorize no code or placeholder tests.
 
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+
 ## Phase 15.1: observed deterministic behavior
 
 ### `GridTestRows` - WO-15-01 - READY after its named prerequisites
 
 *Evidence IDs:* `OBS145-AppGridTest-HELPER-001` (retained below).
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js`. Read only these donor files and the completed prerequisite files named in this order.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/web/GRIDTEST/layout` (resource folder; originally named `LayoutCtrl.js` is not present). Read only these donor files and the completed prerequisite files named in this order.
 
 *Feature:* exact row generation/timer metadata for the UI grid harness; no distributed computation or random scheduler.
 *Dependencies:* WO-C00 frontend runner.
@@ -54,12 +58,15 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/grid_test/GridTestWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/grid_test/test_app_grid_test.py`.
 - **Frontend test:** `app/web/tests/workspaces/grid_test/AppGridTestPanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/AppGridTest/AppGridTest.jar`, `SQX_REFERENCE_ROOT/internal/plugins/AppGridTest/module.js`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppGridTest/GridTest/GridTestAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppGridTest/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Full grid row identity/user-data defaults, random selection scheduling, selection/cell-event semantics and renderer/DOM tests.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
 *Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/grid_test/test_app_grid_test.py -q` or `npm --prefix app/web test -- tests/workspaces/grid_test/AppGridTestPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+
+
+*Source reassessment (2026-10-30):* [AppGridTest source record](research/workspaces-09-19-source-review.md#appgridtest) identifies 1 matching readable Java files and 1 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
 ## Work-order evidence
 
@@ -70,7 +77,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "Grid-test manual add-100 generates rows for indices 0 through 99; timed insertion uses its separate counter and initializes changeCount to zero. Timer periods are 20/30/40ms and row-count refresh is 50ms.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js"
+    "DONOR_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js"
   ],
   "target_domain": "app/workspaces/grid_test; app/web/workspaces/grid_test",
   "feature_ids": [],
@@ -86,7 +93,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
     "expected_observation": "Grid-test manual add-100 generates rows for indices 0 through 99; timed insertion uses its separate counter and initializes changeCount to zero. Timer periods are 20/30/40ms and row-count refresh is 50ms.",
     "artifacts": [
       {
-        "path": "SQX_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js",
+        "path": "DONOR_REFERENCE_ROOT/internal/web/GRIDTEST/layout/LayoutCtrl.js",
         "sha256": "088321305fbb46ec225d9f9749140d06e2cccefbaab9284013795aa6df696cdf"
       }
     ]
@@ -109,7 +116,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/plugins/AppGridTest"
+    "DONOR_REFERENCE_ROOT/internal/plugins/AppGridTest"
   ],
   "target_domain": "app/workspaces/grid_test; app/web/workspaces/grid_test",
   "feature_ids": [],
@@ -124,7 +131,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
     "actual_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "expected_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins"
+      "DONOR_REFERENCE_ROOT/internal/plugins"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",

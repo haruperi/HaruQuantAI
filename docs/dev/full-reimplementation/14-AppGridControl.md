@@ -16,12 +16,16 @@ classDiagram
 - **Outputs / Downstream Role:** the specified helper output only until the full workflow contracts below are made executable.
 - **Commit rule:** one READY feature, one commit, only listed files. Blocked rows authorize no code or placeholder tests.
 
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+
 ## Phase 14.1: observed deterministic behavior
 
 ### `GridJobPresentation` - WO-14-01 - READY after its named prerequisites
 
 *Evidence IDs:* `OBS145-AppGridControl-HELPER-001` (retained below).
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js`. Read only these donor files and the completed prerequisite files named in this order.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout` (resource folder; originally named `LayoutCtrl.js` is not present). Read only these donor files and the completed prerequisite files named in this order.
 
 *Feature:* deterministic English label/refresh predicate helpers, not remote job management.
 *Dependencies:* WO-C00 frontend runner.
@@ -55,12 +59,15 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/grid_control/GridControlWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/grid_control/test_app_grid_control.py`.
 - **Frontend test:** `app/web/tests/workspaces/grid_control/AppGridControlPanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/AppGridControl/AppGridControl.jar`, `SQX_REFERENCE_ROOT/internal/plugins/AppGridControl/module.js`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/GridControl/GridControlAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Complete getData response, worker/node states, identity/time/size units, remote protocol/authorization and job lifecycle error contracts.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
 *Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/grid_control/test_app_grid_control.py -q` or `npm --prefix app/web test -- tests/workspaces/grid_control/AppGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+
+
+*Source reassessment (2026-10-30):* [AppGridControl source record](research/workspaces-09-19-source-review.md#appgridcontrol) identifies 1 matching readable Java files and 1 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
 
 ### `ServletGridControl` - I-ServletGridControl - BLOCKED-NOT-EXECUTABLE
 
@@ -72,12 +79,15 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/grid_control/ServletGridControlPanel.tsx`.
 - **Backend test:** `tests/workspaces/grid_control/test_servlet_grid_control.py`.
 - **Frontend test:** `app/web/tests/workspaces/grid_control/ServletGridControlPanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/ServletGridControl/ServletGridControl.jar`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Every servlet action payload/result/error and shared grid call side effect, including unavailable workers and partial results.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
 *Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/grid_control/test_servlet_grid_control.py -q` or `npm --prefix app/web test -- tests/workspaces/grid_control/ServletGridControlPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+
+
+*Source reassessment (2026-10-30):* [ServletGridControl source record](research/workspaces-09-19-source-review.md#servletgridcontrol) identifies 0 matching readable Java files and 0 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
 ## Work-order evidence
 
@@ -88,7 +98,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "Grid-control uses a 3000ms refresh interval gated by active application; displays Continuous/One time, Waiting/Running, and N/A for progress exactly -1.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js"
+    "DONOR_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js"
   ],
   "target_domain": "app/workspaces/grid_control; app/web/workspaces/grid_control",
   "feature_ids": [],
@@ -104,7 +114,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
     "expected_observation": "Grid-control uses a 3000ms refresh interval gated by active application; displays Continuous/One time, Waiting/Running, and N/A for progress exactly -1.",
     "artifacts": [
       {
-        "path": "SQX_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js",
+        "path": "DONOR_REFERENCE_ROOT/internal/web/GRIDCONTROL/layout/LayoutCtrl.js",
         "sha256": "e5c4647abc646fdc32f86cab3aafd9aa7b14be9a2c05e667963480d2776e3d5c"
       }
     ]
@@ -127,8 +137,8 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/plugins/AppGridControl",
-    "SQX_REFERENCE_ROOT/internal/plugins/ServletGridControl"
+    "DONOR_REFERENCE_ROOT/internal/plugins/AppGridControl",
+    "DONOR_REFERENCE_ROOT/internal/plugins/ServletGridControl"
   ],
   "target_domain": "app/workspaces/grid_control; app/web/workspaces/grid_control",
   "feature_ids": [],
@@ -143,7 +153,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
     "actual_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "expected_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins"
+      "DONOR_REFERENCE_ROOT/internal/plugins"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",

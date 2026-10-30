@@ -12,9 +12,13 @@ classDiagram
 - **Outputs / Downstream Role:** Search candidates, selected portfolios and recorded fitness decisions.
 - **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
 - **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
-- **Shared response contract:** API adapters preserve `StandardResponse.success(*, message, metadata, data)` and `StandardResponse.failure(*, message, metadata, error)` from the current `app/host/response.py`, including `ResponseMetadata` and `StandardError`. The host phase owns its exact migration target. Pure helpers return their declared values. Do not introduce a second generic response envelope; adapt legacy UI transport at its client boundary.
+- **Shared response contract:** canonical response definitions live in `app/core/lib/responses.py`, which retains both `StandardResponse.success(*, message, metadata, data)` / `StandardResponse.failure(*, message, metadata, error)` with `ResponseMetadata` / `StandardError`, and the WO-C02 instance envelope `StandardResponse[T](request_id=..., data=..., revision=...)`. Preserve the existing form for migrated callers; use the instance envelope only where the specific work order requires it. `app/host/response.py` is a historical locator. Any conversion must be explicit at the named host/client boundary; do not remove existing helpers or introduce a third response contract. Pure helpers return their declared values.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
+
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
 
 ## Current-code migration audit and execution order
 
@@ -92,7 +96,7 @@ classDiagram
 ### Work order PM-001: existing-portfolio fitness target state
 *Feature:* Enable/disable the target field with the observed reset-to-zero behavior. **READY after test bootstrap.** This helper does not calculate fitness or optimize weights.
 *Implementation Files:*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioCtrl.js` (`checkColumns`).
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioCtrl.js` (`checkColumns`).
 - **Backend CREATE:** `app/workspaces/portfolio_master/fitness_target.py`.
 - **Frontend:** no file changed; the future fitness view model consumes the resulting target state.
 - **Tests CREATE:** `tests/workspaces/portfolio_master/test_fitness_target.py`.
@@ -113,43 +117,84 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 ### `AppPortfolioMaster` — BLOCKED-NOT-EXECUTABLE
 *Feature:* Full `AppPortfolioMaster` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`.
 - **Backend:** `app/workspaces/portfolio_master/app_portfolio_master.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/PortfolioMasterWorkspace.tsx`.
 - **Backend tests:** `tests/workspaces/portfolio_master/test_app_portfolio_master.py`.
 - **Frontend tests:** `app/web/tests/portfolio_master/AppPortfolioMaster.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`.
 *Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `AppPortfolioMaster`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
+
+*Source reassessment (2026-10-30):* [AppPortfolioMaster source record](research/workspaces-09-19-source-review.md#appportfoliomaster) identifies 1 matching readable Java files and 1 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+
 ### `FitnessMethodExistingPortfolio` — BLOCKED-NOT-EXECUTABLE
 *Feature:* Full `FitnessMethodExistingPortfolio` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio`.
 - **Backend:** `app/workspaces/portfolio_master/fitness_method_existing_portfolio.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/FitnessMethodExistingPortfolio.tsx`.
 - **Backend tests:** `tests/workspaces/portfolio_master/test_fitness_method_existing_portfolio.py`.
 - **Frontend tests:** `app/web/tests/portfolio_master/FitnessMethodExistingPortfolio.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioService.js`; `SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/module.js`.
 *Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `fitnessExistingPortfolio/list`
 *Exact unresolved contract:* Exact metric expression, value-type mapping, weight normalization, missing-value policy and independently computed expected scores are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `FitnessMethodExistingPortfolio`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
+
+*Source reassessment (2026-10-30):* [FitnessMethodExistingPortfolio source record](research/workspaces-09-19-source-review.md#fitnessmethodexistingportfolio) identifies 2 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+
 ## Phase 3: concrete extension definition work orders — BLOCKED-NOT-EXECUTABLE
 
 ### `PortfolioMasterFitness`
-- **Context:** `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness/`; exact current definition count: 3.
+
+*Source reassessment (2026-10-30):* all three primary snippet bodies are readable at `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness`. Their compute methods select precomputed portfolio statistics; they do not calculate NetProfit, stagnation or drawdown themselves. The bounded projection orders below resolve those selectors. Fitness normalization/formatting and integration remain separate from compute projection.
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness`; exact current definition count: 3.
 - **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
 - **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
 - **Definition IDs to account for:** `NetProfit.java`, `PctStagnation.java`, `ReturnDD.java`.
 ### `CorrelationOf`
-- **Context:** `SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ/CorrelationOf/`; exact current definition count: 6.
+
+*Source reassessment (2026-10-30):* all six primary bodies are readable at `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/CorrelationOf`. `Loss.computePeriods` skips canceled orders, buckets by close time, requires an existing period and adds order.PL; its skip predicate is true only when both period values are nonnegative. Do not infer that it sums only negative trades from its name. Full category remains blocked on period/cancellation contracts and per-definition fixtures. This source gap is therefore contract integration, not encryption.
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/CorrelationOf`; exact current definition count: 6.
 - **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
 - **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
 - **Definition IDs to account for:** `Loss.java`, `NumberOfClosedPositions.java`, `NumberOfClosedTrades.java`, `NumberOfOpenPositions.java`, `NumberOfOpenTrades.java`, `ProfitLoss.java`.
+
+## Source-resolved portfolio metric selectors
+
+The following three independent helper orders are READY after WO-C00. They specify compute projection only; normalization, display formatting, extension registration and portfolio construction are excluded. Each order is one commit. The target adapter supplies the already selected portfolio/Both/Money statistics for the requested sample. Missing-statistic lookup returns 0.0, matching `SQStats.getDouble`; no aggregation or division occurs in these selectors. The typed input is `Mapping[str, float]`, and the helper never mutates it.
+
+### PM-METRIC-NetProfit - READY
+
+*Source:* `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness/NetProfit.java`; SHA-256 `4a415cb99cb056b97567fdace21bd5309c88c04db28e022875f537f85ffe8f66`. Also read `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/StatsKey.java` and `SQStats.java#getDouble`.
+*Create:* `app/extend/portfolio_master_fitness/net_profit.py`; `tests/extend/portfolio_master_fitness/test_net_profit.py`. The first selector commit may CREATE the empty package initializer; later commits reuse it.
+*Contract:* `NetProfit.compute(stats: Mapping[str, float]) -> float` is a static method returning the numerical value of `NetProfit`, or 0.0 when that key is absent. Metadata and normalization are not instantiated here. Observed donor constructor metadata is name `Net Profit (Return)`, goal maximize, target 0, average range -10000..10000; these values are evidence for later registration, not invented clipping bounds on compute.
+*Literal fixtures:* stats `{"NetProfit": 12.5}` returns 12.5; `{"NetProfit": -4.0}` returns -4.0; an empty mapping returns 0.0; another metric with value 99.0 does not substitute for the missing key. Assert the mapping remains unchanged. Preserve existing numeric nonfinite values internally; serialization retains its existing finite-value validation. No money/percent string formatting is tested or authorized.
+*Acceptance:* `uv run python -m pytest tests/extend/portfolio_master_fitness/test_net_profit.py -q` exits 0 with all literal cases above. No actual portfolio or broker connection is needed.
+*Commit:* `portfolio-master: select NetProfit fitness metric`. This is not acceptance of full I-FitnessMethodExistingPortfolio.
+
+### PM-METRIC-PctStagnation - READY
+
+*Source:* `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness/PctStagnation.java`; SHA-256 `34bf2dafc2176904403658335ab5f23c6fbdb17a716e279cc3ffb22cb62d7713`. Also read `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/StatsKey.java` and `SQStats.java#getDouble`.
+*Create:* `app/extend/portfolio_master_fitness/pct_stagnation.py`; `tests/extend/portfolio_master_fitness/test_pct_stagnation.py`. The first selector commit may CREATE the empty package initializer; later commits reuse it.
+*Contract:* `PctStagnation.compute(stats: Mapping[str, float]) -> float` is a static method returning the numerical value of `StagnationPct`, or 0.0 when that key is absent. Metadata and normalization are not instantiated here. Observed donor constructor metadata is name `% Stagnation`, goal minimize, target 0, average range 0..100; these values are evidence for later registration, not invented clipping bounds on compute.
+*Literal fixtures:* stats `{"StagnationPct": 12.5}` returns 12.5; `{"StagnationPct": -4.0}` returns -4.0; an empty mapping returns 0.0; another metric with value 99.0 does not substitute for the missing key. Assert the mapping remains unchanged. Preserve existing numeric nonfinite values internally; serialization retains its existing finite-value validation. No money/percent string formatting is tested or authorized.
+*Acceptance:* `uv run python -m pytest tests/extend/portfolio_master_fitness/test_pct_stagnation.py -q` exits 0 with all literal cases above. No actual portfolio or broker connection is needed.
+*Commit:* `portfolio-master: select StagnationPct fitness metric`. This is not acceptance of full I-FitnessMethodExistingPortfolio.
+
+### PM-METRIC-ReturnDD - READY
+
+*Source:* `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness/ReturnDD.java`; SHA-256 `975da2d4f520a8f653cec54dc10a554f0c85e4b3be7aec5a5c1c716e5e958f07`. Also read `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/StatsKey.java` and `SQStats.java#getDouble`.
+*Create:* `app/extend/portfolio_master_fitness/return_dd.py`; `tests/extend/portfolio_master_fitness/test_return_dd.py`. The first selector commit may CREATE the empty package initializer; later commits reuse it.
+*Contract:* `ReturnDD.compute(stats: Mapping[str, float]) -> float` is a static method returning the numerical value of `ReturnDDRatio`, or 0.0 when that key is absent. Metadata and normalization are not instantiated here. Observed donor constructor metadata is name `Return / Drawdown ratio`, goal maximize, target 0, average range -20..20; these values are evidence for later registration, not invented clipping bounds on compute.
+*Literal fixtures:* stats `{"ReturnDDRatio": 12.5}` returns 12.5; `{"ReturnDDRatio": -4.0}` returns -4.0; an empty mapping returns 0.0; another metric with value 99.0 does not substitute for the missing key. Assert the mapping remains unchanged. Preserve existing numeric nonfinite values internally; serialization retains its existing finite-value validation. No money/percent string formatting is tested or authorized.
+*Acceptance:* `uv run python -m pytest tests/extend/portfolio_master_fitness/test_return_dd.py -q` exits 0 with all literal cases above. No actual portfolio or broker connection is needed.
+*Commit:* `portfolio-master: select ReturnDDRatio fitness metric`. This is not acceptance of full I-FitnessMethodExistingPortfolio.
 
 ## Embedded evidence
 
@@ -163,7 +208,7 @@ New evidence record; fields are retained verbatim for future supersession:
   "claim": "Existing-portfolio fitness controller enables target editing only for the approximate type; changing a row to another type disables target editing and sets its value to zero.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioCtrl.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioCtrl.js",
       "sha256": "6fd8bdb5719e302bb8946ac6cb2d6553b51313870d172e21fe3798810251cef3"
     }
   ],

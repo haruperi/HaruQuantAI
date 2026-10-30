@@ -13,12 +13,16 @@ classDiagram
 - **Outputs / Downstream Role:** the specified helper output only until the full workflow contracts below are made executable.
 - **Commit rule:** one READY feature, one commit, only listed files. Blocked rows authorize no code or placeholder tests.
 
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+
 ## Phase 13.1: observed deterministic behavior
 
 ### `NeuralNavigation` - WO-13-01 - READY after its named prerequisites
 
 *Evidence IDs:* `OBS145-AppNeuralNetwork-HELPER-001` (retained below).
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`. Read only these donor files and the completed prerequisite files named in this order.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`. Read only these donor files and the completed prerequisite files named in this order.
 
 *Feature:* expose observed navigation metadata only, without inventing a training algorithm.
 *Dependencies:* WO-C02 StandardResponse.
@@ -47,29 +51,24 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/neural_network/NeuralNetworkWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/neural_network/test_app_neural_network.py`.
 - **Frontend test:** `app/web/tests/workspaces/neural_network/AppNeuralNetworkPanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/AppNeuralNetwork.jar`, `SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/NeuralNetwork/NeuralNetworkAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Training method/model topology/features/target/split/defaults, model artifact format, scheduler contract and independent expected outputs; the hidden navigation registration does not specify these.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
 *Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/neural_network/test_app_neural_network.py -q` or `npm --prefix app/web test -- tests/workspaces/neural_network/AppNeuralNetworkPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
-### `TaskNeuralNetworkTrainer` - I-TaskNeuralNetworkTrainer - BLOCKED-NOT-EXECUTABLE
 
-*Feature:* complete TaskNeuralNetworkTrainer workflow.
-*Evidence IDs:* `OBS145-AppNeuralNetwork-SCOPE-001` establishes source presence only; `OBS145-AppNeuralNetwork-HELPER-001` establishes only the separately scoped helper.
-*Implementation Files (reserved, no creation while blocked):*
-- **Backend:** `app/workspaces/neural_network/task_neural_network_trainer.py`.
-- **Models:** `app/workspaces/neural_network/task_neural_network_trainer_models.py`.
-- **Frontend:** `app/web/workspaces/neural_network/TaskNeuralNetworkTrainerPanel.tsx`.
-- **Backend test:** `tests/workspaces/neural_network/test_task_neural_network_trainer.py`.
-- **Frontend test:** `app/web/tests/workspaces/neural_network/TaskNeuralNetworkTrainerPanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer/TaskNeuralNetworkTrainer.jar`.
-*Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
-*Missing contract:* Complete input DTO, prerequisite resources, result schema, per-item failure/transaction policy, cancellation/retry/restart behavior and exact golden outcomes for this concrete task.
-*Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
-*Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/neural_network/test_task_neural_network_trainer.py -q` or `npm --prefix app/web test -- tests/workspaces/neural_network/TaskNeuralNetworkTrainerPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
-*Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+*Source reassessment (2026-10-30):* [AppNeuralNetwork source record](research/workspaces-09-19-source-review.md#appneuralnetwork) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+
+### `TaskNeuralNetworkTrainer` - I-TaskNeuralNetworkTrainer - SOURCE-CONFIRMED-NO-OP
+
+*Reassessment:* the recovered primary class resolves this former research blocker: the donor task is a placeholder with an empty `start()` method. There is no donor training computation to reimplement from this class. This supersedes the earlier assumption that an unavailable training algorithm was hidden in the task JAR.
+*Evidence:* `SRC-20261030-NEURAL-NOOP`; see the [hashed source record](research/workspaces-09-19-source-review.md#taskneuralnetworktrainer). Inspect `NeuralNetworkTrainerTask.java#start,getRunningStatus,getSettings,getUsedDatabanks,getOutputDatabank` in that record.
+*Observed contract:* task type `NeuralNetworkTrainer`; name `Neural Network Trainer`; folder `TaskNeuralNetworkTrainer`; preferred position 5; product SQUANT; settings in exact order Data, Options, Rankings, Notes; running status 0; used and output databanks null. `start()` performs no operations and returns normally. Clone creates a new task for the supplied project/progress and reuses its settings-tab reference.
+*Scope decision:* keep this task unavailable for training in HaruQuantAI. Do not create the formerly reserved training service, models or frontend panel, and do not report a model/result from an empty task. The already specified hidden-navigation helper remains independently executable. A real trainer requires a separate product requirement defining topology, features, target, splits, artifact format and numerical acceptance; it is not required for matching the observed no-op donor task.
+*Acceptance of this research resolution:* inspect the named source method body and verify it is empty, verify the metadata methods above, and assert the task catalogue cannot advertise a runnable training capability. This is a planning/catalogue constraint, not an instruction to create placeholder production tests or claim trained-model parity.
+*Implementation commit:* none for the no-op task. Any later real trainer must receive a new work order.
 
 ## Work-order evidence
 
@@ -80,7 +79,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "The primary neural navigation registration has title Neural Network Trainer, appCode NEURALNETWORK, order 50, section 0 and hidden true.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js"
+    "DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js"
   ],
   "target_domain": "app/workspaces/neural_network; app/web/workspaces/neural_network",
   "feature_ids": [],
@@ -96,7 +95,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
     "expected_observation": "The primary neural navigation registration has title Neural Network Trainer, appCode NEURALNETWORK, order 50, section 0 and hidden true.",
     "artifacts": [
       {
-        "path": "SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js",
+        "path": "DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork/module.js",
         "sha256": "f6583b2e635bbb7bb4b5d93967443003f4bf0bb81c32ba25c295a3cb1c0dc08d"
       }
     ]
@@ -119,8 +118,8 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork",
-    "SQX_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer"
+    "DONOR_REFERENCE_ROOT/internal/plugins/AppNeuralNetwork",
+    "DONOR_REFERENCE_ROOT/internal/plugins/TaskNeuralNetworkTrainer"
   ],
   "target_domain": "app/workspaces/neural_network; app/web/workspaces/neural_network",
   "feature_ids": [],
@@ -135,7 +134,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
     "actual_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "expected_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins"
+      "DONOR_REFERENCE_ROOT/internal/plugins"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",

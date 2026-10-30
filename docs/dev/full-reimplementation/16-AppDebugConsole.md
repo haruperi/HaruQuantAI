@@ -22,12 +22,16 @@ classDiagram
 - **Outputs / Downstream Role:** the specified helper output only until the full workflow contracts below are made executable.
 - **Commit rule:** one READY feature, one commit, only listed files. Blocked rows authorize no code or placeholder tests.
 
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+
 ## Phase 16.1: observed deterministic behavior
 
 ### `DebugLogBuffer` - WO-16-01 - READY after its named prerequisites
 
 *Evidence IDs:* `OBS145-AppDebugConsole-HELPER-001` (retained below).
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/web/DEBUGCONSOLE/debugconsole/src/components/DebugConsole.vue`. Read only these donor files and the completed prerequisite files named in this order.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/web/DEBUGCONSOLE/debugconsole` (resource folder; originally named `DebugConsole.vue` is not present). Read only these donor files and the completed prerequisite files named in this order.
 
 *Feature:* reproduce the observed log-buffer state transitions, including early batch return; no websocket/auth/HTML renderer.
 *Dependencies:* WO-C00 frontend runner.
@@ -61,12 +65,15 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/debug_console/DebugConsoleWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/debug_console/test_app_debug_console.py`.
 - **Frontend test:** `app/web/tests/workspaces/debug_console/AppDebugConsolePanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/AppDebugConsole/AppDebugConsole.jar`, `SQX_REFERENCE_ROOT/internal/plugins/AppDebugConsole/module.js`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppDebugConsole/DebugConsole/DebugConsoleAppPlugin.java`, `DONOR_REFERENCE_ROOT/internal/plugins/AppDebugConsole/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Backend event schema/subscription/reconnect, category-registration and safe HTML rendering policies. The buffer helper does not authorize an HTML sink.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
 *Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/debug_console/test_app_debug_console.py -q` or `npm --prefix app/web test -- tests/workspaces/debug_console/AppDebugConsolePanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+
+
+*Source reassessment (2026-10-30):* [AppDebugConsole source record](research/workspaces-09-19-source-review.md#appdebugconsole) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
 ## Work-order evidence
 
@@ -77,7 +84,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "DebugConsole filters by exact category unless all, uses case-sensitive message includes, aborts the batch on the first rejected message, and prepends a line to the first 10000 prior code units.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/web/DEBUGCONSOLE/debugconsole/src/components/DebugConsole.vue"
+    "DONOR_REFERENCE_ROOT/internal/web/DEBUGCONSOLE/debugconsole/src/components/DebugConsole.vue"
   ],
   "target_domain": "app/workspaces/debug_console; app/web/workspaces/debug_console",
   "feature_ids": [],
@@ -93,7 +100,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
     "expected_observation": "DebugConsole filters by exact category unless all, uses case-sensitive message includes, aborts the batch on the first rejected message, and prepends a line to the first 10000 prior code units.",
     "artifacts": [
       {
-        "path": "SQX_REFERENCE_ROOT/internal/web/DEBUGCONSOLE/debugconsole/src/components/DebugConsole.vue",
+        "path": "DONOR_REFERENCE_ROOT/internal/web/DEBUGCONSOLE/debugconsole/src/components/DebugConsole.vue",
         "sha256": "7eec81fe6f3e73fd73e9bf806914f40c5dd25b058ed50fcc3231f3fe33510da5"
       }
     ]
@@ -116,7 +123,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
   "confidence": "high",
   "claim": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/plugins/AppDebugConsole"
+    "DONOR_REFERENCE_ROOT/internal/plugins/AppDebugConsole"
   ],
   "target_domain": "app/workspaces/debug_console; app/web/workspaces/debug_console",
   "feature_ids": [],
@@ -131,7 +138,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
     "actual_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "expected_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins"
+      "DONOR_REFERENCE_ROOT/internal/plugins"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",

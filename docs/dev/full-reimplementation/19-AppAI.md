@@ -12,12 +12,16 @@ classDiagram
 - **Outputs / Downstream Role:** the specified helper output only until the full workflow contracts below are made executable.
 - **Commit rule:** one READY feature, one commit, only listed files. Blocked rows authorize no code or placeholder tests.
 
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+
 ## Phase 19.1: observed deterministic behavior
 
 ### `MemoryFlushLabel` - WO-19-01 - READY after its named prerequisites
 
 *Evidence IDs:* `OBS145-AppSQAI-HELPER-001` (retained below).
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/web/SQAI/workspace-panel.js`. Read only these donor files and the completed prerequisite files named in this order.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/web/SQAI` (resource folder; originally named `workspace-panel.js` is not present). Read only these donor files and the completed prerequisite files named in this order.
 
 *Feature:* exact memory-flush description helper only, not memory scheduling, model invocation or MCP execution.
 *Dependencies:* WO-C00 frontend runner.
@@ -45,12 +49,15 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/ai/AIAssistantWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/ai/test_mcp.py`.
 - **Frontend test:** `app/web/tests/workspaces/ai/MCPPanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/ServletMCP/ServletMCP.jar`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/web/SQAI`. (copied AI resource context; original ServletMCP Java body is not present in this donor tree).
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Negotiated protocol/version/capability schemas, tool catalogue/arguments/result/errors, auth/session/resource policy and fixture wire messages.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
 *Acceptance:* not yet executable. A revised order must name literal fixtures and methods before `uv run python -m pytest tests/workspaces/ai/test_mcp.py -q` or `npm --prefix app/web test -- tests/workspaces/ai/MCPPanel.test.tsx` can be acceptance. A zero-test/no-assertion pass is invalid.
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
+
+
+*Source reassessment (2026-10-30):* [ServletMCP source record](research/workspaces-09-19-source-review.md#servletmcp) identifies 0 matching readable Java files and 0 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
 ### `ServletSQAI` - I-ServletSQAI - BLOCKED-NOT-EXECUTABLE
 
@@ -62,7 +69,7 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/ai/AIAssistantWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/ai/test_assistant.py`.
 - **Frontend test:** `app/web/tests/workspaces/ai/AssistantPanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/ServletSQAI/module.js`, `SQX_REFERENCE_ROOT/internal/plugins/ServletSQAI/ServletSQAI.jar`, `SQX_REFERENCE_ROOT/internal/plugins/ServletSQAI/SQAIChatService.js`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI/module.js`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI/SQAIChatService.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Model/provider request/result/stream/tool/memory schemas, cancellation/recovery/error behavior, authorization and exact fixture events.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
@@ -70,6 +77,9 @@ All 2 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 External vendor protocols/account data are not inferred from client action names. A legitimate provider/toolchain or a source-established protocol is required; a fake success response cannot close an external integration.
+
+
+*Source reassessment (2026-10-30):* [ServletSQAI source record](research/workspaces-09-19-source-review.md#servletsqai) identifies 0 matching readable Java files and 2 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
 ## Work-order evidence
 
@@ -80,7 +90,7 @@ External vendor protocols/account data are not inferred from client action names
   "confidence": "high",
   "claim": "AI memory UI displays off when memory disabled or interval negative, after every turn when interval is zero, otherwise every N min at most.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/web/SQAI/workspace-panel.js"
+    "DONOR_REFERENCE_ROOT/internal/web/SQAI/workspace-panel.js"
   ],
   "target_domain": "app/workspaces/ai; app/web/workspaces/ai",
   "feature_ids": [],
@@ -96,7 +106,7 @@ External vendor protocols/account data are not inferred from client action names
     "expected_observation": "AI memory UI displays off when memory disabled or interval negative, after every turn when interval is zero, otherwise every N min at most.",
     "artifacts": [
       {
-        "path": "SQX_REFERENCE_ROOT/internal/web/SQAI/workspace-panel.js",
+        "path": "DONOR_REFERENCE_ROOT/internal/web/SQAI/workspace-panel.js",
         "sha256": "179be7c795f13ec1ada7dfde892ec900e0d459c12f287e0e7007d21247333ec6"
       }
     ]
@@ -119,8 +129,8 @@ External vendor protocols/account data are not inferred from client action names
   "confidence": "high",
   "claim": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/plugins/ServletMCP",
-    "SQX_REFERENCE_ROOT/internal/plugins/ServletSQAI"
+    "DONOR_REFERENCE_ROOT/internal/plugins/ServletMCP",
+    "DONOR_REFERENCE_ROOT/internal/plugins/ServletSQAI"
   ],
   "target_domain": "app/workspaces/ai; app/web/workspaces/ai",
   "feature_ids": [],
@@ -135,7 +145,7 @@ External vendor protocols/account data are not inferred from client action names
     "actual_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "expected_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins"
+      "DONOR_REFERENCE_ROOT/internal/plugins"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",

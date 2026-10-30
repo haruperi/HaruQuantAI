@@ -19,12 +19,16 @@ classDiagram
 - **Outputs / Downstream Role:** the specified helper output only until the full workflow contracts below are made executable.
 - **Commit rule:** one READY feature, one commit, only listed files. Blocked rows authorize no code or placeholder tests.
 
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+
 ## Phase 18.1: observed deterministic behavior
 
 ### `FixedSizeBuildProjection` - WO-18-01 - READY after its named prerequisites
 
 *Evidence IDs:* `OBS145-AppSQXBusiness-HELPER-001` (retained below).
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/web/SQXBUSINESS/src/components/XMLUtil.js`. Read only these donor files and the completed prerequisite files named in this order.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/web/SQXBUSINESS` (resource folder; originally named `XMLUtil.js` is not present). Read only these donor files and the completed prerequisite files named in this order.
 
 *Feature:* fixed-size build attribute projection only, not generation/compilation or license enforcement.
 *Dependencies:* WO-C00 Python package foundation.
@@ -54,7 +58,7 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
 - **Frontend:** `app/web/workspaces/business/BusinessWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/business/test_business.py`.
 - **Frontend test:** `app/web/tests/workspaces/business/BusinessWorkspacePanel.test.tsx`.
-- **Context to Read:** `SQX_REFERENCE_ROOT/internal/plugins/AppSQXBusiness/AppSQXBusiness.jar`, `SQX_REFERENCE_ROOT/internal/plugins/AppSQXBusiness/module.js`.
+- **Context to Read:** `DONOR_REFERENCE_ROOT/internal/plugins/AppSQXBusiness`, `DONOR_REFERENCE_ROOT/internal/plugins/AppSQXBusiness/module.js`.
 *Observed action names (not a payload specification):* No literal client action extracted from this module; the specified class/view context must establish operations.
 *Missing contract:* Complete project/input/settings schema, target build variants, lock/export/compile behavior, allowed platform mappings and error fixtures.
 *Function/signature authorization:* none. No generic `execute(payload: dict)` or invented CRUD surface.
@@ -62,6 +66,9 @@ All 1 assigned plugin modules remain in scope. The helper above is not acceptanc
 *Commit boundary:* this one feature only after its order is READY; do not combine with the helper commit.
 
 External vendor protocols/account data are not inferred from client action names. A legitimate provider/toolchain or a source-established protocol is required; a fake success response cannot close an external integration.
+
+
+*Source reassessment (2026-10-30):* [AppSQXBusiness source record](research/workspaces-09-19-source-review.md#appsqxbusiness) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
 ## Work-order evidence
 
@@ -72,7 +79,7 @@ External vendor protocols/account data are not inferred from client action names
   "confidence": "high",
   "claim": "The fixed-size locked build XML attributes default to use false, name -fixedSize, lots 0.01 and platform mql4 when build settings are absent; otherwise source values supply these attributes.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/web/SQXBUSINESS/src/components/XMLUtil.js"
+    "DONOR_REFERENCE_ROOT/internal/web/SQXBUSINESS/src/components/XMLUtil.js"
   ],
   "target_domain": "app/workspaces/business; app/web/workspaces/business",
   "feature_ids": [],
@@ -88,7 +95,7 @@ External vendor protocols/account data are not inferred from client action names
     "expected_observation": "The fixed-size locked build XML attributes default to use false, name -fixedSize, lots 0.01 and platform mql4 when build settings are absent; otherwise source values supply these attributes.",
     "artifacts": [
       {
-        "path": "SQX_REFERENCE_ROOT/internal/web/SQXBUSINESS/src/components/XMLUtil.js",
+        "path": "DONOR_REFERENCE_ROOT/internal/web/SQXBUSINESS/src/components/XMLUtil.js",
         "sha256": "cff88604ec6c8e02ec273fb1dcc446ce922eb0f3bbfd6d88b5dd3b8985f38a57"
       }
     ]
@@ -111,7 +118,7 @@ External vendor protocols/account data are not inferred from client action names
   "confidence": "high",
   "claim": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/plugins/AppSQXBusiness"
+    "DONOR_REFERENCE_ROOT/internal/plugins/AppSQXBusiness"
   ],
   "target_domain": "app/workspaces/business; app/web/workspaces/business",
   "feature_ids": [],
@@ -126,7 +133,7 @@ External vendor protocols/account data are not inferred from client action names
     "actual_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "expected_observation": "Named primary plugin modules and readable files exist; declarations/action names do not establish complete request/response behavior.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins"
+      "DONOR_REFERENCE_ROOT/internal/plugins"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",

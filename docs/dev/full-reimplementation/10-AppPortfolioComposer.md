@@ -20,9 +20,13 @@ classDiagram
 - **Outputs / Downstream Role:** Composition specifications and portfolio evaluation results.
 - **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
 - **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
-- **Shared response contract:** API adapters preserve `StandardResponse.success(*, message, metadata, data)` and `StandardResponse.failure(*, message, metadata, error)` from the current `app/host/response.py`, including `ResponseMetadata` and `StandardError`. The host phase owns its exact migration target. Pure helpers return their declared values. Do not introduce a second generic response envelope; adapt legacy UI transport at its client boundary.
+- **Shared response contract:** canonical response definitions live in `app/core/lib/responses.py`, which retains both `StandardResponse.success(*, message, metadata, data)` / `StandardResponse.failure(*, message, metadata, error)` with `ResponseMetadata` / `StandardError`, and the WO-C02 instance envelope `StandardResponse[T](request_id=..., data=..., revision=...)`. Preserve the existing form for migrated callers; use the instance envelope only where the specific work order requires it. `app/host/response.py` is a historical locator. Any conversion must be explicit at the named host/client boundary; do not remove existing helpers or introduce a third response contract. Pure helpers return their declared values.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
+
+## Source reassessment — 2026-10-30
+
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
 
 ## Current-code migration audit and execution order
 
@@ -106,7 +110,7 @@ classDiagram
 ### Work order PC-001: composition initial configuration
 *Feature:* Construct the observed composition view's initial settings. **READY after test bootstrap.** This helper does not decide allocation, return aggregation or model formulas.
 *Implementation Files:*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js` (`instance.config`).
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js` (`instance.config`).
 - **Backend CREATE:** `app/workspaces/portfolio_composer/defaults.py`.
 - **Frontend:** no file changed; later state-loading service supplies this object to React.
 - **Tests CREATE:** `tests/workspaces/portfolio_composer/test_defaults.py`.
@@ -150,58 +154,70 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 ### `AppPortfolioComposer` — BLOCKED-NOT-EXECUTABLE
 *Feature:* Full `AppPortfolioComposer` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer`.
 - **Backend:** `app/workspaces/portfolio_composer/app_portfolio_composer.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/PortfolioComposerWorkspace.tsx`.
 - **Backend tests:** `tests/workspaces/portfolio_composer/test_app_portfolio_composer.py`.
 - **Frontend tests:** `app/web/tests/portfolio_composer/AppPortfolioComposer.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/module.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/module.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
 *Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `AppPortfolioComposer`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
+
+*Source reassessment (2026-10-30):* [AppPortfolioComposer source record](research/workspaces-09-19-source-review.md#appportfoliocomposer) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+
 ### `PortfolioComposer` — BLOCKED-NOT-EXECUTABLE
 *Feature:* Full `PortfolioComposer` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer`.
 - **Backend:** `app/workspaces/portfolio_composer/portfolio_composer.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/PortfolioComposer.tsx`.
 - **Backend tests:** `tests/workspaces/portfolio_composer/test_portfolio_composer.py`.
 - **Frontend tests:** `app/web/tests/portfolio_composer/PortfolioComposer.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/portfoliocomposer/addBuyHoldStrategy` `/portfoliocomposer/recompute` `/portfoliocomposer/stop` `/portfoliocomposer/loadFiles` `/project/saveReports` `/portfoliocomposer/savePortfolio` `/portfoliocomposer/loadGridData` `/portfoliocomposer/removeAllReports` `/portfoliocomposer/removeReports`
 *Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `PortfolioComposer`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
+
+*Source reassessment (2026-10-30):* [PortfolioComposer source record](research/workspaces-09-19-source-review.md#portfoliocomposer) identifies 9 matching readable Java files and 16 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+
 ### `ResultsPortfolioComposerChart` — BLOCKED-NOT-EXECUTABLE
 *Feature:* Full `ResultsPortfolioComposerChart` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart`.
 - **Backend:** `app/workspaces/portfolio_composer/results_portfolio_composer_chart.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerChart.tsx`.
 - **Backend tests:** `tests/workspaces/portfolio_composer/test_results_portfolio_composer_chart.py`.
 - **Frontend tests:** `app/web/tests/portfolio_composer/ResultsPortfolioComposerChart.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/PortfolioComposerChartService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/PortfolioComposerChartService.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocomposerchart/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPortfolioComposerChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
 
+
+*Source reassessment (2026-10-30):* [ResultsPortfolioComposerChart source record](research/workspaces-09-19-source-review.md#resultsportfoliocomposerchart) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+
 ### `ResultsPortfolioComposerLog` — BLOCKED-NOT-EXECUTABLE
 *Feature:* Full `ResultsPortfolioComposerLog` behavior; this is not completed by the helper commit above.
 *Implementation Files (reserved, no code authorized):*
-- **Donor:** `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/`.
+- **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog`.
 - **Backend:** `app/workspaces/portfolio_composer/results_portfolio_composer_log.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerLog.tsx`.
 - **Backend tests:** `tests/workspaces/portfolio_composer/test_results_portfolio_composer_log.py`.
 - **Frontend tests:** `app/web/tests/portfolio_composer/ResultsPortfolioComposerLog.test.tsx`.
-*Context to Read:* `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/module.js`; `SQX_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/PortfolioComposerLogService.js`.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/PortfolioComposerLogService.js`.
 *Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocomposerlog/print`
 *Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
 *Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
 *Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPortfolioComposerLog`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+
+
+*Source reassessment (2026-10-30):* [ResultsPortfolioComposerLog source record](research/workspaces-09-19-source-review.md#resultsportfoliocomposerlog) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
 
 ## Source-body resolution: concrete composition algorithms
 
@@ -254,7 +270,7 @@ The primary `PortfolioComposer.jar` is readable; encryption of core libraries do
   "claim": "Primary plugin owns selection parsing, expected-shortfall arithmetic and integer automatic-search allocation; manual weights and automatic-search allocations have different semantics.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposer.jar",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposer.jar",
       "sha256": "46998223c28fb3ddce99dcf44bb5009fef53a8c7df0d09889a455b4aac0a1e16"
     }
   ],
@@ -271,7 +287,7 @@ The primary `PortfolioComposer.jar` is readable; encryption of core libraries do
     "expected_observation": "Five literal selection IDs and decimal counts; mean-sigma*normal_pdf(normal_quantile(confidence))/(1-confidence); min weight1 for fewer than80 members else0; integer candidates sum100.",
     "actual_observation": "Five literal selection IDs and decimal counts; mean-sigma*normal_pdf(normal_quantile(confidence))/(1-confidence); min weight1 for fewer than80 members else0; integer candidates sum100.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposer.jar@sha256:46998223c28fb3ddce99dcf44bb5009fef53a8c7df0d09889a455b4aac0a1e16"
+      "DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposer.jar@sha256:46998223c28fb3ddce99dcf44bb5009fef53a8c7df0d09889a455b4aac0a1e16"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -297,7 +313,7 @@ New evidence record; fields are retained verbatim for future supersession:
   "claim": "Composer service initializes the listed configuration values; its two date labels are supplied by a date-formatting helper. The selection-type identifier is the literal SharpRatio.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js",
       "sha256": "da13beb5619f3993db54ae0a3e359da52f7b022a4a779e7d4c81d81b993d84ff"
     }
   ],

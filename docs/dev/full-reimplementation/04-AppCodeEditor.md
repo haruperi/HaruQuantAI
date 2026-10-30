@@ -12,6 +12,10 @@ classDiagram
 - **Dependencies:** AppCore shared contracts; AppHome routing contributions. Dataset-dependent tests additionally require AppDataManager data contracts.
 - **Outputs / Downstream Role:** versioned extension descriptors and diagnostics consumed through shared core interfaces.
 
+## Source reassessment authority — 2026-10-30
+
+The [workspace source review](research/workspaces-03-08-source-review.md) adds exact readable context to every blocked complete-contribution order in this file. Its source paths supplement the old Context to Read lists. Shared libraries are available locally; plugin bodies, UI consumers, templates and per-definition fixtures remain separate evidence. A complete-contribution order retains its status until its exact target contract and acceptance cases are specified. New bounded READY suborders below supersede only their named portion.
+
 ## Execution rule for this file
 
 The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. BLOCKED-NOT-EXECUTABLE orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
@@ -53,7 +57,7 @@ efactor(code-editor): migrate code editor workspace and services.
 *Feature:* generate parameter labels and result row classes without implementing indicator comparison calculations.
 **Task ID:** `WO-CE-INDICATOR-PRESENTATION`. **Readiness:** READY-AFTER-FRONTEND-TEST-BOOTSTRAP. **Evidence:** `OBS145-INDICATOR-PRESENTATION-001`. **One commit:** `feat(code-editor): implement indicator test row presentation`.
 
-*Context to Read:* `app/web/package.json`, `app/web/vitest.config.ts`, `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`, `SQX_REFERENCE_ROOT/internal/web/common/Batch1/libs.js` (valueFilled only). No server model or repository file is additional context.
+*Context to Read:* `app/web/package.json`, `app/web/vitest.config.ts`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`, `DONOR_REFERENCE_ROOT/internal/web/common` (resource folder; originally named `libs.js` is not present) (valueFilled only). No server model or repository file is additional context.
 
 *Implementation Files:*
 - **Frontend create:** `app/web/workspaces/code_editor/indicator_test_presentation.ts`.
@@ -95,6 +99,9 @@ efactor(code-editor): migrate code editor workspace and services.
 
 ### `AppCodeEditor`
 
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appcodeeditor). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and 0 previously recovered primary Java files for `AppCodeEditor`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
+
 *Feature:* `AppCodeEditor` complete observed workspace contribution. **Task ID:** `I-AppCodeEditor`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-AppCodeEditor-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
@@ -103,7 +110,7 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Frontend:** `app/web/workspaces/code_editor/CodeEditorWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/code_editor/test_workspace.py`.
 - **Frontend test:** `app/web/tests/workspaces/code_editor/CodeEditorWorkspace.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js`, `SQX_REFERENCE_ROOT/internal/plugins/AppCodeEditor/AppCodeEditor.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js`, `DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement.
 - **Function/signature authorization:** none. Do not create `CodeEditorService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -111,6 +118,9 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CodeEditorImportExport`
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#codeeditorimportexport). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and 4 previously recovered primary Java files for `CodeEditorImportExport`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 
 *Feature:* `CodeEditorImportExport` complete observed workspace contribution. **Task ID:** `I-CodeEditorImportExport`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CodeEditorImportExport-SURFACE-001`.
 
@@ -120,7 +130,7 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Frontend:** `app/web/workspaces/code_editor/ImportExportPanel.tsx`.
 - **Backend test:** `tests/workspaces/code_editor/test_import_export.py`.
 - **Frontend test:** `app/web/tests/workspaces/code_editor/ImportExportPanel.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js`, `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/CodeEditorImportExport.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport`.
 - **Observed actions:** `/importexport/cancel`; `/importexport/export`; `/importexport/import`; `/importexport/list`; `/importexport/overwrite`; `/importexport/overwriteAlways`; `/importexport/skip`; `/importexport/skipAlways`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `ExtensionPackageService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -128,6 +138,9 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `CodeEditorIndicatorTester`
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#codeeditorindicatortester). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 5 previously recovered primary Java files for `CodeEditorIndicatorTester`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 
 *Feature:* `CodeEditorIndicatorTester` complete observed workspace contribution. **Task ID:** `I-CodeEditorIndicatorTester`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-CodeEditorIndicatorTester-SURFACE-001`.
 
@@ -137,7 +150,7 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Frontend:** `app/web/workspaces/code_editor/IndicatorTesterPanel.tsx`.
 - **Backend test:** `tests/workspaces/code_editor/test_indicator_tester.py`.
 - **Frontend test:** `app/web/tests/workspaces/code_editor/IndicatorTesterPanel.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`, `SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/CodeEditorIndicatorTester.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester`.
 - **Observed actions:** `indyTester/addTests`; `indyTester/createNewConfig`; `indyTester/downloadTests`; `indyTester/listIndicators`; `indyTester/loadConfig`; `indyTester/saveConfig`; `indyTester/startTesting`; `indyTester/stopTesting`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `IndicatorTestService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -145,6 +158,9 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletCodeEditor`
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletcodeeditor). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 12 current plugin JavaScript files and 13 previously recovered primary Java files for `ServletCodeEditor`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 
 *Feature:* `ServletCodeEditor` complete observed workspace contribution. **Task ID:** `I-ServletCodeEditor`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletCodeEditor-SURFACE-001`.
 
@@ -154,7 +170,7 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Frontend:** `app/web/workspaces/code_editor/SourceEditor.tsx`.
 - **Backend test:** `tests/workspaces/code_editor/test_commands.py`.
 - **Frontend test:** `app/web/tests/workspaces/code_editor/SourceEditor.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js`, `SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/ServletCodeEditor.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor`.
 - **Observed actions:** `codeeditor/clone`; `codeeditor/compile`; `codeeditor/compileAll`; `codeeditor/compilePlugin`; `codeeditor/createNew`; `codeeditor/createNewDir`; `codeeditor/createNewFile`; `codeeditor/createNewTemplate`; `codeeditor/delete`; `codeeditor/editorAutocomplete`; `codeeditor/findInFiles`; `codeeditor/fixImports`; `codeeditor/getContent`; `codeeditor/listCodeTypes`; `codeeditor/listIndicators`; `codeeditor/listTemplates`; `codeeditor/loadLastOpenedFiles`; `codeeditor/reload`; `codeeditor/reloadApp`; `codeeditor/rename`; `codeeditor/save`; `codeeditor/saveAs`; `codeeditor/saveLastOpenedFiles`; `codeeditor/stopCompilation`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract.
 - **Function/signature authorization:** none. Do not create `CodeEditorCommandService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -162,6 +178,10 @@ efactor(code-editor): migrate code editor workspace and services.
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ## Phase 4.10: Owned executable extension categories
+*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. Source file counts do not establish completion or parity.
+
+
+*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies readable primary source counts for every row below. Missing per-definition target contracts/fixtures remain the gate; no row is blocked because the shared libraries lack readable source.
 
 **Readiness:** BLOCKED-NOT-EXECUTABLE for every row. A source category is not a formula spec. No strategy runtime or generic base-indicator clone is authorized here.
 
@@ -197,8 +217,8 @@ Original historical objects below are retained without modification; new static 
   "confidence": "high",
   "claim": "Extension categories are physically present under internal/extend/Snippets/SQ; platform export templates are present under internal/extend/Code.",
   "sources": [
-    "SQX_REFERENCE_ROOT/internal/extend/Snippets/SQ",
-    "SQX_REFERENCE_ROOT/internal/extend/Code",
+    "DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ",
+    "DONOR_REFERENCE_ROOT/internal/extend/Code",
     "https://strategyquant.com/doc/introduction-2/"
   ],
   "target_domain": "app/extend",
@@ -243,7 +263,7 @@ Original historical objects below are retained without modification; new static 
   "confidence": "high",
   "claim": "948 compiled definitions include 929 non-nested entries, all with corresponding source-file locations under internal/extend/Snippets.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/Snippets.jar!SQ/Blocks"
+    "DONOR_REFERENCE_ROOT/internal/libs/Snippets.jar!SQ/Blocks"
   ],
   "target_domain": "app/extend",
   "related_records": [
@@ -291,7 +311,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js",
       "sha256": "f0aec6f431bdf6506fe06b9f9b503d05b2e5bfbe2f7cad97c2398c87fd3e39b9"
     }
   ],
@@ -308,7 +328,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js"
+      "DONOR_REFERENCE_ROOT/internal/plugins/AppCodeEditor/module.js"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -337,7 +357,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "Direct source inspection identifies these client request literals: /importexport/cancel, /importexport/export, /importexport/import, /importexport/list, /importexport/overwrite, /importexport/overwriteAlways, /importexport/skip, /importexport/skipAlways",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js",
       "sha256": "bfbfeca93e89628bbad88b94dfd472764d56ed5ab4780755e9a5a51335cca319"
     }
   ],
@@ -354,7 +374,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "Direct source inspection identifies these client request literals: /importexport/cancel, /importexport/export, /importexport/import, /importexport/list, /importexport/overwrite, /importexport/overwriteAlways, /importexport/skip, /importexport/skipAlways",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js"
+      "DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorImportExport/ImportExportService.js"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -383,7 +403,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "Direct source inspection identifies these client request literals: indyTester/addTests, indyTester/createNewConfig, indyTester/downloadTests, indyTester/listIndicators, indyTester/loadConfig, indyTester/saveConfig, indyTester/startTesting, indyTester/stopTesting",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js",
       "sha256": "4cd97ae5c5101508b1a71f22e003cd2cd44c5d1d992e0ac737b0f65c04340ec4"
     }
   ],
@@ -400,7 +420,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "Direct source inspection identifies these client request literals: indyTester/addTests, indyTester/createNewConfig, indyTester/downloadTests, indyTester/listIndicators, indyTester/loadConfig, indyTester/saveConfig, indyTester/startTesting, indyTester/stopTesting",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js"
+      "DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -429,7 +449,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "Direct source inspection identifies these client request literals: codeeditor/clone, codeeditor/compile, codeeditor/compileAll, codeeditor/compilePlugin, codeeditor/createNew, codeeditor/createNewDir, codeeditor/createNewFile, codeeditor/createNewTemplate, codeeditor/delete, codeeditor/editorAutocomplete, codeeditor/findInFiles, codeeditor/fixImports, codeeditor/getContent, codeeditor/listCodeTypes, codeeditor/listIndicators, codeeditor/listTemplates, codeeditor/loadLastOpenedFiles, codeeditor/reload, codeeditor/reloadApp, codeeditor/rename, codeeditor/save, codeeditor/saveAs, codeeditor/saveLastOpenedFiles, codeeditor/stopCompilation",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js",
       "sha256": "4f31e22df848ce20f1cab2e9ac34b959c7fba94858980efe7e1426896271f9fd"
     }
   ],
@@ -446,7 +466,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "Direct source inspection identifies these client request literals: codeeditor/clone, codeeditor/compile, codeeditor/compileAll, codeeditor/compilePlugin, codeeditor/createNew, codeeditor/createNewDir, codeeditor/createNewFile, codeeditor/createNewTemplate, codeeditor/delete, codeeditor/editorAutocomplete, codeeditor/findInFiles, codeeditor/fixImports, codeeditor/getContent, codeeditor/listCodeTypes, codeeditor/listIndicators, codeeditor/listTemplates, codeeditor/loadLastOpenedFiles, codeeditor/reload, codeeditor/reloadApp, codeeditor/rename, codeeditor/save, codeeditor/saveAs, codeeditor/saveLastOpenedFiles, codeeditor/stopCompilation",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js"
+      "DONOR_REFERENCE_ROOT/internal/plugins/ServletCodeEditor/services/CodeEditorService.js"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -472,11 +492,11 @@ Original historical objects below are retained without modification; new static 
   "claim": "Indicator-test labels use the portion before the first dot, parenthesized parameter text and bracketed shift. Row styling distinguishes checked/unchecked and case-sensitive leading Passed/Failed/other status. valueFilled treats null, empty, not set and undefined strings as absent. Config-reading defaults in the inspected service are use=true, decimals=6 and shift=1.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js",
       "sha256": "4cd97ae5c5101508b1a71f22e003cd2cd44c5d1d992e0ac737b0f65c04340ec4"
     },
     {
-      "path": "SQX_REFERENCE_ROOT/internal/web/common/Batch1/libs.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/web/common/Batch1/libs.js",
       "sha256": "51274ed7dac393997b786967e41475392fb494d975f74ebc3e2ba5adad1882a6"
     }
   ],
@@ -493,8 +513,8 @@ Original historical objects below are retained without modification; new static 
     "expected_observation": "Indicator-test labels use the portion before the first dot, parenthesized parameter text and bracketed shift. Row styling distinguishes checked/unchecked and case-sensitive leading Passed/Failed/other status. valueFilled treats null, empty, not set and undefined strings as absent. Config-reading defaults in the inspected service are use=true, decimals=6 and shift=1.",
     "actual_observation": "Indicator-test labels use the portion before the first dot, parenthesized parameter text and bracketed shift. Row styling distinguishes checked/unchecked and case-sensitive leading Passed/Failed/other status. valueFilled treats null, empty, not set and undefined strings as absent. Config-reading defaults in the inspected service are use=true, decimals=6 and shift=1.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js",
-      "SQX_REFERENCE_ROOT/internal/web/common/Batch1/libs.js"
+      "DONOR_REFERENCE_ROOT/internal/plugins/CodeEditorIndicatorTester/services/IndicatorTesterService.js",
+      "DONOR_REFERENCE_ROOT/internal/web/common/Batch1/libs.js"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",

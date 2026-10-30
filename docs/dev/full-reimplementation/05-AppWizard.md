@@ -14,6 +14,10 @@ classDiagram
 - **Dependencies:** AppCore shared contracts; AppHome routing contributions. Dataset-dependent tests additionally require AppDataManager data contracts.
 - **Outputs / Downstream Role:** versioned strategy documents, templates and export artifacts consumed through shared core interfaces.
 
+## Source reassessment authority — 2026-10-30
+
+The [workspace source review](research/workspaces-03-08-source-review.md) adds exact readable context to every blocked complete-contribution order in this file. Its source paths supplement the old Context to Read lists. Shared libraries are available locally; plugin bodies, UI consumers, templates and per-definition fixtures remain separate evidence. A complete-contribution order retains its status until its exact target contract and acceptance cases are specified. New bounded READY suborders below supersede only their named portion.
+
 ## Execution rule for this file
 
 The task text and its exact Context to Read list are the entire coding context. READY tasks are independently implementable helper/coordinator slices; their prerequisites must already exist with the stated symbols. BLOCKED-NOT-EXECUTABLE orders authorize no production edits and no guessed DTO/default/algorithm. A senior engineer must replace the listed missing contract with evidence-backed signatures before assigning that order to a coding agent. There is no instruction to make a design decision or research unspecified behavior during a coding commit.
@@ -58,7 +62,7 @@ efactor(wizard): migrate algowizard workspace and rule models.
 *Feature:* sanitize suggested strategy names and generate collision-free display names using the observed naming convention.
 **Task ID:** `WO-WZ-STRATEGY-NAMES`. **Readiness:** READY-AFTER-FRONTEND-TEST-BOOTSTRAP. **Evidence:** `OBS145-WIZARD-NAMES-001`. **One commit:** `feat(wizard): implement strategy name rules`.
 
-*Context to Read:* `app/web/package.json`, `app/web/vitest.config.ts`, `SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-C12ZW4O3.js.map` sources entry `../../../src/helpers/strategyName.ts`. Read sourcesContent for that exact source key; do not copy its text to the repository or port unrelated store code.
+*Context to Read:* `app/web/package.json`, `app/web/vitest.config.ts`, `DONOR_REFERENCE_ROOT/internal/web/AlgoWizard/assets` (resource folder; originally named `index-C12ZW4O3.js.map` is not present) sources entry `../../../src/helpers/strategyName.ts`. Read sourcesContent for that exact source key; do not copy its text to the repository or port unrelated store code.
 
 *Implementation Files:*
 - **Frontend create:** `app/web/workspaces/wizard/strategy_names.ts`.
@@ -97,6 +101,9 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 
 ### `AppWizard`
 
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appwizard). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 0 previously recovered primary Java files for `AppWizard`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
+
 *Feature:* `AppWizard` complete observed workspace contribution. **Task ID:** `I-AppWizard`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-AppWizard-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
@@ -105,7 +112,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Frontend:** `app/web/workspaces/wizard/WizardWorkspace.tsx`.
 - **Backend test:** `tests/workspaces/wizard/test_workspace.py`.
 - **Frontend test:** `app/web/tests/workspaces/wizard/WizardWorkspace.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js`, `SQX_REFERENCE_ROOT/internal/plugins/AppWizard/AppWizard.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js`, `DONOR_REFERENCE_ROOT/internal/plugins/AppWizard/Wizard/WizardAppPlugin.java`.
 - **Observed actions:** `/AlgoWizard/examples/examples.json`; `/algowizard/loadExample`.
 - **Unresolved contract preventing coding:** For every request literal listed here, the complete typed request and response fields, defaults, validation order/error literals, persistence transaction and event payload must be supplied. An opaque dict passthrough is not the contract. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `WizardService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -113,6 +120,9 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletAlgoCloud`
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletalgocloud). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 2 previously recovered primary Java files for `ServletAlgoCloud`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 
 *Feature:* `ServletAlgoCloud` complete observed workspace contribution. **Task ID:** `I-ServletAlgoCloud`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletAlgoCloud-SURFACE-001`.
 
@@ -122,7 +132,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Frontend:** `app/web/workspaces/wizard/CloudExportPanel.tsx`.
 - **Backend test:** `tests/workspaces/wizard/test_cloud_export.py`.
 - **Frontend test:** `app/web/tests/workspaces/wizard/CloudExportPanel.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoCloud`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `CloudExportService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -130,6 +140,9 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletAlgoWizard`
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletalgowizard). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 4 previously recovered primary Java files for `ServletAlgoWizard`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 
 *Feature:* `ServletAlgoWizard` complete observed workspace contribution. **Task ID:** `I-ServletAlgoWizard`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletAlgoWizard-SURFACE-001`.
 
@@ -139,7 +152,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Frontend:** `app/web/workspaces/wizard/VisualBlockPanel.tsx`.
 - **Backend test:** `tests/workspaces/wizard/test_visual_blocks.py`.
 - **Frontend test:** `app/web/tests/workspaces/wizard/VisualBlockPanel.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `VisualBlockService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -147,6 +160,9 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletConstants`
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletconstants). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 2 previously recovered primary Java files for `ServletConstants`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 
 *Feature:* `ServletConstants` complete observed workspace contribution. **Task ID:** `I-ServletConstants`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletConstants-SURFACE-001`.
 
@@ -156,7 +172,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Frontend:** `app/web/workspaces/wizard/WizardCataloguePanel.tsx`.
 - **Backend test:** `tests/workspaces/wizard/test_catalogue.py`.
 - **Frontend test:** `app/web/tests/workspaces/wizard/WizardCataloguePanel.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/ServletConstants/ServletConstants.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletConstants`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `WizardCatalogueService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -164,6 +180,9 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Commit boundary:** after the senior fills the missing contract, one commit for this one feature; if it requires more than one independently testable behavior, the senior splits the work order before assignment.
 
 ### `ServletStrategy`
+
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletstrategy). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 3 previously recovered primary Java files for `ServletStrategy`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+
 
 *Feature:* `ServletStrategy` complete observed workspace contribution. **Task ID:** `I-ServletStrategy`. **Readiness:** BLOCKED-NOT-EXECUTABLE. **Evidence:** `OBS145-ServletStrategy-SURFACE-001`.
 
@@ -173,7 +192,7 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 - **Frontend:** `app/web/workspaces/wizard/StrategyDocumentPanel.tsx`.
 - **Backend test:** `tests/workspaces/wizard/test_strategies.py`.
 - **Frontend test:** `app/web/tests/workspaces/wizard/StrategyDocumentPanel.test.tsx`.
-- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `SQX_REFERENCE_ROOT/internal/plugins/ServletStrategy/ServletStrategy.jar`.
+- **Context to Read:** `app/core/lib/responses.py`, `app/core/lib/errors.py`, `DONOR_REFERENCE_ROOT/internal/plugins/ServletStrategy`.
 - **Observed actions:** No client route literal was established; use the exact carrier context above..
 - **Unresolved contract preventing coding:** The exact public operations, request/response fields, defaults, errors and persisted effects have not been established by this bounded inspection. A module name or Java method name is not a behavioral requirement. Strategy XML node/parameter schemas, conversions and export templates require per-field/per-node fixtures; naming-helper acceptance does not satisfy these contracts.
 - **Function/signature authorization:** none. Do not create `StrategyDocumentService.execute(payload: dict)` or infer CRUD methods from the feature name.
@@ -182,16 +201,18 @@ Use test name `StrategyNames.sanitize` and `StrategyNames.unique` with table cas
 
 ## Phase 5.10: Complete template coverage
 
+*Source reassessment — 2026-10-30:* [Export source availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) records readable templates for all six targets. The shared loader context is now `DONOR_REFERENCE_ROOT/internal/libs/business/loader/TransformEngineLoader.java` and `DONOR_REFERENCE_ROOT/internal/libs/business/loader/StrategyLoader.java`; template semantics and exact golden exports remain to be specified per platform.
+
 **Readiness:** BLOCKED-NOT-EXECUTABLE for export implementation. Donor `internal/ctemplate` and `internal/extend/Code` require structural/semantic fixtures, not generic string replacement. The exact category target catalog is:
 
 | Donor target | Exact target descriptor module |
 | --- | --- |
-| `SQX_REFERENCE_ROOT/internal/extend/Code/EasyLanguage/Main.tpl` | `app/extend/code/easylanguage/descriptor.py` |
-| `SQX_REFERENCE_ROOT/internal/extend/Code/JForex/Main.tpl` | `app/extend/code/jforex/descriptor.py` |
-| `SQX_REFERENCE_ROOT/internal/extend/Code/MetaTrader4/Main.tpl` | `app/extend/code/mql4/descriptor.py` |
-| `SQX_REFERENCE_ROOT/internal/extend/Code/MetaTrader5/Main.tpl` | `app/extend/code/mql5/descriptor.py` |
-| `SQX_REFERENCE_ROOT/internal/extend/Code/NinjaTrader/Main.tpl` | `app/extend/code/ninjatrader/descriptor.py` |
-| `SQX_REFERENCE_ROOT/internal/extend/Code/PseudoCode/Main.tpl` | `app/extend/code/pseudo_code/descriptor.py` |
+| `DONOR_REFERENCE_ROOT/internal/extend/Code/EasyLanguage/Main.tpl` | `app/extend/code/easylanguage/descriptor.py` |
+| `DONOR_REFERENCE_ROOT/internal/extend/Code/JForex/Main.tpl` | `app/extend/code/jforex/descriptor.py` |
+| `DONOR_REFERENCE_ROOT/internal/extend/Code/MetaTrader4/Main.tpl` | `app/extend/code/mql4/descriptor.py` |
+| `DONOR_REFERENCE_ROOT/internal/extend/Code/MetaTrader5/Main.tpl` | `app/extend/code/mql5/descriptor.py` |
+| `DONOR_REFERENCE_ROOT/internal/extend/Code/NinjaTrader/Main.tpl` | `app/extend/code/ninjatrader/descriptor.py` |
+| `DONOR_REFERENCE_ROOT/internal/extend/Code/PseudoCode/Main.tpl` | `app/extend/code/pseudo_code/descriptor.py` |
 
 No descriptor.py file is authorized until its exact template IDs/options/capability fields are specified. Shared global includes have one owner `app/core/wizard/template_helpers.py`, but their functions remain blocked until each used include helper is independently specified. Visual custom blocks/groups and executable Python snippets remain separate contracts.
 
@@ -211,7 +232,7 @@ Original historical objects below are retained without modification; new static 
   "confidence": "high",
   "claim": "24 definitions include template transformation and custom-indicator import/parsing support.",
   "sources": [
-    "SQX_PREVIOUS_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar!com/strategyquant/wizard/desktop/indicators/SCustomIndicatorFileParser.class"
+    "DONOR_REFERENCE_ROOT/internal/libs/SQWizardBusiness.jar!com/strategyquant/wizard/desktop/indicators/SCustomIndicatorFileParser.class"
   ],
   "target_domain": "app/core/wizard",
   "related_records": [],
@@ -257,7 +278,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "Direct source inspection identifies these client request literals: /AlgoWizard/examples/examples.json, /algowizard/loadExample",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js",
       "sha256": "494a9aee7f4bded38f81c68f35521a5a5b7013f93d2f9edf2e5485c8e83ef6a0"
     }
   ],
@@ -274,7 +295,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "Direct source inspection identifies these client request literals: /AlgoWizard/examples/examples.json, /algowizard/loadExample",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js"
+      "DONOR_REFERENCE_ROOT/internal/plugins/AppWizard/AlgoWizardService.js"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -303,7 +324,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar",
       "sha256": "bd40d7d7d7f71c7e7553bbfb3e08f5b700038e8d98263d3ac5dc78a4d4fdc7b7"
     }
   ],
@@ -320,7 +341,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar"
+      "DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoCloud/ServletAlgoCloud.jar"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -349,7 +370,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar",
       "sha256": "f0ff394bb1b905f4e396b6245edd02dec2ddbe99290fb0a12039e71a65ed63cc"
     }
   ],
@@ -366,7 +387,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar"
+      "DONOR_REFERENCE_ROOT/internal/plugins/ServletAlgoWizard/ServletAlgoWizard.jar"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -395,7 +416,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/ServletConstants/ServletConstants.jar",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/ServletConstants/ServletConstants.jar",
       "sha256": "188e5c2312faf36246d0c7d71a2312a9a51f21c2049bec9cd30b98fedec07e24"
     }
   ],
@@ -412,7 +433,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/ServletConstants/ServletConstants.jar"
+      "DONOR_REFERENCE_ROOT/internal/plugins/ServletConstants/ServletConstants.jar"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -441,7 +462,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/plugins/ServletStrategy/ServletStrategy.jar",
+      "path": "DONOR_REFERENCE_ROOT/internal/plugins/ServletStrategy/ServletStrategy.jar",
       "sha256": "ad58850406ffb2bcdf01773459b48bae65a95737a30d023f0442f7fb35bbb5e6"
     }
   ],
@@ -458,7 +479,7 @@ Original historical objects below are retained without modification; new static 
     "actual_observation": "The inspected primary module files establish the module carrier/registration; no complete request/result contract is established by this bounded inspection.",
     "expected_observation": "Module carrier and any literal route arguments present in inspected files.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/plugins/ServletStrategy/ServletStrategy.jar"
+      "DONOR_REFERENCE_ROOT/internal/plugins/ServletStrategy/ServletStrategy.jar"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
@@ -484,7 +505,7 @@ Original historical objects below are retained without modification; new static 
   "claim": "Embedded source ../../../src/helpers/strategyName.ts defines ASCII name sanitization retaining letters/digits/space/underscore/hyphen/dot, with empty replacement default. Name allocation returns an unused base unchanged; when base exists it starts maximum suffix at 1 and returns one above the largest matching parenthesized decimal suffix. These are frontend helper observations, not persistence uniqueness guarantees.",
   "sources": [
     {
-      "path": "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-C12ZW4O3.js.map",
+      "path": "DONOR_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-C12ZW4O3.js.map",
       "sha256": "3e2267455244c03bec2e07ced841e1f10afd9cbba241d32e7cd406d72f0e903c"
     }
   ],
@@ -501,7 +522,7 @@ Original historical objects below are retained without modification; new static 
     "expected_observation": "Embedded source ../../../src/helpers/strategyName.ts defines ASCII name sanitization retaining letters/digits/space/underscore/hyphen/dot, with empty replacement default. Name allocation returns an unused base unchanged; when base exists it starts maximum suffix at 1 and returns one above the largest matching parenthesized decimal suffix. These are frontend helper observations, not persistence uniqueness guarantees.",
     "actual_observation": "Embedded source ../../../src/helpers/strategyName.ts defines ASCII name sanitization retaining letters/digits/space/underscore/hyphen/dot, with empty replacement default. Name allocation returns an unused base unchanged; when base exists it starts maximum suffix at 1 and returns one above the largest matching parenthesized decimal suffix. These are frontend helper observations, not persistence uniqueness guarantees.",
     "artifacts": [
-      "SQX_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-C12ZW4O3.js.map"
+      "DONOR_REFERENCE_ROOT/internal/web/AlgoWizard/assets/index-C12ZW4O3.js.map"
     ]
   },
   "repository_commit": "f5c7d12d5715b8ebee55165b8eddad9068f83cb9",
