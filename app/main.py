@@ -9,13 +9,14 @@ Use `python -m app.main --reload` to restart on Python source changes in app/.
 from __future__ import annotations
 
 import argparse
+import mimetypes
 from asyncio import to_thread
 from collections.abc import AsyncGenerator, Mapping, Sequence
 from contextlib import asynccontextmanager
 from pathlib import Path
 
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request, Response
 
 from app.core.host.logging import get_logger, shutdown_logging
 from app.core.host.persistence import HostPersistence
@@ -23,7 +24,9 @@ from app.core.host.session import SessionManager
 from app.core.host.settings import SettingsManager
 from app.core.host.transport import CredentialTester, install_transport
 from app.core.host.vault import Vault
-from app.workspace.data_manager.data.partition_files import recover_catalog_publications
+from app.workspace.data_manager.data.partition_files import (
+    recover_catalog_publications,
+)
 from app.workspace.data_manager.logs import Logs
 
 logger = get_logger(__name__)
@@ -31,11 +34,130 @@ _MAX_PORT = 65535
 _GRACEFUL_SHUTDOWN_SECONDS = 5
 
 
+def _is_reserved_path(path_str: str) -> bool:
+    normalized = "/" + path_str.strip("/")
+    for prefix in ("/api", "/events", "/health"):
+        if normalized == prefix or normalized.startswith(prefix + "/"):
+            return True
+    return False
+
+
+def _resolve_media_type(path: Path) -> str:
+    if path.suffix == ".js":
+        return "application/javascript"
+    if path.suffix == ".css":
+        return "text/css"
+    if path.suffix == ".html":
+        return "text/html"
+    mime, _ = mimetypes.guess_type(str(path))
+    return mime or "application/octet-stream"
+
+
+def _make_response(
+    status_code: int,
+    media_type: str,
+    headers: Mapping[str, str] | None = None,
+    content: bytes = b"",
+    *,
+    is_head: bool = False,
+) -> Response:
+    body = b"" if is_head else content
+    return Response(
+        content=body,
+        status_code=status_code,
+        media_type=media_type,
+        headers=dict(headers or {}),
+    )
+
+
+def _serve_file(path: Path, is_asset: bool, *, is_head: bool) -> Response:
+    cache = "public, max-age=31536000, immutable" if is_asset else "no-cache"
+    return _make_response(
+        200,
+        _resolve_media_type(path),
+        {"Cache-Control": cache},
+        path.read_bytes(),
+        is_head=is_head,
+    )
+
+
+def _is_asset_path(candidate: Path, assets_dir: Path) -> bool:
+    try:
+        candidate.relative_to(assets_dir)
+        return True
+    except ValueError:
+        return False
+
+
+def install_web_build(application: FastAPI, build_dir: Path) -> None:
+    """Serve the static React/Vite production build and SPA client routes."""
+    resolved_build_dir = build_dir.resolve()
+    assets_dir = (resolved_build_dir / "assets").resolve()
+
+    @application.api_route(
+        "/{full_path:path}",
+        methods=["GET", "HEAD"],
+        include_in_schema=False,
+    )
+    async def serve_spa_or_asset(
+        request: Request,
+        full_path: str = "",
+    ) -> Response:
+        is_head = request.method == "HEAD"
+        if _is_reserved_path(full_path):
+            return _make_response(
+                404,
+                "application/json",
+                content=b'{"detail":"Not Found"}',
+                is_head=is_head,
+            )
+
+        index_file = resolved_build_dir / "index.html"
+        if not index_file.is_file():
+            return _make_response(
+                503,
+                "application/json",
+                {"Cache-Control": "no-store"},
+                b'{"detail":"Web build unavailable"}',
+                is_head=is_head,
+            )
+
+        clean = full_path.lstrip("/")
+        candidate = index_file if not clean else (resolved_build_dir / clean).resolve()
+        try:
+            candidate.relative_to(resolved_build_dir)
+        except ValueError:
+            return _make_response(
+                404,
+                "application/json",
+                content=b'{"detail":"Not Found"}',
+                is_head=is_head,
+            )
+
+        if candidate.is_file():
+            return _serve_file(
+                candidate,
+                _is_asset_path(candidate, assets_dir),
+                is_head=is_head,
+            )
+
+        if clean == "assets" or clean.startswith("assets/") or candidate.suffix:
+            return _make_response(
+                404,
+                "application/json",
+                content=b'{"detail":"Not Found"}',
+                is_head=is_head,
+            )
+
+        return _serve_file(index_file, is_asset=False, is_head=is_head)
+
+
 def create_app(
     persistence: HostPersistence | None = None,
     *,
     vault: Vault | None = None,
     connection_testers: Mapping[str, CredentialTester] | None = None,
+    web_build_dir: Path | None = None,
 ) -> FastAPI:
     """Create an independent application with shared host services in app.state."""
 
@@ -99,6 +221,13 @@ def create_app(
     async def health() -> dict[str, str]:
         """Report that the backend is running after successful startup."""
         return {"status": "ok"}
+
+    web_dir = (
+        web_build_dir
+        if web_build_dir is not None
+        else Path(__file__).resolve().parent / "web" / "dist"
+    )
+    install_web_build(application, web_dir)
 
     return application
 
