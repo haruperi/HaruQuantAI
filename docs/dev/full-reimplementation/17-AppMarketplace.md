@@ -1,4 +1,5 @@
 # AppMarketplace - feature work orders
+> **Status: CLOSED / COMPLETED (2026-10-30)**: Phase 17.1 (`MarketplaceLocale`), Phase 17.2 (`AppMarketplace` models, store, file map, package installer, uninstaller, zip packaging), and `MIG-AppMarketplace` presentation (`MarketplaceWorkspace`, test suite) are fully implemented and verified.
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -34,8 +35,8 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 - **Frontend Create:** `app/web/workspaces/marketplace/locale.ts`.
 - **Test Create:** `app/web/tests/workspace/marketplace/locale.test.ts`.
 *Functional Requirements & Implementation:*
-- [ ] `MarketplaceLocale.from_flag(flag: string | null): string` -> exported static method; null -> en, trim strings, trimmed empty -> en, case-insensitive cz -> cs, otherwise return trimmed original case. No list of supported languages or language guessing.
-- [ ] `test('marketplace language normalization')` -> null,'' and '  ' produce en; 'cz','CZ',' cz ' produce cs; ' EN ' produces EN; 'fr' produces fr.
+- [X] `MarketplaceLocale.from_flag(flag: string | null): string` -> exported static method; null -> en, trim strings, trimmed empty -> en, case-insensitive cz -> cs, otherwise return trimmed original case. No list of supported languages or language guessing.
+- [X] `test('marketplace language normalization')` -> null,'' and '  ' produce en; 'cz','CZ',' cz ' produce cs; ' EN ' produces EN; 'fr' produces fr.
 *Acceptance:* `npm --prefix app/web test -- tests/workspace/marketplace/locale.test.ts` exits 0, one parameterized test group with eight rows.
 *Commit:* `marketplace: preserve bridge locale normalization`.
 
@@ -43,7 +44,7 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 
 All 1 assigned plugin modules remain in scope. The helper above is not acceptance of these complete features. Reserved paths below are exact; do not create service stubs or infer signatures while a row is blocked.
 
-### `AppMarketplace` - I-AppMarketplace - READY
+### `AppMarketplace` - I-AppMarketplace - COMPLETED
 
 *Feature:* complete AppMarketplace workflow.
 *Evidence IDs:* `OBS145-AppMarketplace-SCOPE-001` establishes source presence only; `OBS145-AppMarketplace-HELPER-001` establishes only the separately scoped helper.
