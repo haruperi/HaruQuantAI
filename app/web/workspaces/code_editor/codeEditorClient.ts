@@ -6,8 +6,8 @@
  * - Virtual file system navigation, CRUD, clone, and search
  * - Python AST syntax compilation and dynamic reloading
  * - StrategyQuant X 12 snippet template generators
- * - Indicator tester with Lightweight Charts series
- * - Extension package export/import with collision resolution
+ * - Indicator tester with Lightweight Charts series, batch suite, test distribution, and calibration
+ * - Extension package export/import with interactive conflict resolution
  */
 
 import { createDomainClient, type TransportConfig } from '../../shell/transport';
@@ -210,6 +210,115 @@ export interface FormatDto { format_id: 'python' | 'pseudocode'; name: string; e
 export interface PathInfoDto { file_path: string; ownership: 'builtin' | 'user' | 'host'; protected: boolean; exists: boolean; clone_target: string }
 export interface SnippetOptions { indicator?: string; order_action_type?: string; mc_type?: string }
 
+export interface SuiteIndicatorOptionDto {
+  identity: string;
+  indicator: string;
+  class_name: string;
+  output: string;
+  file_path: string;
+  default_parameters: string;
+  parameters: Record<string, unknown>;
+  protected: boolean;
+}
+
+export interface SuiteTestCaseDto {
+  test_id: string;
+  use: boolean;
+  indicator: string;
+  parameters: string;
+  decimals: number;
+  result: string;
+  shift: number;
+  file_name: string;
+  exists: boolean;
+  show_grid: boolean;
+  errors: string[];
+}
+
+export interface SuiteConfigDto {
+  engine: string;
+  bars_to_reserve: number;
+  tests: SuiteTestCaseDto[];
+}
+
+export interface SuiteSnapshotDto {
+  job_id: string;
+  status: 'IDLE' | 'QUEUED' | 'RUNNING' | 'COMPLETED' | 'STOPPED' | 'FAILED' | 'INTERRUPTED';
+  status_code: 0 | 1 | 3 | 4;
+  progress: number;
+  completed_tests: number;
+  total_tests: number;
+  passed_tests: number;
+  failed_tests: number;
+  skipped_tests: number;
+  cancellation_requested: boolean;
+  message: string;
+  config: SuiteConfigDto;
+  xml_content: string;
+}
+
+export interface TestDistributionSnapshotDto {
+  job_id: string;
+  status: 'IDLE' | 'RUNNING' | 'COMPLETED' | 'FAILED';
+  progress: number;
+  completed: boolean;
+  error: string;
+  installed_files: string[];
+  config_updated: boolean;
+}
+
+export interface CalibrationRequestDto {
+  project_name?: string;
+  task_name?: string | null;
+  symbols: string[];
+  timeframes: string[];
+  engine?: string;
+  max_steps?: number;
+  indicators?: string[];
+  ranges_config_text?: string | null;
+  bars_count?: number;
+}
+
+export interface CalibratedRangeEntryDto {
+  key: string;
+  indicator: string;
+  output: string;
+  min_value: number;
+  max_value: number;
+  step: number;
+  mean: number;
+  std_dev: number;
+  samples: number;
+}
+
+export interface CalibrationResultDto {
+  project_name: string;
+  task_name?: string | null;
+  engine: string;
+  calibrated_count: number;
+  skipped_indicators: string[];
+  ranges: CalibratedRangeEntryDto[];
+}
+
+export interface SkippedImportItemDto {
+  name: string;
+  reason: string;
+}
+
+export interface ImportSessionSnapshotDto {
+  session_id: string;
+  status: 'RUNNING' | 'AWAITING_DECISION' | 'COMPLETED' | 'CANCELLED' | 'TIMED_OUT' | 'FAILED';
+  decision_mode: 0 | 1 | 2 | 3 | 4 | 5;
+  current_conflict: string | null;
+  current_archive: string | null;
+  processed_entries: number;
+  total_entries: number;
+  new_files: string[];
+  not_imported_files: SkippedImportItemDto[];
+  reload_results: CompileResultDto[];
+  message: string;
+}
+
 export function createCodeEditorClient(config: TransportConfig = {}) {
   const client = createDomainClient('/code-editor', config);
 
@@ -377,6 +486,102 @@ export function createCodeEditorClient(config: TransportConfig = {}) {
 
     async editIndicatorParams(testId: string, params: Record<string, unknown>): Promise<IndicatorTestResultDto> {
       return client.post('/indicator-test/edit-params', { test_id: testId, params });
+    },
+
+    async suiteIndicators(): Promise<SuiteIndicatorOptionDto[]> {
+      return client.get('/indicator-suite/indicators');
+    },
+
+    async suiteCreateConfig(
+      indicators: string[] = [],
+      engine = 'MetaTrader4',
+      barsToReserve = 300
+    ): Promise<SuiteSnapshotDto> {
+      return client.post('/indicator-suite/config/new', {
+        indicators,
+        engine,
+        bars_to_reserve: barsToReserve,
+      });
+    },
+
+    async suiteAddTests(indicators: string[], allowDuplicates = false): Promise<SuiteSnapshotDto> {
+      return client.post('/indicator-suite/config/add-tests', {
+        indicators,
+        allow_duplicates: allowDuplicates,
+      });
+    },
+
+    async suiteGetConfig(): Promise<SuiteSnapshotDto> {
+      return client.get('/indicator-suite/config');
+    },
+
+    async suiteLoadConfig(xmlContent?: string): Promise<SuiteSnapshotDto> {
+      return client.post('/indicator-suite/config/load', { xml_content: xmlContent ?? null });
+    },
+
+    async suiteSaveConfig(payload: { config?: SuiteConfigDto; xml_content?: string }): Promise<SuiteSnapshotDto> {
+      return client.post('/indicator-suite/config/save', payload);
+    },
+
+    async suiteStart(payload: { config?: SuiteConfigDto; selected_only?: boolean } = {}): Promise<SuiteSnapshotDto> {
+      return client.post('/indicator-suite/start', {
+        config: payload.config ?? null,
+        selected_only: payload.selected_only ?? true,
+      });
+    },
+
+    async suiteStop(jobId?: string): Promise<SuiteSnapshotDto> {
+      const q = jobId ? `?job_id=${encodeURIComponent(jobId)}` : '';
+      return client.post(`/indicator-suite/stop${q}`, {});
+    },
+
+    async suiteStatus(jobId?: string): Promise<SuiteSnapshotDto> {
+      const q = jobId ? `?job_id=${encodeURIComponent(jobId)}` : '';
+      return client.get(`/indicator-suite/status${q}`);
+    },
+
+    async downloadTests(payload: {
+      archive_path?: string;
+      source_url?: string;
+      expected_sha256: string;
+    }): Promise<TestDistributionSnapshotDto> {
+      return client.post('/indicator-suite/download-tests', payload);
+    },
+
+    async downloadTestsStatus(jobId?: string): Promise<TestDistributionSnapshotDto> {
+      const q = jobId ? `?job_id=${encodeURIComponent(jobId)}` : '';
+      return client.get(`/indicator-suite/download-status${q}`);
+    },
+
+    async calibrateIndicators(payload: CalibrationRequestDto): Promise<CalibrationResultDto> {
+      return client.post('/indicator-suite/calibrate', payload);
+    },
+
+    async listExportableFiles(filterText = ''): Promise<NavigatorItemDto> {
+      const q = filterText ? `?filter_text=${encodeURIComponent(filterText)}` : '';
+      return client.get(`/import-export/list${q}`);
+    },
+
+    async startImportSession(
+      archivePaths: string[],
+      timeoutSeconds = 60
+    ): Promise<ImportSessionSnapshotDto> {
+      return client.post('/import-export/session/start', {
+        archive_paths: archivePaths,
+        timeout_seconds: timeoutSeconds,
+      });
+    },
+
+    async getImportSession(sessionId?: string): Promise<ImportSessionSnapshotDto> {
+      const q = sessionId ? `?session_id=${encodeURIComponent(sessionId)}` : '';
+      return client.get(`/import-export/session${q}`);
+    },
+
+    async applyImportSessionAction(
+      sessionId: string,
+      action: 'overwrite' | 'overwrite_always' | 'skip' | 'skip_always' | 'cancel'
+    ): Promise<ImportSessionSnapshotDto> {
+      return client.post('/import-export/session/action', { session_id: sessionId, action });
     },
   };
 }

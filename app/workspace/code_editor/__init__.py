@@ -23,6 +23,14 @@ from app.workspace.code_editor._common import (
 from app.workspace.code_editor.editor import AppCodeEditor
 from app.workspace.code_editor.http import router as code_editor_router
 from app.workspace.code_editor.import_export import ImportExport
+from app.workspace.code_editor.import_session import ImportSessionService
+from app.workspace.code_editor.indicator_calibration import (
+    IndicatorCalibrationService,
+)
+from app.workspace.code_editor.indicator_suite import IndicatorSuiteService
+from app.workspace.code_editor.indicator_test_distribution import (
+    IndicatorTestDistributionService,
+)
 from app.workspace.code_editor.indicator_tester import IndicatorTester
 from app.workspace.code_editor.routes import CodeEditor
 from app.workspace.code_editor.templates import (
@@ -37,6 +45,10 @@ __all__ = [
     "CodeEditorError",
     "EditorTab",
     "ImportExport",
+    "ImportSessionService",
+    "IndicatorCalibrationService",
+    "IndicatorSuiteService",
+    "IndicatorTestDistributionService",
     "IndicatorTester",
     "SyntaxDiagnostic",
     "code_editor_router",

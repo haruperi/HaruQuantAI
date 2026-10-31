@@ -45,15 +45,25 @@ from app.workspace.code_editor.results import (
     ArchiveEntry,
     ExportResult,
     ImportResult,
+    NavigatorItem,
     PackageManifest,
 )
 from app.workspace.code_editor.routes import CodeEditor
 
 logger = logging.getLogger(__name__)
 
+MAX_ARCHIVE_SIZE = 10 * 1024 * 1024
+MAX_ARCHIVE_ENTRIES = 500
+MAX_UNCOMPRESSED_SIZE = 25 * 1024 * 1024
+
 
 class ImportExport:
     """Handles archiving, export, and conflict-resolved import of extension snippets."""
+
+    def list_exportable(self, filter_text: str = "") -> NavigatorItem:
+        """FR-CODEEDITOR-EXPORT-LIST: List user-owned snippets for export."""
+        logger.debug("FR-code-editor-import-export: list_exportable invoked")
+        return CodeEditor().navigator(ownership="user", filter_text=filter_text)
 
     def export(
         self,
