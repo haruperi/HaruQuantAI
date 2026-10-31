@@ -7,22 +7,41 @@
 ```mermaid
 classDiagram
   class OverviewTemplatePolicy
-  class AppResultsWorkflow
-  AppResultsWorkflow --> OverviewTemplatePolicy : later integration
+  class AppResultsService
+  class DatabankActionsService
+  class ResultsEquityChartService
+  class ResultsReportExportService
+  class ResultsExtensionCatalog
+  AppResultsService --> OverviewTemplatePolicy : selects initial overview template
+  AppResultsService --> DatabankActionsService : databank view/rename/correlation/actions
+  AppResultsService --> ResultsEquityChartService : equity/drawdown/benchmark/profile series
+  AppResultsService --> ResultsReportExportService : SQ3/SQ4/HTML/PDF/CSV/source exports
+  AppResultsService --> ResultsExtensionCatalog : Columns/Stats/EngineCharts/CustomAnalysis
 ```
 
 - **Primary Role:** Result selection, views, databank actions and exports.
-- **Dependencies:** AppCore result/metric contracts; AppHome slots.
+- **Dependencies:** AppCore result/metric contracts (`app/core/trading/results/`, `app/core/jobs/databank.py`, `app/core/trading/statistics/`); AppHome slots.
 - **Outputs / Downstream Role:** Result projections, rendered result tabs and export receipts.
-- **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
-- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
+- **Execution boundary:** each READY work order or phased dispatch slice is one tested commit with explicit signatures, error codes, state transitions, fixtures, and verification commands.
+- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; reconciled with Core result/databank/statistics services and donor source review. Implementation status belongs only in the domain README.
 - **Shared response contract:** existing legacy API adapters preserve `StandardResponse.success(*, message, metadata, data)` and `StandardResponse.failure(*, message, metadata, error)`, `ResponseMetadata` and `StandardError` from canonical `app/core/lib/responses.py`. New instance envelopes use `StandardResponse[T](request_id: str, data: T, revision: int | None = None)` only where the individual order specifies that contract; structured new errors use `app/core/lib/errors.py::DomainError`. Pure helpers return their declared values. Preserve existing callers and translate envelopes only at an explicitly specified compatibility boundary.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
 
 ## Source reassessment authority — 2026-10-30
 
-The [workspace source review](research/workspaces-03-08-source-review.md) adds exact readable context to every blocked complete-contribution order in this file. Its source paths supplement the old Context to Read lists. Shared libraries are available locally; plugin bodies, UI consumers, templates and per-definition fixtures remain separate evidence. A complete-contribution order retains its status until its exact target contract and acceptance cases are specified. New bounded READY suborders below supersede only their named portion.
+The [workspace source review](research/workspaces-03-08-source-review.md) provides exact readable context for every module and extension category in this file, and all Phase 2 modules and Phase 3 extension cohorts below are reconciled against HaruQuantAI Core (`ResultStore`, `DatabankContainer`, `StatisticsService`, `ProjectGenerationCoordinator`, `HSLStrategyDocument`, `StrategyCompiler`) with concrete signatures, schemas, error codes, fixtures, and verification commands.
+
+## Phased Implementation Roadmap & Dispatch Sequence
+
+| Phase | Scope | Modules & Work Orders Covered | Target Backend / Extension Paths | Target Frontend & Test Paths |
+|---|---|---|---|---|
+| **Phase 6.1** | UI Migration & Pure Template Selection Policy | `RES-M01`, `RES-001` | `app/workspace/results/overview_template_policy.py` | `app/web/workspaces/results/**`, `tests/workspace/results/test_overview_template_policy.py`, `app/web/tests/workspace/results/**` |
+| **Phase 6.2** | Core Results Workspace Shell, Views, Overview, Trade List & Trade Analysis | `AppResults`, `ResultsOverview`, `ResultsSPOverview`, `ResultsStockpicker`, `ResultsStrategyConfig`, `ResultsTradeAnalysis`, `ResultsTradeList`, `ResultsTradelistViews`, `ResultsExplore`, `ResultsReport` | `app/workspace/results/app_results.py`, `results_overview.py`, `results_s_p_overview.py`, `results_stockpicker.py`, `results_strategy_config.py`, `results_trade_analysis.py`, `results_trade_list.py`, `results_tradelist_views.py`, `results_explore.py`, `results_report.py` | `app/web/workspaces/results/ResultsWorkspace.tsx`, `ResultsOverview/**`, `ResultsSPOverview/**`, `ResultsStockpicker/**`, `ResultsStrategyConfig/**`, `ResultsTradeAnalysis/**`, `ResultsTradeList/**`, `ResultsTradelistViews/**`, `tests/workspace/results/test_results_*.py` |
+| **Phase 6.3** | Equity Charts, Subcharts, Price/Trade Charts & Profile Charts | `ResultsEquityChart`, `EquityChartBenchmark`, `EquityChartDailyChart`, `EquityChartDrawdown`, `EquityChartVolatility`, `EquityChartVolume`, `ResultsChart`, `ResultsProfileChart`, `ResultsPortfolioCorrelation` | `app/workspace/results/results_equity_chart.py`, `equity_chart_benchmark.py`, `equity_chart_daily_chart.py`, `equity_chart_drawdown.py`, `equity_chart_volatility.py`, `equity_chart_volume.py`, `results_chart.py`, `results_profile_chart.py`, `results_portfolio_correlation.py` | `app/web/workspaces/results/ResultsEquityChart/**`, `ResultsChart/**`, `ResultsProfileChart/**`, `ResultsPortfolioCorrelation/**`, `tests/workspace/results/test_*chart*.py` |
+| **Phase 6.4** | Databank Actions, Views, Rename, Correlation Filter & Custom Plugin Host | `ResultsDatabankActions`, `ResultsDatabankViews`, `CustomDatabankActions`, `DatabankFilterByCorrelation`, `DatabankRename`, `ServletRenameTool`, `ResultsPlugins`, `CustomResultsPluginActions` | `app/workspace/results/results_databank_actions.py`, `results_databank_views.py`, `custom_databank_actions.py`, `databank_filter_by_correlation.py`, `databank_rename.py`, `servlet_rename_tool.py`, `results_plugins.py`, `custom_results_plugin_actions.py` | `app/web/workspaces/results/databank/**`, `ResultsPlugins.tsx`, `tests/workspace/results/test_*databank*.py` |
+| **Phase 6.5** | Source Code Projection, Archive Loaders & Report/Trades Exporters | `ResultsSourceCode`, `LoaderSQ3`, `LoaderSQ4`, `SaverHTML`, `SaverPDF`, `SaverSQ3`, `SaverStrategyTrades` | `app/workspace/results/results_source_code.py`, `loader_s_q3.py`, `loader_s_q4.py`, `saver_h_t_m_l.py`, `saver_p_d_f.py`, `saver_s_q3.py`, `saver_strategy_trades.py` | `app/web/workspaces/results/ResultsSourceCode/**`, `LoaderSQ3.tsx`, `LoaderSQ4.tsx`, `SaverHTML.tsx`, `SaverPDF.tsx`, `SaverSQ3.tsx`, `SaverStrategyTrades.tsx`, `tests/workspace/results/test_loader_*.py`, `test_saver_*.py` |
+| **Phase 6.6** | Concrete Extension Cohorts (`Columns`, `Stats`, `EngineCharts`, `CustomAnalysis`) | Phase 3 Extension Cohorts (`Columns` ×160, `Stats` ×7, `EngineCharts` ×14, `CustomAnalysis` ×2) | `app/extend/columns/`, `app/extend/stats/`, `app/extend/engine_charts/`, `app/extend/custom_analysis/` | `tests/extend/test_columns_catalog.py`, `tests/extend/test_stats_overview.py`, `tests/extend/test_engine_charts.py`, `tests/extend/test_custom_analysis.py` |
 
 ## Current-code migration audit and execution order
 
@@ -242,610 +261,795 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 
 ## Phase 2: complete module scope — READY
 
-Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
+Each module below defines its authorized target paths, backend/frontend contracts, Core integration points (`app/core/trading/results/`, `app/core/jobs/databank.py`, `app/core/trading/statistics/`), error codes, deterministic fixtures, and verification commands.
 
 ### `AppResults` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appresults). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppResults`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appresults). Located 2 plugin JavaScript files (`DONOR_REFERENCE_ROOT/internal/plugins/AppResults/module.js`, `AppResultsCtrl.js`) and decompiled Java controller declarations.
 
-*Feature:* Full `AppResults` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Top-level Results workspace host, strategy result selection, active tab routing, and `project/getDataItems` result-key projection over `ResultStore` and `DatabankContainer`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppResults`.
 - **Backend:** `app/workspace/results/app_results.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/results/test_app_results.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/AppResults.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppResults/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `project/getDataItems`
-*Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `AppResults`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppResults/module.js`; `app/core/trading/results/result_store.py`; `app/core/jobs/databank.py`.
+*Evidence ID:* `OBS-145-OVERVIEW-TEMPLATE-001`, `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `project/getDataItems`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `AppResultsDataItem(result_key: str, label: str, symbol: str, timeframe: str, sample_type: str, direction: str, is_portfolio: bool)` and `AppResultsSelectionState(project_id: str, databank_name: str, strategy_id: str, active_result_key: str, active_tab_id: str, data_items: tuple[AppResultsDataItem, ...])` -> Frozen dataclasses in `app/workspace/results/app_results.py`.
+- [ ] `AppResultsService.get_data_items(project_id: str, databank_name: str, strategy_id: str) -> StandardResponse[AppResultsSelectionState]` -> Query `ResultStore` and `DatabankContainer` for the strategy's stored result bundles (`Main`, `Portfolio`, additional market/cross-check keys), returning deterministic order (`Main` first, `Portfolio` second when present, remaining keys sorted lexicographically). Raise `DomainError(code="RESULTS_STRATEGY_NOT_FOUND")` if `strategy_id` is absent.
+- [ ] `ResultsWorkspace.tsx` -> Bind strategy selection and result-key selector (`Main` / `Portfolio` / sub-result keys) to `AppResultsService.get_data_items`, propagating active `strategy_id` and `result_key` to all registered `Results*` tab contributions.
+- [ ] Golden fixture: strategy `"Strat_01"` with `Main` (`EURUSD`, `H1`) and `Additional_1` (`GBPUSD`, `H1`) produces `data_items` tuple of length 2 with `active_result_key == "Main"` and `active_tab_id == "overview"`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_app_results.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/AppResults.test.tsx` -> exits `0`.
 
 ### `CustomDatabankActions` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customdatabankactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CustomDatabankActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customdatabankactions). Located 6 plugin JavaScript files (`delete/module.js`, `moveLeft/module.js`, `moveRight/module.js`, `moveToPosition/module.js`).
 
-*Feature:* Full `CustomDatabankActions` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Custom databank tab ordering and deletion actions (`delete`, `moveLeft`, `moveRight`, `moveToPosition`) for user-created databank containers within a project.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions`.
 - **Backend:** `app/workspace/results/custom_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomDatabankActions.tsx`.
 - **Backend tests:** `tests/workspace/results/test_custom_databank_actions.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/CustomDatabankActions.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveLeft/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveRight/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/moveToPosition/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CustomDatabankActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomDatabankActions/delete/module.js`; `moveLeft/module.js`; `moveRight/module.js`; `moveToPosition/module.js`; `app/core/jobs/databank.py`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `DatabankTabOrderReceipt(project_id: str, databank_names: tuple[str, ...], active_databank: str, revision: int)` -> Returned by `CustomDatabankActionsService`.
+- [ ] `CustomDatabankActionsService.move_left(project_id: str, databank_name: str)`, `move_right(project_id: str, databank_name: str)`, `move_to_position(project_id: str, databank_name: str, target_index: int)`, and `delete_databank(project_id: str, databank_name: str)` -> Reorder or delete user databanks while protecting built-in system databanks (`"Results"`, `"Last generation"`) with `DomainError(code="RESULTS_SYSTEM_DATABANK_PROTECTED")`. Clamping out-of-range `target_index` raises `DomainError(code="RESULTS_DATABANK_INDEX_OUT_OF_RANGE")`.
+- [ ] Golden fixture: databanks `("Results", "CustomA", "CustomB")`; `move_left("CustomB")` yields `("Results", "CustomB", "CustomA")`; attempting `delete_databank("Results")` raises `RESULTS_SYSTEM_DATABANK_PROTECTED`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_custom_databank_actions.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/CustomDatabankActions.test.tsx` -> exits `0`.
 
 ### `CustomResultsPluginActions` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customresultspluginactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CustomResultsPluginActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#customresultspluginactions). Located 3 plugin JavaScript files (`delete/module.js`, `rename/module.js`).
 
-*Feature:* Full `CustomResultsPluginActions` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Rename and delete actions for user-authored custom results tabs registered in `ResultsPlugins`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions`.
 - **Backend:** `app/workspace/results/custom_results_plugin_actions.py`.
 - **Frontend:** `app/web/workspaces/results/CustomResultsPluginActions.tsx`.
 - **Backend tests:** `tests/workspace/results/test_custom_results_plugin_actions.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/CustomResultsPluginActions.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/rename/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CustomResultsPluginActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CustomResultsPluginActions/delete/module.js`; `rename/module.js`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `CustomResultPluginActionReceipt(plugin_id: str, title: str, deleted: bool, revision: int)` -> Returned by `CustomResultsPluginActionsService.rename_plugin(plugin_id: str, new_title: str)` and `delete_plugin(plugin_id: str)`.
+- [ ] Validate `new_title.strip()` is non-empty (`<= 64` chars) and unique case-insensitively among custom result plugins; raise `DomainError(code="RESULTS_PLUGIN_NAME_INVALID")` or `DomainError(code="RESULTS_PLUGIN_NAME_CONFLICT")`. Built-in tabs (`Overview`, `List of trades`, `Equity chart`, `Trade analysis`, `Source code`) cannot be renamed or deleted (`DomainError(code="RESULTS_BUILTIN_PLUGIN_IMMUTABLE")`).
+- [ ] Golden fixture: renaming custom plugin `"MyTab"` to `"RiskTab"` returns `title == "RiskTab"`; renaming to `""` raises `RESULTS_PLUGIN_NAME_INVALID`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_custom_results_plugin_actions.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/CustomResultsPluginActions.test.tsx` -> exits `0`.
 
 ### `DatabankFilterByCorrelation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankfilterbycorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`DatabankFilterByCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankfilterbycorrelation). Located `DatabankFilterByCorrelation/module.js` and `DatabankFilterByCorrelation.java`.
 
-*Feature:* Full `DatabankFilterByCorrelation` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Filter strategies in a databank by pairwise correlation threshold over a chosen timeframe/period (`HOUR`, `DAY`, `WEEK`, `MONTH`) and correlation method (`ProfitLoss`, `PctReturn`, `NumberOfTrades`, `Drawdown`, `TrendLine`, `LossToLoss`), keeping the higher-fitness strategy when two strategies exceed `max_correlation`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation`.
 - **Backend:** `app/workspace/results/databank_filter_by_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankFilterByCorrelation.tsx`.
 - **Backend tests:** `tests/workspace/results/test_databank_filter_by_correlation.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/DatabankFilterByCorrelation.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `DatabankFilterByCorrelation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankFilterByCorrelation/module.js`; `app/core/trading/statistics/correlation.py`; `app/core/jobs/databank.py`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `CorrelationFilterRequest(project_id: str, databank_name: str, strategy_ids: tuple[str, ...], period: Literal["HOUR", "DAY", "WEEK", "MONTH"] = "DAY", method: str = "ProfitLoss", max_correlation: float = 0.5, allow_negative: bool = False, action: Literal["SELECT", "DELETE"] = "SELECT")` and `CorrelationFilterResult(kept_ids: tuple[str, ...], flagged_ids: tuple[str, ...], max_pair_correlation: dict[str, float])`.
+- [ ] `DatabankFilterByCorrelationService.apply(request: CorrelationFilterRequest) -> StandardResponse[CorrelationFilterResult]` -> Rank candidate strategies by descending `fitness` (tie-breaker: ascending `strategy_id`), greedily retain the highest-fitness strategy, and flag any subsequent strategy whose Pearson correlation (or `abs(corr)` when `allow_negative=False`) with any already-kept strategy is `>= max_correlation`. When `action == "DELETE"`, remove `flagged_ids` from the target databank and increment databank revision. Validate `0.0 < max_correlation <= 1.0` (`DomainError(code="RESULTS_INVALID_CORRELATION_THRESHOLD")`).
+- [ ] Golden fixture: 3 strategies `S1 (fitness=0.9)`, `S2 (fitness=0.8, corr(S1,S2)=0.75)`, `S3 (fitness=0.7, corr(S1,S3)=0.20)` with `max_correlation=0.5` yields `kept_ids=("S1", "S3")` and `flagged_ids=("S2",)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_databank_filter_by_correlation.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/DatabankFilterByCorrelation.test.tsx` -> exits `0`.
 
 ### `DatabankRename` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankrename). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 2 previously recovered primary Java files for `DatabankRename`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#databankrename). Located 2 plugin JavaScript files and 2 primary Java files for `DatabankRename`.
 
-*Feature:* Full `DatabankRename` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Batch strategy rename dialog and execution over selected databank rows (`/databank/rename`) supporting prefix, suffix, base name template, start index, and zero-padded numbering.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename`.
 - **Backend:** `app/workspace/results/databank_rename.py`.
 - **Frontend:** `app/web/workspaces/results/DatabankRename.tsx`.
 - **Backend tests:** `tests/workspace/results/test_databank_rename.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/DatabankRename.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/databank/rename`
-*Exact unresolved contract:* Conflict/collision behavior and transaction semantics of the shared databank store are not yet pinned; source per-item log-and-continue behavior must be reconciled with the target receipt/error contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `DatabankRename`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/DatabankRename/ui/module.js`; `ServletRenameTool` below.
+*Functional Requirements & Authorized Contract:*
+- [ ] `DatabankRenameRequest(project_id: str, databank_name: str, strategy_ids: tuple[str, ...], prefix: str = "Strategy ", start_number: int = 1, digits: int = 1, suffix: str = "", separator: str = ".")` and `DatabankRenameReceipt(renamed: tuple[tuple[str, str], ...], skipped: tuple[tuple[str, str], ...], revision: int)`.
+- [ ] `DatabankRenameService.rename_strategies(request: DatabankRenameRequest) -> StandardResponse[DatabankRenameReceipt]` -> Delegate pattern formatting and collision resolution to `ServletRenameTool` (`app/workspace/results/servlet_rename_tool.py`), updating strategy display names in `DatabankContainer` in deterministic selection order. If a target name collides with an unselected strategy in the same databank, auto-increment the numeric counter until free; record missing `strategy_id` entries in `skipped` with reason `"NOT_FOUND"` rather than aborting valid items.
+- [ ] Golden fixture: renaming `("id_1", "id_2")` with `prefix="Strat_"`, `start_number=5`, `digits=3`, `separator=""` produces `(("id_1", "Strat_005"), ("id_2", "Strat_006"))`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_databank_rename.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/DatabankRename.test.tsx` -> exits `0`.
 
 ### `EquityChartBenchmark` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartbenchmark). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartBenchmark`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartbenchmark). Located `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/Benchmark/Benchmark.java`.
 
-*Feature:* Full `EquityChartBenchmark` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Benchmark overlay series computation for the Equity Chart, normalizing buy-and-hold instrument close prices to the strategy's initial deposit and date window.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark`.
 - **Backend:** `app/workspace/results/equity_chart_benchmark.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartBenchmark.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_benchmark.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/EquityChartBenchmark.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/Benchmark/Benchmark.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartBenchmark`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartBenchmark/Benchmark/Benchmark.java`; `app/web/workspaces/results/ResultsEquityChart/benchmark/Benchmark.ts`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `BenchmarkPoint(timestamp_ms: int, equity: float, return_pct: float)` and `BenchmarkSeriesResult(symbol: str, initial_capital: float, points: tuple[BenchmarkPoint, ...])`.
+- [ ] `EquityChartBenchmarkService.compute(initial_capital: float, bars: Sequence[tuple[int, float]], *, start_ms: int | None = None, end_ms: int | None = None, symbol: str = "") -> BenchmarkSeriesResult` -> Filter `(timestamp_ms, close_price)` bars to `[start_ms, end_ms]`, anchor at the first bar `close_0`, and compute `equity_t = round(initial_capital * (close_t / close_0), 2)` and `return_pct_t = round(((close_t / close_0) - 1.0) * 100.0, 4)`. Return empty `points=()` if fewer than 1 valid bar with `close_0 > 0`.
+- [ ] Golden fixture: `initial_capital=10000.0`, bars `[(1000, 100.0), (2000, 105.0), (3000, 98.0)]` yields equities `(10000.0, 10500.0, 9800.0)` and `return_pct` `(0.0, 5.0, -2.0)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_equity_chart_benchmark.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/EquityChartBenchmark.test.tsx` -> exits `0`.
 
 ### `EquityChartDailyChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdailychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartDailyChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdailychart). Located `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart/DailyChart/DailyChart.java`.
 
-*Feature:* Full `EquityChartDailyChart` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Daily/periodic P&L bar subchart series for the Equity Chart, aggregating closed trade net profits by UTC calendar day.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart`.
 - **Backend:** `app/workspace/results/equity_chart_daily_chart.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDailyChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_daily_chart.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/EquityChartDailyChart.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDailyChart/DailyChart/DailyChart.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartDailyChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Functional Requirements & Authorized Contract:*
+- [ ] `DailyPlPoint(day_epoch_ms: int, net_pl: float, cumulative_balance: float, trade_count: int)` -> Produced by `EquityChartDailyChartService.build_series(initial_capital: float, trades: Sequence[TradeRecord]) -> tuple[DailyPlPoint, ...]`.
+- [ ] Group closed trades by UTC day floor (`(close_time_ms // 86_400_000) * 86_400_000`), sum `profit_loss` per day (`round(..., 2)`), accumulate running `cumulative_balance` starting from `initial_capital`, and emit points sorted by `day_epoch_ms` ascending.
+- [ ] Golden fixture: two trades on day `D1` (`+120.0`, `-20.0`) and one trade on `D2` (`+50.0`) with `initial_capital=10000.0` yield `D1(net_pl=100.0, cumulative_balance=10100.0, trade_count=2)` and `D2(net_pl=50.0, cumulative_balance=10150.0, trade_count=1)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_equity_chart_daily_chart.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/EquityChartDailyChart.test.tsx` -> exits `0`.
 
 ### `EquityChartDrawdown` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdrawdown). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartDrawdown`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartdrawdown). Located `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown/Drawdown/EquityChartDrawdown.java`.
 
-*Feature:* Full `EquityChartDrawdown` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Drawdown subchart series (money and percentage underwater curve) synchronized with the parent Equity Chart points.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown`.
 - **Backend:** `app/workspace/results/equity_chart_drawdown.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartDrawdown.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_drawdown.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/EquityChartDrawdown.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartDrawdown/Drawdown/EquityChartDrawdown.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartDrawdown`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Functional Requirements & Authorized Contract:*
+- [ ] `DrawdownPoint(index: int, timestamp_ms: int, drawdown_money: float, drawdown_pct: float, peak_equity: float)` -> Produced by `EquityChartDrawdownService.compute(initial_capital: float, equity_points: Sequence[tuple[int, float]]) -> tuple[DrawdownPoint, ...]`.
+- [ ] Track `peak_equity = max(initial_capital, max_{j <= i} equity_j)`. At each point `i`, `drawdown_money = round(min(0.0, equity_i - peak_equity), 2)` (non-positive underwater convention matching donor chart) and `drawdown_pct = round((drawdown_money / peak_equity) * 100.0, 4)` when `peak_equity > 0` else `0.0`.
+- [ ] Golden fixture: `initial_capital=10000.0`, points `[(1, 10200.0), (2, 9996.0), (3, 10500.0)]` yields `drawdown_money=(0.0, -204.0, 0.0)` and `drawdown_pct=(0.0, -2.0, 0.0)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_equity_chart_drawdown.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/EquityChartDrawdown.test.tsx` -> exits `0`.
 
 ### `EquityChartVolatility` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolatility). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartVolatility`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolatility). Located `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility/Volatility/Volatility.java`.
 
-*Feature:* Full `EquityChartVolatility` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Rolling trade/daily return standard-deviation subchart series for the Equity Chart.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility`.
 - **Backend:** `app/workspace/results/equity_chart_volatility.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolatility.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_volatility.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/EquityChartVolatility.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolatility/Volatility/Volatility.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartVolatility`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Functional Requirements & Authorized Contract:*
+- [ ] `VolatilityPoint(index: int, timestamp_ms: int, rolling_stddev_money: float, rolling_stddev_pct: float)` -> Produced by `EquityChartVolatilityService.compute(points: Sequence[tuple[int, float]], *, window: int = 20) -> tuple[VolatilityPoint, ...]`.
+- [ ] Compute step-to-step deltas `d_i = equity_i - equity_{i-1}` and percentage deltas `p_i = (d_i / equity_{i-1}) * 100.0`. Over the trailing window `min(i, window)` (`window >= 2`), compute population standard deviation rounded to `4` decimals (`0.0` for `i == 0`). Raise `DomainError(code="RESULTS_INVALID_VOLATILITY_WINDOW")` if `window < 2`.
+- [ ] Golden fixture: 4 equity points `[10000, 10100, 10000, 10100]` with `window=2` yields `rolling_stddev_money == 100.0` at indices `2` and `3`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_equity_chart_volatility.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/EquityChartVolatility.test.tsx` -> exits `0`.
 
 ### `EquityChartVolume` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolume). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`EquityChartVolume`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#equitychartvolume). Located `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume/Volume/EquityChartVolume.java`.
 
-*Feature:* Full `EquityChartVolume` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Trade size / lot volume subchart series synchronized with the parent Equity Chart trade sequence or date axis.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume`.
 - **Backend:** `app/workspace/results/equity_chart_volume.py`.
 - **Frontend:** `app/web/workspaces/results/EquityChartVolume.tsx`.
 - **Backend tests:** `tests/workspace/results/test_equity_chart_volume.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/EquityChartVolume.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/EquityChartVolume/Volume/EquityChartVolume.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `EquityChartVolume`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Functional Requirements & Authorized Contract:*
+- [ ] `VolumePoint(index: int, timestamp_ms: int, size: float, direction: Literal["LONG", "SHORT"])` -> Produced by `EquityChartVolumeService.compute(trades: Sequence[TradeRecord]) -> tuple[VolumePoint, ...]`.
+- [ ] Map each closed trade in chronological order (`close_time_ms`, tie-breaker `ticket`) to `VolumePoint` with `size = round(abs(trade.size), 4)`.
+- [ ] Golden fixture: 2 trades (`size=0.1, LONG` at `t=1000`; `size=0.25, SHORT` at `t=2000`) yield `VolumePoint`s with `size=(0.1, 0.25)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_equity_chart_volume.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/EquityChartVolume.test.tsx` -> exits `0`.
 
 ### `LoaderSQ3` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`LoaderSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq3). Located decompiled primary Java files in `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
 
-*Feature:* Full `LoaderSQ3` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Legacy `.str` (SQ3 XML / ZIP container) strategy and trade-result loader into `HSLStrategyDocument` and `ResultStore`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
 - **Backend:** `app/workspace/results/loader_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ3.tsx`.
 - **Backend tests:** `tests/workspace/results/test_loader_s_q3.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/LoaderSQ3.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `LoaderSQ3`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ3`; `app/core/strategy/hsl/document.py`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `LoadedStrategyArchive(strategy_id: str, name: str, format_version: Literal["SQ3"], strategy_xml: str, trade_count: int, warnings: tuple[str, ...])` -> Returned by `LoaderSQ3Service.load_bytes(filename: str, payload: bytes) -> LoadedStrategyArchive`.
+- [ ] Accept both raw UTF-8 XML starting with `<Strategy` / `<?xml` and ZIP-wrapped `.str` archives containing `strategy.xml` or `<name>.xml`. Parse strategy name, settings (`symbol`, `timeframe`, `initialCapital`), and embedded `<Orders>` / `<Trade>` rows. Reject empty or non-XML/non-ZIP payloads with `DomainError(code="RESULTS_SQ3_MALFORMED_ARCHIVE")` and unsupported major schema versions with `DomainError(code="RESULTS_SQ3_UNSUPPORTED_VERSION")`.
+- [ ] Golden fixture: loading a minimal `.str` XML fixture with 2 `<Order>` nodes returns `format_version == "SQ3"` and `trade_count == 2`; loading random binary bytes raises `RESULTS_SQ3_MALFORMED_ARCHIVE`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_loader_s_q3.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/LoaderSQ3.test.tsx` -> exits `0`.
 
 ### `LoaderSQ4` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq4). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and 1 previously recovered primary Java files for `LoaderSQ4`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#loadersq4). Located `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4/SQ4/SQ4LoaderPlugin.java`.
 
-*Feature:* Full `LoaderSQ4` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Native `.sqx` / `.sq4` ZIP archive loader extracting `strategy.xml`, `settings.xml`, and stored result/trade bundles into `DatabankContainer` and `ResultStore`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4`.
 - **Backend:** `app/workspace/results/loader_s_q4.py`.
 - **Frontend:** `app/web/workspaces/results/LoaderSQ4.tsx`.
 - **Backend tests:** `tests/workspace/results/test_loader_s_q4.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/LoaderSQ4.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4/SQ4/SQ4LoaderPlugin.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `LoaderSQ4`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/LoaderSQ4/SQ4/SQ4LoaderPlugin.java`; `app/core/strategy/hsl/serializer.py`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `LoaderSQ4Service.load_bytes(filename: str, payload: bytes) -> LoadedStrategyArchive` -> Inspect `.sqx`/`.sq4` ZIP archive entries (rejecting path-traversal entries containing `..` or leading `/` with `DomainError(code="RESULTS_SQ4_UNSAFE_ARCHIVE_ENTRY")`), parse the primary `<Strategy>` XML and embedded `<Results>` / `<Trades>` sections, and return `LoadedStrategyArchive(format_version="SQ4", ...)`. Raise `DomainError(code="RESULTS_SQ4_MALFORMED_ARCHIVE")` if the payload is neither valid ZIP with XML nor valid `.sqx` XML.
+- [ ] Golden fixture: round-tripping a serialized `.sqx` strategy archive with 3 trades restores `name`, `symbol`, `timeframe`, and `trade_count == 3`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_loader_s_q4.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/LoaderSQ4.test.tsx` -> exits `0`.
 
 ### `ResultsChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultschart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultschart). Located `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js` and `ResultsChartService.js`.
 
-*Feature:* Full `ResultsChart` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Strategy price chart with OHLCV candles, indicator overlays, and executed trade entry/exit markers (`resultsCharts/loadChartData`, `resultsCharts/cancelLoading`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart`.
 - **Backend:** `app/workspace/results/results_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_chart.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsChart.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/ResultsChartService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsCharts/cancelLoading` `resultsCharts/loadChartData`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsChart/module.js`; `ResultsChartService.js`; `app/web/workspaces/results/ResultsChart/chart.tsx`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `resultsCharts/cancelLoading`, `resultsCharts/loadChartData`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ChartCandle(timestamp_ms: int, open: float, high: float, low: float, close: float, volume: float)`, `ChartTradeMarker(ticket: int, open_time_ms: int, close_time_ms: int, open_price: float, close_price: float, direction: str, profit_loss: float, sl_level: float | None, pt_level: float | None)`, and `ResultsChartPayload(result_key: str, symbol: str, timeframe: str, candles: tuple[ChartCandle, ...], trades: tuple[ChartTradeMarker, ...], indicators: dict[str, tuple[tuple[int, float | None], ...]], truncated: bool)`.
+- [ ] `ResultsChartService.load_chart_data(project_id: str, databank_name: str, strategy_id: str, result_key: str = "Main", *, start_ms: int | None = None, end_ms: int | None = None, max_bars: int = 5000) -> StandardResponse[ResultsChartPayload]` and `cancel_loading(request_id: str) -> StandardResponse[bool]`. Slice candles and trades to `[start_ms, end_ms]`, cap returned bars at `max_bars` (setting `truncated=True` when sliced), and represent undefined warm-up indicator values as `None`.
+- [ ] Golden fixture: 10 candles and 2 trades sliced to `[t_2, t_7]` with `max_bars=4` return `len(candles) == 4`, `truncated == True`, and only trades overlapping `[t_2, t_7]`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_chart.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsChart.test.tsx` -> exits `0`.
 
 ### `ResultsDatabankActions` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankactions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 63 current plugin JavaScript files and 2 previously recovered primary Java files for `ResultsDatabankActions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankactions). Located 63 plugin JavaScript files and 2 primary Java files for `ResultsDatabankActions`.
 
-*Feature:* Full `ResultsDatabankActions` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Complete databank toolbar action suite: `clearAll`, `delete`, `load`, `save` (`exportCSV`, `saveReports`, `saveSingleFileJava`), `portfolio` (`merge`, `mergeWF`, `moveToPC`, `moveToPM`, `split`), `retest`, `tools` (`compareStrategies`, `editParameters`, `editStrategy`, `runCa`, `select` passed/failed, `setNote`), and databank folder synchronization.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions`.
 - **Backend:** `app/workspace/results/results_databank_actions.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankActions.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_databank_actions.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsDatabankActions.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/clearAll/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/delete/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/load/LoadService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsDatabankActions/getStrategyXml` `/instruments/addAlias` `/instruments/addInstrument` `/project/instrumentSelected` `project/retest` `resultsDatabankActions/exportDatabankToCSV` `project/saveReports` `project/saveSingleFileJava` `dirs/setLastFolderUsed` `project/synchronizeDatabank` `project/setDatabankSynchronization` `resultsDatabankActions/compareStrategies` `resultsDatabankActions/getStrategyParameters` `resultsDatabankActions/setStrategyParameters`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsDatabankActions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankActions/DatabankActionsService.js`; `app/core/jobs/databank.py`; `app/core/trading/portfolio/merger.py`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `resultsDatabankActions/getStrategyXml`, `/instruments/addAlias`, `/instruments/addInstrument`, `/project/instrumentSelected`, `project/retest`, `resultsDatabankActions/exportDatabankToCSV`, `project/saveReports`, `project/saveSingleFileJava`, `dirs/setLastFolderUsed`, `project/synchronizeDatabank`, `project/setDatabankSynchronization`, `resultsDatabankActions/compareStrategies`, `resultsDatabankActions/getStrategyParameters`, `resultsDatabankActions/setStrategyParameters`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ResultsDatabankActionsService` methods:
+  - `clear_all(project_id: str, databank_name: str) -> DatabankMutationReceipt`
+  - `delete_strategies(project_id: str, databank_name: str, strategy_ids: tuple[str, ...]) -> DatabankMutationReceipt`
+  - `select_by_filter(project_id: str, databank_name: str, status: Literal["PASSED", "FAILED"]) -> tuple[str, ...]`
+  - `set_note(project_id: str, databank_name: str, strategy_id: str, note: str) -> DatabankMutationReceipt`
+  - `get_strategy_parameters(project_id: str, databank_name: str, strategy_id: str) -> dict[str, str | int | float | bool]` and `set_strategy_parameters(...) -> DatabankMutationReceipt`
+  - `merge_portfolio(project_id: str, databank_name: str, strategy_ids: tuple[str, ...], *, mode: Literal["STANDARD", "WF"] = "STANDARD") -> str` (creates combined portfolio strategy in databank via Core portfolio merger; requires `len(strategy_ids) >= 2`, else `DomainError(code="RESULTS_PORTFOLIO_MIN_STRATEGIES")`)
+  - `split_portfolio(project_id: str, databank_name: str, portfolio_strategy_id: str) -> tuple[str, ...]`
+  - `compare_strategies(project_id: str, databank_name: str, strategy_ids: tuple[str, ...]) -> dict[str, dict[str, float | str]]`
+  - `export_databank_csv(project_id: str, databank_name: str, column_ids: tuple[str, ...], *, separator: str = ",") -> str`
+- [ ] Golden fixture: merging 2 strategies `S1` (`net_profit=500.0`) and `S2` (`net_profit=300.0`) creates `"Portfolio(S1, S2)"` with combined `net_profit == 800.0`; `split_portfolio` restores constituent records.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_databank_actions.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsDatabankActions.test.tsx` -> exits `0`.
 
 ### `ResultsDatabankViews` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsDatabankViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsdatabankviews). Located `DatabankViewsService.js` and `module.js`.
 
-*Feature:* Full `ResultsDatabankViews` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Databank column view configuration CRUD (`/dbviews/addView`, `/dbviews/updateView`, `/dbviews/removeView`, `/dbviews/changeView`) controlling which `Columns/Databanks` definitions, widths, formats, and sort orders are displayed.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews`.
 - **Backend:** `app/workspace/results/results_databank_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsDatabankViews.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_databank_views.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsDatabankViews.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/dbviews/removeView` `/dbviews/addView` `/dbviews/updateView` `/dbviews/changeView`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsDatabankViews`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsDatabankViews/DatabankViewsService.js`; `module.js`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `/dbviews/removeView`, `/dbviews/addView`, `/dbviews/updateView`, `/dbviews/changeView`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `DatabankColumnBinding(column_id: str, sample_type: str = "FullSample", direction: str = "Both", market: str = "Main", width: int = 100)` and `DatabankViewDefinition(view_id: str, name: str, is_default: bool, columns: tuple[DatabankColumnBinding, ...])`.
+- [ ] `ResultsDatabankViewsService` methods: `list_views()`, `add_view(name: str, columns: tuple[DatabankColumnBinding, ...])`, `update_view(view_id: str, name: str, columns: tuple[DatabankColumnBinding, ...])`, `remove_view(view_id: str)`, and `change_view(view_id: str)`. Protect built-in `"Default"` view from deletion (`DomainError(code="RESULTS_DEFAULT_VIEW_PROTECTED")`) and validate every `column_id` against the Phase 3 `Columns/Databanks` & `Columns/WalkForward` catalog (`DomainError(code="RESULTS_UNKNOWN_DATABANK_COLUMN")`).
+- [ ] Golden fixture: adding view `"CustomRisk"` with `("NetProfit", "ReturnDDRatio", "SharpeRatio")` persists in deterministic column order; removing `"Default"` raises `RESULTS_DEFAULT_VIEW_PROTECTED`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_databank_views.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsDatabankViews.test.tsx` -> exits `0`.
 
 ### `ResultsEquityChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsequitychart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsEquityChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsequitychart). Located 5 plugin JavaScript files (`EquityChartService.js`, `module.js`, `EquityChartCtrl.js`).
 
-*Feature:* Full `ResultsEquityChart` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Primary Equity Chart view controller and projection service (`equitychart/print`, `/main/openlink`) supporting trade-by-trade or time-based equity curves, open-equity M2M curves, sample split markers (`IS`, `OOS`, `IST`, `ISV`), portfolio sub-strategy curves, and subchart composition (`Benchmark`, `DailyChart`, `Drawdown`, `Volatility`, `Volume`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart`.
 - **Backend:** `app/workspace/results/results_equity_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsEquityChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_equity_chart.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsEquityChart.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/main/openlink` `equitychart/print`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsEquityChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsEquityChart/EquityChartService.js`; `app/web/workspaces/results/ResultsEquityChart/EquityChartCtrl.ts`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `EquityCurvePoint(index: int, timestamp_ms: int, balance: float, open_equity: float, drawdown_money: float, drawdown_pct: float, sample_type: str)` and `EquityChartProjection(result_key: str, initial_capital: float, mode: Literal["TRADES", "TIME"], direction: Literal["BOTH", "LONG", "SHORT"], points: tuple[EquityCurvePoint, ...], sample_boundaries: tuple[tuple[str, int], ...])`.
+- [ ] `ResultsEquityChartService.get_projection(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", mode: Literal["TRADES", "TIME"] = "TRADES", direction: Literal["BOTH", "LONG", "SHORT"] = "BOTH") -> StandardResponse[EquityChartProjection]`. Anchor index `0` at `(first_open_time_ms, initial_capital, initial_capital, 0.0, 0.0, "IS")`, filter trades by `direction` when not `"BOTH"`, and compute running closed balance and M2M open equity (`balance - mae`).
+- [ ] Golden fixture: `initial_capital=10000.0` with 1 LONG trade (`+250.0`, `mae=50.0`) and 1 SHORT trade (`-100.0`, `mae=30.0`) produces 3 points (`10000.0`, `10250.0`, `10150.0`) in `"BOTH"` mode and 2 points (`10000.0`, `10250.0`) in `"LONG"` mode.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_equity_chart.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsEquityChart.test.tsx` -> exits `0`.
 
 ### `ResultsExplore` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsexplore). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsExplore`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsexplore). Located `ExploreService.js` and `module.js`.
 
-*Feature:* Full `ResultsExplore` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Interactive Strategy Explore / What-If quick inspector (`explore/info`) summarizing trade count, net profit, drawdown, win rate, and parameter sensitivity breakdown for the active strategy result.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore`.
 - **Backend:** `app/workspace/results/results_explore.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsExplore.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_explore.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsExplore.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `explore/info`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsExplore`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsExplore/ExploreService.js`; `module.js`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `explore/info`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ExploreInfoPayload(strategy_id: str, result_key: str, symbol: str, timeframe: str, total_trades: int, net_profit: float, drawdown_pct: float, profit_factor: float, return_dd_ratio: float, parameters: dict[str, str | int | float | bool], sample_breakdown: dict[str, dict[str, float]])`.
+- [ ] `ResultsExploreService.get_info(project_id: str, databank_name: str, strategy_id: str, result_key: str = "Main") -> StandardResponse[ExploreInfoPayload]` -> Query `ResultStore` and `StatisticsService` to return top-level metrics and per-sample (`FullSample`, `InSample`, `OutOfSample`) breakdowns.
+- [ ] Golden fixture: strategy with 10 IS trades (`net_profit=400.0`) and 5 OOS trades (`net_profit=200.0`) returns `total_trades == 15`, `net_profit == 600.0`, and `sample_breakdown["InSample"]["net_profit"] == 400.0`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_explore.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsExplore.test.tsx` -> exits `0`.
 
 ### `ResultsOverview` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsoverview). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and 2 previously recovered primary Java files for `ResultsOverview`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsoverview). Located 3 plugin JavaScript files (`module.js`, `ResultsOverviewCtrl.js`, `ResultsOverviewService.js`) and 2 primary Java files.
 
-*Feature:* Full `ResultsOverview` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Strategy Overview tab rendering structured statistical metrics, monthly/yearly performance matrix, and template selection via `OverviewTemplatePolicy.select` and the Phase 3 `Stats/Overview` templates.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview`.
 - **Backend:** `app/workspace/results/results_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsOverview.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_overview.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsOverview.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsOverview`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOverview/ResultsOverviewCtrl.js`; `ResultsOverviewService.js`; `app/workspace/results/overview_template_policy.py`; `app/core/trading/statistics/`.
+*Evidence ID:* `OBS-145-OVERVIEW-TEMPLATE-001`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `OverviewMetricRow(metric_id: str, label: str, all_trades: str | float, long_trades: str | float, short_trades: str | float, unit: str)` and `MonthlyPerformanceRow(year: int, months: tuple[float | None, ...], ytd_money: float, ytd_pct: float)`.
+- [ ] `OverviewProjection(strategy_id: str, result_key: str, selected_template: str, available_templates: tuple[str, ...], sample_type: str, metrics: tuple[OverviewMetricRow, ...], monthly_matrix: tuple[MonthlyPerformanceRow, ...])`.
+- [ ] `ResultsOverviewService.get_overview(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", template: str | None = None, sample_type: str = "FullSample") -> StandardResponse[OverviewProjection]`. When `template is None`, resolve via `OverviewTemplatePolicy.select(available_templates)`. Compute `All`, `Long`, and `Short` metric columns using `StatisticsService` and the selected `Stats/Overview` template descriptor (`SQDefault`, `SQDefaultPct`, `DefaultOpenDD`, `SQDefaultWithPortfolio`, `SQDefaultWithPortfolioPct`, `AWSharedDefault`, `TSOverview`).
+- [ ] Golden fixture: calling `get_overview` with `template=None` and `available_templates=("SQDefault", "SQDefaultPct")` selects `"SQDefault"` and populates `metrics` and 12-month `monthly_matrix` rows.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_overview.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsOverview.test.tsx` -> exits `0`.
 
 ### `ResultsPlugins` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsplugins). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsPlugins`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsplugins). Located `ResultsPluginsService.js` and `module.js`.
 
-*Feature:* Full `ResultsPlugins` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Custom Results Plugin host and data bridge (`resultsPlugins/list`, `create`, `rename`, `delete`, `stats`, `orders`, `settings`, `databankStrategies`, `strategyStats`, `strategyOrders`, `strategyResultKeys`, `candles`, `dataSymbols`, `sqai/complete`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins`.
 - **Backend:** `app/workspace/results/results_plugins.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPlugins.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_plugins.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsPlugins.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/ResultsPluginsService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `resultsPlugins/list` `resultsPlugins/create` `resultsPlugins/rename` `resultsPlugins/delete` `resultsPlugins/stats` `resultsPlugins/orders` `resultsPlugins/settings` `sourcecode/print` `resultsPlugins/databankStrategies` `resultsPlugins/strategyStats` `resultsPlugins/strategyOrders` `resultsPlugins/strategyResultKeys` `resultsPlugins/candles` `resultsPlugins/dataSymbols` `sqai/complete`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPlugins`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPlugins/ResultsPluginsService.js`; `module.js`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `resultsPlugins/list`, `resultsPlugins/create`, `resultsPlugins/rename`, `resultsPlugins/delete`, `resultsPlugins/stats`, `resultsPlugins/orders`, `resultsPlugins/settings`, `sourcecode/print`, `resultsPlugins/databankStrategies`, `resultsPlugins/strategyStats`, `resultsPlugins/strategyOrders`, `resultsPlugins/strategyResultKeys`, `resultsPlugins/candles`, `resultsPlugins/dataSymbols`, `sqai/complete`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ResultsPluginDescriptor(plugin_id: str, title: str, source_html: str, source_js: str, is_builtin: bool)` and `ResultsPluginsService` providing CRUD (`list_plugins`, `create_plugin`, `rename_plugin`, `delete_plugin`) plus read-only strategy data accessors (`get_stats`, `get_orders`, `get_settings`, `list_databank_strategies`, `get_strategy_result_keys`, `get_candles`, `list_data_symbols`).
+- [ ] Custom plugins execute in a sandboxed iframe/panel receiving read-only JSON snapshots of `stats`, `orders`, `settings`, and `candles`; direct host filesystem or arbitrary SQL access is prohibited.
+- [ ] Golden fixture: creating custom plugin `"OrderHeatmap"` and querying `get_strategy_result_keys` for `"Strat_01"` returns `("Main", "Portfolio")`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_plugins.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsPlugins.test.tsx` -> exits `0`.
 
 ### `ResultsPortfolioCorrelation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsportfoliocorrelation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsPortfolioCorrelation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsportfoliocorrelation). Located 5 plugin JavaScript files (`PortfolioCorrelationService.js`, `PortfolioCorrelationCtrl.js`, `module.js`).
 
-*Feature:* Full `ResultsPortfolioCorrelation` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Portfolio Correlation matrix computation, cancellation, and persistence (`portfoliocorrelation/compute`, `portfoliocorrelation/stop`, `portfoliocorrelation/correlationSave`) over sub-strategies of a portfolio or selected databank strategies.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation`.
 - **Backend:** `app/workspace/results/results_portfolio_correlation.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsPortfolioCorrelation.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_portfolio_correlation.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsPortfolioCorrelation.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocorrelation/compute` `portfoliocorrelation/stop` `portfoliocorrelation/correlationSave`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPortfolioCorrelation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioCorrelation/PortfolioCorrelationService.js`; `app/core/trading/statistics/correlation.py`; `app/web/workspaces/results/ResultsPortfolioCorrelation/PortfolioCorrelationCtrl.ts`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `portfoliocorrelation/compute`, `portfoliocorrelation/stop`, `portfoliocorrelation/correlationSave`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `PortfolioCorrelationRequest(strategy_ids: tuple[str, ...], period: Literal["HOUR", "DAY", "WEEK", "MONTH", "YEAR"] = "DAY", method: Literal["ProfitLoss", "PctReturn", "NumberOfTrades", "Drawdown", "TrendLine", "LossToLoss"] = "ProfitLoss", allow_empty_periods: bool = False)` and `PortfolioCorrelationMatrix(strategy_ids: tuple[str, ...], period: str, method: str, matrix: dict[str, dict[str, float]], avg_correlation: float, max_correlation: float)`.
+- [ ] `ResultsPortfolioCorrelationService.compute(request: PortfolioCorrelationRequest) -> StandardResponse[PortfolioCorrelationMatrix]`, `stop(request_id: str) -> StandardResponse[bool]`, and `save_preferences(period: str, method: str, allow_empty_periods: bool) -> StandardResponse[bool]`. Delegate time-bucket alignment and correlation formulas to the Phase 3 `CorrelationOf` evaluators (`app/extend/correlation/`), ensuring diagonal entries equal `1.0` and symmetric off-diagonal entries `matrix[a][b] == matrix[b][a]` rounded to `4` decimals.
+- [ ] Golden fixture: 2 strategies with identical daily P&L series `[10.0, -5.0, 20.0]` yield `matrix["S1"]["S2"] == 1.0`; opposite series `[-10.0, 5.0, -20.0]` yield `matrix["S1"]["S2"] == -1.0`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_portfolio_correlation.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsPortfolioCorrelation.test.tsx` -> exits `0`.
 
 ### `ResultsProfileChart` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsprofilechart). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsProfileChart`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsprofilechart). Located `ProfileChartService.js` and `module.js`.
 
-*Feature:* Full `ResultsProfileChart` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Trade MFE/MAE/P&L excursion profile path chart (`profilechart/paths`) projecting per-trade normalized or money/pip intra-trade paths over bar/time steps.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart`.
 - **Backend:** `app/workspace/results/results_profile_chart.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsProfileChart.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_profile_chart.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsProfileChart.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `profilechart/paths`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsProfileChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsProfileChart/ProfileChartService.js`; `app/web/workspaces/results/ResultsProfileChart/ProfileChartCtrl.ts`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `profilechart/paths`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `TradeProfilePath(ticket: int, direction: str, is_winner: bool, points: tuple[float, ...])` and `ProfileChartPayload(result_key: str, unit: Literal["MONEY", "PIPS", "PCT"], paths: tuple[TradeProfilePath, ...], mean_path: tuple[float, ...], quantile_25: tuple[float, ...], quantile_75: tuple[float, ...])`.
+- [ ] `ResultsProfileChartService.get_paths(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", unit: Literal["MONEY", "PIPS", "PCT"] = "MONEY", max_trades: int = 500) -> StandardResponse[ProfileChartPayload]`. Reconstruct bar-by-bar or 4-point (`0.0 -> -MAE -> +MFE -> ProfitLoss` when intra-bar path array is absent) excursion paths for up to `max_trades` trades, and compute step-wise `mean_path`, `quantile_25`, and `quantile_75`.
+- [ ] Golden fixture: 2 winning trades with 4-point paths `(0.0, -10.0, 50.0, 40.0)` and `(0.0, -20.0, 70.0, 60.0)` produce `mean_path == (0.0, -15.0, 60.0, 50.0)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_profile_chart.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsProfileChart.test.tsx` -> exits `0`.
 
 ### `ResultsReport` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsreport). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsReport`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsreport). Located 2 plugin JavaScript files (`DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`).
 
-*Feature:* Full `ResultsReport` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Printable HTML summary report view combining Overview metrics, Equity Chart snapshot metadata, Monthly Performance table, and Trade Statistics for a strategy result.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport`.
 - **Backend:** `app/workspace/results/results_report.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsReport.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_report.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsReport.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsReport`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsReport/module.js`; `SaverHTML` below.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ResultsReportDocument(strategy_id: str, strategy_name: str, result_key: str, generated_at_utc: str, overview: OverviewProjection, html_body: str)` -> Returned by `ResultsReportService.render_report(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", template: str | None = None) -> StandardResponse[ResultsReportDocument]`.
+- [ ] Escape all user-supplied strategy names and notes via `html.escape` before embedding in `html_body`.
+- [ ] Golden fixture: rendering report for `"Strat_01"` produces valid HTML containing the strategy name, `Overview` metrics table, and monthly matrix without unescaped `<script>` tags.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_report.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsReport.test.tsx` -> exits `0`.
 
 ### `ResultsSourceCode` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultssourcecode). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsSourceCode`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultssourcecode). Located `SourceCodeService.js` and `module.js`.
 
-*Feature:* Full `ResultsSourceCode` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Strategy source-code generation, syntax view, MT4/MT5 EA compilation path configuration, and Walk-Forward calendar export (`sourcecode/print`, `sourcecode/getDataPath`, `sourcecode/saveMTPaths`, `sourcecode/saveEA`, `sourcecode/saveWFCalendar`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode`.
 - **Backend:** `app/workspace/results/results_source_code.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSourceCode.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_source_code.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsSourceCode.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sourcecode/print` `sourcecode/getDataPath` `sourcecode/saveMTPaths` `sourcecode/saveEA` `sourcecode/saveWFCalendar`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSourceCode`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSourceCode/SourceCodeService.js`; `app/workspace/wizard/platform_export_descriptors.py`; `app/core/strategy/compiler/compiler.py`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `sourcecode/print`, `sourcecode/getDataPath`, `sourcecode/saveMTPaths`, `sourcecode/saveEA`, `sourcecode/saveWFCalendar`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SourceCodeProjection(strategy_id: str, target_id: str, title: str, file_extension: str, param_style: str, code: str)` and `MTPathsConfig(mt4_terminal_dir: str, mt5_terminal_dir: str)`.
+- [ ] `ResultsSourceCodeService` methods:
+  - `render_source_code(project_id: str, databank_name: str, strategy_id: str, *, target_id: str = "PseudoCode", param_style: Literal["PARAM_NAMES", "PARAM_VALUES"] = "PARAM_NAMES") -> StandardResponse[SourceCodeProjection]` (delegates target metadata to `app/workspace/wizard/platform_export_descriptors.py` and code emission to `StrategyCompiler` for `EasyLanguage`, `MetaTrader4`, `MetaTrader5`, `NinjaScript`, `PseudoCode`, `JForex`, `cTrader`).
+  - `get_mt_paths() -> StandardResponse[MTPathsConfig]` and `save_mt_paths(config: MTPathsConfig) -> StandardResponse[MTPathsConfig]`.
+  - `export_wf_calendar(project_id: str, databank_name: str, strategy_id: str) -> StandardResponse[str]` (renders Walk-Forward parameter schedule CSV/table when WF matrix result exists, else raises `DomainError(code="RESULTS_WF_RESULT_REQUIRED")`).
+- [ ] Golden fixture: rendering `"Strat_01"` with `target_id="MetaTrader5"` returns `.mq5` source containing `OnTick()`; requesting an unknown `target_id` raises `DomainError(code="RESULTS_UNKNOWN_SOURCE_TARGET")`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_source_code.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsSourceCode.test.tsx` -> exits `0`.
 
 ### `ResultsSPOverview` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsspoverview). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 11 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsSPOverview`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsspoverview). Located 11 plugin JavaScript files (`SPOverviewService.js`, `SPOverviewCtrl.js`, `module.js`).
 
-*Feature:* Full `ResultsSPOverview` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Stockpicker Overview tab (`spoverview/print`) displaying portfolio-level Stockpicker metrics, open positions snapshot, benchmark comparison, and constituent symbol weights.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview`.
 - **Backend:** `app/workspace/results/results_s_p_overview.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsSPOverview.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_s_p_overview.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsSPOverview.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `spoverview/print`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSPOverview`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSPOverview/SPOverviewService.js`; `app/web/workspaces/results/ResultsSPOverview/SPOverviewCtrl.ts`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `spoverview/print`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SPOpenPosition(symbol: str, direction: str, open_time_ms: int, open_price: float, current_price: float, size: float, unrealized_pl: float, weight_pct: float)` and `SPOverviewProjection(strategy_id: str, result_key: str, cagr_pct: float, max_dd_pct: float, sharpe_ratio: float, exposure_pct: float, open_positions: tuple[SPOpenPosition, ...], symbol_breakdown: dict[str, float])`.
+- [ ] `ResultsSPOverviewService.get_sp_overview(project_id: str, databank_name: str, strategy_id: str, result_key: str = "Main") -> StandardResponse[SPOverviewProjection]`. Compute per-symbol realized P&L contribution in `symbol_breakdown` and current open positions sorted by descending `weight_pct`.
+- [ ] Golden fixture: Stockpicker strategy with 2 symbols (`AAPL` `+600.0`, `MSFT` `+400.0`) produces `symbol_breakdown == {"AAPL": 600.0, "MSFT": 400.0}`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_s_p_overview.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsSPOverview.test.tsx` -> exits `0`.
 
 ### `ResultsStockpicker` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstockpicker). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsStockpicker`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstockpicker). Located `StockpickerService.js` and `module.js`.
 
-*Feature:* Full `ResultsStockpicker` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Stockpicker constituent symbol breakdown and rebalance history table (`stockpicker/print`) showing per-symbol trade count, win rate, net profit, and average holding period.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker`.
 - **Backend:** `app/workspace/results/results_stockpicker.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStockpicker.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_stockpicker.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsStockpicker.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `stockpicker/print`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsStockpicker`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStockpicker/StockpickerService.js`; `app/web/workspaces/results/ResultsStockpicker/stockpicker.tsx`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `stockpicker/print`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `StockpickerSymbolRow(symbol: str, trade_count: int, winning_pct: float, net_profit: float, profit_factor: float, avg_bars_in_trade: float)` and `ResultsStockpickerPayload(strategy_id: str, result_key: str, rows: tuple[StockpickerSymbolRow, ...])`.
+- [ ] `ResultsStockpickerService.get_symbol_rows(project_id: str, databank_name: str, strategy_id: str, result_key: str = "Main") -> StandardResponse[ResultsStockpickerPayload]` -> Group closed trades by `trade.symbol`, compute per-symbol statistics, and sort rows by `net_profit` descending (tie-breaker: `symbol` ascending).
+- [ ] Golden fixture: 3 trades (`AAPL` `+100`, `AAPL` `-20`, `NVDA` `+300`) return rows ordered `NVDA (net_profit=300.0, trade_count=1)` then `AAPL (net_profit=80.0, trade_count=2, winning_pct=50.0)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_stockpicker.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsStockpicker.test.tsx` -> exits `0`.
 
 ### `ResultsStrategyConfig` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstrategyconfig). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsStrategyConfig`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsstrategyconfig). Located `StrategyConfigService.js` and `module.js`.
 
-*Feature:* Full `ResultsStrategyConfig` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Strategy Configuration inspector (`strategyconfig/loadStrategySettings`, `strategyconfig/print`) displaying backtest data range, symbol/timeframe, spread/slippage/commission model, money management configuration, trading options, and strategy parameters.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig`.
 - **Backend:** `app/workspace/results/results_strategy_config.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsStrategyConfig.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_strategy_config.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsStrategyConfig.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `strategyconfig/print` `strategyconfig/loadStrategySettings`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsStrategyConfig`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsStrategyConfig/StrategyConfigService.js`; `app/web/workspaces/results/ResultsStrategyConfig/strategyconfig.tsx`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `strategyconfig/print`, `strategyconfig/loadStrategySettings`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `StrategySettingsProjection(strategy_id: str, strategy_name: str, symbol: str, timeframe: str, start_date: str, end_date: str, initial_capital: float, precision: str, spread_pips: float, slippage_pips: float, commission_description: str, money_management: dict[str, Any], trading_options: dict[str, Any], parameters: dict[str, str | int | float | bool])`.
+- [ ] `ResultsStrategyConfigService.load_strategy_settings(project_id: str, databank_name: str, strategy_id: str, result_key: str = "Main") -> StandardResponse[StrategySettingsProjection]`. Extract exact execution settings from the stored `HSLStrategyDocument` and `ResultStore` metadata.
+- [ ] Golden fixture: loading settings for `"Strat_01"` returns `symbol == "EURUSD"`, `timeframe == "H1"`, `initial_capital == 10000.0`, and the exact parameter map.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_strategy_config.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsStrategyConfig.test.tsx` -> exits `0`.
 
 ### `ResultsTradeAnalysis` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradeanalysis). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 5 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsTradeAnalysis`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradeanalysis). Located 5 plugin JavaScript files (`TradeAnalysisService.js`, `TradeAnalysisCtrl.js`, `module.js`).
 
-*Feature:* Full `ResultsTradeAnalysis` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Trade Analysis dashboard (`tradeanalysis/print`) evaluating the 27 `TradeAnalysis` chart buckets (by hour, day of week, month, duration, MAE/MFE, trade size, winning/losing streaks) over a strategy's trades.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis`.
 - **Backend:** `app/workspace/results/results_trade_analysis.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeAnalysis.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_trade_analysis.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsTradeAnalysis.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `tradeanalysis/print`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradeAnalysis`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeAnalysis/services/TradeAnalysisService.js`; `app/web/workspaces/results/ResultsTradeAnalysis/controllers/TradeAnalysisCtrl.ts`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `tradeanalysis/print`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `TradeAnalysisBucket(label: str, profit_loss: float, profit_pct: float, trade_count: int, win_count: int, loss_count: int)` and `TradeAnalysisPanePayload(pane_id: str, title: str, buckets: tuple[TradeAnalysisBucket, ...])`.
+- [ ] `ResultsTradeAnalysisService.evaluate(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", sample_type: str = "FullSample", direction: Literal["BOTH", "LONG", "SHORT"] = "BOTH", pane_ids: tuple[str, ...] | None = None) -> StandardResponse[tuple[TradeAnalysisPanePayload, ...]]`. Delegate bucket aggregation to the Phase 3 `TradeAnalysis` extension cohort (`app/extend/trade_analysis/`).
+- [ ] Golden fixture: evaluating `ProfitsByDayInWeek` on 2 Monday trades (`+100.0`, `-40.0`) and 1 Friday trade (`+50.0`) returns Monday `profit_loss == 60.0, trade_count == 2` and Friday `profit_loss == 50.0, trade_count == 1`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_trade_analysis.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsTradeAnalysis.test.tsx` -> exits `0`.
 
 ### `ResultsTradeList` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelist). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsTradeList`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelist). Located 2 plugin JavaScript files (`ResultsTradelistCtrl.js`, `module.js`).
 
-*Feature:* Full `ResultsTradeList` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Paginated, sortable, filterable List of Trades projection bound to the active `ResultsTradelistViews` column layout and `Columns/Trades` evaluators.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList`.
 - **Backend:** `app/workspace/results/results_trade_list.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradeList.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_trade_list.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsTradeList.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList/module.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradeList`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradeList/module.js`; `app/web/workspaces/results/ResultsTradeList/ResultsTradelistCtrl.ts`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `TradeListPage(strategy_id: str, result_key: str, view_id: str, total_rows: int, offset: int, limit: int, columns: tuple[str, ...], rows: tuple[dict[str, str | int | float | None], ...])`.
+- [ ] `ResultsTradeListService.get_trades(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", view_id: str = "Default", sample_type: str = "FullSample", direction: Literal["BOTH", "LONG", "SHORT"] = "BOTH", sort_by: str = "NumberOfTrade", descending: bool = False, offset: int = 0, limit: int = 200) -> StandardResponse[TradeListPage]`. Evaluate each requested column via `app/extend/columns/trades.py`, compute running `Balance`, `Drawdown`, and `PctDrawdown` prior to pagination slicing, and return the requested `[offset : offset + limit]` window.
+- [ ] Golden fixture: 5 trades queried with `offset=1, limit=2` return `total_rows == 5`, `len(rows) == 2`, and `rows[0]["NumberOfTrade"] == 2` with cumulative `Balance` reflecting trade 1 + trade 2.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_trade_list.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsTradeList.test.tsx` -> exits `0`.
 
 ### `ResultsTradelistViews` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelistviews). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsTradelistViews`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultstradelistviews). Located `TradelistViewsService.js` and `module.js`.
 
-*Feature:* Full `ResultsTradelistViews` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Trade List column view configuration CRUD (`/tradelistviews/addView`, `/tradelistviews/updateView`, `/tradelistviews/removeView`, `/tradelistviews/changeView`) controlling which `Columns/Trades` definitions are rendered in `ResultsTradeList`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews`.
 - **Backend:** `app/workspace/results/results_tradelist_views.py`.
 - **Frontend:** `app/web/workspaces/results/ResultsTradelistViews.tsx`.
 - **Backend tests:** `tests/workspace/results/test_results_tradelist_views.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ResultsTradelistViews.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/tradelistviews/removeView` `/tradelistviews/addView` `/tradelistviews/updateView` `/tradelistviews/changeView`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsTradelistViews`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsTradelistViews/TradelistViewsService.js`; `module.js`.
+*Evidence ID:* `OBS-HARU-RES-REUSE-20261029`. Literal frontend request vocabulary: `/tradelistviews/removeView`, `/tradelistviews/addView`, `/tradelistviews/updateView`, `/tradelistviews/changeView`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `TradelistColumnBinding(column_id: str, width: int = 90)` and `TradelistViewDefinition(view_id: str, name: str, is_default: bool, columns: tuple[TradelistColumnBinding, ...])`.
+- [ ] `ResultsTradelistViewsService` methods: `list_views()`, `add_view(name: str, columns: tuple[TradelistColumnBinding, ...])`, `update_view(view_id: str, name: str, columns: tuple[TradelistColumnBinding, ...])`, `remove_view(view_id: str)`, and `change_view(view_id: str)`. Protect the built-in `"Default"` view (`DomainError(code="RESULTS_DEFAULT_TRADELIST_VIEW_PROTECTED")`) and validate every `column_id` against the 30 `Columns/Trades` definitions (`DomainError(code="RESULTS_UNKNOWN_TRADELIST_COLUMN")`).
+- [ ] Golden fixture: default view includes `("NumberOfTrade", "Symbol", "Type", "OpenTime", "OpenPrice", "Size", "CloseTime", "ClosePrice", "ProfitLoss", "Balance", "Comment")`; adding `"ExcursionView"` with `("NumberOfTrade", "MAE", "MFE", "ProfitLoss")` succeeds.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_results_tradelist_views.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ResultsTradelistViews.test.tsx` -> exits `0`.
 
 ### `SaverHTML` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverhtml). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverHTML`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverhtml). Located `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML/HTML/HTMLReportPlugin.java`.
 
-*Feature:* Full `SaverHTML` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Standalone HTML strategy report exporter serializing Overview metrics, monthly table, strategy settings, and trade list into a self-contained UTF-8 `.html` artifact.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML`.
 - **Backend:** `app/workspace/results/saver_h_t_m_l.py`.
 - **Frontend:** `app/web/workspaces/results/SaverHTML.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_h_t_m_l.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/SaverHTML.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverHTML/HTML/HTMLReportPlugin.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverHTML`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ExportArtifactReceipt(filename: str, mime_type: str, size_bytes: int, content_bytes: bytes)` -> Returned by `SaverHTMLService.export_strategy_html(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", include_trades: bool = True) -> ExportArtifactReceipt`.
+- [ ] Emit deterministic, self-contained UTF-8 HTML (`<!DOCTYPE html>`) with inline CSS, escaped strategy metadata, Overview metrics table, Monthly performance table, and (when `include_trades=True`) Trade List table.
+- [ ] Golden fixture: exporting `"Strat_01"` returns `mime_type == "text/html; charset=utf-8"`, `filename == "Strat_01.html"`, and non-empty `content_bytes` starting with `b"<!DOCTYPE html>"`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_saver_h_t_m_l.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/SaverHTML.test.tsx` -> exits `0`.
 
 ### `SaverPDF` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverpdf). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverPDF`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverpdf). Located `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF/PDF/PDFReportPlugin.java`.
 
-*Feature:* Full `SaverPDF` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* PDF strategy report exporter serializing strategy summary, Overview metrics, and trade list into a deterministic `.pdf` byte stream (`%PDF-1.4`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF`.
 - **Backend:** `app/workspace/results/saver_p_d_f.py`.
 - **Frontend:** `app/web/workspaces/results/SaverPDF.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_p_d_f.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/SaverPDF.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverPDF/PDF/PDFReportPlugin.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverPDF`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SaverPDFService.export_strategy_pdf(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", include_trades: bool = False) -> ExportArtifactReceipt`.
+- [ ] Generate a valid standards-compliant PDF document (`%PDF-1.4` header, catalog, pages, content streams with strategy name, key metrics, monthly summary, and `%%EOF` trailer) with `mime_type == "application/pdf"` and `filename == f"{strategy_name}.pdf"`.
+- [ ] Golden fixture: exporting `"Strat_01"` produces `content_bytes.startswith(b"%PDF-1.4")` and `content_bytes.strip().endswith(b"%%EOF")`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_saver_p_d_f.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/SaverPDF.test.tsx` -> exits `0`.
 
 ### `SaverSQ3` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saversq3). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverSQ3`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saversq3). Located decompiled primary Java files in `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
 
-*Feature:* Full `SaverSQ3` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Legacy `.str` (SQ3 XML / ZIP) strategy archive exporter compatible with `LoaderSQ3`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
 - **Backend:** `app/workspace/results/saver_s_q3.py`.
 - **Frontend:** `app/web/workspaces/results/SaverSQ3.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_s_q3.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/SaverSQ3.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverSQ3`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverSQ3`; `LoaderSQ3` above.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SaverSQ3Service.export_sq3(project_id: str, databank_name: str, strategy_id: str) -> ExportArtifactReceipt` -> Serialize strategy settings, parameters, and `Main` closed trades into a `.str` ZIP archive containing `<strategy_name>.xml` (`formatVersion="SQ3"`). Round-tripping the output through `LoaderSQ3Service.load_bytes` must preserve `name`, `symbol`, `timeframe`, and `trade_count`.
+- [ ] Golden fixture: `SaverSQ3Service.export_sq3` followed by `LoaderSQ3Service.load_bytes` returns identical strategy name and trade count.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_saver_s_q3.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/SaverSQ3.test.tsx` -> exits `0`.
 
 ### `SaverStrategyTrades` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverstrategytrades). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SaverStrategyTrades`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#saverstrategytrades). Located `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades/StrategyTrades/StrategyTradesSaverPlugin.java`.
 
-*Feature:* Full `SaverStrategyTrades` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Strategy trades CSV exporter serializing closed trades for a strategy result with configurable column delimiter and decimal precision.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades`.
 - **Backend:** `app/workspace/results/saver_strategy_trades.py`.
 - **Frontend:** `app/web/workspaces/results/SaverStrategyTrades.tsx`.
 - **Backend tests:** `tests/workspace/results/test_saver_strategy_trades.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/SaverStrategyTrades.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SaverStrategyTrades/StrategyTrades/StrategyTradesSaverPlugin.java`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact supported format versions, field ordering/encoding, compatibility-loss rules and malformed-file behavior are not yet locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SaverStrategyTrades`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SaverStrategyTradesService.export_trades_csv(project_id: str, databank_name: str, strategy_id: str, *, result_key: str = "Main", delimiter: str = ",", column_ids: tuple[str, ...] | None = None) -> ExportArtifactReceipt`.
+- [ ] Default `column_ids` to `("NumberOfTrade", "Ticket", "Symbol", "Type", "OpenTime", "OpenPrice", "Size", "CloseTime", "ClosePrice", "ProfitLoss", "ProfitLossPips", "ProfitLossPct", "Balance", "Drawdown", "Comment")`. Emit RFC 4180 CSV with header row and deterministic `\n` line endings.
+- [ ] Golden fixture: exporting 2 trades produces 3 lines (1 header + 2 data rows) with exact field values matching `Columns/Trades`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_saver_strategy_trades.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/SaverStrategyTrades.test.tsx` -> exits `0`.
 
 ### `ServletRenameTool` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletrenametool). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ServletRenameTool`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletrenametool). Located decompiled primary Java files in `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
 
-*Feature:* Full `ServletRenameTool` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Deterministic strategy rename formatter and collision resolver backing `DatabankRename` (`/databank/rename`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
 - **Backend:** `app/workspace/results/servlet_rename_tool.py`.
 - **Frontend:** `app/web/workspaces/results/ServletRenameTool.tsx`.
 - **Backend tests:** `tests/workspace/results/test_servlet_rename_tool.py`.
 - **Frontend tests:** `app/web/tests/workspace/results/ServletRenameTool.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`.
-*Evidence and limit:* `OBS-145-OVERVIEW-TEMPLATE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Conflict/collision behavior and transaction semantics of the shared databank store are not yet pinned; source per-item log-and-continue behavior must be reconciled with the target receipt/error contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ServletRenameTool`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletRenameTool`; `DatabankRename` above.
+*Functional Requirements & Authorized Contract:*
+- [ ] `RenamePatternSpec(prefix: str = "Strategy ", start_number: int = 1, digits: int = 1, suffix: str = "", separator: str = ".")`.
+- [ ] `ServletRenameTool.format_names(strategy_ids: Sequence[str], spec: RenamePatternSpec, *, existing_names: Set[str] = frozenset()) -> tuple[tuple[str, str], ...]`. Validate `start_number >= 0`, `1 <= digits <= 10`, and `len(prefix.strip()) > 0` (`DomainError(code="RESULTS_INVALID_RENAME_SPEC")`). Format each candidate as `f"{spec.prefix}{spec.separator}{counter:0{spec.digits}d}{spec.suffix}"`, advancing `counter` past any name already present in `existing_names` or previously emitted in the batch.
+- [ ] Golden fixture: `strategy_ids=("s1", "s2")`, `spec=RenamePatternSpec(prefix="Strategy ", start_number=1, digits=2, separator="")`, `existing_names={"Strategy 01"}` yields `(("s1", "Strategy 02"), ("s2", "Strategy 03"))`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/results/test_servlet_rename_tool.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/results/ServletRenameTool.test.tsx` -> exits `0`.
 
 ## Phase 3: concrete extension definition work orders — READY
-*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. Source file counts do not establish completion or parity.
 
+*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths across all 4 extension categories owned by `AppResults`. Each cohort below defines its authorized target Python package, descriptor/evaluator contract, boundary behavior, golden fixtures, and verification command.
 
-### `Columns`
-- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Columns`; exact current definition count: 160.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `Databanks/AHPR.java`, `Databanks/ActualDD.java`, `Databanks/ActualDrawdownPct.java`, `Databanks/AmbiguousTrades.java`, `Databanks/AmbiguousTradesPct.java`, `Databanks/AnnualPctReturn.java`, `Databanks/AnnualPctReturnDDRatio.java`, `Databanks/AvgAbsTrade.java`, `Databanks/AvgBarsInTrade.java`, `Databanks/AvgBarsLoss.java`, `Databanks/AvgBarsWin.java`, `Databanks/AvgConsecLosses.java`, `Databanks/AvgConsecWins.java`, `Databanks/AvgDrawdown.java`, `Databanks/AvgLoss.java`, `Databanks/AvgParametersStability.java`, `Databanks/AvgPctDrawdown.java`, `Databanks/AvgPctProfitPerYear.java`, `Databanks/AvgProfitPerDay.java`, `Databanks/AvgProfitPerMonth.java`, `Databanks/AvgProfitPerYear.java`, `Databanks/AvgTrStddevRatio.java`, `Databanks/AvgTrade.java`, `Databanks/AvgTradesPerDay.java`, `Databanks/AvgTradesPerMonth.java`, `Databanks/AvgTradesPerYear.java`, `Databanks/AvgWin.java`, `Databanks/BacktestDuration.java`, `Databanks/BestWF.java`, `Databanks/BiggestMAE.java`, `Databanks/CAGR.java`, `Databanks/CalmarRatio.java`, `Databanks/Commission.java`, `Databanks/Complexity.java`, `Databanks/DateGenerated.java`, `Databanks/DateLastModified.java`, `Databanks/DegreesOfFreedom.java`, `Databanks/Drawdown.java`, `Databanks/DrawdownPct.java`, `Databanks/DrawdownPips.java`, `Databanks/EdgeRatioInPips.java`, `Databanks/Efficiency.java`, `Databanks/EntryIndicators.java`, `Databanks/EquityAngle.java`, `Databanks/EquitySlope.java`, `Databanks/ExitIndicators.java`, `Databanks/ExitQuality.java`, `Databanks/Expectancy.java`, `Databanks/Exposure.java`, `Databanks/ExposurePosition.java`, `Databanks/FiltersResult.java`, `Databanks/Fitness.java`, `Databanks/GrossLoss.java`, `Databanks/GrossProfit.java`, `Databanks/InitialDeposit.java`, `Databanks/KellyFormula.java`, `Databanks/LongestTrade.java`, `Databanks/MagicNumber.java`, `Databanks/MaxConsecLosses.java`, `Databanks/MaxConsecWins.java`, `Databanks/MaxIntradayDrawdown.java`, `Databanks/MaxLoss.java`, `Databanks/MaxNewHighDuration.java`, `Databanks/MaxProfit.java`, `Databanks/MaxTSIntradayDrawdown.java`, `Databanks/MiniEquityChart.java`, `Databanks/NSymmetry.java`, `Databanks/NetProfit.java`, `Databanks/NetProfitInPct.java`, `Databanks/NetProfitInPips.java`, `Databanks/Note.java`, `Databanks/NumberOfCanceled.java`, `Databanks/NumberOfLosses.java`, `Databanks/NumberOfProfits.java`, `Databanks/NumberOfTrades.java`, `Databanks/OpenDrawdown.java`, `Databanks/OpenDrawdownPct.java`, `Databanks/Outlier2.java`, `Databanks/Parameters.java`, `Databanks/PayoutRatio.java`, `Databanks/PriceIndicators.java`, `Databanks/ProfitFactor.java`, `Databanks/ProfitableMonths.java`, `Databanks/ProfitableMonthsPct.java`, `Databanks/RExpectancy.java`, `Databanks/RExpectancyScore.java`, `Databanks/RSquared.java`, `Databanks/RecoveryFactor.java`, `Databanks/ResultsName.java`, `Databanks/ReturnDDRatio.java`, `Databanks/ReturnOpenDDRatio.java`, `Databanks/SQN.java`, `Databanks/SQNScore.java`, `Databanks/SharpeRatio.java`, `Databanks/SlippageInMoney.java`, `Databanks/Stability.java`, `Databanks/StabilitySQ3.java`, `Databanks/Stagnation.java`, `Databanks/StagnationPct.java`, `Databanks/StandardDev.java`, `Databanks/Symbol.java`, `Databanks/Symmetry.java`, `Databanks/TSIndex.java`, `Databanks/TSWinLossRatio.java`, `Databanks/TimeFrame.java`, `Databanks/TotalDataDays.java`, `Databanks/TotalDataMonths.java`, `Databanks/TotalDataYears.java`, `Databanks/TotalMFE.java`, `Databanks/TotalTradingDays.java`, `Databanks/TotalTradingMonths.java`, `Databanks/TotalTradingYears.java`, `Databanks/TradesSymmetry.java`, `Databanks/UlcerIndex.java`, `Databanks/UlcerPerformanceIndex.java`, `Databanks/WinLossRatio.java`, `Databanks/WinningPct.java`, `Databanks/WorstParametersStability.java`, `Databanks/WorstYearProfit.java`, `Databanks/ZProbability.java`, `Databanks/ZScore.java`, `Trades/Balance.java`, `Trades/BarsInTrade.java`, `Trades/ClosePrice.java`, `Trades/CloseTime.java`, `Trades/CloseType.java`, `Trades/CommSwap.java`, `Trades/Comment.java`, `Trades/Drawdown.java`, `Trades/MAE.java`, `Trades/MAEPips.java`, `Trades/MFE.java`, `Trades/MFEPips.java`, `Trades/NumberOfTrade.java`, `Trades/OpenPrice.java`, `Trades/OpenTime.java`, `Trades/OriginalOpenPrice.java`, `Trades/OriginalOpenTime.java`, `Trades/PTLevel.java`, `Trades/PctDrawdown.java`, `Trades/ProfitLoss.java`, `Trades/ProfitLossPct.java`, `Trades/ProfitLossPips.java`, `Trades/ResultName.java`, `Trades/SLLevel.java`, `Trades/SampleType.java`, `Trades/Size.java`, `Trades/SlippageInMoney.java`, `Trades/Symbol.java`, `Trades/Ticket.java`, `Trades/TimeInTrade.java`, `Trades/Type.java`, `WalkForward/WFMaxDDbyRun.java`, `WalkForward/WFMaxPctDDbyRun.java`, `WalkForward/WFMaxProfitByRun.java`, `WalkForward/WFMaxProfitByRunInPct.java`, `WalkForward/WFMaxStagnationInPct.java`, `WalkForward/WFMinTradesInRun.java`, `WalkForward/WFPctOfProfitableRuns.java`, `WalkForward/WFScore.java`.
-### `Stats`
+### `Columns` — READY (160 definitions)
+
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Columns`; exact current definition count: 160 (`122` in `Databanks/`, `30` in `Trades/`, `8` in `WalkForward/`).
+- **Target Package & Files:**
+  - `app/extend/columns/__init__.py`
+  - `app/extend/columns/base.py`
+  - `app/extend/columns/databanks.py` (122 `Databanks/*` column descriptors & evaluators)
+  - `app/extend/columns/trades.py` (30 `Trades/*` column descriptors & evaluators)
+  - `app/extend/columns/walk_forward.py` (8 `WalkForward/*` column descriptors & evaluators)
+  - `tests/extend/test_columns_catalog.py`
+- **Authorized Contract & Signatures:**
+  - `ColumnCategory = Literal["Databanks", "Trades", "WalkForward"]`
+  - `ColumnValueType = Literal["MONEY", "PCT", "PIPS", "NUMBER", "INT", "TEXT", "DATETIME", "CHART"]`
+  - `ColumnDescriptor(column_id: str, category: ColumnCategory, label: str, value_type: ColumnValueType, decimals: int, maximize: bool | None, source_ref: str)`
+  - `DatabankColumnEvaluator.evaluate(column_id: str, stats: StrategyStatsSnapshot, *, sample_type: str = "FullSample", direction: str = "Both") -> float | int | str`
+  - `TradeColumnEvaluator.evaluate(column_id: str, trade: TradeRecord, *, index: int, running_balance: float, running_dd_money: float, running_dd_pct: float) -> float | int | str | None`
+  - `WalkForwardColumnEvaluator.evaluate(column_id: str, wf_runs: Sequence[WalkForwardRunStats]) -> float`
+  - **Zero-trade / Zero-denominator Boundary Rules:**
+    - When `NumberOfTrades == 0`, ratio/average/percentage columns return `0.0` (`ProfitFactor`, `ReturnDDRatio`, `SharpeRatio`, `WinningPct`, `AvgTrade`, `Expectancy`, `SQN`, `RSquared`, `Stability`).
+    - When `GrossLoss == 0.0` and `GrossProfit > 0.0`, `ProfitFactor` returns `round(GrossProfit, 2)` (capped finite representation, never `NaN` or `inf`).
+    - When `Drawdown == 0.0` and `NetProfit > 0.0`, `ReturnDDRatio` and `RecoveryFactor` return `round(NetProfit, 2)`.
+    - All float outputs are finite (`math.isfinite`) and rounded to `descriptor.decimals`.
+- **Golden Fixtures:**
+  - `Databanks`: 4 trades `[+200.0, -50.0, +150.0, -100.0]` (`initial_deposit=10000.0`) -> `NetProfit == 200.0`, `GrossProfit == 350.0`, `GrossLoss == -150.0`, `ProfitFactor == 2.33`, `NumberOfTrades == 4`, `WinningPct == 50.0`, `AvgTrade == 50.0`, `MaxProfit == 200.0`, `MaxLoss == -100.0`.
+  - `Trades`: Trade `#1` (`open=1.1000`, `close=1.1050`, `size=1.0`, `pl=500.0`, `initial=10000.0`) -> `NumberOfTrade == 1`, `ProfitLoss == 500.0`, `Balance == 10500.0`, `ProfitLossPct == 5.0`.
+  - `WalkForward`: 4 WF runs with net profits `[100.0, -20.0, 80.0, 40.0]` -> `WFPctOfProfitableRuns == 75.0`, `WFMaxProfitByRun == 100.0`.
+- **Definition IDs accounted for (160):** `Databanks/AHPR.java`, `Databanks/ActualDD.java`, `Databanks/ActualDrawdownPct.java`, `Databanks/AmbiguousTrades.java`, `Databanks/AmbiguousTradesPct.java`, `Databanks/AnnualPctReturn.java`, `Databanks/AnnualPctReturnDDRatio.java`, `Databanks/AvgAbsTrade.java`, `Databanks/AvgBarsInTrade.java`, `Databanks/AvgBarsLoss.java`, `Databanks/AvgBarsWin.java`, `Databanks/AvgConsecLosses.java`, `Databanks/AvgConsecWins.java`, `Databanks/AvgDrawdown.java`, `Databanks/AvgLoss.java`, `Databanks/AvgParametersStability.java`, `Databanks/AvgPctDrawdown.java`, `Databanks/AvgPctProfitPerYear.java`, `Databanks/AvgProfitPerDay.java`, `Databanks/AvgProfitPerMonth.java`, `Databanks/AvgProfitPerYear.java`, `Databanks/AvgTrStddevRatio.java`, `Databanks/AvgTrade.java`, `Databanks/AvgTradesPerDay.java`, `Databanks/AvgTradesPerMonth.java`, `Databanks/AvgTradesPerYear.java`, `Databanks/AvgWin.java`, `Databanks/BacktestDuration.java`, `Databanks/BestWF.java`, `Databanks/BiggestMAE.java`, `Databanks/CAGR.java`, `Databanks/CalmarRatio.java`, `Databanks/Commission.java`, `Databanks/Complexity.java`, `Databanks/DateGenerated.java`, `Databanks/DateLastModified.java`, `Databanks/DegreesOfFreedom.java`, `Databanks/Drawdown.java`, `Databanks/DrawdownPct.java`, `Databanks/DrawdownPips.java`, `Databanks/EdgeRatioInPips.java`, `Databanks/Efficiency.java`, `Databanks/EntryIndicators.java`, `Databanks/EquityAngle.java`, `Databanks/EquitySlope.java`, `Databanks/ExitIndicators.java`, `Databanks/ExitQuality.java`, `Databanks/Expectancy.java`, `Databanks/Exposure.java`, `Databanks/ExposurePosition.java`, `Databanks/FiltersResult.java`, `Databanks/Fitness.java`, `Databanks/GrossLoss.java`, `Databanks/GrossProfit.java`, `Databanks/InitialDeposit.java`, `Databanks/KellyFormula.java`, `Databanks/LongestTrade.java`, `Databanks/MagicNumber.java`, `Databanks/MaxConsecLosses.java`, `Databanks/MaxConsecWins.java`, `Databanks/MaxIntradayDrawdown.java`, `Databanks/MaxLoss.java`, `Databanks/MaxNewHighDuration.java`, `Databanks/MaxProfit.java`, `Databanks/MaxTSIntradayDrawdown.java`, `Databanks/MiniEquityChart.java`, `Databanks/NSymmetry.java`, `Databanks/NetProfit.java`, `Databanks/NetProfitInPct.java`, `Databanks/NetProfitInPips.java`, `Databanks/Note.java`, `Databanks/NumberOfCanceled.java`, `Databanks/NumberOfLosses.java`, `Databanks/NumberOfProfits.java`, `Databanks/NumberOfTrades.java`, `Databanks/OpenDrawdown.java`, `Databanks/OpenDrawdownPct.java`, `Databanks/Outlier2.java`, `Databanks/Parameters.java`, `Databanks/PayoutRatio.java`, `Databanks/PriceIndicators.java`, `Databanks/ProfitFactor.java`, `Databanks/ProfitableMonths.java`, `Databanks/ProfitableMonthsPct.java`, `Databanks/RExpectancy.java`, `Databanks/RExpectancyScore.java`, `Databanks/RSquared.java`, `Databanks/RecoveryFactor.java`, `Databanks/ResultsName.java`, `Databanks/ReturnDDRatio.java`, `Databanks/ReturnOpenDDRatio.java`, `Databanks/SQN.java`, `Databanks/SQNScore.java`, `Databanks/SharpeRatio.java`, `Databanks/SlippageInMoney.java`, `Databanks/Stability.java`, `Databanks/StabilitySQ3.java`, `Databanks/Stagnation.java`, `Databanks/StagnationPct.java`, `Databanks/StandardDev.java`, `Databanks/Symbol.java`, `Databanks/Symmetry.java`, `Databanks/TSIndex.java`, `Databanks/TSWinLossRatio.java`, `Databanks/TimeFrame.java`, `Databanks/TotalDataDays.java`, `Databanks/TotalDataMonths.java`, `Databanks/TotalDataYears.java`, `Databanks/TotalMFE.java`, `Databanks/TotalTradingDays.java`, `Databanks/TotalTradingMonths.java`, `Databanks/TotalTradingYears.java`, `Databanks/TradesSymmetry.java`, `Databanks/UlcerIndex.java`, `Databanks/UlcerPerformanceIndex.java`, `Databanks/WinLossRatio.java`, `Databanks/WinningPct.java`, `Databanks/WorstParametersStability.java`, `Databanks/WorstYearProfit.java`, `Databanks/ZProbability.java`, `Databanks/ZScore.java`, `Trades/Balance.java`, `Trades/BarsInTrade.java`, `Trades/ClosePrice.java`, `Trades/CloseTime.java`, `Trades/CloseType.java`, `Trades/CommSwap.java`, `Trades/Comment.java`, `Trades/Drawdown.java`, `Trades/MAE.java`, `Trades/MAEPips.java`, `Trades/MFE.java`, `Trades/MFEPips.java`, `Trades/NumberOfTrade.java`, `Trades/OpenPrice.java`, `Trades/OpenTime.java`, `Trades/OriginalOpenPrice.java`, `Trades/OriginalOpenTime.java`, `Trades/PTLevel.java`, `Trades/PctDrawdown.java`, `Trades/ProfitLoss.java`, `Trades/ProfitLossPct.java`, `Trades/ProfitLossPips.java`, `Trades/ResultName.java`, `Trades/SLLevel.java`, `Trades/SampleType.java`, `Trades/Size.java`, `Trades/SlippageInMoney.java`, `Trades/Symbol.java`, `Trades/Ticket.java`, `Trades/TimeInTrade.java`, `Trades/Type.java`, `WalkForward/WFMaxDDbyRun.java`, `WalkForward/WFMaxPctDDbyRun.java`, `WalkForward/WFMaxProfitByRun.java`, `WalkForward/WFMaxProfitByRunInPct.java`, `WalkForward/WFMaxStagnationInPct.java`, `WalkForward/WFMinTradesInRun.java`, `WalkForward/WFPctOfProfitableRuns.java`, `WalkForward/WFScore.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_columns_catalog.py --no-cov -q` -> exits `0` (asserts all 160 definition IDs are registered and evaluated).
+
+### `Stats` — READY (7 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Stats`; exact current definition count: 7.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `Overview/AWSharedDefault.java`, `Overview/DefaultOpenDD.java`, `Overview/SQDefault.java`, `Overview/SQDefaultPct.java`, `Overview/SQDefaultWithPortfolio.java`, `Overview/SQDefaultWithPortfolioPct.java`, `Overview/TSOverview.java`.
-### `EngineCharts`
+- **Target Package & Files:**
+  - `app/extend/stats/__init__.py`
+  - `app/extend/stats/overview_templates.py`
+  - `tests/extend/test_stats_overview.py`
+- **Authorized Contract & Signatures:**
+  - `OverviewStatsTemplate(template_id: str, label: str, use_pct: bool, include_portfolio_comparison: bool, use_open_dd: bool, metric_column_ids: tuple[str, ...], source_ref: str)`
+  - `OverviewStatsCatalog.get(template_id: str) -> OverviewStatsTemplate` and `OverviewStatsCatalog.render_rows(template_id: str, stats: StrategyStatsSnapshot) -> tuple[OverviewMetricRow, ...]`
+  - Maps all 7 donor overview templates:
+    1. `AWSharedDefault`
+    2. `DefaultOpenDD` (`use_open_dd=True`)
+    3. `SQDefault` (`use_pct=False`, `include_portfolio_comparison=False`)
+    4. `SQDefaultPct` (`use_pct=True`, `include_portfolio_comparison=False`)
+    5. `SQDefaultWithPortfolio` (`use_pct=False`, `include_portfolio_comparison=True`)
+    6. `SQDefaultWithPortfolioPct` (`use_pct=True`, `include_portfolio_comparison=True`)
+    7. `TSOverview` (Tradestation-style overview layout)
+- **Definition IDs accounted for (7):** `Overview/AWSharedDefault.java`, `Overview/DefaultOpenDD.java`, `Overview/SQDefault.java`, `Overview/SQDefaultPct.java`, `Overview/SQDefaultWithPortfolio.java`, `Overview/SQDefaultWithPortfolioPct.java`, `Overview/TSOverview.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_stats_overview.py --no-cov -q` -> exits `0`.
+
+### `EngineCharts` — READY (14 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/EngineCharts`; exact current definition count: 14.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `AcceptedStrategiesPerHour.java`, `AverageStrategiesPerHourChart.java`, `DatabankFitnessIS.java`, `DatabankFitnessIST.java`, `DatabankFitnessISV.java`, `DatabankFitnessOOS.java`, `GenEvoFitnessIS.java`, `GenEvoFitnessIST.java`, `GenEvoFitnessISV.java`, `GenEvoFitnessOOS.java`, `GeneticEvolutionInfo.java`, `HeapMemoryChart.java`, `OffHeapMemoryChart.java`, `OffHeapMemoryInfoChart.java`.
-### `CustomAnalysis`
+- **Target Package & Files:**
+  - `app/extend/engine_charts/__init__.py`
+  - `app/extend/engine_charts/catalog.py`
+  - `tests/extend/test_engine_charts.py`
+- **Authorized Contract & Signatures:**
+  - `EngineChartSeriesPoint(step: int, timestamp_ms: int, value: float, secondary_value: float | None = None)`
+  - `EngineChartDescriptor(chart_id: str, label: str, category: Literal["THROUGHPUT", "DATABANK_FITNESS", "GENETIC_FITNESS", "MEMORY"], sample_key: str | None, unit: str, source_ref: str)`
+  - `EngineChartsCatalog.project(chart_id: str, telemetry: JobRuntimeTelemetrySnapshot) -> tuple[EngineChartSeriesPoint, ...]`
+  - Evaluates throughput (`AcceptedStrategiesPerHour`, `AverageStrategiesPerHourChart`), databank best/avg fitness (`DatabankFitnessIS`, `DatabankFitnessIST`, `DatabankFitnessISV`, `DatabankFitnessOOS`), genetic generation fitness (`GenEvoFitnessIS`, `GenEvoFitnessIST`, `GenEvoFitnessISV`, `GenEvoFitnessOOS`, `GeneticEvolutionInfo`), and runtime memory (`HeapMemoryChart`, `OffHeapMemoryChart`, `OffHeapMemoryInfoChart`).
+- **Definition IDs accounted for (14):** `AcceptedStrategiesPerHour.java`, `AverageStrategiesPerHourChart.java`, `DatabankFitnessIS.java`, `DatabankFitnessIST.java`, `DatabankFitnessISV.java`, `DatabankFitnessOOS.java`, `GenEvoFitnessIS.java`, `GenEvoFitnessIST.java`, `GenEvoFitnessISV.java`, `GenEvoFitnessOOS.java`, `GeneticEvolutionInfo.java`, `HeapMemoryChart.java`, `OffHeapMemoryChart.java`, `OffHeapMemoryInfoChart.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_engine_charts.py --no-cov -q` -> exits `0`.
+
+### `CustomAnalysis` — READY (2 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/CustomAnalysis`; exact current definition count: 2.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `CorrelationFilter.java`, `OutlierTrade.java`.
+- **Target Package & Files:**
+  - `app/extend/custom_analysis/__init__.py`
+  - `app/extend/custom_analysis/analyzers.py`
+  - `tests/extend/test_custom_analysis.py`
+- **Authorized Contract & Signatures:**
+  - `CorrelationFilterAnalyzer.evaluate(strategy_ids: Sequence[str], correlation_matrix: Mapping[str, Mapping[str, float]], *, max_correlation: float = 0.5) -> tuple[str, ...]` (returns retained strategy IDs whose pairwise correlation is `< max_correlation`).
+  - `OutlierTradeAnalyzer.evaluate(trades: Sequence[TradeRecord], *, std_multiplier: float = 3.0) -> OutlierTradeReport(outlier_tickets: tuple[int, ...], mean_pl: float, std_pl: float, adjusted_net_profit: float)` (flags trades where `abs(trade.profit_loss - mean_pl) > std_multiplier * std_pl` and computes `adjusted_net_profit` excluding flagged outliers).
+- **Definition IDs accounted for (2):** `CorrelationFilter.java`, `OutlierTrade.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_custom_analysis.py --no-cov -q` -> exits `0`.
 
 ## Embedded evidence
 

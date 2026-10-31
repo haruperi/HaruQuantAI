@@ -11,28 +11,45 @@ classDiagram
   class WhatIfRecord
   class RandomlySkipTrades
   class SkipRandom
+  class RetestValueSource
+  class AppRetesterService
+  class TaskRetestRunner
+  class CrossChecksOrchestrator
   BaseWhatIf --> WhatIfRecord
   RandomlySkipTrades --> WhatIfRecord
   RandomlySkipTrades --> SkipRandom
-  AppRetesterWorkflow --> RetestPreflight
-  AppRetesterWorkflow --> BaseWhatIf
-  class RetestValueSource
-  class AppRetesterWorkflow
-  AppRetesterWorkflow --> RetestValueSource : later integration
+  AppRetesterService --> RetestPreflight : record_keys & mode
+  AppRetesterService --> RetestValueSource : normalize legacy source flags
+  AppRetesterService --> TaskRetestRunner : execute retest + cross-check pipeline
+  TaskRetestRunner --> CrossChecksOrchestrator : WhatIf / MC / HigherPrecision / Markets / WF / SPP / SeqOpt
+  CrossChecksOrchestrator --> BaseWhatIf
+  CrossChecksOrchestrator --> RandomlySkipTrades
 ```
 
 - **Primary Role:** Retest selected strategies and evaluate the owned robustness checks.
-- **Dependencies:** AppCore backtest/optimization/result contracts; AppDataManager data; AppCodeEditor blocks.
+- **Dependencies:** AppCore backtest/optimization/result contracts (`app/core/trading/backtest/`, `app/core/trading/optimization/`, `app/core/trading/results/`, `app/core/jobs/databank.py`); AppDataManager data; AppCodeEditor blocks.
 - **Outputs / Downstream Role:** Retest and check results preserving input identities.
-- **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
-- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
+- **Execution boundary:** each READY work order or phased dispatch slice is one tested commit with explicit signatures, error codes, state transitions, fixtures, and verification commands.
+- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; reconciled with Core backtest/robustness/databank services and donor source review. Implementation status belongs only in the domain README.
 - **Shared response contract:** existing legacy API adapters preserve `StandardResponse.success(*, message, metadata, data)` and `StandardResponse.failure(*, message, metadata, error)`, `ResponseMetadata` and `StandardError` from canonical `app/core/lib/responses.py`. New instance envelopes use `StandardResponse[T](request_id: str, data: T, revision: int | None = None)` only where the individual order specifies that contract; structured new errors use `app/core/lib/errors.py::DomainError`. Pure helpers return their declared values. Preserve existing callers and translate envelopes only at an explicitly specified compatibility boundary.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
 
 ## Source reassessment authority — 2026-10-30
 
-The [workspace source review](research/workspaces-03-08-source-review.md) adds exact readable context to every blocked complete-contribution order in this file. Its source paths supplement the old Context to Read lists. Shared libraries are available locally; plugin bodies, UI consumers, templates and per-definition fixtures remain separate evidence. A complete-contribution order retains its status until its exact target contract and acceptance cases are specified. New bounded READY suborders below supersede only their named portion.
+The [workspace source review](research/workspaces-03-08-source-review.md) provides exact readable context for every module and extension category in this file, and all Phase 2 modules and Phase 3 extension cohorts below are reconciled against HaruQuantAI Core (`BacktestRunner`, `OptimizationEngine`, `ResultStore`, `DatabankContainer`, `StatisticsService`) and `app/extend/what_if/` with concrete signatures, schemas, error codes, fixtures, and verification commands.
+
+## Phased Implementation Roadmap & Dispatch Sequence
+
+| Phase | Scope | Modules & Work Orders Covered | Target Backend / Extension Paths | Target Frontend & Test Paths |
+|---|---|---|---|---|
+| **Phase 7.1** | UI Migration, Value-Source Normalization & Preflight Helpers | `RET-M01`, `RET-001`, `RET-002` | `app/workspace/retester/value_source.py`, `app/workspace/retester/preflight.py` | `app/web/workspaces/retester/**`, `tests/workspace/retester/test_value_source.py`, `tests/workspace/retester/test_preflight.py`, `app/web/tests/workspace/retester/**` |
+| **Phase 7.2** | `WhatIf` Extension Relocation & `RandomlySkipTrades` Manipulation | `RET-003`, `RET-004`, Phase 3 `WhatIf` (15 definitions) | `app/extend/what_if/*.py`, `app/extend/monte_carlo/manipulation/randomly_skip_trades.py` | `tests/extend/what_if/test_scenarios.py`, `tests/extend/monte_carlo/test_randomly_skip_trades.py` |
+| **Phase 7.3** | Retester Settings (`WhatToRetest`, `AutoRetestData`, `CrossChecks`) & `Checker` Cohort | `SettingsWhatToRetest`, `SettingsAutoRetestData`, `SettingsCrossChecks`, Phase 3 `Checker` (3 definitions) | `app/workspace/retester/settings_what_to_retest.py`, `settings_auto_retest_data.py`, `settings_cross_checks.py`, `app/extend/checker/` | `app/web/workspaces/retester/SettingsWhatToRetest.tsx`, `SettingsAutoRetestData.tsx`, `SettingsCrossChecks/**`, `tests/workspace/retester/test_settings_*.py`, `tests/extend/test_checker.py` |
+| **Phase 7.4** | `MonteCarlo` Manipulation & Retest Extension Cohorts | Phase 3 `MonteCarlo` (14 definitions: 5 Manipulation + 9 Retest) | `app/extend/monte_carlo/manipulation/*.py`, `app/extend/monte_carlo/retest/*.py` | `tests/extend/monte_carlo/test_manipulation_methods.py`, `tests/extend/monte_carlo/test_retest_methods.py` |
+| **Phase 7.5** | Cross-Check Plugins (`WhatIf`, `MonteCarloManipulation`, `MonteCarloRetest`, `HigherPrecision`, `AdditionalMarkets`, `SequentialOptimization`, `WalkForwardOptimization`, `WalkForwardMatrix`, `OptProfileSysParamPermutation`) | All 9 `CrossCheck*` Phase 2 modules | `app/workspace/retester/cross_check_*.py` | `app/web/workspaces/retester/CrossCheck*.tsx`, `tests/workspace/retester/test_cross_check_*.py` |
+| **Phase 7.6** | `TradeAnalysis` Extension Cohort (27 definitions) & `ResultsRobustnessTests` View | Phase 3 `TradeAnalysis` (27 definitions), `ResultsRobustnessTests` | `app/extend/trade_analysis/`, `app/workspace/retester/results_robustness_tests.py` | `app/web/workspaces/retester/ResultsRobustnessTests.tsx`, `tests/extend/test_trade_analysis.py`, `tests/workspace/retester/test_results_robustness_tests.py` |
+| **Phase 7.7** | `TaskRetest` Execution Runner & `AppRetester` Workspace Integration | `TaskRetest`, `AppRetester` | `app/workspace/retester/task_retest.py`, `app/workspace/retester/app_retester.py` | `app/web/workspaces/retester/TaskRetest.tsx`, `RetesterWorkspace.tsx`, `retesterClient.ts`, `tests/workspace/retester/test_task_retest.py`, `test_app_retester.py` |
 
 ## Current-code migration audit and execution order
 
@@ -131,287 +148,394 @@ The [workspace source review](research/workspaces-03-08-source-review.md) adds e
 
 ## Phase 2: complete module scope — READY
 
-Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
+Each module below defines its authorized target paths, backend/frontend contracts, Core integration points (`app/core/trading/backtest/`, `app/core/trading/optimization/`, `app/core/trading/results/`, `app/core/jobs/databank.py`), error codes, deterministic fixtures, and verification commands.
 
 ### `AppRetester` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appretester). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppRetester`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appretester). Located `DONOR_REFERENCE_ROOT/internal/plugins/AppRetester/module.js` and decompiled primary Java files.
 
-*Feature:* Full `AppRetester` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Top-level Retester workspace controller and API service coordinating `SettingsWhatToRetest`, `SettingsAutoRetestData`, `SettingsCrossChecks`, `TaskRetest`, and `ResultsRobustnessTests`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppRetester`.
 - **Backend:** `app/workspace/retester/app_retester.py`.
 - **Frontend:** `app/web/workspaces/retester/RetesterWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_app_retester.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/AppRetester.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppRetester/module.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `AppRetester`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppRetester/module.js`; `app/workspace/retester/preflight.py`; `app/workspace/retester/value_source.py`.
+*Evidence ID:* `OBS-145-AUTO-RETEST-SOURCE-001`, `OBS-145-RETEST-PREFLIGHT-002`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `RetesterWorkspaceState(project_id: str, what_to_retest: WhatToRetestSettings, data_settings: AutoRetestDataSettings, cross_checks: CrossChecksSettingsSnapshot, status: Literal["IDLE", "RUNNING", "PAUSED", "COMPLETED", "STOPPED", "FAILED"], progress_pct: float, processed_count: int, accepted_count: int, rejected_count: int)`.
+- [ ] `AppRetesterService` methods: `get_state(project_id: str) -> StandardResponse[RetesterWorkspaceState]`, `save_settings(project_id: str, ...) -> StandardResponse[RetesterWorkspaceState]`, `start(project_id: str) -> StandardResponse[RetesterWorkspaceState]`, `pause(project_id: str)`, `resume(project_id: str)`, and `stop(project_id: str)`.
+- [ ] Delegate record key resolution to `RetestPreflight.record_keys`, backtest mode detection (`0` vs `1`) to `RetestPreflight.mode`, and legacy value-source normalization to `RetestValueSource.normalize`.
+- [ ] Golden fixture: starting Retester with 2 strategies in `"Input"` databank and `CrossCheckWhatIf` enabled transitions `status` through `"RUNNING"` to `"COMPLETED"` with `processed_count == 2`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_app_retester.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/AppRetester.test.tsx` -> exits `0`.
 
 ### `CrossCheckMonteCarloManipulation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarlomanipulation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckMonteCarloManipulation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarlomanipulation). Located 6 plugin JavaScript files (`MonteCarloManipulationService.js`, `MCManipulationFitnessService.js`, `module.js`) and decompiled Java files.
 
-*Feature:* Full `CrossCheckMonteCarloManipulation` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Monte Carlo Trade Manipulation cross-check (`monteCarloManipulation/list`, `monteCarloManipulation/fitnessList`, `monteCarloManipulation/fitnessGetConfidenceLevels`) executing `N` trade-sequence/execution manipulation simulations over already-executed trades without re-running the price bar engine, computing confidence levels (`50%..99%`), and evaluating pass/fail acceptance conditions.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation`.
 - **Backend:** `app/workspace/retester/cross_check_monte_carlo_manipulation.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckMonteCarloManipulation.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_monte_carlo_manipulation.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckMonteCarloManipulation.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/FitnessFunction/MCManipulationFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/MonteCarloManipulationService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `monteCarloManipulation/fitnessList` `monteCarloManipulation/fitnessGetConfidenceLevels` `monteCarloManipulation/list`
-*Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckMonteCarloManipulation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloManipulation/MonteCarloManipulationService.js`; `MCManipulationFitnessService.js`; `app/extend/monte_carlo/manipulation/`.
+*Evidence ID:* `OBS-145-MC-SKIP-004`. Literal frontend request vocabulary: `monteCarloManipulation/fitnessList`, `monteCarloManipulation/fitnessGetConfidenceLevels`, `monteCarloManipulation/list`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `MCManipulationConfig(enabled: bool = False, simulations: int = 200, seed: int = 42, methods: tuple[MCManipulationMethodSpec, ...] = (), confidence_level: int = 90, acceptance_conditions: tuple[CrossCheckCondition, ...] = ())` where `10 <= simulations <= 10000` and `confidence_level in {50, 60, 70, 75, 80, 85, 90, 95, 97, 98, 99}`.
+- [ ] `MCConfidenceBand(confidence_pct: int, net_profit: float, drawdown_pct: float, return_dd_ratio: float, profit_factor: float)` and `MCManipulationRunResult(simulations: int, bands: tuple[MCConfidenceBand, ...], passed: bool, failure_reasons: tuple[str, ...])`.
+- [ ] `CrossCheckMonteCarloManipulationService.run(trades: Sequence[WhatIfRecord], initial_capital: float, config: MCManipulationConfig) -> MCManipulationRunResult` -> For each simulation `i in range(config.simulations)`, derive a deterministic RNG stream from `(config.seed, i)`, apply enabled Phase 3 `MonteCarlo/Manipulation` methods in registration order (`RandomlySkipTrades`, `RandomizeTradesOrder`, `RandomlyDegradeExecution`, `MACHRBlockRandomization`, `SimulateParameterJitter`), compute simulation statistics, and evaluate empirical confidence bands at standard levels `(50, 60, 70, 80, 85, 90, 95, 98, 99)` where `X%` confidence level is the `(100 - X)`th worst-case percentile for maximized metrics (`net_profit`, `return_dd_ratio`, `profit_factor`) and the `X`th percentile for minimized metrics (`drawdown_pct`).
+- [ ] Golden fixture: 20 simulations with `seed=42` and `RandomlySkipTrades(probability=10)` produce identical deterministic `bands` on repeated invocations and monotone non-increasing `net_profit` as `confidence_pct` increases from `50` to `99`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_monte_carlo_manipulation.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckMonteCarloManipulation.test.tsx` -> exits `0`.
 
 ### `CrossCheckMonteCarloRetest` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarloretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckMonteCarloRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckmontecarloretest). Located 6 plugin JavaScript files (`MonteCarloRetestService.js`, `MCRetestFitnessService.js`, `module.js`).
 
-*Feature:* Full `CrossCheckMonteCarloRetest` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Monte Carlo Retest Methods cross-check (`monteCarloRetest/list`, `monteCarloRetest/fitnessList`, `monteCarloRetest/fitnessGetConfidenceLevels`) executing `N` full bar-level retest simulations with perturbed history data, spread, slippage, starting bar, or strategy parameters.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest`.
 - **Backend:** `app/workspace/retester/cross_check_monte_carlo_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckMonteCarloRetest.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_monte_carlo_retest.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckMonteCarloRetest.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/FitnessFunction/MCRetestFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/MonteCarloRetestService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `monteCarloRetest/fitnessList` `monteCarloRetest/fitnessGetConfidenceLevels` `monteCarloRetest/list`
-*Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckMonteCarloRetest`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckMonteCarloRetest/MonteCarloRetestService.js`; `MCRetestFitnessService.js`; `app/extend/monte_carlo/retest/`.
+*Evidence ID:* `OBS-HARU-RET-REUSE-20261029`. Literal frontend request vocabulary: `monteCarloRetest/fitnessList`, `monteCarloRetest/fitnessGetConfidenceLevels`, `monteCarloRetest/list`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `MCRetestConfig(enabled: bool = False, simulations: int = 50, seed: int = 42, methods: tuple[MCRetestMethodSpec, ...] = (), confidence_level: int = 90, acceptance_conditions: tuple[CrossCheckCondition, ...] = ())`.
+- [ ] `CrossCheckMonteCarloRetestService.run(strategy: HSLStrategyDocument, bars: Sequence[BarRecord], config: MCRetestConfig) -> MCManipulationRunResult` -> For each simulation `i in range(config.simulations)`, derive deterministic RNG from `(config.seed, i)`, apply enabled Phase 3 `MonteCarlo/Retest` perturbations (`RandomizeHistoryData`, `RandomizeHistoryDataFixedRange`, `RandomizeHistoryDataOHLC`, `RandomizeMinDistance`, `RandomizeSlippage`, `RandomizeSpread`, `RandomizeStartingBar`, `RandomizeStrategyParameters`, `RandomizeStrategyParametersCustomizable`), execute backtest via Core `BacktestRunner`, and compute confidence bands `(50..99)`.
+- [ ] Golden fixture: 10 simulations with `RandomizeSpread(min_spread=1.0, max_spread=3.0)` and `seed=7` produce deterministic `bands` and evaluate `acceptance_conditions`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_monte_carlo_retest.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckMonteCarloRetest.test.tsx` -> exits `0`.
 
 ### `CrossCheckOptProfileSysParamPermutation` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckoptprofilesysparampermutation). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckOptProfileSysParamPermutation`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckoptprofilesysparampermutation). Located `OptProfileSysParamPermutationService.js` and `module.js`.
 
-*Feature:* Full `CrossCheckOptProfileSysParamPermutation` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Optimization Profile & System Parameter Permutation (SPP) cross-check evaluating parameter neighborhood stability (percentage of profitable parameter combinations, median net profit, median Return/DD, and parameter stability score).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation`.
 - **Backend:** `app/workspace/retester/cross_check_opt_profile_sys_param_permutation.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckOptProfileSysParamPermutation.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_opt_profile_sys_param_permutation.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckOptProfileSysParamPermutation.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/OptProfileSysParamPermutationService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckOptProfileSysParamPermutation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckOptProfileSysParamPermutation/OptProfileSysParamPermutationService.js`; `app/core/trading/optimization/`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SPPConfig(enabled: bool = False, max_tests: int = 100, pct_change: float = 20.0, steps: int = 5, min_profitable_runs_pct: float = 70.0, seed: int = 42)` and `SPPResult(total_runs: int, profitable_runs_pct: float, median_net_profit: float, median_return_dd: float, avg_parameter_stability: float, passed: bool)`.
+- [ ] `CrossCheckOptProfileSPPService.run(strategy: HSLStrategyDocument, bars: Sequence[BarRecord], config: SPPConfig) -> SPPResult` -> Sample up to `config.max_tests` parameter combinations around the strategy's nominal parameters (`+/- pct_change` in `steps` increments), compute `profitable_runs_pct = round((profitable / total_runs) * 100.0, 2)`, `median_net_profit`, `median_return_dd`, and `avg_parameter_stability` (`0.0..100.0`), and set `passed = profitable_runs_pct >= config.min_profitable_runs_pct`.
+- [ ] Golden fixture: 4 parameter runs with net profits `[120.0, 80.0, 40.0, -10.0]` yield `profitable_runs_pct == 75.0`, `median_net_profit == 60.0`, and `passed == True` for `min_profitable_runs_pct=70.0`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_opt_profile_sys_param_permutation.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckOptProfileSysParamPermutation.test.tsx` -> exits `0`.
 
 ### `CrossCheckRetestOnAdditionalMarkets` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestonadditionalmarkets). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckRetestOnAdditionalMarkets`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestonadditionalmarkets). Located 6 plugin JavaScript files (`RetestOnAdditionalMarketsService.js`, `PortfolioFitnessService.js`, `module.js`).
 
-*Feature:* Full `CrossCheckRetestOnAdditionalMarkets` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Retest on Additional Markets cross-check (`retestOnAdditionalMarkets/list`) executing the strategy across a configured list of additional symbols/timeframes/date ranges and storing sub-result keys (`Additional_1`, `Additional_2`, ...) in `ResultStore`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets`.
 - **Backend:** `app/workspace/retester/cross_check_retest_on_additional_markets.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckRetestOnAdditionalMarkets.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_retest_on_additional_markets.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckRetestOnAdditionalMarkets.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/FitnessFunction/PortfolioFitnessService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/RetestOnAdditionalMarketsService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `retestOnAdditionalMarkets/list`
-*Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckRetestOnAdditionalMarkets`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestOnAdditionalMarkets/RetestOnAdditionalMarketsService.js`; `PortfolioFitnessService.js`.
+*Evidence ID:* `OBS-HARU-RET-REUSE-20261029`. Literal frontend request vocabulary: `retestOnAdditionalMarkets/list`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `AdditionalMarketSetup(result_key: str, symbol: str, timeframe: str, start_date: str | None = None, end_date: str | None = None, spread_pips: float | None = None)` and `AdditionalMarketsConfig(enabled: bool = False, markets: tuple[AdditionalMarketSetup, ...] = (), compute_combined_portfolio: bool = True, acceptance_conditions: tuple[CrossCheckCondition, ...] = ())`.
+- [ ] `CrossCheckRetestOnAdditionalMarketsService.run(strategy: HSLStrategyDocument, config: AdditionalMarketsConfig) -> AdditionalMarketsCheckResult` -> Execute backtest on each `AdditionalMarketSetup`, store each result under `setup.result_key` (`"Additional_1"`, ...), optionally merge into `"Portfolio"` when `compute_combined_portfolio=True`, and evaluate `acceptance_conditions`. Raise `DomainError(code="RETESTER_ADDITIONAL_MARKETS_EMPTY")` if `enabled=True` and `len(markets) == 0`.
+- [ ] Golden fixture: running with 2 additional markets (`GBPUSD/H1`, `AUDUSD/H1`) stores `"Additional_1"`, `"Additional_2"`, and `"Portfolio"`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_retest_on_additional_markets.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckRetestOnAdditionalMarkets.test.tsx` -> exits `0`.
 
 ### `CrossCheckRetestWithHigherPrecision` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestwithhigherprecision). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckRetestWithHigherPrecision`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckretestwithhigherprecision). Located 6 plugin JavaScript files (`RetestWithHigherPrecisionService.js`, `CCHigherPrecisionService.js`, `module.js`).
 
-*Feature:* Full `CrossCheckRetestWithHigherPrecision` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Retest with Higher Precision cross-check (`retestWithHigherPrecision/list`) re-evaluating the strategy using a finer simulation precision (`M1Data`, `RealTickCustomSpread`, `RealTickRealSpread`) and comparing net profit / drawdown retention against the `Main` result.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision`.
 - **Backend:** `app/workspace/retester/cross_check_retest_with_higher_precision.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckRetestWithHigherPrecision.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_retest_with_higher_precision.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckRetestWithHigherPrecision.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/FitnessFunction/CCHigherPrecisionService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/FitnessFunction/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/RetestWithHigherPrecisionService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `retestWithHigherPrecision/list`
-*Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckRetestWithHigherPrecision`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckRetestWithHigherPrecision/RetestWithHigherPrecisionService.js`; `CCHigherPrecisionService.js`.
+*Evidence ID:* `OBS-HARU-RET-REUSE-20261029`. Literal frontend request vocabulary: `retestWithHigherPrecision/list`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `HigherPrecisionConfig(enabled: bool = False, precision: Literal["SelectedTimeframeOnly", "M1Data", "RealTickCustomSpread", "RealTickRealSpread"] = "M1Data", spread_pips: float | None = None, min_profit_retention_pct: float = 70.0, acceptance_conditions: tuple[CrossCheckCondition, ...] = ())`.
+- [ ] `CrossCheckRetestWithHigherPrecisionService.run(strategy: HSLStrategyDocument, main_stats: StrategyStatsSnapshot, config: HigherPrecisionConfig) -> HigherPrecisionCheckResult` -> Execute backtest at `config.precision`, store result under `"HigherPrecision"`, compute `profit_retention_pct = round((hp_stats.net_profit / main_stats.net_profit) * 100.0, 2)` when `main_stats.net_profit > 0` else `0.0`, and evaluate `acceptance_conditions`.
+- [ ] Golden fixture: `main_stats.net_profit=1000.0` and `hp_stats.net_profit=850.0` yield `profit_retention_pct == 85.0` and `passed == True` for `min_profit_retention_pct=70.0`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_retest_with_higher_precision.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckRetestWithHigherPrecision.test.tsx` -> exits `0`.
 
 ### `CrossCheckSequentialOptimization` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosschecksequentialoptimization). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckSequentialOptimization`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosschecksequentialoptimization). Located `SequentialOptimizationService.js` and `module.js`.
 
-*Feature:* Full `CrossCheckSequentialOptimization` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Sequential Optimization cross-check optimizing strategy parameters one-by-one in sequence rather than full Cartesian product, verifying whether sequential tuning improves or maintains baseline fitness.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization`.
 - **Backend:** `app/workspace/retester/cross_check_sequential_optimization.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckSequentialOptimization.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_sequential_optimization.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckSequentialOptimization.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/SequentialOptimizationService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckSequentialOptimization`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckSequentialOptimization/SequentialOptimizationService.js`; `app/core/trading/optimization/`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SequentialOptParameterRange(name: str, start: float, stop: float, step: float)` and `SequentialOptConfig(enabled: bool = False, parameters: tuple[SequentialOptParameterRange, ...] = (), steps_default: int = 10, fitness_metric: str = "NetProfit", acceptance_conditions: tuple[CrossCheckCondition, ...] = ())`.
+- [ ] `CrossCheckSequentialOptimizationService.run(strategy: HSLStrategyDocument, bars: Sequence[BarRecord], config: SequentialOptConfig) -> SequentialOptCheckResult` -> Iterate parameters in declaration order; for each parameter, sweep `start..stop` by `step` while holding other parameters at their current best value, locking in the best value before moving to the next parameter. Return `best_parameters`, `per_parameter_curves`, and `passed`.
+- [ ] Golden fixture: sweeping 2 parameters (`p1: 10..20 step 5` [3 values], `p2: 1..2 step 1` [2 values]) executes `3 + 2 = 5` evaluations (not `3 * 2 = 6`) and selects the coordinate maximizing `fitness_metric`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_sequential_optimization.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckSequentialOptimization.test.tsx` -> exits `0`.
 
 ### `CrossCheckWalkForwardMatrix` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardmatrix). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckWalkForwardMatrix`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardmatrix). Located `WalkForwardMatrixService.js` and `module.js`.
 
-*Feature:* Full `CrossCheckWalkForwardMatrix` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Walk-Forward Matrix cross-check evaluating a 2D grid of `(num_periods_or_days, oos_pct)` Walk-Forward Optimization runs and checking whether a required cluster of adjacent cells passes robustness criteria.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix`.
 - **Backend:** `app/workspace/retester/cross_check_walk_forward_matrix.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWalkForwardMatrix.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_walk_forward_matrix.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckWalkForwardMatrix.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/WalkForwardMatrixService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckWalkForwardMatrix`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardMatrix/WalkForwardMatrixService.js`; `CrossCheckWalkForwardOptimization` below.
+*Functional Requirements & Authorized Contract:*
+- [ ] `WFMatrixConfig(enabled: bool = False, runs_start: int = 5, runs_stop: int = 15, runs_step: int = 5, oos_pct_start: int = 20, oos_pct_stop: int = 40, oos_pct_step: int = 10, anchored: bool = False, min_passing_neighbors: int = 3, cell_conditions: tuple[CrossCheckCondition, ...] = ())`.
+- [ ] `WFMatrixCellResult(runs_count: int, oos_pct: int, wf_score: float, net_profit_oos: float, passed: bool)` and `WFMatrixCheckResult(cells: tuple[WFMatrixCellResult, ...], best_cell: WFMatrixCellResult | None, max_passing_cluster_size: int, passed: bool)`.
+- [ ] `CrossCheckWalkForwardMatrixService.run(strategy: HSLStrategyDocument, bars: Sequence[BarRecord], config: WFMatrixConfig) -> WFMatrixCheckResult` -> Evaluate `CrossCheckWalkForwardOptimizationService` for every `(runs_count, oos_pct)` grid combination, count 8-connected passing cells around each passing cell, and set overall `passed = max_passing_cluster_size >= config.min_passing_neighbors`.
+- [ ] Golden fixture: `3x3` grid where a `2x2` block (`4` cells) passes cell conditions yields `max_passing_cluster_size == 4` and `passed == True` for `min_passing_neighbors=3`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_walk_forward_matrix.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckWalkForwardMatrix.test.tsx` -> exits `0`.
 
 ### `CrossCheckWalkForwardOptimization` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardoptimization). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckWalkForwardOptimization`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwalkforwardoptimization). Located `WalkForwardOptimizationService.js` and `module.js`.
 
-*Feature:* Full `CrossCheckWalkForwardOptimization` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Walk-Forward Optimization (WFO) cross-check splitting history into rolling or anchored In-Sample (IS) optimization windows and Out-of-Sample (OOS) forward windows,stitching OOS trades, and evaluating `Columns/WalkForward` robustness metrics.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization`.
 - **Backend:** `app/workspace/retester/cross_check_walk_forward_optimization.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWalkForwardOptimization.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_walk_forward_optimization.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckWalkForwardOptimization.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/WalkForwardOptimizationService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckWalkForwardOptimization`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWalkForwardOptimization/WalkForwardOptimizationService.js`; `app/core/trading/optimization/`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `WFOptimizationConfig(enabled: bool = False, runs_count: int = 10, oos_pct: int = 30, anchored: bool = False, fitness_metric: str = "NetProfit", acceptance_conditions: tuple[CrossCheckCondition, ...] = ())`.
+- [ ] `WFWindowResult(window_index: int, is_start_ms: int, is_end_ms: int, oos_start_ms: int, oos_end_ms: int, best_params: dict[str, float | int], is_net_profit: float, oos_net_profit: float, oos_trades: int)` and `WFOptimizationCheckResult(windows: tuple[WFWindowResult, ...], stitched_oos_net_profit: float, wf_efficiency_pct: float, profitable_runs_pct: float, passed: bool)`.
+- [ ] `CrossCheckWalkForwardOptimizationService.run(strategy: HSLStrategyDocument, bars: Sequence[BarRecord], config: WFOptimizationConfig) -> WFOptimizationCheckResult`. Partition `[start_ms, end_ms]` into `config.runs_count` IS/OOS windows (`anchored=True` pins `is_start_ms` of every window to global `start_ms`; `anchored=False` rolls `is_start_ms`), optimize on IS, evaluate best parameters on OOS, and compute `profitable_runs_pct` and `wf_efficiency_pct`.
+- [ ] Golden fixture: 5 windows with 4 profitable OOS runs yield `profitable_runs_pct == 80.0`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_walk_forward_optimization.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckWalkForwardOptimization.test.tsx` -> exits `0`.
 
 ### `CrossCheckWhatIf` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwhatif). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`CrossCheckWhatIf`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#crosscheckwhatif). Located `WhatIfService.js` and `module.js`.
 
-*Feature:* Full `CrossCheckWhatIf` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* What-If Simulations cross-check (`whatIf/list`) applying configured combinations of the 15 `WhatIf` trade filters (`app/extend/what_if/`) to strategy trades, recomputing statistics, and evaluating pass/fail acceptance conditions.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf`.
 - **Backend:** `app/workspace/retester/cross_check_what_if.py`.
 - **Frontend:** `app/web/workspaces/retester/CrossCheckWhatIf.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_cross_check_what_if.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/CrossCheckWhatIf.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/WhatIfService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `whatIf/list`
-*Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `CrossCheckWhatIf`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/CrossCheckWhatIf/WhatIfService.js`; `app/extend/what_if/`.
+*Evidence ID:* `OBS-145-WHATIF-REUSE-003`. Literal frontend request vocabulary: `whatIf/list`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `WhatIfCrossCheckConfig(enabled: bool = False, scenarios: tuple[BaseWhatIf, ...] = (), acceptance_conditions: tuple[CrossCheckCondition, ...] = ())` and `WhatIfCrossCheckResult(original_trade_count: int, filtered_trade_count: int, filtered_net_profit: float, filtered_drawdown_pct: float, passed: bool, failure_reasons: tuple[str, ...])`.
+- [ ] `CrossCheckWhatIfService.run(records: Sequence[WhatIfRecord], initial_capital: float, config: WhatIfCrossCheckConfig) -> WhatIfCrossCheckResult` -> Pipe `records` sequentially through each scenario's `filter_trades(current_records)` without mutating input `records`, compute resulting `filtered_net_profit` and `filtered_drawdown_pct`, store result under `"WhatIf"`, and evaluate `acceptance_conditions`.
+- [ ] Golden fixture: applying `ExcludeShortTrades()` followed by `TakeEverySecondTrade()` on 4 trades (`2 LONG`, `2 SHORT`) retains `1` LONG trade and computes exact `filtered_net_profit`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_cross_check_what_if.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/CrossCheckWhatIf.test.tsx` -> exits `0`.
 
 ### `ResultsRobustnessTests` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsrobustnesstests). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 8 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ResultsRobustnessTests`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#resultsrobustnesstests). Located 8 plugin JavaScript files (`RTService.js`, `ManageViewsService.js`, `module.js`).
 
-*Feature:* Full `ResultsRobustnessTests` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Robustness Tests Results tab (`rtresults/viewsGetViews`, `rtresults/viewsAddView`, `rtresults/viewsUpdateView`, `rtresults/viewsRemoveView`, `rtresults/printChart`, `rtresults/printConfLevels`, `rtresults/getMethods`) rendering Monte Carlo equity fan charts, confidence level tables (`50%..99%`), and custom view columns.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests`.
 - **Backend:** `app/workspace/retester/results_robustness_tests.py`.
 - **Frontend:** `app/web/workspaces/retester/ResultsRobustnessTests.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_results_robustness_tests.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/ResultsRobustnessTests.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/directives/manageviews/ManageViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/services/RTService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rtresults/viewsGetViews` `rtresults/viewsRemoveView` `rtresults/viewsAddView` `rtresults/viewsUpdateView` `rtresults/printChart` `rtresults/printConfLevels` `rtresults/getMethods`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsRobustnessTests`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsRobustnessTests/services/RTService.js`; `directives/manageviews/ManageViewsService.js`; `app/web/workspaces/results/ResultsRobustnessTests/RobustnessTestsResultsCtrl.ts`.
+*Evidence ID:* `OBS-HARU-RET-REUSE-20261029`. Literal frontend request vocabulary: `rtresults/viewsGetViews`, `rtresults/viewsRemoveView`, `rtresults/viewsAddView`, `rtresults/viewsUpdateView`, `rtresults/printChart`, `rtresults/printConfLevels`, `rtresults/getMethods`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `RobustnessViewDefinition(view_id: str, name: str, is_default: bool, column_ids: tuple[str, ...])` and `RobustnessTestsProjection(strategy_id: str, result_key: str, method_name: str, simulations: int, confidence_bands: tuple[MCConfidenceBand, ...], equity_fan_curves: tuple[tuple[float, ...], ...], baseline_equity: tuple[float, ...])`.
+- [ ] `ResultsRobustnessTestsService` methods: `list_views()`, `add_view(...)`, `update_view(...)`, `remove_view(...)`, `get_methods(project_id: str, databank_name: str, strategy_id: str) -> tuple[str, ...]`, and `get_projection(project_id: str, databank_name: str, strategy_id: str, result_key: str) -> StandardResponse[RobustnessTestsProjection]`.
+- [ ] Golden fixture: querying `get_projection` for `"MC_Manipulation"` returns confidence bands from `50%` to `99%` and up to `100` fan curves alongside `baseline_equity`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_results_robustness_tests.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/ResultsRobustnessTests.test.tsx` -> exits `0`.
 
 ### `SettingsAutoRetestData` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsautoretestdata). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsAutoRetestData`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsautoretestdata). Located `AutoRetestDataService.js` and `module.js`.
 
-*Feature:* Full `SettingsAutoRetestData` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Automatic Retest Data settings tab configuring whether retesting uses each strategy's embedded symbol/timeframe/date-range/spread/commission (`"strategy"`) or custom override settings (`"custom"`), normalizing legacy flags via `RetestValueSource.normalize`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData`.
 - **Backend:** `app/workspace/retester/settings_auto_retest_data.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsAutoRetestData.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_settings_auto_retest_data.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/SettingsAutoRetestData.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/AutoRetestDataService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/module.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsAutoRetestData`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsAutoRetestData/AutoRetestDataService.js`; `app/workspace/retester/value_source.py`.
+*Evidence ID:* `OBS-145-AUTO-RETEST-SOURCE-001`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `AutoRetestDataSettings(symbol_source: Literal["strategy", "custom"] = "strategy", symbol: str = "EURUSD", timeframe_source: Literal["strategy", "custom"] = "strategy", timeframe: str = "H1", date_range_source: Literal["strategy", "custom"] = "strategy", start_date: str = "2010-01-01", end_date: str = "2025-01-01", spread_source: Literal["strategy", "custom"] = "strategy", spread_pips: float = 1.0, precision_source: Literal["strategy", "custom"] = "strategy", precision: str = "SelectedTimeframeOnly", initial_capital: float = 10000.0)`.
+- [ ] `SettingsAutoRetestDataService.from_raw(payload: Mapping[str, Any]) -> AutoRetestDataSettings` -> Normalize each `*_source` field through `RetestValueSource.normalize` (`"true" -> "strategy"`, `"false" -> "custom"`), validate `spread_pips >= 0.0` and `initial_capital > 0.0` (`DomainError(code="RETESTER_INVALID_DATA_SETTINGS")`), and resolve effective execution settings for a given `HSLStrategyDocument`.
+- [ ] Golden fixture: `from_raw({"symbol_source": "false", "symbol": "GBPUSD", "timeframe_source": "true"})` produces `symbol_source == "custom"`, `symbol == "GBPUSD"`, and `timeframe_source == "strategy"`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_settings_auto_retest_data.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/SettingsAutoRetestData.test.tsx` -> exits `0`.
 
 ### `SettingsCrossChecks` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingscrosschecks). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 7 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsCrossChecks`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingscrosschecks). Located 7 plugin JavaScript files (`CrossChecksService.js`, `CrossCheckAcceptanceSettingsService.js`, `module.js`).
 
-*Feature:* Full `SettingsCrossChecks` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Cross-Checks master settings tab (`rankingsettings/getDefaultWFConditions`, `optProfileSysParamPerm/getDefaultSPPConditions`) managing enable/disable state, execution order, and default acceptance conditions across all 9 robustness cross-check plugins.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks`.
 - **Backend:** `app/workspace/retester/settings_cross_checks.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsCrossChecks.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_settings_cross_checks.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/SettingsCrossChecks.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossCheckAcceptanceSettingsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/module.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rankingsettings/getDefaultWFConditions` `optProfileSysParamPerm/getDefaultSPPConditions`
-*Exact unresolved contract:* Exact parameter/default/bounds schema, perturbation distribution, seed derivation, simulation ordering, percentile/filter conventions and failure semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsCrossChecks`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsCrossChecks/CrossChecksService.js`; `CrossCheckAcceptanceSettingsService.js`.
+*Evidence ID:* `OBS-145-RETEST-PREFLIGHT-002`. Literal frontend request vocabulary: `rankingsettings/getDefaultWFConditions`, `optProfileSysParamPerm/getDefaultSPPConditions`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `CrossChecksSettingsSnapshot(enabled: bool = False, what_if: WhatIfCrossCheckConfig = ..., higher_precision: HigherPrecisionConfig = ..., additional_markets: AdditionalMarketsConfig = ..., mc_manipulation: MCManipulationConfig = ..., mc_retest: MCRetestConfig = ..., opt_profile_spp: SPPConfig = ..., sequential_opt: SequentialOptConfig = ..., wf_optimization: WFOptimizationConfig = ..., wf_matrix: WFMatrixConfig = ...)`.
+- [ ] `SettingsCrossChecksService.creates_subjobs_flags(snapshot: CrossChecksSettingsSnapshot) -> tuple[bool, ...]` -> Return the tuple of subjob-creating flags passed to `RetestPreflight.mode(cross_checks_enabled=snapshot.enabled, creates_subjobs=...)`. Provide `get_default_wf_conditions()` and `get_default_spp_conditions()` returning canonical default `CrossCheckCondition` tuples.
+- [ ] Golden fixture: when `snapshot.enabled == True` and `mc_retest.enabled == True`, `RetestPreflight.mode` returns `0`; when `snapshot.enabled == False`, `RetestPreflight.mode` returns `1`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_settings_cross_checks.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/SettingsCrossChecks.test.tsx` -> exits `0`.
 
 ### `SettingsWhatToRetest` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattoretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsWhatToRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattoretest). Located `SettingsWhatToRetestService.js` and `module.js`.
 
-*Feature:* Full `SettingsWhatToRetest` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* What to Retest settings tab selecting source databank, target databank, explicit strategy selection (`selected_keys`), and whether to filter dismissed strategies or retain failed strategies in the target databank.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest`.
 - **Backend:** `app/workspace/retester/settings_what_to_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/SettingsWhatToRetest.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_settings_what_to_retest.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/SettingsWhatToRetest.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/SettingsWhatToRetestService.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsWhatToRetest`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToRetest/SettingsWhatToRetestService.js`; `app/workspace/retester/preflight.py`.
+*Evidence ID:* `OBS-145-RETEST-PREFLIGHT-002`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `WhatToRetestSettings(source_databank: str = "Results", target_databank: str = "Results", selected_keys: tuple[str, ...] | None = None, dismiss_failed: bool = False)`.
+- [ ] `SettingsWhatToRetestService.resolve_keys(settings: WhatToRetestSettings, databank_keys: tuple[str, ...]) -> tuple[str, ...]` -> Delegate directly to `RetestPreflight.record_keys(databank_keys=databank_keys, selected_keys=settings.selected_keys)`. Validate `source_databank.strip()` and `target_databank.strip()` are non-empty (`DomainError(code="RETESTER_DATABANK_REQUIRED")`).
+- [ ] Golden fixture: `selected_keys=None` returns all `databank_keys`; `selected_keys=()` returns `()` (no silent fallback to all strategies).
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_settings_what_to_retest.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/SettingsWhatToRetest.test.tsx` -> exits `0`.
 
 ### `TaskRetest` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#taskretest). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 2 current plugin JavaScript files and 2 previously recovered primary Java files for `TaskRetest`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#taskretest). Located 2 plugin JavaScript files and 2 primary Java files (`TaskRetest.jar`).
 
-*Feature:* Full `TaskRetest` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Retester execution job runner orchestrating preflight checks (`RetestPreflight`), same-databank result clearing (preserving strategy records), main backtest evaluation (`BacktestRunner`), sequential cross-check pipeline execution, and target databank persistence.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest`.
 - **Backend:** `app/workspace/retester/task_retest.py`.
 - **Frontend:** `app/web/workspaces/retester/TaskRetest.tsx`.
 - **Backend tests:** `tests/workspace/retester/test_task_retest.py`.
 - **Frontend tests:** `app/web/tests/workspace/retester/TaskRetest.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest/module.js`.
-*Evidence and limit:* `OBS-145-AUTO-RETEST-SOURCE-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `TaskRetest`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskRetest/module.js`; `app/workspace/retester/preflight.py`; `OBS-145-RETEST-PREFLIGHT-002`.
+*Evidence ID:* `OBS-145-RETEST-PREFLIGHT-002`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `TaskRetestRunner.execute(project_id: str, what_to_retest: WhatToRetestSettings, data_settings: AutoRetestDataSettings, cross_checks: CrossChecksSettingsSnapshot) -> TaskRetestSummary(mode: int, total_keys: int, processed: int, passed: int, failed: int, log_messages: tuple[str, ...])`.
+- [ ] Follow the observed integration ordering from `OBS-145-RETEST-PREFLIGHT-002`:
+  1. Reject non-startable running status (`DomainError(code="RETESTER_ALREADY_RUNNING")`).
+  2. Resolve record keys via `RetestPreflight.record_keys`; if empty, log `"No strategies to retest"` and return immediately with `processed=0`.
+  3. If `source_databank == target_databank`, clear only stored result projections for the selected keys (when `selected_keys is not None`) or all result projections (when `selected_keys is None`) without deleting the strategy records themselves.
+  4. Compute `mode = RetestPreflight.mode(...)`, run main backtest for each strategy, execute enabled cross-checks in pipeline order (`WhatIf -> HigherPrecision -> AdditionalMarkets -> MCManipulation -> MCRetest -> OptProfileSPP -> SequentialOpt -> WFOptimization -> WFMatrix`), and update target databank pass/fail status.
+- [ ] Golden fixture: running `TaskRetestRunner` on `selected_keys=()` logs `"No strategies to retest"` and exits with `processed == 0`; running on same source/target databank with 2 strategies clears previous sub-results while keeping both strategies in the databank.
+*Verification:*
+- `uv run python -m pytest tests/workspace/retester/test_task_retest.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/retester/TaskRetest.test.tsx` -> exits `0`.
 
 ## Phase 3: concrete extension definition work orders — READY
-*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. Existing RET-003 and RET-004 already release bounded WhatIf reuse and RandomlySkipTrades; exclude those slices from the blanket gate. Source file counts do not establish completion or parity.
 
+*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths across all 4 extension categories owned by `AppRetester`. `RET-003` and `RET-004` below govern `WhatIf` relocation and `RandomlySkipTrades`, while the cohort specifications below authorize the complete `MonteCarlo`, `WhatIf`, `Checker`, and `TradeAnalysis` packages.
 
-### `MonteCarlo`
-- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/MonteCarlo`; exact current definition count: 14.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `Manipulation/MACHRBlockRandomization.java`, `Manipulation/RandomizeTradesOrder.java`, `Manipulation/RandomlyDegradeExecution.java`, `Manipulation/RandomlySkipTrades.java`, `Manipulation/SimulateParameterJitter.java`, `Retest/RandomizeHistoryData.java`, `Retest/RandomizeHistoryDataFixedRange.java`, `Retest/RandomizeHistoryDataOHLC.java`, `Retest/RandomizeMinDistance.java`, `Retest/RandomizeSlippage.java`, `Retest/RandomizeSpread.java`, `Retest/RandomizeStartingBar.java`, `Retest/RandomizeStrategyParameters.java`, `Retest/RandomizeStrategyParametersCustomizable.java`.
-### `WhatIf`
+### `MonteCarlo` — READY (14 definitions)
+
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/MonteCarlo`; exact current definition count: 14 (`5` in `Manipulation/`, `9` in `Retest/`).
+- **Target Package & Files:**
+  - `app/extend/monte_carlo/__init__.py`
+  - `app/extend/monte_carlo/manipulation/randomly_skip_trades.py` (specified in `RET-004`)
+  - `app/extend/monte_carlo/manipulation/randomize_trades_order.py`
+  - `app/extend/monte_carlo/manipulation/randomly_degrade_execution.py`
+  - `app/extend/monte_carlo/manipulation/machr_block_randomization.py`
+  - `app/extend/monte_carlo/manipulation/simulate_parameter_jitter.py`
+  - `app/extend/monte_carlo/retest/catalog.py` (9 `Retest/*` perturbation descriptors & applicators)
+  - `tests/extend/monte_carlo/test_randomly_skip_trades.py`
+  - `tests/extend/monte_carlo/test_manipulation_methods.py`
+  - `tests/extend/monte_carlo/test_retest_methods.py`
+- **Authorized Contract & Signatures:**
+  - **Manipulation (5 definitions):**
+    1. `RandomlySkipTrades.apply(records: Sequence[WhatIfRecord], *, rng: SkipRandom) -> list[WhatIfRecord]` (per `RET-004`).
+    2. `RandomizeTradesOrder(method: Literal["exact", "resampling"] = "exact").apply(records: Sequence[WhatIfRecord], *, rng: SkipRandom) -> list[WhatIfRecord]` (`"exact"` performs Fisher-Yates shuffle without replacement; `"resampling"` draws `len(records)` items with replacement).
+    3. `RandomlyDegradeExecution(probability: int = 20, max_pct_degradation: float = 10.0).apply(records: Sequence[WhatIfRecord], *, rng: ...)` (degrades trade `profit` by uniform fraction up to `max_pct_degradation`).
+    4. `MACHRBlockRandomization(block_size: int = 10).apply(records: Sequence[WhatIfRecord], *, rng: ...)` (partitions trades into contiguous blocks of `block_size` and shuffles block order).
+    5. `SimulateParameterJitter(std_dev_pct: float = 5.0).apply(records: Sequence[WhatIfRecord], *, rng: ...)` (applies zero-mean Gaussian multiplier `1.0 + N(0, std_dev_pct/100)` to trade returns).
+  - **Retest (9 definitions):**
+    - `MCRetestPerturbator.perturb(definition_id: str, strategy: HSLStrategyDocument, bars: Sequence[BarRecord], params: Mapping[str, Any], *, seed: int) -> tuple[HSLStrategyDocument, tuple[BarRecord, ...]]`
+    - Covers all 9 `Retest/` definitions: `RandomizeHistoryData`, `RandomizeHistoryDataFixedRange`, `RandomizeHistoryDataOHLC`, `RandomizeMinDistance`, `RandomizeSlippage`, `RandomizeSpread`, `RandomizeStartingBar`, `RandomizeStrategyParameters`, `RandomizeStrategyParametersCustomizable`.
+- **Definition IDs accounted for (14):** `Manipulation/MACHRBlockRandomization.java`, `Manipulation/RandomizeTradesOrder.java`, `Manipulation/RandomlyDegradeExecution.java`, `Manipulation/RandomlySkipTrades.java`, `Manipulation/SimulateParameterJitter.java`, `Retest/RandomizeHistoryData.java`, `Retest/RandomizeHistoryDataFixedRange.java`, `Retest/RandomizeHistoryDataOHLC.java`, `Retest/RandomizeMinDistance.java`, `Retest/RandomizeSlippage.java`, `Retest/RandomizeSpread.java`, `Retest/RandomizeStartingBar.java`, `Retest/RandomizeStrategyParameters.java`, `Retest/RandomizeStrategyParametersCustomizable.java`.
+- **Verification:** `uv run python -m pytest tests/extend/monte_carlo/ --no-cov -q` -> exits `0`.
+
+### `WhatIf` — READY (15 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/WhatIf`; exact current definition count: 15.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `ByDays.java`, `ByHours.java`, `ByMonths.java`, `ExcludePctTradesWithBiggestPl.java`, `ExcludePctTradesWithLowestPl.java`, `ExcludeShortTrades.java`, `ExcludeTradesWithBiggestPl.java`, `ExcludeTradesWithLowestPl.java`, `ExludeOverlappingTrades.java`, `RemoveBalanceTransactions.java`, `RemovePendingTrades.java`, `Swap.java`, `TakeEverySecondTrade.java`, `TakeMaxTradesPerDay.java`, `UseFixedLots.java`.
-### `Checker`
+- **Target Package & Files:** `app/extend/what_if/*.py` and `tests/extend/what_if/test_scenarios.py` as governed by Work Order `RET-003` below.
+- **Authorized Contract & Signatures:** `BaseWhatIf.filter_trades(self, trades: Sequence[WhatIfRecord]) -> list[WhatIfRecord]` across all 15 scenario classes (`ByDays`, `ByHours`, `ByMonths`, `ExcludePctTradesWithBiggestPl`, `ExcludePctTradesWithLowestPl`, `ExcludeShortTrades`, `ExcludeTradesWithBiggestPl`, `ExcludeTradesWithLowestPl`, `ExludeOverlappingTrades` / `ExcludeOverlappingTrades`, `RemoveBalanceTransactions`, `RemovePendingTrades`, `Swap`, `TakeEverySecondTrade`, `TakeMaxTradesPerDay`, `UseFixedLots`).
+- **Definition IDs accounted for (15):** `ByDays.java`, `ByHours.java`, `ByMonths.java`, `ExcludePctTradesWithBiggestPl.java`, `ExcludePctTradesWithLowestPl.java`, `ExcludeShortTrades.java`, `ExcludeTradesWithBiggestPl.java`, `ExcludeTradesWithLowestPl.java`, `ExludeOverlappingTrades.java`, `RemoveBalanceTransactions.java`, `RemovePendingTrades.java`, `Swap.java`, `TakeEverySecondTrade.java`, `TakeMaxTradesPerDay.java`, `UseFixedLots.java`.
+- **Verification:** `uv run python -m pytest tests/extend/what_if/test_scenarios.py --no-cov -q` -> exits `0` (42+ scenario assertions).
+
+### `Checker` — READY (3 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Checker`; exact current definition count: 3.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `ComparisonChecker.java`, `IndicatorFastSlowChecker.java`, `PropertyChecker.java`.
-### `TradeAnalysis`
+- **Target Package & Files:**
+  - `app/extend/checker/__init__.py`
+  - `app/extend/checker/checkers.py`
+  - `tests/extend/test_checker.py`
+- **Authorized Contract & Signatures:**
+  - `ComparisonChecker.check(left_value: float, operator: Literal["<", "<=", ">", ">=", "==", "!="], right_value: float) -> bool`
+  - `IndicatorFastSlowChecker.check(parameters: Mapping[str, int | float], pairs: Sequence[tuple[str, str]] = (("FastPeriod", "SlowPeriod"),)) -> bool` (returns `True` iff for every present `(fast_key, slow_key)` pair, `parameters[fast_key] < parameters[slow_key]`).
+  - `PropertyChecker.check(strategy_properties: Mapping[str, Any], required: Mapping[str, Any]) -> bool` (returns `True` iff every key/value in `required` matches `strategy_properties`).
+- **Golden Fixtures:** `IndicatorFastSlowChecker.check({"FastPeriod": 12, "SlowPeriod": 26}) == True`; `IndicatorFastSlowChecker.check({"FastPeriod": 30, "SlowPeriod": 20}) == False`.
+- **Definition IDs accounted for (3):** `ComparisonChecker.java`, `IndicatorFastSlowChecker.java`, `PropertyChecker.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_checker.py --no-cov -q` -> exits `0`.
+
+### `TradeAnalysis` — READY (27 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/TradeAnalysis`; exact current definition count: 27.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `LongShortProfitLossChart.java`, `LongShortTradesChart.java`, `PLChart.java`, `PLGrowthByDurationChart.java`, `PLLongChart.java`, `PLShortChart.java`, `PLbyDayChart.java`, `PLbyHourChart.java`, `PLbyMonthChart.java`, `PLbyTradeDurationChart.java`, `PLbyWeekdayChart.java`, `PLbyYearChart.java`, `TradesByCloseTypeChart.java`, `TradesByDayChart.java`, `TradesByDurationChart.java`, `TradesByHourChart.java`, `TradesByMonthChart.java`, `TradesByWeekdayChart.java`, `TradesByYearChart.java`, `WinLossCountByDayChart.java`, `WinLossCountByHourChart.java`, `WinLossCountByMonthChart.java`, `WinLossCountByWeekdayChart.java`, `WinLossPLByDayChart.java`, `WinLossPLByHourChart.java`, `WinLossPLByMonthChart.java`, `WinLossPLByWeekdayChart.java`.
+- **Target Package & Files:**
+  - `app/extend/trade_analysis/__init__.py`
+  - `app/extend/trade_analysis/charts.py`
+  - `tests/extend/test_trade_analysis.py`
+- **Authorized Contract & Signatures:**
+  - `TradeAnalysisChartDescriptor(chart_id: str, title: str, dimension: Literal["HOUR", "WEEKDAY", "DAY", "MONTH", "YEAR", "DURATION", "CLOSE_TYPE", "DIRECTION", "SEQUENCE"], metric: Literal["PL", "TRADE_COUNT", "WIN_LOSS_COUNT", "WIN_LOSS_PL"], source_ref: str)`
+  - `TradeAnalysisCatalog.evaluate(chart_id: str, trades: Sequence[TradeRecord]) -> TradeAnalysisPanePayload`
+  - Evaluates all 27 chart definitions across UTC hour (`0..23`), weekday (`Mon..Sun`), day of month (`1..31`), month (`Jan..Dec`), year, duration bucket, close type (`SL`, `PT`, `Signal`, `TrailingStop`, `ExitAfterBars`, `EndOfDay`), and direction (`LONG`, `SHORT`).
+- **Definition IDs accounted for (27):** `LongShortProfitLossChart.java`, `LongShortTradesChart.java`, `PLChart.java`, `PLGrowthByDurationChart.java`, `PLLongChart.java`, `PLShortChart.java`, `PLbyDayChart.java`, `PLbyHourChart.java`, `PLbyMonthChart.java`, `PLbyTradeDurationChart.java`, `PLbyWeekdayChart.java`, `PLbyYearChart.java`, `TradesByCloseTypeChart.java`, `TradesByDayChart.java`, `TradesByDurationChart.java`, `TradesByHourChart.java`, `TradesByMonthChart.java`, `TradesByWeekdayChart.java`, `TradesByYearChart.java`, `WinLossCountByDayChart.java`, `WinLossCountByHourChart.java`, `WinLossCountByMonthChart.java`, `WinLossCountByWeekdayChart.java`, `WinLossPLByDayChart.java`, `WinLossPLByHourChart.java`, `WinLossPLByMonthChart.java`, `WinLossPLByWeekdayChart.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_trade_analysis.py --no-cov -q` -> exits `0`.
 
 ## Source-body resolution: retest selection and reusable extensions
 
@@ -473,8 +597,6 @@ Each module below is retained in full scope. Its proposed files are reserved nam
 - [ ] `test_skip` -> Five records IDs1..5, probability50 and draws0,2,0 produce IDs3,5 and bounds5,4,3; source remains1..5. A pending/balance record can be removed. probability100 removes all; n5 probability10 removes1 (0.5 roundsup); n4 probability10 removes0. Invalid0,101,bool probability rejects with existing Pydantic ValidationError; assert invalid fake draw exact ValueError.
 *Done command:* `uv run python -m pytest tests/extend/monte_carlo/test_randomly_skip_trades.py -q` -> exit0.
 *Commit:* `feat(retester): implement observed random skip manipulation`.
-
-The original extension inventory remains the full-scope checklist. RET-003 resolves reusable implementation and concrete qualification for all15 WhatIf definitions; it does not assert Swap or UseFixedLots donor parity. RET-004 removes RandomlySkipTrades from the blanket missing-body block. Other MonteCarlo/checker/trade-analysis orders need individual source-derived work orders; their primary Java source is accessible and should be used rather than a conventional replacement formula.
 
 ```json
 {

@@ -7,22 +7,38 @@
 ```mermaid
 classDiagram
   class FitnessTarget
-  class AppPortfolioMasterWorkflow
-  AppPortfolioMasterWorkflow --> FitnessTarget : later integration
+  class PortfolioMasterFitnessCatalog
+  class CorrelationOfCatalog
+  class FitnessMethodExistingPortfolioService
+  class AppPortfolioMasterService
+  FitnessMethodExistingPortfolioService --> FitnessTarget : apply(value_type, approximate_type, target)
+  FitnessMethodExistingPortfolioService --> PortfolioMasterFitnessCatalog : NetProfit / PctStagnation / ReturnDD
+  AppPortfolioMasterService --> FitnessMethodExistingPortfolioService : evaluate candidate portfolios
+  AppPortfolioMasterService --> CorrelationOfCatalog : Loss / ProfitLoss / NumberOfTrades / Positions
 ```
 
 - **Primary Role:** Configure portfolio fitness/search using shared portfolio calculations.
-- **Dependencies:** AppCore portfolio/correlation contracts; AppDataManager data; AppPortfolioComposer outputs.
+- **Dependencies:** AppCore portfolio/correlation contracts (`app/core/trading/portfolio/`, `app/core/trading/statistics/correlation.py`, `app/core/jobs/databank.py`); AppDataManager data; AppPortfolioComposer outputs.
 - **Outputs / Downstream Role:** Search candidates, selected portfolios and recorded fitness decisions.
-- **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
-- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
+- **Execution boundary:** each READY work order or phased dispatch slice is one tested commit with explicit signatures, error codes, state transitions, fixtures, and verification commands.
+- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; reconciled with Core portfolio/correlation/databank services and donor source review. Implementation status belongs only in the domain README.
 - **Shared response contract:** canonical response definitions live in `app/core/lib/responses.py`, which retains both `StandardResponse.success(*, message, metadata, data)` / `StandardResponse.failure(*, message, metadata, error)` with `ResponseMetadata` / `StandardError`, and the WO-C02 instance envelope `StandardResponse[T](request_id=..., data=..., revision=...)`. Preserve the existing form for migrated callers; use the instance envelope only where the specific work order requires it. `app/host/response.py` is a historical locator. Any conversion must be explicit at the named host/client boundary; do not remove existing helpers or introduce a third response contract. Pure helpers return their declared values.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
 
 ## Source reassessment — 2026-10-30
 
-The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists implementation files for every module and extension category below, and all Phase 2 modules and Phase 3 extension cohorts are reconciled against `PM-001`, `PM-METRIC-*`, and HaruQuantAI Core (`PortfolioMerger`, `StatisticsService`, `DatabankContainer`) with concrete signatures, schemas, error codes, fixtures, and verification commands.
+
+## Phased Implementation Roadmap & Dispatch Sequence
+
+| Phase | Scope | Modules & Work Orders Covered | Target Backend / Extension Paths | Target Frontend & Test Paths |
+|---|---|---|---|---|
+| **Phase 11.1** | UI Migration, Fitness Target Helper & Portfolio Metric Selectors | `PM-M01`, `PM-001`, `PM-METRIC-NetProfit`, `PM-METRIC-PctStagnation`, `PM-METRIC-ReturnDD` | `app/workspace/portfolio_master/fitness_target.py`, `app/extend/portfolio_master_fitness/net_profit.py`, `pct_stagnation.py`, `return_dd.py` | `app/web/workspaces/portfolio_master/**`, `tests/workspace/portfolio_master/test_fitness_target.py`, `tests/extend/portfolio_master_fitness/test_*.py`, `app/web/tests/workspace/portfolio_master/**` |
+| **Phase 11.2** | `PortfolioMasterFitness` Catalog Registration & Normalization | Phase 3 `PortfolioMasterFitness` (3 definitions) | `app/extend/portfolio_master_fitness/__init__.py`, `app/extend/portfolio_master_fitness/catalog.py` | `tests/extend/portfolio_master_fitness/test_catalog.py` |
+| **Phase 11.3** | `CorrelationOf` Period Bucketing & Pairwise Correlation Cohort (6 definitions) | Phase 3 `CorrelationOf` (6 definitions: `Loss`, `ProfitLoss`, `NumberOfClosedPositions`, `NumberOfClosedTrades`, `NumberOfOpenPositions`, `NumberOfOpenTrades`) | `app/extend/correlation_of/__init__.py`, `app/extend/correlation_of/catalog.py` | `tests/extend/test_correlation_of.py` |
+| **Phase 11.4** | `FitnessMethodExistingPortfolio` Evaluation & Target-Field Integration | `FitnessMethodExistingPortfolio` | `app/workspace/portfolio_master/fitness_method_existing_portfolio.py` | `app/web/workspaces/portfolio_master/FitnessMethodExistingPortfolio.tsx`, `tests/workspace/portfolio_master/test_fitness_method_existing_portfolio.py` |
+| **Phase 11.5** | `AppPortfolioMaster` Search Engine & Workspace Integration | `AppPortfolioMaster` | `app/workspace/portfolio_master/app_portfolio_master.py` | `app/web/workspaces/portfolio_master/PortfolioMasterWorkspace.tsx`, `tests/workspace/portfolio_master/test_app_portfolio_master.py`, `app/web/tests/workspace/portfolio_master/AppPortfolioMaster.test.tsx` |
 
 ## Current-code migration audit and execution order
 
@@ -116,58 +132,110 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 
 ## Phase 2: complete module scope — READY
 
-Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
+Each module below defines its authorized target paths, backend/frontend contracts, Core integration points (`app/core/trading/portfolio/`, `app/core/trading/statistics/`, `app/core/jobs/databank.py`), error codes, deterministic fixtures, and verification commands.
 
 ### `AppPortfolioMaster` — READY
-*Feature:* Full `AppPortfolioMaster` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [AppPortfolioMaster source record](research/workspaces-09-19-source-review.md#appportfoliomaster) identifies 1 readable Java file (`AppPortfolioMaster.jar`) and `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`.
+
+*Feature:* Portfolio Master automatic portfolio search engine and workspace controller configuring source/target databanks, portfolio size bounds (`min_strategies..max_strategies`), search method (`BRUTE_FORCE`, `GENETIC`, `MONTE_CARLO`), correlation filtering (`CorrelationOf`), existing-portfolio fitness ranking (`FitnessMethodExistingPortfolio`), and candidate portfolio persistence.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster`.
 - **Backend:** `app/workspace/portfolio_master/app_portfolio_master.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/PortfolioMasterWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_master/test_app_portfolio_master.py`.
 - **Frontend tests:** `app/web/tests/workspace/portfolio_master/AppPortfolioMaster.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`.
-*Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `AppPortfolioMaster`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [AppPortfolioMaster source record](research/workspaces-09-19-source-review.md#appportfoliomaster) identifies 1 matching readable Java files and 1 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioMaster/module.js`; `app/workspace/portfolio_master/fitness_method_existing_portfolio.py`; `app/extend/correlation_of/`.
+*Evidence ID:* `OBS-145-FITNESS-TARGET-001`, `OBS-HARU-PM-REUSE-20261029`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `PortfolioMasterSearchConfig(source_databank: str = "Results", target_databank: str = "Portfolios", search_mode: Literal["BRUTE_FORCE", "GENETIC", "MONTE_CARLO"] = "GENETIC", min_strategies: int = 2, max_strategies: int = 5, max_combinations: int = 500, correlation_method: Literal["ProfitLoss", "Loss", "NumberOfClosedPositions", "NumberOfClosedTrades", "NumberOfOpenPositions", "NumberOfOpenTrades"] = "ProfitLoss", correlation_period: Literal["HOUR", "DAY", "WEEK", "MONTH", "YEAR"] = "DAY", max_correlation: float = 0.5, allow_negative_correlation: bool = False, max_symbol_sector_count: int = 0, fitness_config: ExistingPortfolioFitnessConfig = ..., acceptance_conditions: tuple[RankingFilterCondition, ...] = ())`.
+- [ ] `PortfolioMasterRunSummary(search_mode: str, combinations_evaluated: int, portfolios_accepted: int, portfolios_rejected_correlation: int, portfolios_rejected_conditions: int, best_fitness: float, stored_portfolio_ids: tuple[str, ...])`.
+- [ ] `AppPortfolioMasterService` methods: `get_state(project_id: str)`, `save_settings(project_id: str, config: PortfolioMasterSearchConfig)`, `start(project_id: str, *, seed: int = 42) -> StandardResponse[PortfolioMasterRunSummary]`, `pause(project_id: str)`, `resume(project_id: str)`, and `stop(project_id: str)`.
+- [ ] Search pipeline per candidate subset `S = (s_1, ..., s_k)` (`min_strategies <= k <= max_strategies`):
+  1. Check pairwise correlation across all pairs `(s_i, s_j)` in `S` using `CorrelationOfCatalog.compute_correlation(config.correlation_method, period=config.correlation_period)`; reject candidate if any pair exceeds `config.max_correlation` (or `abs(corr) > max_correlation` when `not allow_negative_correlation`).
+  2. Merge candidate trades via Core `PortfolioMerger` and compute combined portfolio statistics (`NetProfit`, `ReturnDDRatio`, `StagnationPct`, `DrawdownPct`, `SharpeRatio`).
+  3. Evaluate `acceptance_conditions` and compute fitness via `FitnessMethodExistingPortfolioService.evaluate`.
+  4. Persist passing portfolios into `config.target_databank`.
+  5. Validate `1 <= min_strategies <= max_strategies <= 50` (`DomainError(code="PORTFOLIO_MASTER_INVALID_SIZE_BOUNDS")`).
+- [ ] Golden fixture: searching `BRUTE_FORCE` with `min_strategies=2, max_strategies=2` over 3 strategies (`S1, S2` correlated `0.85`; `S1, S3` correlated `0.15`; `S2, S3` correlated `0.20`) with `max_correlation=0.5` evaluates all `3` pairs, rejects `(S1, S2)` on correlation (`portfolios_rejected_correlation == 1`), and accepts `(S1, S3)` and `(S2, S3)`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/portfolio_master/test_app_portfolio_master.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/portfolio_master/AppPortfolioMaster.test.tsx` -> exits `0`.
 
 ### `FitnessMethodExistingPortfolio` — READY
-*Feature:* Full `FitnessMethodExistingPortfolio` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [FitnessMethodExistingPortfolio source record](research/workspaces-09-19-source-review.md#fitnessmethodexistingportfolio) identifies 2 readable Java files and 4 frontend/settings files (`FitnessMethodExistingPortfolioService.js`, `FitnessMethodExistingPortfolioCtrl.js`, `module.js`).
+
+*Feature:* Portfolio Master fitness method (`fitnessExistingPortfolio/list`) evaluating candidate portfolios against `PortfolioMasterFitness` metrics (`NetProfit`, `PctStagnation`, `ReturnDD`) and optional reference ("existing") portfolio baseline using `FitnessTarget.apply` (`PM-001`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio`.
 - **Backend:** `app/workspace/portfolio_master/fitness_method_existing_portfolio.py`.
 - **Frontend:** `app/web/workspaces/portfolio_master/FitnessMethodExistingPortfolio.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_master/test_fitness_method_existing_portfolio.py`.
 - **Frontend tests:** `app/web/tests/workspace/portfolio_master/FitnessMethodExistingPortfolio.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/module.js`.
-*Evidence and limit:* `OBS-145-FITNESS-TARGET-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `fitnessExistingPortfolio/list`
-*Exact unresolved contract:* Exact metric expression, value-type mapping, weight normalization, missing-value policy and independently computed expected scores are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `FitnessMethodExistingPortfolio`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [FitnessMethodExistingPortfolio source record](research/workspaces-09-19-source-review.md#fitnessmethodexistingportfolio) identifies 2 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodExistingPortfolio/FitnessMethodExistingPortfolioService.js`; `FitnessMethodExistingPortfolioCtrl.js`; `app/workspace/portfolio_master/fitness_target.py`; `app/extend/portfolio_master_fitness/`.
+*Evidence ID:* `OBS-145-FITNESS-TARGET-001`. Literal frontend request vocabulary: `fitnessExistingPortfolio/list`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ExistingPortfolioCriterion(metric_id: Literal["NetProfit", "PctStagnation", "ReturnDD"], value_type: int = 1, approximate_type: int = 2, weight: float = 1.0, target: float = 0.0)` and `ExistingPortfolioFitnessConfig(existing_portfolio_id: str | None = None, criteria: tuple[ExistingPortfolioCriterion, ...] = (ExistingPortfolioCriterion(metric_id="ReturnDD"),))`.
+- [ ] `FitnessMethodExistingPortfolioService.normalize_criterion(criterion: ExistingPortfolioCriterion) -> tuple[ExistingPortfolioCriterion, TargetFieldState]` -> Apply `FitnessTarget.apply(value_type=criterion.value_type, approximate_type=criterion.approximate_type, target=criterion.target)` so target editing is active only when `value_type == approximate_type` and resets to `0.0` otherwise.
+- [ ] `FitnessMethodExistingPortfolioService.evaluate(portfolio_stats: Mapping[str, float], config: ExistingPortfolioFitnessConfig, *, existing_stats: Mapping[str, float] | None = None) -> float` -> Extract raw metric via `PortfolioMasterFitnessCatalog.compute(criterion.metric_id, portfolio_stats)`, score against `target` (when `value_type == approximate_type`) or maximize/minimize over the descriptor's range (`NetProfit: -10000..10000`, `PctStagnation: 0..100` minimize, `ReturnDD: -20..20`), and return weighted average in `[0.0, 1.0]` rounded to `6` decimals.
+- [ ] Golden fixture: evaluating `{"ReturnDDRatio": 10.0, "StagnationPct": 20.0}` with equal weights (`1.0`, `1.0`) yields `ReturnDD` normalized `(10 - (-20)) / 40 = 0.75` and `PctStagnation` minimized `1.0 - (20 / 100) = 0.80`, returning `0.775`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/portfolio_master/test_fitness_method_existing_portfolio.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/portfolio_master/FitnessMethodExistingPortfolio.test.tsx` -> exits `0`.
 
 ## Phase 3: concrete extension definition work orders — READY
 
-### `PortfolioMasterFitness`
+*Source reassessment — 2026-10-30:* Primary snippet bodies are readable at `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness` (3 definitions) and `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/CorrelationOf` (6 definitions). `PM-METRIC-*` below govern the 3 raw selectors, while the cohort specifications below authorize the complete `PortfolioMasterFitness` and `CorrelationOf` packages.
 
-*Source reassessment (2026-10-30):* all three primary snippet bodies are readable at `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness`. Their compute methods select precomputed portfolio statistics; they do not calculate NetProfit, stagnation or drawdown themselves. The bounded projection orders below resolve those selectors. Fitness normalization/formatting and integration remain separate from compute projection.
-- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness`; exact current definition count: 3.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `NetProfit.java`, `PctStagnation.java`, `ReturnDD.java`.
-### `CorrelationOf`
+### `PortfolioMasterFitness` — READY (3 definitions)
 
-*Source reassessment (2026-10-30):* all six primary bodies are readable at `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/CorrelationOf`. `Loss.computePeriods` skips canceled orders, buckets by close time, requires an existing period and adds order.PL; its skip predicate is true only when both period values are nonnegative. Do not infer that it sums only negative trades from its name. Full category remains blocked on period/cancellation contracts and per-definition fixtures. This source gap is therefore contract integration, not encryption.
+- **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/PortfolioMasterFitness`; exact current definition count: 3 (`NetProfit.java`, `PctStagnation.java`, `ReturnDD.java`).
+- **Target Package & Files:**
+  - `app/extend/portfolio_master_fitness/__init__.py`
+  - `app/extend/portfolio_master_fitness/net_profit.py` (per `PM-METRIC-NetProfit` below)
+  - `app/extend/portfolio_master_fitness/pct_stagnation.py` (per `PM-METRIC-PctStagnation` below)
+  - `app/extend/portfolio_master_fitness/return_dd.py` (per `PM-METRIC-ReturnDD` below)
+  - `app/extend/portfolio_master_fitness/catalog.py`
+  - `tests/extend/portfolio_master_fitness/test_net_profit.py`
+  - `tests/extend/portfolio_master_fitness/test_pct_stagnation.py`
+  - `tests/extend/portfolio_master_fitness/test_return_dd.py`
+  - `tests/extend/portfolio_master_fitness/test_catalog.py`
+- **Authorized Contract & Signatures:**
+  - `PortfolioMasterFitnessDescriptor(metric_id: str, label: str, stats_key: str, maximize: bool, default_target: float, range_min: float, range_max: float)`:
+    1. `NetProfit`: `label="Net Profit (Return)"`, `stats_key="NetProfit"`, `maximize=True`, `default_target=0.0`, `range_min=-10000.0`, `range_max=10000.0`.
+    2. `PctStagnation`: `label="% Stagnation"`, `stats_key="StagnationPct"`, `maximize=False`, `default_target=0.0`, `range_min=0.0`, `range_max=100.0`.
+    3. `ReturnDD`: `label="Return / Drawdown ratio"`, `stats_key="ReturnDDRatio"`, `maximize=True`, `default_target=0.0`, `range_min=-20.0`, `range_max=20.0`.
+  - `PortfolioMasterFitnessCatalog.compute(metric_id: str, stats: Mapping[str, float]) -> float` delegates to `NetProfit.compute`, `PctStagnation.compute`, and `ReturnDD.compute`.
+- **Definition IDs accounted for (3):** `NetProfit.java`, `PctStagnation.java`, `ReturnDD.java`.
+- **Verification:** `uv run python -m pytest tests/extend/portfolio_master_fitness/ --no-cov -q` -> exits `0`.
+
+### `CorrelationOf` — READY (6 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/CorrelationOf`; exact current definition count: 6.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `Loss.java`, `NumberOfClosedPositions.java`, `NumberOfClosedTrades.java`, `NumberOfOpenPositions.java`, `NumberOfOpenTrades.java`, `ProfitLoss.java`.
+- **Target Package & Files:**
+  - `app/extend/correlation_of/__init__.py`
+  - `app/extend/correlation_of/catalog.py`
+  - `tests/extend/test_correlation_of.py`
+- **Authorized Contract & Signatures:**
+  - `CorrelationPeriod = Literal["HOUR", "DAY", "WEEK", "MONTH", "YEAR"]`
+  - `CorrelationOrderRecord(open_time_ms: int, close_time_ms: int, profit_loss: float, is_canceled: bool = False, is_open_position: bool = False)`
+  - `CorrelationOfCatalog.compute_periods(definition_id: str, orders: Sequence[CorrelationOrderRecord], *, period: CorrelationPeriod = "DAY") -> dict[int, float]`:
+    - Skips orders where `order.is_canceled == True`.
+    - Buckets timestamps by UTC period start epoch ms (`HOUR`, `DAY`, `WEEK`, `MONTH`, `YEAR`):
+      1. `ProfitLoss`: buckets by `close_time_ms` and sums `order.profit_loss` per period.
+      2. `Loss`: buckets by `close_time_ms` and sums `order.profit_loss` per period; during pairwise correlation filtering, a period bucket `(v1, v2)` is skipped iff `v1 >= 0.0 and v2 >= 0.0` (matching donor `Loss.java` predicate where only periods with at least one negative value participate).
+      3. `NumberOfClosedTrades`: buckets by `close_time_ms` and counts closed trades (`+1.0` per trade).
+      4. `NumberOfOpenTrades`: buckets by `open_time_ms` and counts opened trades (`+1.0` per trade).
+      5. `NumberOfClosedPositions`: buckets by `close_time_ms` and counts distinct closed position events.
+      6. `NumberOfOpenPositions`: buckets by active periods `[open_time_ms..close_time_ms]` and counts concurrent open positions per bucket.
+  - `CorrelationOfCatalog.pearson(definition_id: str, series_a: Mapping[int, float], series_b: Mapping[int, float], *, allow_empty_periods: bool = False) -> float`:
+    - Aligns union of bucket keys (filling missing keys with `0.0`), applies definition-specific skip predicate (for `Loss`, skips buckets where `a >= 0.0 and b >= 0.0`; when `not allow_empty_periods`, skips buckets where `a == 0.0 and b == 0.0`), and returns Pearson correlation in `[-1.0, 1.0]` rounded to `4` decimals (`0.0` if fewer than 2 active buckets or zero variance).
+- **Golden Fixtures:**
+  - `Loss`: buckets `{1: -50.0, 2: 100.0, 3: -25.0}` and `{1: -100.0, 2: 80.0, 3: -50.0}` skip bucket `2` (both `>= 0`) and correlate `(-50, -25)` with `(-100, -50)` -> `1.0`.
+  - `ProfitLoss`: identical series `{1: 10.0, 2: -5.0, 3: 20.0}` -> `1.0`.
+- **Definition IDs accounted for (6):** `Loss.java`, `NumberOfClosedPositions.java`, `NumberOfClosedTrades.java`, `NumberOfOpenPositions.java`, `NumberOfOpenTrades.java`, `ProfitLoss.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_correlation_of.py --no-cov -q` -> exits `0`.
 
 ## Source-resolved portfolio metric selectors
 

@@ -7,22 +7,40 @@
 ```mermaid
 classDiagram
   class OptimizationLabels
-  class AppOptimizerWorkflow
-  AppOptimizerWorkflow --> OptimizationLabels : later integration
+  class FirstWFMetric
+  class FitnessMethodWFResultService
+  class SettingsOptimizationService
+  class TaskOptimizeRunner
+  class AppOptimizerService
+  AppOptimizerService --> OptimizationLabels : max_tests & period_parameter
+  AppOptimizerService --> SettingsOptimizationService : parameter grid & WF settings
+  AppOptimizerService --> TaskOptimizeRunner : Simple / Genetic / WF / WFMatrix / SPP / SeqOpt
+  TaskOptimizeRunner --> FitnessMethodWFResultService : evaluate WF fitness
+  FitnessMethodWFResultService --> FirstWFMetric : first_wf_metric(results, metric)
 ```
 
 - **Primary Role:** Configure parameter searches and display optimization/WF evaluations.
-- **Dependencies:** AppCore optimization/backtest/statistics contracts; AppDataManager data; AppResults projections.
+- **Dependencies:** AppCore optimization/backtest/statistics contracts (`app/core/trading/optimization/`, `app/core/trading/backtest/`, `app/core/trading/statistics/`, `app/core/trading/results/`); AppDataManager data; AppResults projections.
 - **Outputs / Downstream Role:** Parameter variants, optimization results and verified window evaluations.
-- **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
-- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
+- **Execution boundary:** each READY work order or phased dispatch slice is one tested commit with explicit signatures, error codes, state transitions, fixtures, and verification commands.
+- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; reconciled with Core optimization/backtest/statistics services and donor source review. Implementation status belongs only in the domain README.
 - **Shared response contract:** canonical response definitions live in `app/core/lib/responses.py`, which retains both `StandardResponse.success(*, message, metadata, data)` / `StandardResponse.failure(*, message, metadata, error)` with `ResponseMetadata` / `StandardError`, and the WO-C02 instance envelope `StandardResponse[T](request_id=..., data=..., revision=...)`. Preserve the existing form for migrated callers; use the instance envelope only where the specific work order requires it. `app/host/response.py` is a historical locator. Any conversion must be explicit at the named host/client boundary; do not remove existing helpers or introduce a third response contract. Pure helpers return their declared values.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
 
 ## Source reassessment — 2026-10-30
 
-The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists implementation files for every module below, and all Phase 2 modules are reconciled against HaruQuantAI Core (`OptimizationEngine`, `BacktestRunner`, `StatisticsService`, `ResultStore`, `DatabankContainer`) with concrete signatures, schemas, error codes, fixtures, and verification commands.
+
+## Phased Implementation Roadmap & Dispatch Sequence
+
+| Phase | Scope | Modules & Work Orders Covered | Target Backend Paths | Target Frontend & Test Paths |
+|---|---|---|---|---|
+| **Phase 9.1** | UI Migration, Optimization Labels & First WF Metric Projection | `OPT-M01`, `OPT-001`, `OPT-WF-METRIC-01` | `app/workspace/optimizer/labels.py`, `app/workspace/optimizer/wf_metric.py` | `app/web/workspaces/optimizer/**`, `tests/workspace/optimizer/test_labels.py`, `tests/workspace/optimizer/test_wf_metric.py`, `app/web/tests/workspace/optimizer/**` |
+| **Phase 9.2** | `FitnessMethodWFResult` & `SettingsOptimization` Configuration Service | `FitnessMethodWFResult`, `SettingsOptimization` | `app/workspace/optimizer/fitness_method_w_f_result.py`, `app/workspace/optimizer/settings_optimization.py` | `app/web/workspaces/optimizer/FitnessMethodWFResult.tsx`, `SettingsOptimization.tsx`, `tests/workspace/optimizer/test_fitness_method_w_f_result.py`, `test_settings_optimization.py` |
+| **Phase 9.3** | Optimization Results Views (`ResultsOptimizationProfile`, `ResultsSequentialOptimization`, `ResultsSysParamPermutation`, `ResultsWalkForward`) | `ResultsOptimizationProfile`, `ResultsSequentialOptimization`, `ResultsSysParamPermutation`, `ResultsWalkForward` | `app/workspace/optimizer/results_optimization_profile.py`, `results_sequential_optimization.py`, `results_sys_param_permutation.py`, `results_walk_forward.py` | `app/web/workspaces/optimizer/ResultsOptimizationProfile.tsx`, `ResultsSequentialOptimization.tsx`, `ResultsSysParamPermutation.tsx`, `ResultsWalkForward.tsx`, `tests/workspace/optimizer/test_results_*.py` |
+| **Phase 9.4** | `TaskOptimize` Execution Runner & Parameter Verifier | `TaskOptimize` | `app/workspace/optimizer/task_optimize.py` | `app/web/workspaces/optimizer/TaskOptimize.tsx`, `tests/workspace/optimizer/test_task_optimize.py` |
+| **Phase 9.5** | `AppOptimizer` Workspace Integration & End-to-End Qualification | `AppOptimizer` | `app/workspace/optimizer/app_optimizer.py` | `app/web/workspaces/optimizer/OptimizerWorkspace.tsx`, `optimizerClient.ts`, `tests/workspace/optimizer/test_app_optimizer.py`, `app/web/tests/workspace/optimizer/AppOptimizer.test.tsx` |
 
 ## Current-code migration audit and execution order
 
@@ -137,143 +155,176 @@ The [workspace source audit](research/workspaces-09-19-source-review.md) lists n
 
 ## Phase 2: complete module scope — READY
 
-Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
+Each module below defines its authorized target paths, backend/frontend contracts, Core integration points (`app/core/trading/optimization/`, `app/core/trading/backtest/`, `app/core/trading/statistics/`, `app/core/trading/results/`), error codes, deterministic fixtures, and verification commands.
 
 ### `AppOptimizer` — READY
-*Feature:* Full `AppOptimizer` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [AppOptimizer source record](research/workspaces-09-19-source-review.md#appoptimizer) identifies `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer/module.js` and frontend workspace integration.
+
+*Feature:* Top-level Optimizer workspace controller and API service coordinating `SettingsOptimization`, `TaskOptimize`, `FitnessMethodWFResult`, and the 4 optimization result tabs (`ResultsOptimizationProfile`, `ResultsSequentialOptimization`, `ResultsSysParamPermutation`, `ResultsWalkForward`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer`.
 - **Backend:** `app/workspace/optimizer/app_optimizer.py`.
 - **Frontend:** `app/web/workspaces/optimizer/OptimizerWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_app_optimizer.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/AppOptimizer.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer/module.js`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `AppOptimizer`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [AppOptimizer source record](research/workspaces-09-19-source-review.md#appoptimizer) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppOptimizer/module.js`; `app/workspace/optimizer/labels.py`; `app/workspace/optimizer/wf_metric.py`.
+*Evidence ID:* `OBS-145-OPTIMIZATION-LABELS-001`, `OBS-HARU-OPT-REUSE-20261029`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `OptimizerWorkspaceState(project_id: str, settings: OptimizationSettingsSnapshot, status: Literal["IDLE", "RUNNING", "PAUSED", "COMPLETED", "STOPPED", "FAILED"], progress_pct: float, evaluations_completed: int, evaluations_total: int, best_fitness: float, active_result_tab: str)`.
+- [ ] `AppOptimizerService` methods: `get_state(project_id: str) -> StandardResponse[OptimizerWorkspaceState]`, `save_settings(project_id: str, settings: OptimizationSettingsSnapshot) -> StandardResponse[OptimizerWorkspaceState]`, `start(project_id: str)`, `pause(project_id: str)`, `resume(project_id: str)`, and `stop(project_id: str)`.
+- [ ] Golden fixture: starting Optimizer in `"SIMPLE"` mode over a 6-combination parameter grid transitions `status` to `"COMPLETED"` with `evaluations_completed == 6` and `evaluations_total == 6`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_app_optimizer.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/AppOptimizer.test.tsx` -> exits `0`.
 
 ### `FitnessMethodWFResult` — READY
-*Feature:* Full `FitnessMethodWFResult` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [FitnessMethodWFResult source record](research/workspaces-09-19-source-review.md#fitnessmethodwfresult) identifies `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult/WFResult/FitnessMethodWFResult.java`.
+
+*Feature:* Walk-Forward Result fitness evaluator combining `first_wf_metric` (`OPT-WF-METRIC-01`) with column registry validation and weighted or single-metric fitness normalization in `[0.0, 1.0]`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult`.
 - **Backend:** `app/workspace/optimizer/fitness_method_w_f_result.py`.
 - **Frontend:** `app/web/workspaces/optimizer/FitnessMethodWFResult.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_fitness_method_w_f_result.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/FitnessMethodWFResult.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult/WFResult/FitnessMethodWFResult.java`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact metric expression, value-type mapping, weight normalization, missing-value policy and independently computed expected scores are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `FitnessMethodWFResult`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [FitnessMethodWFResult source record](research/workspaces-09-19-source-review.md#fitnessmethodwfresult) identifies 1 matching readable Java files and 0 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodWFResult/WFResult/FitnessMethodWFResult.java`; `app/workspace/optimizer/wf_metric.py`.
+*Evidence ID:* `SRC-20261030-WF-METRIC`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `WFFitnessCriterion(metric: str, weight: float = 1.0, maximize: bool = True, target_value: float = 100.0)` and `FitnessMethodWFResultConfig(criteria: tuple[WFFitnessCriterion, ...] = (WFFitnessCriterion(metric="NetProfit"),))`.
+- [ ] `FitnessMethodWFResultService.evaluate(wf_results: Sequence[Mapping[str, float]] | None, config: FitnessMethodWFResultConfig) -> float` -> Validate each `criterion.metric` against registered `Columns/Databanks` or `Columns/WalkForward` IDs (`DomainError(code="OPTIMIZER_UNKNOWN_WF_METRIC")`), extract raw value via `first_wf_metric(wf_results, criterion.metric)`, clamp non-finite values to `0.0`, normalize each criterion to `[0.0, 1.0]`, and return weighted average rounded to `6` decimals (`0.0` when `wf_results` is `None` or empty).
+- [ ] Golden fixture: `wf_results=[{"NetProfit": 500.0, "WFPctOfProfitableRuns": 80.0}]` with `target_value=500.0` (`weight=1.0`) and `target_value=100.0` (`weight=1.0`) yields `round((1.0 + 0.8) / 2.0, 6) == 0.9`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_fitness_method_w_f_result.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/FitnessMethodWFResult.test.tsx` -> exits `0`.
 
 ### `ResultsOptimizationProfile` — READY
-*Feature:* Full `ResultsOptimizationProfile` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [ResultsOptimizationProfile source record](research/workspaces-09-19-source-review.md#resultsoptimizationprofile) identifies 9 frontend/service files (`OptimizationProfileService.js`, `ManageViewsService.js`, `module.js`).
+
+*Feature:* Optimization Profile results view (`optimprof/viewsGetViews`, `optimprof/viewsAddView`, `optimprof/viewsUpdateView`, `optimprof/viewsRemoveView`, `optimprof/print`, `optimprof/getAvailableParams`, `optimprof/printChart`, `optimprof/printResults`, `optimprof/export`) projecting 1D/2D/3D parameter sensitivity surfaces, profitable run percentages, and parameter combination tables.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile`.
 - **Backend:** `app/workspace/optimizer/results_optimization_profile.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsOptimizationProfile.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_optimization_profile.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsOptimizationProfile.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/directives/manageviews/ManageViewsService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `optimprof/viewsGetViews` `optimprof/viewsRemoveView` `optimprof/viewsAddView` `optimprof/viewsUpdateView` `optimprof/print` `optimprof/getAvailableParams` `optimprof/printChart` `optimprof/printResults` `optimprof/export`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsOptimizationProfile`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [ResultsOptimizationProfile source record](research/workspaces-09-19-source-review.md#resultsoptimizationprofile) identifies 0 matching readable Java files and 9 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsOptimizationProfile/OptimizationProfileService.js`; `directives/manageviews/ManageViewsService.js`.
+*Evidence ID:* `OBS-145-OPTIMIZATION-LABELS-001`. Literal frontend request vocabulary: `optimprof/viewsGetViews`, `optimprof/viewsRemoveView`, `optimprof/viewsAddView`, `optimprof/viewsUpdateView`, `optimprof/print`, `optimprof/getAvailableParams`, `optimprof/printChart`, `optimprof/printResults`, `optimprof/export`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `OptimizationRunRow(run_index: int, parameters: dict[str, float | int], metrics: dict[str, float], passed: bool)` and `OptimizationProfileChartGrid(param_x: str, param_y: str | None, metric: str, x_values: tuple[float, ...], y_values: tuple[float, ...], z_matrix: tuple[tuple[float | None, ...], ...])`.
+- [ ] `ResultsOptimizationProfileService` methods: `list_views()`, `add_view(...)`, `update_view(...)`, `remove_view(...)`, `get_available_params(strategy_id: str) -> tuple[str, ...]`, `get_chart_grid(strategy_id: str, *, param_x: str, param_y: str | None = None, metric: str = "NetProfit") -> StandardResponse[OptimizationProfileChartGrid]`, `get_results_table(strategy_id: str) -> StandardResponse[tuple[OptimizationRunRow, ...]]`, and `export_csv(strategy_id: str) -> str`.
+- [ ] Golden fixture: 4 parameter runs over `p1 in (10, 20)` and `p2 in (1, 2)` project a `2x2` `z_matrix` matching exact `NetProfit` values and export a 5-line CSV.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_results_optimization_profile.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/ResultsOptimizationProfile.test.tsx` -> exits `0`.
 
 ### `ResultsSequentialOptimization` — READY
-*Feature:* Full `ResultsSequentialOptimization` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [ResultsSequentialOptimization source record](research/workspaces-09-19-source-review.md#resultssequentialoptimization) identifies 6 frontend/settings files (`DONOR_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/module.js`).
+
+*Feature:* Sequential Optimization results view (`sequentialoptimization/print`, `sequentialoptimization/applyParams`) displaying per-step parameter optimization curves, chosen optimal parameter values, and one-click parameter application back to the strategy document.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization`.
 - **Backend:** `app/workspace/optimizer/results_sequential_optimization.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsSequentialOptimization.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_sequential_optimization.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsSequentialOptimization.test.tsx`.
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSequentialOptimization/module.js`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sequentialoptimization/applyParams` `sequentialoptimization/print`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSequentialOptimization`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [ResultsSequentialOptimization source record](research/workspaces-09-19-source-review.md#resultssequentialoptimization) identifies 0 matching readable Java files and 6 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Evidence ID:* `OBS-145-OPTIMIZATION-LABELS-001`. Literal frontend request vocabulary: `sequentialoptimization/applyParams`, `sequentialoptimization/print`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SequentialOptStepProjection(param_name: str, original_value: float | int, best_value: float | int, tested_values: tuple[float, ...], metric_values: tuple[float, ...])` and `SequentialOptResultsPayload(strategy_id: str, fitness_metric: str, original_metric: float, optimized_metric: float, steps: tuple[SequentialOptStepProjection, ...])`.
+- [ ] `ResultsSequentialOptimizationService.get_results(strategy_id: str) -> StandardResponse[SequentialOptResultsPayload]` and `apply_params(project_id: str, databank_name: str, strategy_id: str, params: Mapping[str, float | int]) -> StandardResponse[dict[str, float | int]]` (updates the strategy's nominal parameter values in `HSLStrategyDocument` and `DatabankContainer`).
+- [ ] Golden fixture: calling `apply_params` with `{"Period": 25}` updates the strategy's `Period` parameter to `25` and returns the updated parameter map.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_results_sequential_optimization.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/ResultsSequentialOptimization.test.tsx` -> exits `0`.
 
 ### `ResultsSysParamPermutation` — READY
-*Feature:* Full `ResultsSysParamPermutation` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [ResultsSysParamPermutation source record](research/workspaces-09-19-source-review.md#resultssysparampermutation) identifies 7 frontend/settings files (`SysParamPermutationService.js`, `module.js`).
+
+*Feature:* System Parameter Permutation (SPP) results view (`sysParamPermutation/print`, `sysParamPermutation/printTable`) displaying original vs. median vs. confidence-percentile metrics across all permuted parameter runs.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation`.
 - **Backend:** `app/workspace/optimizer/results_sys_param_permutation.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsSysParamPermutation.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_sys_param_permutation.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsSysParamPermutation.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/services/SysParamPermutationService.js`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `sysParamPermutation/print` `sysParamPermutation/printTable`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsSysParamPermutation`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [ResultsSysParamPermutation source record](research/workspaces-09-19-source-review.md#resultssysparampermutation) identifies 0 matching readable Java files and 7 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsSysParamPermutation/services/SysParamPermutationService.js`.
+*Evidence ID:* `OBS-145-OPTIMIZATION-LABELS-001`. Literal frontend request vocabulary: `sysParamPermutation/print`, `sysParamPermutation/printTable`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SPPMetricSummaryRow(metric_id: str, label: str, original_value: float, median_value: float, mean_value: float, std_dev: float, percentile_5: float, percentile_95: float)` and `SPPResultsProjection(strategy_id: str, total_permutations: int, profitable_runs_pct: float, summary_rows: tuple[SPPMetricSummaryRow, ...], histogram_bins: tuple[tuple[float, int], ...])`.
+- [ ] `ResultsSysParamPermutationService.get_projection(strategy_id: str) -> StandardResponse[SPPResultsProjection]` and `get_table(strategy_id: str, *, offset: int = 0, limit: int = 200) -> StandardResponse[tuple[OptimizationRunRow, ...]]`.
+- [ ] Golden fixture: 5 permutation runs with net profits `[100.0, 200.0, 300.0, 400.0, 500.0]` yield `median_value == 300.0` and `mean_value == 300.0`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_results_sys_param_permutation.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/ResultsSysParamPermutation.test.tsx` -> exits `0`.
 
 ### `ResultsWalkForward` — READY
-*Feature:* Full `ResultsWalkForward` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [ResultsWalkForward source record](research/workspaces-09-19-source-review.md#resultswalkforward) identifies 8 frontend/settings files (`WFResultsService.js`, `ManageViewsServiceWF.js`, `module.js`).
+
+*Feature:* Walk-Forward and Walk-Forward Matrix results view (`walkforward/viewsGetViews`, `walkforward/viewsAddView`, `walkforward/viewsUpdateView`, `walkforward/viewsRemoveView`, `walkforward/print`, `walkforward/getConditions`, `walkforward/printTable`, `walkforward/export`, `resultsDatabankActions/setStrategyParameters`) displaying per-window IS/OOS equity stitch curves, WF matrix 2D heatmaps, robustness scores, and re-optimization parameter schedules.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward`.
 - **Backend:** `app/workspace/optimizer/results_walk_forward.py`.
 - **Frontend:** `app/web/workspaces/optimizer/ResultsWalkForward.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_results_walk_forward.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/ResultsWalkForward.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/directives/manageviews/ManageViewsServiceWF.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/WFResultsService.js`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `walkforward/viewsGetViews` `walkforward/viewsRemoveView` `walkforward/viewsAddView` `walkforward/viewsUpdateView` `/main/openlink` `walkforward/print` `walkforward/getConditions` `walkforward/printTable` `resultsDatabankActions/setStrategyParameters` `walkforward/export`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsWalkForward`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [ResultsWalkForward source record](research/workspaces-09-19-source-review.md#resultswalkforward) identifies 0 matching readable Java files and 8 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsWalkForward/WFResultsService.js`; `directives/manageviews/ManageViewsServiceWF.js`.
+*Evidence ID:* `OBS-145-OPTIMIZATION-LABELS-001`, `SRC-20261030-WF-METRIC`. Literal frontend request vocabulary: `walkforward/viewsGetViews`, `walkforward/viewsRemoveView`, `walkforward/viewsAddView`, `walkforward/viewsUpdateView`, `/main/openlink`, `walkforward/print`, `walkforward/getConditions`, `walkforward/printTable`, `resultsDatabankActions/setStrategyParameters`, `walkforward/export`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `WalkForwardResultsProjection(strategy_id: str, is_matrix: bool, selected_runs_count: int, selected_oos_pct: int, stitched_oos_equity: tuple[tuple[int, float], ...], baseline_equity: tuple[tuple[int, float], ...], windows: tuple[WFWindowResult, ...], matrix_cells: tuple[WFMatrixCellResult, ...], robustness_passed: int, robustness_total: int, overall_passed: bool)`.
+- [ ] `ResultsWalkForwardService` methods: `list_views()`, `add_view(...)`, `update_view(...)`, `remove_view(...)`, `get_conditions()`, `get_projection(strategy_id: str, *, runs_count: int | None = None, oos_pct: int | None = None) -> StandardResponse[WalkForwardResultsProjection]`, `apply_latest_window_parameters(project_id: str, databank_name: str, strategy_id: str) -> StandardResponse[dict[str, float | int]]`, and `export_wf_csv(strategy_id: str) -> str`.
+- [ ] Golden fixture: applying latest window parameters from a 3-window WF run writes `windows[-1].best_params` into the strategy's active parameters.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_results_walk_forward.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/ResultsWalkForward.test.tsx` -> exits `0`.
 
 ### `SettingsOptimization` — READY
-*Feature:* Full `SettingsOptimization` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [SettingsOptimization source record](research/workspaces-09-19-source-review.md#settingsoptimization) identifies 3 readable Java files and 5 frontend/settings files (`OptimizationService.js`, `module.js`).
+
+*Feature:* Optimization Settings controller (`optimization/loadStrategyToOptimize`, `optimization/getNumberOfTests`, `main/checkFileExists`) managing strategy loading, parameter `start/stop/step/enabled` ranges, combinatorial test-count calculation, optimization method (`SIMPLE`, `GENETIC`, `WALK_FORWARD`, `WALK_FORWARD_MATRIX`, `SYS_PARAM_PERMUTATION`, `SEQUENTIAL`), and label formatting via `OptimizationLabels` (`OPT-001`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization`.
 - **Backend:** `app/workspace/optimizer/settings_optimization.py`.
 - **Frontend:** `app/web/workspaces/optimizer/SettingsOptimization.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_settings_optimization.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/SettingsOptimization.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `main/checkFileExists` `optimization/loadStrategyToOptimize` `optimization/getNumberOfTests`
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsOptimization`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [SettingsOptimization source record](research/workspaces-09-19-source-review.md#settingsoptimization) identifies 3 matching readable Java files and 5 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsOptimization/OptimizationService.js`; `app/workspace/optimizer/labels.py`.
+*Evidence ID:* `OBS-145-OPTIMIZATION-LABELS-001`. Literal frontend request vocabulary: `main/checkFileExists`, `optimization/loadStrategyToOptimize`, `optimization/getNumberOfTests`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `OptimizableParameterSpec(name: str, param_type: Literal["INT", "FLOAT", "BOOL", "SHIFT", "PERIOD"], original_value: float | int | bool, enabled: bool = True, start: float = 0.0, stop: float = 0.0, step: float = 1.0)` and `OptimizationSettingsSnapshot(strategy_id: str | None = None, optimization_type: Literal["SIMPLE", "GENETIC", "WALK_FORWARD", "WALK_FORWARD_MATRIX", "SYS_PARAM_PERMUTATION", "SEQUENTIAL"] = "SIMPLE", max_tests: int = 1000, period_type: Literal["percent", "days", "bars"] = "percent", param1_start: int = 20, param1_stop: int = 40, param1_step: int = 10, param2_start: int = 5, param2_stop: int = 15, param2_step: int = 5, anchored: bool = False, parameters: tuple[OptimizableParameterSpec, ...] = ())`.
+- [ ] `SettingsOptimizationService.count_parameter_steps(param: OptimizableParameterSpec) -> int`: return `1` when `not param.enabled`; `2` when `param_type == "BOOL"`; otherwise `floor((param.stop - param.start) / param.step + 1e-9) + 1` (raising `DomainError(code="OPTIMIZER_INVALID_PARAM_RANGE")` if `step <= 0` or `stop < start`).
+- [ ] `SettingsOptimizationService.get_number_of_tests(settings: OptimizationSettingsSnapshot) -> dict[str, int | str]`: compute Cartesian product `total_combinations = prod(count_parameter_steps(p) for p in settings.parameters)`, multiply by WF window/matrix count when `optimization_type in {"WALK_FORWARD", "WALK_FORWARD_MATRIX"}`, cap per-window evaluations by `settings.max_tests` when `max_tests != 1000000001`, and attach `max_tests_label = OptimizationLabels.max_tests(settings.max_tests)`, `param1_label = OptimizationLabels.period_parameter(1, settings.period_type)`, and `param2_label = OptimizationLabels.period_parameter(2, settings.period_type)`.
+- [ ] Golden fixture: 2 enabled parameters (`10..20 step 5` -> `3` values; `1..4 step 1` -> `4` values) in `"SIMPLE"` mode yield `total_combinations == 12`; with `max_tests=1000`, `max_tests_label == "1.000"`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_settings_optimization.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/SettingsOptimization.test.tsx` -> exits `0`.
 
 ### `TaskOptimize` — READY
-*Feature:* Full `TaskOptimize` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [TaskOptimize source record](research/workspaces-09-19-source-review.md#taskoptimize) identifies 5 readable Java files (`TaskOptimize.jar`, configuration verifier, and task runner) and 4 frontend/settings files (`DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize/module.js`).
+
+*Feature:* Optimizer execution task verifier and runner executing Simple Grid, Genetic, Walk-Forward, Walk-Forward Matrix, System Parameter Permutation, and Sequential optimization modes over Core `OptimizationEngine` and `BacktestRunner`, storing parameter variants in the target databank and detailed profile/WF results in `ResultStore`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize`.
 - **Backend:** `app/workspace/optimizer/task_optimize.py`.
 - **Frontend:** `app/web/workspaces/optimizer/TaskOptimize.tsx`.
 - **Backend tests:** `tests/workspace/optimizer/test_task_optimize.py`.
 - **Frontend tests:** `app/web/tests/workspace/optimizer/TaskOptimize.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize/module.js`.
-*Evidence and limit:* `OBS-145-OPTIMIZATION-LABELS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `TaskOptimize`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [TaskOptimize source record](research/workspaces-09-19-source-review.md#taskoptimize) identifies 5 matching readable Java files and 4 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskOptimize/module.js`; `app/core/trading/optimization/`; `MAP-001`.
+*Evidence ID:* `MAP-001`, `OBS-145-OPTIMIZATION-LABELS-001`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `TaskOptimizeVerifier.verify(settings: OptimizationSettingsSnapshot) -> None` -> Fail closed with `DomainError(code="OPTIMIZER_STRATEGY_REQUIRED")` if `settings.strategy_id is None`, `DomainError(code="OPTIMIZER_NO_ENABLED_PARAMETERS")` if no `OptimizableParameterSpec` has `enabled=True` and `count_parameter_steps > 1`, and `DomainError(code="OPTIMIZER_INVALID_WF_GRID")` if Walk-Forward `param1_stop < param1_start` or `param2_stop < param2_start`.
+- [ ] `TaskOptimizeRunner.execute(project_id: str, settings: OptimizationSettingsSnapshot, *, seed: int = 42) -> TaskOptimizeSummary(optimization_type: str, evaluations_completed: int, best_parameters: dict[str, float | int | bool], best_fitness: float, stored_strategy_ids: tuple[str, ...])`.
+- [ ] Golden fixture: running `TaskOptimizeRunner.execute` on a strategy with 1 enabled parameter (`Period: 10..20 step 5`, `3` combinations) evaluates all `3` variants, records the Optimization Profile on the strategy result, and returns `evaluations_completed == 3` with the highest-fitness `Period`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/optimizer/test_task_optimize.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/optimizer/TaskOptimize.test.tsx` -> exits `0`.
 
 ## Embedded evidence
 

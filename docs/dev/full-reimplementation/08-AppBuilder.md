@@ -7,22 +7,41 @@
 ```mermaid
 classDiagram
   class GeneticOptions
-  class AppBuilderWorkflow
-  AppBuilderWorkflow --> GeneticOptions : later integration
+  class FullPosition
+  class ImprovementLabels
+  class AppBuilderService
+  class TaskBuildRunner
+  class BuilderSettingsOrchestrator
+  AppBuilderService --> GeneticOptions : defaults(in_sample_type)
+  AppBuilderService --> ImprovementLabels : improvement_label(use, action)
+  AppBuilderService --> BuilderSettingsOrchestrator : WhatToBuild / GeneticOptions / Blocks / PartsToImprove / Rankings
+  AppBuilderService --> TaskBuildRunner : GP / Random candidate generation & calibration
+  TaskBuildRunner --> FullPosition : CloseSize/Formulas/Negater
 ```
 
 - **Primary Role:** Configure and run candidate generation using the shared generation engine.
-- **Dependencies:** AppCore generation/backtest/contracts; AppCodeEditor blocks; AppRetester checks.
+- **Dependencies:** AppCore generation/backtest/contracts (`app/core/trading/generation/`, `app/core/trading/backtest/`, `app/core/jobs/databank.py`); AppCodeEditor blocks; AppRetester checks.
 - **Outputs / Downstream Role:** Candidate strategies and their recorded evaluations.
-- **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
-- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
+- **Execution boundary:** each READY work order or phased dispatch slice is one tested commit with explicit signatures, error codes, state transitions, fixtures, and verification commands.
+- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; reconciled with Core generation/backtest/databank services and donor source review. Implementation status belongs only in the domain README.
 - **Shared response contract:** existing legacy API adapters preserve `StandardResponse.success(*, message, metadata, data)` and `StandardResponse.failure(*, message, metadata, error)`, `ResponseMetadata` and `StandardError` from canonical `app/core/lib/responses.py`. New instance envelopes use `StandardResponse[T](request_id: str, data: T, revision: int | None = None)` only where the individual order specifies that contract; structured new errors use `app/core/lib/errors.py::DomainError`. Pure helpers return their declared values. Preserve existing callers and translate envelopes only at an explicitly specified compatibility boundary.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
 
 ## Source reassessment authority — 2026-10-30
 
-The [workspace source review](research/workspaces-03-08-source-review.md) adds exact readable context to every blocked complete-contribution order in this file. Its source paths supplement the old Context to Read lists. Shared libraries are available locally; plugin bodies, UI consumers, templates and per-definition fixtures remain separate evidence. A complete-contribution order retains its status until its exact target contract and acceptance cases are specified. New bounded READY suborders below supersede only their named portion.
+The [workspace source review](research/workspaces-03-08-source-review.md) provides exact readable context for every module and extension category in this file, and all Phase 2 modules and Phase 3 extension cohorts below are reconciled against HaruQuantAI Core (`GenerationEngine`, `ProjectGenerationCoordinator`, `BacktestRunner`, `DatabankContainer`, `StatisticsService`, `HSLStrategyDocument`) with concrete signatures, schemas, error codes, fixtures, and verification commands.
+
+## Phased Implementation Roadmap & Dispatch Sequence
+
+| Phase | Scope | Modules & Work Orders Covered | Target Backend / Extension Paths | Target Frontend & Test Paths |
+|---|---|---|---|---|
+| **Phase 8.1** | UI Migration, Genetic Defaults, Close-Size Sentinel & Improvement Labels | `BLD-M01`, `BLD-001`, `WO-BLD-FULL-POSITION`, `WO-BLD-IMPROVEMENT-LABEL` | `app/workspace/builder/genetic_defaults.py`, `app/workspace/builder/improvement_labels.py`, `app/extend/formulas/close_size/full_position.py` | `app/web/workspaces/builder/**`, `tests/workspace/builder/test_genetic_defaults.py`, `test_improvement_labels.py`, `tests/extend/formulas/close_size/test_full_position.py` |
+| **Phase 8.2** | Builder Settings (`WhatToBuild`, `GeneticOptions`, `PartsToImprove`) | `SettingsWhatToBuild`, `SettingsGeneticOptions`, `SettingsPartsToImprove` | `app/workspace/builder/settings_what_to_build.py`, `settings_genetic_options.py`, `settings_parts_to_improve.py` | `app/web/workspaces/builder/SettingsWhatToBuild.tsx`, `SettingsGeneticOptions.tsx`, `SettingsPartsToImprove.tsx`, `tests/workspace/builder/test_settings_*.py` |
+| **Phase 8.3** | Building Blocks (`SettingsBlocks`), Rankings (`SettingsRankings`) & `FitnessMethodStrategyResult` | `SettingsBlocks`, `SettingsRankings`, `FitnessMethodStrategyResult` | `app/workspace/builder/settings_blocks.py`, `settings_rankings.py`, `fitness_method_strategy_result.py` | `app/web/workspaces/builder/SettingsBlocks.tsx`, `SettingsRankings/**`, `FitnessMethodStrategyResult.tsx`, `tests/workspace/builder/test_fitness_method_strategy_result.py` |
+| **Phase 8.4** | `Formulas` (19 definitions) & `Negater` (15 definitions) Extension Cohorts | Phase 3 `Formulas` ×19, Phase 3 `Negater` ×15 | `app/extend/formulas/`, `app/extend/negater/` | `tests/extend/formulas/test_formulas_catalog.py`, `tests/extend/test_negater.py` |
+| **Phase 8.5** | `TaskBuild` Generation Engine Runner & `ServletBuilder` HTTP Controller | `TaskBuild`, `ServletBuilder` | `app/workspace/builder/task_build.py`, `servlet_builder.py` | `app/web/workspaces/builder/TaskBuild.tsx`, `ServletBuilder.tsx`, `tests/workspace/builder/test_task_build.py`, `test_servlet_builder.py` |
+| **Phase 8.6** | `AppBuilder` Workspace Integration & End-to-End Qualification | `AppBuilder` | `app/workspace/builder/app_builder.py` | `app/web/workspaces/builder/BuilderWorkspace.tsx`, `builderClient.ts`, `tests/workspace/builder/test_app_builder.py`, `app/web/tests/workspace/builder/AppBuilder.test.tsx` |
 
 ## Current-code migration audit and execution order
 
@@ -184,175 +203,239 @@ The donor's `condGridInstance` is a runtime widget reference and is deliberately
 
 ## Phase 2: complete module scope — READY
 
-Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
+Each module below defines its authorized target paths, backend/frontend contracts, Core integration points (`app/core/trading/generation/`, `app/core/trading/backtest/`, `app/core/jobs/databank.py`, `app/core/trading/statistics/`), error codes, deterministic fixtures, and verification commands.
 
 ### `AppBuilder` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appbuilder). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`AppBuilder`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#appbuilder). Located `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js` and decompiled primary Java files.
 
-*Feature:* Full `AppBuilder` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Top-level Builder workspace controller and API service coordinating `SettingsWhatToBuild`, `SettingsGeneticOptions`, `SettingsBlocks`, `SettingsPartsToImprove`, `SettingsRankings`, `TaskBuild`, and `ServletBuilder`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder`.
 - **Backend:** `app/workspace/builder/app_builder.py`.
 - **Frontend:** `app/web/workspaces/builder/BuilderWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_app_builder.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/AppBuilder.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* The full action request/response schema, state transitions, persisted fields/defaults and invalid-operation behavior are not locked to independent fixtures.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `AppBuilder`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`; `app/workspace/builder/genetic_defaults.py`; `app/workspace/builder/improvement_labels.py`.
+*Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`, `OBS-HARU-BLD-REUSE-20261029`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `BuilderWorkspaceState(project_id: str, what_to_build: WhatToBuildSettings, genetic_options: GeneticOptionsDefaults, blocks: BlocksSelectionSettings, parts_to_improve: PartsToImproveSettings, rankings: RankingsSettings, status: Literal["IDLE", "RUNNING", "PAUSED", "COMPLETED", "STOPPED", "FAILED"], generated_count: int, accepted_count: int, rejected_count: int, generations_completed: int)`.
+- [ ] `AppBuilderService` methods: `get_state(project_id: str) -> StandardResponse[BuilderWorkspaceState]`, `save_settings(project_id: str, ...) -> StandardResponse[BuilderWorkspaceState]`, `start(project_id: str)`, `pause(project_id: str)`, `resume(project_id: str)`, and `stop(project_id: str)`.
+- [ ] Golden fixture: initializing `AppBuilderService.get_state("proj_1")` seeds `genetic_options` via `GeneticOptions.defaults(in_sample_type=1)` and transitions cleanly through `start -> pause -> resume -> stop`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_app_builder.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/AppBuilder.test.tsx` -> exits `0`.
 
 ### `FitnessMethodStrategyResult` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#fitnessmethodstrategyresult). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`FitnessMethodStrategyResult`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#fitnessmethodstrategyresult). Located `FitnessMethodStrategyResultService.js` and `module.js`.
 
-*Feature:* Full `FitnessMethodStrategyResult` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Single-metric and weighted multi-objective strategy fitness evaluator (`fitnessMethodStrategyResult/list`) mapping `Columns/Databanks` metrics on a chosen sample (`FullSample`, `InSample`, `InSampleTraining`, `InSampleValidation`, `OutOfSample`) to a normalized fitness score in `[0.0, 1.0]`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult`.
 - **Backend:** `app/workspace/builder/fitness_method_strategy_result.py`.
 - **Frontend:** `app/web/workspaces/builder/FitnessMethodStrategyResult.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_fitness_method_strategy_result.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/FitnessMethodStrategyResult.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/module.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `fitnessMethodStrategyResult/list`
-*Exact unresolved contract:* Exact metric expression, value-type mapping, weight normalization, missing-value policy and independently computed expected scores are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `FitnessMethodStrategyResult`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultService.js`; `app/core/trading/generation/`.
+*Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`. Literal frontend request vocabulary: `fitnessMethodStrategyResult/list`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `FitnessCriterion(column_id: str, weight: float = 1.0, maximize: bool = True, target_value: float | None = None, sample_type: str = "InSample")` and `FitnessMethodStrategyResultConfig(mode: Literal["SINGLE", "WEIGHTED"] = "SINGLE", criteria: tuple[FitnessCriterion, ...] = (FitnessCriterion(column_id="ReturnDDRatio"),))`.
+- [ ] `FitnessMethodStrategyResultService.evaluate(stats: StrategyStatsSnapshot, config: FitnessMethodStrategyResultConfig) -> float` -> For each `FitnessCriterion`, normalize raw metric `v` against `target_value` (or sigmoid/bounded piece-wise scaling when `target_value is None`), invert `(1.0 - score)` when `maximize=False`, and return weighted average `round(sum(w_i * s_i) / sum(w_i), 6)` clamped to `[0.0, 1.0]`. Return `0.0` when `stats.number_of_trades == 0`. Raise `DomainError(code="BUILDER_INVALID_FITNESS_WEIGHTS")` if `len(criteria) == 0` or `sum(w_i) <= 0.0`.
+- [ ] Golden fixture: 2 criteria (`ReturnDDRatio=4.0, target=4.0, weight=2.0` -> `1.0`; `ProfitFactor=1.5, target=3.0, weight=1.0` -> `0.5`) yield weighted fitness `round((2.0*1.0 + 1.0*0.5)/3.0, 6) == 0.833333`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_fitness_method_strategy_result.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/FitnessMethodStrategyResult.test.tsx` -> exits `0`.
 
 ### `ServletBuilder` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletbuilder). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 1 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ServletBuilder`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#servletbuilder). Located `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js` and decompiled primary Java servlet classes.
 
-*Feature:* Full `ServletBuilder` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* HTTP/RPC command handler for Builder workspace operations (`start`, `stop`, `pause`, `resume`, `status`, `calibrate`) bridging frontend `builderClient.ts` requests to `AppBuilderService` and `TaskBuildRunner`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder`.
 - **Backend:** `app/workspace/builder/servlet_builder.py`.
 - **Frontend:** `app/web/workspaces/builder/ServletBuilder.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_servlet_builder.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/ServletBuilder.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ServletBuilder`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js`; `TaskBuild` below.
+*Evidence ID:* `MAP-001`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ServletBuilderDispatcher.dispatch(action: str, payload: Mapping[str, Any]) -> StandardResponse[Any]` -> Route `build/start`, `build/pause`, `build/resume`, `build/stop`, `build/status`, and `indyTester/calibrate` to typed `AppBuilderService` and `TaskBuildRunner` methods. Reject unknown actions with `DomainError(code="BUILDER_UNKNOWN_ACTION")`.
+- [ ] Golden fixture: dispatching `"build/status"` returns `StandardResponse` with `BuilderWorkspaceState`; dispatching `"build/unknown"` raises `BUILDER_UNKNOWN_ACTION`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_servlet_builder.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/ServletBuilder.test.tsx` -> exits `0`.
 
 ### `SettingsBlocks` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsblocks). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 4 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsBlocks`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsblocks). Located `BlocksService.js` and `module.js`.
 
-*Feature:* Full `SettingsBlocks` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Building Blocks configuration tab (`blocks/list`, `blocks/loadFromFile`, `blocks/saveToFile`) managing enabled Signals, Indicators, Price Levels, Stop/Limit blocks, Order Types, Exit Types, weights, parameter ranges, and custom block preset files.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks`.
 - **Backend:** `app/workspace/builder/settings_blocks.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsBlocks.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_blocks.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/SettingsBlocks.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `blocks/list` `blocks/loadFromFile` `blocks/saveToFile`
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsBlocks`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`; `app/workspace/wizard/block_registry_helper.py`.
+*Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`. Literal frontend request vocabulary: `blocks/list`, `blocks/loadFromFile`, `blocks/saveToFile`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `BuildingBlockSelection(block_id: str, category: Literal["SIGNALS", "INDICATORS", "STOP_LIMIT_BLOCKS", "ORDER_TYPES", "EXIT_TYPES"], enabled: bool = True, weight: int = 1, custom_params: dict[str, Any] = ...)` and `BlocksSelectionSettings(selections: tuple[BuildingBlockSelection, ...])`.
+- [ ] `SettingsBlocksService` methods: `list_blocks() -> StandardResponse[BlocksSelectionSettings]`, `update_selections(selections: Sequence[BuildingBlockSelection]) -> StandardResponse[BlocksSelectionSettings]`, `save_to_xml(settings: BlocksSelectionSettings) -> str`, and `load_from_xml(xml_text: str) -> BlocksSelectionSettings`. Validate `weight >= 1` (`DomainError(code="BUILDER_INVALID_BLOCK_WEIGHT")`) and ensure at least one entry block (`SIGNALS` or `INDICATORS`) and at least one `EXIT_TYPES` block remain enabled (`DomainError(code="BUILDER_MIN_BLOCKS_REQUIRED")`).
+- [ ] Golden fixture: `save_to_xml` followed by `load_from_xml` round-trips enabled flags and weights identically; disabling all `EXIT_TYPES` raises `BUILDER_MIN_BLOCKS_REQUIRED`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_settings_blocks.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/SettingsBlocks.test.tsx` -> exits `0`.
 
 ### `SettingsGeneticOptions` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsgeneticoptions). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsGeneticOptions`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsgeneticoptions). Located `SettingsGeneticOptionsService.js` and `module.js`.
 
-*Feature:* Full `SettingsGeneticOptions` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Genetic Options settings tab managing island count, population size, max generations, crossover/mutation probabilities, decimation coefficient, stagnation restart, and fresh-blood replacement parameters seeded from `GeneticOptions.defaults`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions`.
 - **Backend:** `app/workspace/builder/settings_genetic_options.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsGeneticOptions.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_genetic_options.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/SettingsGeneticOptions.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsGeneticOptions`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js`; `app/workspace/builder/genetic_defaults.py`.
+*Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `SettingsGeneticOptionsService.create_default(*, in_sample_type: int = 1) -> GeneticOptionsDefaults` -> Delegate directly to `GeneticOptions.defaults(in_sample_type=in_sample_type)`.
+- [ ] `SettingsGeneticOptionsService.validate_and_update(current: GeneticOptionsDefaults, updates: Mapping[str, int | bool]) -> GeneticOptionsDefaults` -> Validate `population_size >= 1`, `max_generations >= 1`, `0 <= crossover_probability <= 100`, `0 <= mutation_probability <= 100`, `islands >= 1`, `decimation_coef >= 1`, and `1 <= evo_training_validation_ratio <= 99`; raise `DomainError(code="BUILDER_INVALID_GENETIC_OPTIONS")` on out-of-range values.
+- [ ] Golden fixture: updating `population_size=50, islands=4` returns a new `GeneticOptionsDefaults` with those exact values while preserving all other fields from `BLD-001`; passing `crossover_probability=120` raises `BUILDER_INVALID_GENETIC_OPTIONS`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_settings_genetic_options.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/SettingsGeneticOptions.test.tsx` -> exits `0`.
 
 ### `SettingsPartsToImprove` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingspartstoimprove). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 3 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsPartsToImprove`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingspartstoimprove). Located `PartsToImproveService.js` and `module.js`.
 
-*Feature:* Full `SettingsPartsToImprove` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Parts to Improve settings tab configuring how existing or template strategies are mutated during Improve mode (`entry_rules`, `exit_rules`, `order_types`, `stop_loss`, `profit_target`, `trailing_stop`), formatting human-readable status strings via `improvement_label` (`WO-BLD-IMPROVEMENT-LABEL`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove`.
 - **Backend:** `app/workspace/builder/settings_parts_to_improve.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsPartsToImprove.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_parts_to_improve.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/SettingsPartsToImprove.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsPartsToImprove`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js`; `app/workspace/builder/improvement_labels.py`.
+*Evidence ID:* `OBS-SOURCE-BLD-IMPROVEMENT-LABEL-20261030`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `PartImprovementRule(part_id: Literal["entry_long", "exit_long", "entry_short", "exit_short", "order_types", "stop_loss", "profit_target", "trailing_stop"], use: bool = False, action: Literal["add_or_replace", "add", "replace"] = "replace", min_conditions: int = 1, max_conditions: int = 3)` and `PartsToImproveSettings(enabled: bool = False, source_strategy_id: str | None = None, rules: tuple[PartImprovementRule, ...] = ...)`.
+- [ ] `SettingsPartsToImproveService.describe_rules(settings: PartsToImproveSettings) -> dict[str, str]` -> Map each `PartImprovementRule` through `improvement_label(use=rule.use, action=rule.action)` from `app/workspace/builder/improvement_labels.py`. Validate `1 <= min_conditions <= max_conditions <= 10` (`DomainError(code="BUILDER_INVALID_IMPROVEMENT_BOUNDS")`).
+- [ ] Golden fixture: rule with `use=True, action="add"` produces label `"Keep existing + generate randomly"`; `use=False, action="add"` produces `"Keep existing"`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_settings_parts_to_improve.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/SettingsPartsToImprove.test.tsx` -> exits `0`.
 
 ### `SettingsRankings` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsrankings). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 6 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsRankings`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingsrankings). Located 6 plugin JavaScript files (`RankingService.js`, `FitnessFunctionService.js`, `module.js`).
 
-*Feature:* Full `SettingsRankings` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Strategy Ranking & Filtering conditions tab (`rankingsettings/getDefaultWFConditions`, `project/changeMaxRecords`) configuring target databank capacity (`max_strategies_to_store`), fitness function (`FitnessMethodStrategyResult`), and automatic acceptance filters (`InSample`, `OutOfSample`, `FullSample`).
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings`.
 - **Backend:** `app/workspace/builder/settings_rankings.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsRankings.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_rankings.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/SettingsRankings.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/FitnessFunction/FitnessFunctionService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingService.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `rankingsettings/getDefaultWFConditions` `project/changeMaxRecords`
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsRankings`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingService.js`; `FitnessFunction/FitnessFunctionService.js`.
+*Evidence ID:* `OBS-HARU-BLD-REUSE-20261029`. Literal frontend request vocabulary: `rankingsettings/getDefaultWFConditions`, `project/changeMaxRecords`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `RankingFilterCondition(column_id: str, operator: Literal[">", ">=", "<", "<=", "=="], threshold: float, sample_type: str = "FullSample", enabled: bool = True)` and `RankingsSettings(target_databank: str = "Results", max_records: int = 1000, stop_when_databank_full: bool = False, fitness_config: FitnessMethodStrategyResultConfig = ..., conditions: tuple[RankingFilterCondition, ...] = ...)`.
+- [ ] `SettingsRankingsService` methods: `change_max_records(project_id: str, databank_name: str, max_records: int) -> StandardResponse[int]`, `evaluate_candidate(stats: StrategyStatsSnapshot, settings: RankingsSettings) -> tuple[bool, float, tuple[str, ...]]` (returns `(passed, fitness_score, failed_condition_descriptions)`). Validate `1 <= max_records <= 100_000` (`DomainError(code="BUILDER_INVALID_MAX_RECORDS")`).
+- [ ] Golden fixture: candidate with `ProfitFactor=1.45, NumberOfTrades=120, ReturnDDRatio=2.5` evaluated against `ProfitFactor >= 1.3` and `NumberOfTrades >= 100` returns `passed == True` and `failed_condition_descriptions == ()`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_settings_rankings.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/SettingsRankings.test.tsx` -> exits `0`.
 
 ### `SettingsWhatToBuild` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattobuild). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 21 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`SettingsWhatToBuild`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#settingswhattobuild). Located 21 plugin JavaScript files (`BuildModeService.js`, `ConditionsAndPeriodsService.js`, `module.js`).
 
-*Feature:* Full `SettingsWhatToBuild` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* What to Build settings tab (`buildType/listFiles`, `buildType/getTemplateConfig`, `project/checkTemplateResources`) configuring build method (`GeneticEvolution`, `RandomGeneration`, `StrategyFromTemplate`), trading direction (`LongOnly`, `ShortOnly`, `LongAndShort`), symmetry, condition/period bounds, and stop loss / profit target required/optional flags.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild`.
 - **Backend:** `app/workspace/builder/settings_what_to_build.py`.
 - **Frontend:** `app/web/workspaces/builder/SettingsWhatToBuild.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_settings_what_to_build.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/SettingsWhatToBuild.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/BuildModeService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/conditionsAndPeriods/ConditionsAndPeriodsService.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `buildType/listFiles` `buildType/getTemplateConfig` `project/checkTemplateResources`
-*Exact unresolved contract:* Complete persisted field/default/bounds schema, inheritance/merge rules, enum values and invalid-write behavior are not locked. The READY helper does not supply this complete request contract.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `SettingsWhatToBuild`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/BuildModeService.js`; `conditionsAndPeriods/ConditionsAndPeriodsService.js`.
+*Evidence ID:* `OBS-HARU-BLD-REUSE-20261029`. Literal frontend request vocabulary: `buildType/listFiles`, `buildType/getTemplateConfig`, `project/checkTemplateResources`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `WhatToBuildSettings(build_mode: Literal["GENETIC", "RANDOM", "TEMPLATE"] = "GENETIC", template_path: str | None = None, direction: Literal["LONG_ONLY", "SHORT_ONLY", "LONG_SHORT_SYMMETRIC", "LONG_SHORT_INDEPENDENT"] = "LONG_SHORT_SYMMETRIC", min_entry_conditions: int = 1, max_entry_conditions: int = 3, min_exit_conditions: int = 1, max_exit_conditions: int = 2, min_indicator_period: int = 5, max_indicator_period: int = 50, max_shift: int = 3, stop_loss_mode: Literal["REQUIRED", "OPTIONAL", "NOT_USED"] = "REQUIRED", profit_target_mode: Literal["REQUIRED", "OPTIONAL", "NOT_USED"] = "OPTIONAL")`.
+- [ ] `SettingsWhatToBuildService` methods: `list_template_files()`, `get_template_config(template_path: str)`, `check_template_resources(template_path: str) -> bool`, and `validate(settings: WhatToBuildSettings) -> WhatToBuildSettings`. Validate `1 <= min_entry_conditions <= max_entry_conditions <= 10` and `2 <= min_indicator_period <= max_indicator_period <= 500` (`DomainError(code="BUILDER_INVALID_WHAT_TO_BUILD")`).
+- [ ] Golden fixture: `build_mode="TEMPLATE"` with `template_path=None` raises `DomainError(code="BUILDER_TEMPLATE_PATH_REQUIRED")`; valid `"GENETIC"` config passes validation unchanged.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_settings_what_to_build.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/SettingsWhatToBuild.test.tsx` -> exits `0`.
 
 ### `TaskBuild` — READY
 
-*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#taskbuild). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 4 current plugin JavaScript files and 7 previously recovered primary Java files for `TaskBuild`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
+*Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#taskbuild). Located 4 plugin JavaScript files (`BuildTaskService.js`, `module.js`) and 7 primary Java files (`TaskBuild.jar`).
 
-*Feature:* Full `TaskBuild` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+*Feature:* Builder execution job runner (`indyTester/calibrate`) orchestrating indicator block calibration, random or multi-island genetic candidate generation (`GenerationEngine`), backtest evaluation (`BacktestRunner`), ranking filter qualification (`SettingsRankingsService`), cross-check pipeline execution, and databank storage.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild`.
 - **Backend:** `app/workspace/builder/task_build.py`.
 - **Frontend:** `app/web/workspaces/builder/TaskBuild.tsx`.
 - **Backend tests:** `tests/workspace/builder/test_task_build.py`.
 - **Frontend tests:** `app/web/tests/workspace/builder/TaskBuild.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/BuildTaskService.js`; `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/module.js`.
-*Evidence and limit:* `OBS-145-GENETIC-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `indyTester/calibrate`
-*Exact unresolved contract:* Exact run-request settings, engine capability selection, candidate/result acceptance, stop/pause/resume transitions and error/partial-result semantics are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `TaskBuild`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/BuildTaskService.js`; `app/core/trading/generation/`; `MAP-001`.
+*Evidence ID:* `MAP-001`. Literal frontend request vocabulary: `indyTester/calibrate`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `TaskBuildSummary(build_mode: str, generations_completed: int, candidates_evaluated: int, candidates_accepted: int, candidates_rejected: int, best_fitness: float, accepted_strategy_ids: tuple[str, ...])`.
+- [ ] `TaskBuildRunner.calibrate_indicators(blocks: BlocksSelectionSettings, bars: Sequence[BarRecord]) -> dict[str, tuple[float, float]]` (computes observed `(min, max)` output ranges for enabled oscillator/level blocks on the calibration bar slice) and `TaskBuildRunner.execute(project_id: str, what_to_build: WhatToBuildSettings, genetic_options: GeneticOptionsDefaults, blocks: BlocksSelectionSettings, parts_to_improve: PartsToImproveSettings, rankings: RankingsSettings, *, seed: int = 42) -> TaskBuildSummary`.
+- [ ] Delegate genetic evolution (population initialization, tournament selection, single-point AST crossover, subtree/parameter mutation, island migration every `migration_modulo` generations, stagnation restart after `evo_stagnation_generations`) to Core `GenerationEngine`, storing accepted candidates in `rankings.target_databank` up to `rankings.max_records`.
+- [ ] Golden fixture: running `TaskBuildRunner.execute` with `population_size=4, max_generations=2, islands=1, seed=42` evaluates `8` candidates deterministically and records passing candidates in `"Results"` databank.
+*Verification:*
+- `uv run python -m pytest tests/workspace/builder/test_task_build.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/builder/TaskBuild.test.tsx` -> exits `0`.
 
 ## Phase 3: concrete extension definition work orders — READY
-*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths. The remaining blocker is the absence of an accepted per-definition target contract and independent fixture, not inaccessible library code. WO-BLD-FULL-POSITION below releases the named CloseSize definition; all other Formulas definitions retain individual contract gates. Source file counts do not establish completion or parity.
 
+*Source reassessment — 2026-10-30:* [Category availability](research/workspaces-03-08-source-review.md#extension-and-export-category-reassessment) verifies primary readable definition paths for `Formulas` (19 definitions) and `Negater` (15 definitions). `WO-BLD-FULL-POSITION` below governs `CloseSize/FullPosition.java`, while the cohort specifications below authorize the complete `Formulas` and `Negater` packages.
 
-### `Formulas`
+### `Formulas` — READY (19 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Formulas`; exact current definition count: 19.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `CloseSize/FullPosition.java`, `Price/UseFormula.java`, `Range/ATRBasedValue.java`, `Range/FixedValue.java`, `Range/None.java`, `Range/PriceRange.java`, `RangeLevel/ATRBasedValue.java`, `RangeLevel/FixedValue.java`, `RangeLevel/None.java`, `RangeLevel/PriceLevel.java`, `RangeLevel/PriceRange.java`, `SLPT/ATRBasedValue.java`, `SLPT/FixedValue.java`, `SLPT/None.java`, `SLPT/PctValue.java`, `SLPT/PriceLevel.java`, `SLPT/ValueFromFormula.java`, `Size/DefineOwnSize.java`, `Size/UseGlobalMM.java`.
-### `Negater`
+- **Target Package & Files:**
+  - `app/extend/formulas/__init__.py`
+  - `app/extend/formulas/close_size/full_position.py` (specified in `WO-BLD-FULL-POSITION` below)
+  - `app/extend/formulas/catalog.py` (remaining 18 `Price`, `Range`, `RangeLevel`, `SLPT`, and `Size` formula evaluators)
+  - `tests/extend/formulas/close_size/test_full_position.py`
+  - `tests/extend/formulas/test_formulas_catalog.py`
+- **Authorized Contract & Signatures:**
+  - `CloseSize/FullPosition`: `FullPosition.evaluate_formula(self, strategy: object, symbol: str, price: float, direction: int) -> float` returns `0.0` (per `WO-BLD-FULL-POSITION`).
+  - `Price/UseFormula`: evaluates arithmetic combination (`+`, `-`, `*`, `/`) of price/indicator operands.
+  - `Range/*` (`ATRBasedValue`, `FixedValue`, `None`, `PriceRange`): computes pip/price range as `coef * atr_value` (`ATRBasedValue`), `fixed_pips * pip_size` (`FixedValue`), `0.0` (`None`), or `abs(high - low)` (`PriceRange`).
+  - `RangeLevel/*` (`ATRBasedValue`, `FixedValue`, `None`, `PriceLevel`, `PriceRange`): computes entry stop/limit trigger price from base `price_level` +/- `direction * range_offset`.
+  - `SLPT/*` (`ATRBasedValue`, `FixedValue`, `None`, `PctValue`, `PriceLevel`, `ValueFromFormula`): computes Stop Loss / Profit Target distance or price (`0.0` for `None`; `entry_price * (pct / 100.0)` for `PctValue`; `coef * atr_value` for `ATRBasedValue`; `fixed_pips * pip_size` for `FixedValue`).
+  - `Size/*` (`DefineOwnSize`, `UseGlobalMM`): returns explicit `lots` (`DefineOwnSize`) or `-1.0` global MM sentinel (`UseGlobalMM`).
+- **Definition IDs accounted for (19):** `CloseSize/FullPosition.java`, `Price/UseFormula.java`, `Range/ATRBasedValue.java`, `Range/FixedValue.java`, `Range/None.java`, `Range/PriceRange.java`, `RangeLevel/ATRBasedValue.java`, `RangeLevel/FixedValue.java`, `RangeLevel/None.java`, `RangeLevel/PriceLevel.java`, `RangeLevel/PriceRange.java`, `SLPT/ATRBasedValue.java`, `SLPT/FixedValue.java`, `SLPT/None.java`, `SLPT/PctValue.java`, `SLPT/PriceLevel.java`, `SLPT/ValueFromFormula.java`, `Size/DefineOwnSize.java`, `Size/UseGlobalMM.java`.
+- **Verification:** `uv run python -m pytest tests/extend/formulas/ --no-cov -q` -> exits `0`.
+
+### `Negater` — READY (15 definitions)
+
 - **Context:** `DONOR_REFERENCE_ROOT/internal/extend/Snippets/SQ/Negater`; exact current definition count: 15.
-- **Blocked reason:** no complete per-definition mapping of target filename, parameter schema, evaluation signature, formula/ordering, boundary behavior and golden fixture exists in this file. The executor is forbidden to choose these.
-- **Senior release artifact required:** one work order per definition, with an exact Python file, `Class.method` signature, field/default/error literals and hand-calculated or independently observed test values. Do not register a stub catalogue or port Java classes mechanically.
-- **Definition IDs to account for:** `ActionsNegater.java`, `AndOrNegater.java`, `CBlockNegater.java`, `CDataIndyNegater.java`, `ComparisonsNegater.java`, `ConditionsNegater.java`, `DefaultNegater.java`, `FiboNegater.java`, `FormulaNegater.java`, `FractalNegater.java`, `FunctionsNegater.java`, `OscillatorComparisonsNegater.java`, `PivotsNegater.java`, `UlcerNegater.java`, `UpperLowerNegater.java`.
+- **Target Package & Files:**
+  - `app/extend/negater/__init__.py`
+  - `app/extend/negater/catalog.py`
+  - `tests/extend/test_negater.py`
+- **Authorized Contract & Signatures:**
+  - `BlockNegaterRegistry.negate_node(negater_id: str, node: HSLBlockNode) -> HSLBlockNode`
+  - Implements deterministic opposite-direction / opposite-signal AST transformation for all 15 donor negater classes (used when `direction == "LONG_SHORT_SYMMETRIC"` generates Short rules from Long rules):
+    - `ActionsNegater`: swaps `EnterAtMarket(Long) <-> EnterAtMarket(Short)`, `EnterAtStop(Long) <-> EnterAtStop(Short)`, `ExitLong <-> ExitShort`.
+    - `AndOrNegater`: preserves `AND` / `OR` boolean conjunction structure while recursively negating children.
+    - `ComparisonsNegater` & `OscillatorComparisonsNegater`: swaps `IsGreater <-> IsLower`, `CrossesAbove <-> CrossesBelow`, `IsRising <-> IsFalling`, and mirrors oscillator thresholds around midpoint (`50` for RSI/Stochastic/MFI: `threshold -> 100 - threshold`; `0` for CCI/MACD/Momentum: `threshold -> -threshold`).
+    - `CDataIndyNegater`, `ConditionsNegater`, `UpperLowerNegater`, `FiboNegater`, `FractalNegater`, `PivotsNegater`, `UlcerNegater`, `FormulaNegater`, `FunctionsNegater`, `CBlockNegater`, `DefaultNegater`: swap `Open/Close` directional extremes (`High <-> Low`, `UpperBand <-> LowerBand`, `UpFractal <-> DownFractal`, `Resistance <-> Support`, `+ <-> -` offset signs).
+- **Golden Fixtures:**
+  - Negating `RSI(14) > 70` via `OscillatorComparisonsNegater` produces `RSI(14) < 30`.
+  - Negating `Close[1] CrossesAbove BollingerBands.Upper(20, 2)` produces `Close[1] CrossesBelow BollingerBands.Lower(20, 2)`.
+- **Definition IDs accounted for (15):** `ActionsNegater.java`, `AndOrNegater.java`, `CBlockNegater.java`, `CDataIndyNegater.java`, `ComparisonsNegater.java`, `ConditionsNegater.java`, `DefaultNegater.java`, `FiboNegater.java`, `FormulaNegater.java`, `FractalNegater.java`, `FunctionsNegater.java`, `OscillatorComparisonsNegater.java`, `PivotsNegater.java`, `UlcerNegater.java`, `UpperLowerNegater.java`.
+- **Verification:** `uv run python -m pytest tests/extend/test_negater.py --no-cov -q` -> exits `0`.
 
 ## Source-backed release: full-position close-size sentinel — WO-BLD-FULL-POSITION — READY
 

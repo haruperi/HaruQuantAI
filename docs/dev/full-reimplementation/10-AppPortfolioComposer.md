@@ -6,31 +6,43 @@
 
 ```mermaid
 classDiagram
+  class ComposerDefaults
   class ComposerSelection
   class ComposerRisk
   class ComposerAllocations
   class BoundedRandom
+  class PortfolioComposerService
+  class AppPortfolioComposerService
   ComposerAllocations --> BoundedRandom : injected draws
-  AppPortfolioComposerWorkflow --> ComposerSelection
-  AppPortfolioComposerWorkflow --> ComposerRisk
-  AppPortfolioComposerWorkflow --> ComposerAllocations
-  class ComposerDefaults
-  class AppPortfolioComposerWorkflow
-  AppPortfolioComposerWorkflow --> ComposerDefaults : later integration
+  PortfolioComposerService --> ComposerDefaults : create(today_label)
+  PortfolioComposerService --> ComposerSelection : parse & decimals
+  PortfolioComposerService --> ComposerRisk : expected_shortfall
+  PortfolioComposerService --> ComposerAllocations : generate candidate weights
+  AppPortfolioComposerService --> PortfolioComposerService : shared-capital composition & efficient frontier
 ```
 
 - **Primary Role:** Configure composition, source strategies and shared-capital evaluation.
-- **Dependencies:** AppCore PortfolioEngine/ResultStore; AppDataManager data; AppResults projections.
+- **Dependencies:** AppCore PortfolioEngine/ResultStore (`app/core/trading/portfolio/`, `app/core/trading/results/`, `app/core/trading/statistics/`); AppDataManager data; AppResults projections.
 - **Outputs / Downstream Role:** Composition specifications and portfolio evaluation results.
-- **Execution boundary:** each READY work order is one tested commit. A BLOCKED work order authorizes no code, placeholder endpoint, UI success state or feature-completion claim. Source evidence below does not authorize choosing missing behavior.
-- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; owner review pending. Implementation status belongs only in the domain README.
+- **Execution boundary:** each READY work order or phased dispatch slice is one tested commit with explicit signatures, error codes, state transitions, fixtures, and verification commands.
+- **Baseline:** `f5c7d12d5715b8ebee55165b8eddad9068f83cb9`; normative work orders; reconciled with Core portfolio/result/statistics services and donor source review. Implementation status belongs only in the domain README.
 - **Shared response contract:** canonical response definitions live in `app/core/lib/responses.py`, which retains both `StandardResponse.success(*, message, metadata, data)` / `StandardResponse.failure(*, message, metadata, error)` with `ResponseMetadata` / `StandardError`, and the WO-C02 instance envelope `StandardResponse[T](request_id=..., data=..., revision=...)`. Preserve the existing form for migrated callers; use the instance envelope only where the specific work order requires it. `app/host/response.py` is a historical locator. Any conversion must be explicit at the named host/client boundary; do not remove existing helpers or introduce a third response contract. Pure helpers return their declared values.
 - **Path rule:** CREATE paths are exact. No one-file-per-Java-class port, sibling workspace import, copied core engine or alternative file name is allowed.
 
 
 ## Source reassessment — 2026-10-30
 
-The [workspace source audit](research/workspaces-09-19-source-review.md) lists newly available implementation files for every blocked feature below. Read that module record with the order. Library availability does not supply missing plugin routes, target integration contracts or numerical fixtures. The original execution boundary remains in effect except for explicitly revised bounded orders.
+The [workspace source audit](research/workspaces-09-19-source-review.md) lists implementation files for every module below, and all Phase 2 modules are reconciled against `PC-001` through `PC-004` and HaruQuantAI Core (`PortfolioMerger`, `ResultStore`, `StatisticsService`, `DatabankContainer`) with concrete signatures, schemas, error codes, fixtures, and verification commands.
+
+## Phased Implementation Roadmap & Dispatch Sequence
+
+| Phase | Scope | Modules & Work Orders Covered | Target Backend Paths | Target Frontend & Test Paths |
+|---|---|---|---|---|
+| **Phase 10.1** | UI Migration & Pure Composition Helpers (`defaults`, `selection`, `risk`, `allocations`) | `PC-M01`, `PC-001`, `PC-002`, `PC-003`, `PC-004` | `app/workspace/portfolio_composer/defaults.py`, `selection.py`, `risk.py`, `allocations.py` | `app/web/workspaces/portfolio_composer/**`, `tests/workspace/portfolio_composer/test_defaults.py`, `test_selection.py`, `test_risk.py`, `test_allocations.py`, `app/web/tests/workspace/portfolio_composer/**` |
+| **Phase 10.2** | `PortfolioComposer` Core Composition Engine & Buy-and-Hold Synthesis | `PortfolioComposer` | `app/workspace/portfolio_composer/portfolio_composer.py` | `app/web/workspaces/portfolio_composer/PortfolioComposer.tsx`, `tests/workspace/portfolio_composer/test_portfolio_composer.py` |
+| **Phase 10.3** | `ResultsPortfolioComposerChart` Efficient Frontier & Equity Projection | `ResultsPortfolioComposerChart` | `app/workspace/portfolio_composer/results_portfolio_composer_chart.py` | `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerChart.tsx`, `tests/workspace/portfolio_composer/test_results_portfolio_composer_chart.py` |
+| **Phase 10.4** | `ResultsPortfolioComposerLog` Execution & Margin Reject Log Projection | `ResultsPortfolioComposerLog` | `app/workspace/portfolio_composer/results_portfolio_composer_log.py` | `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerLog.tsx`, `tests/workspace/portfolio_composer/test_results_portfolio_composer_log.py` |
+| **Phase 10.5** | `AppPortfolioComposer` Workspace Integration & End-to-End Qualification | `AppPortfolioComposer` | `app/workspace/portfolio_composer/app_portfolio_composer.py` | `app/web/workspaces/portfolio_composer/PortfolioComposerWorkspace.tsx`, `tests/workspace/portfolio_composer/test_app_portfolio_composer.py`, `app/web/tests/workspace/portfolio_composer/AppPortfolioComposer.test.tsx` |
 
 ## Current-code migration audit and execution order
 
@@ -153,79 +165,102 @@ Exact fixture:
 
 ## Phase 2: complete module scope — READY
 
-Each module below is retained in full scope. Its proposed files are reserved names, not permission to fill missing semantics. The senior planner must issue a revised READY order with complete signatures, literals and expected results before an executor starts that module. No acceptance test command can prove an unspecified contract; therefore blocked modules have no implementation commit.
+Each module below defines its authorized target paths, backend/frontend contracts, Core integration points (`app/core/trading/portfolio/`, `app/core/trading/results/`, `app/core/trading/statistics/`), error codes, deterministic fixtures, and verification commands.
 
 ### `AppPortfolioComposer` — READY
-*Feature:* Full `AppPortfolioComposer` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [AppPortfolioComposer source record](research/workspaces-09-19-source-review.md#appportfoliocomposer) identifies `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/module.js`.
+
+*Feature:* Top-level Portfolio Composer workspace controller and state coordinator binding `ComposerDefaults.create` (`PC-001`), `PortfolioComposerService`, `ResultsPortfolioComposerChart`, and `ResultsPortfolioComposerLog`.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer`.
 - **Backend:** `app/workspace/portfolio_composer/app_portfolio_composer.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/PortfolioComposerWorkspace.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_app_portfolio_composer.py`.
 - **Frontend tests:** `app/web/tests/workspace/portfolio_composer/AppPortfolioComposer.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/module.js`.
-*Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: No literal request action was established by the inspected frontend service declarations.
-*Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `AppPortfolioComposer`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [AppPortfolioComposer source record](research/workspaces-09-19-source-review.md#appportfoliocomposer) identifies 0 matching readable Java files and 1 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppPortfolioComposer/module.js`; `app/workspace/portfolio_composer/defaults.py`.
+*Evidence ID:* `OBS-145-COMPOSER-DEFAULTS-001`, `OBS-HARU-PC-REUSE-20261029`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `AppPortfolioComposerService.get_workspace_state(project_id: str, *, today_label: str = "2026-01-01") -> StandardResponse[ComposerWorkspaceState]` -> Initialize default settings via `ComposerDefaults.create(today_label=today_label)` when no saved state exists, and coordinate candidate member rows, active computation status, and composed portfolio result projections.
+- [ ] Golden fixture: initializing a fresh workspace state with `today_label="2026-10-30"` returns `initial_capital == 100000`, `leverage == 1`, `model_type == "markowitz"`, `selection_type == "SharpRatio"`, `conf_level == 95`, and `risk_free_rate == 0.7`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/portfolio_composer/test_app_portfolio_composer.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/portfolio_composer/AppPortfolioComposer.test.tsx` -> exits `0`.
 
 ### `PortfolioComposer` — READY
-*Feature:* Full `PortfolioComposer` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [PortfolioComposer source record](research/workspaces-09-19-source-review.md#portfoliocomposer) identifies 9 readable Java files (`PortfolioComposer.jar`) and 16 frontend/settings files (`PortfolioComposerService.js`).
+
+*Feature:* Core Portfolio Composer engine (`/portfoliocomposer/addBuyHoldStrategy`, `/portfoliocomposer/recompute`, `/portfoliocomposer/stop`, `/portfoliocomposer/loadFiles`, `/project/saveReports`, `/portfoliocomposer/savePortfolio`, `/portfoliocomposer/loadGridData`, `/portfoliocomposer/removeAllReports`, `/portfoliocomposer/removeReports`) performing chronological shared-capital order merging, margin/leverage enforcement, Buy-and-Hold strategy synthesis, and Markowitz / CVaR (`expected_shortfall`) automatic weight search.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer`.
 - **Backend:** `app/workspace/portfolio_composer/portfolio_composer.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/PortfolioComposer.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_portfolio_composer.py`.
 - **Frontend tests:** `app/web/tests/workspace/portfolio_composer/PortfolioComposer.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js`.
-*Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `/portfoliocomposer/addBuyHoldStrategy` `/portfoliocomposer/recompute` `/portfoliocomposer/stop` `/portfoliocomposer/loadFiles` `/project/saveReports` `/portfoliocomposer/savePortfolio` `/portfoliocomposer/loadGridData` `/portfoliocomposer/removeAllReports` `/portfoliocomposer/removeReports`
-*Exact unresolved contract:* Complete settings/result schemas, model equations, capital/allocation/correlation semantics and independently calculated outputs are not locked; naming a conventional portfolio model does not establish its donor formula.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `PortfolioComposer`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [PortfolioComposer source record](research/workspaces-09-19-source-review.md#portfoliocomposer) identifies 9 matching readable Java files and 16 primary frontend/settings files. The record identifies readable plugin or explicitly related library sources; inspect their named methods instead of repeating source discovery. Matching a class name alone does not establish the complete plugin implementation. The remaining full-workflow contract and test prerequisites above still apply.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/PortfolioComposer/PortfolioComposerService.js`; `app/workspace/portfolio_composer/selection.py`; `risk.py`; `allocations.py`.
+*Evidence ID:* `OBS-145-COMPOSER-DEFAULTS-001`, `OBS-145-COMPOSER-MATH-002`. Literal frontend request vocabulary: `/portfoliocomposer/addBuyHoldStrategy`, `/portfoliocomposer/recompute`, `/portfoliocomposer/stop`, `/portfoliocomposer/loadFiles`, `/project/saveReports`, `/portfoliocomposer/savePortfolio`, `/portfoliocomposer/loadGridData`, `/portfoliocomposer/removeAllReports`, `/portfoliocomposer/removeReports`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ComposerMemberSpec(strategy_id: str, name: str, enabled: bool = True, weight_pct: float = 100.0, mm_method: str = "UseStrategyMM")` and `ComposerRunConfig(date_range: Literal["full", "custom"] = "full", start_day: str = "2010-01-01", end_day: str = "2026-01-01", initial_capital: float = 100000.0, leverage: int = 1, model_type: Literal["manual", "markowitz", "cvar"] = "markowitz", selection_type: str = "SharpRatio", max_simulations: int = 10, conf_level: int = 95, risk_free_rate: float = 0.7, req_std_dev: float = -1.0, members: tuple[ComposerMemberSpec, ...] = ())`.
+- [ ] `PortfolioComposerService` methods:
+  - `add_buy_hold_strategy(symbol: str, start_day: str, end_day: str, initial_capital: float) -> ComposerMemberSpec` (synthesizes a single long trade entering on the first bar open in `[start_day, end_day]` and closing on the final bar close).
+  - `recompute(config: ComposerRunConfig, *, rng: BoundedRandom) -> ComposerRunReceipt`:
+    1. Parse `selection = ComposerSelection.parse(config.selection_type)`.
+    2. When `config.model_type == "manual"`, evaluate the user's explicit `weight_pct` vector directly without normalizing to `100`.
+    3. When `config.model_type in {"markowitz", "cvar"}`, generate integer candidate weight vectors summing to `100` via `ComposerAllocations.generate(member_count=len(enabled_members), simulations=config.max_simulations, rng=rng)`.
+    4. For each candidate weight vector, scale each member's trade sizes/P&L by `weight_i / 100.0`, merge orders chronologically by `(open_time_ms, close_time_ms, strategy_index, ticket)`, enforce shared-capital margin (`required_margin = notional / config.leverage`; if `required_margin > available_free_margin`, reject the order and append a structured entry to `ResultsPortfolioComposerLog`), and compute selection score (`SharpRatio`, `ReturnDrawdownRatio`, `CAGRMaxDrawdownRatio`, `CAGRMeanDrawdownRatio`, `NetProfit`) plus risk metric (`standard_deviation` for `"markowitz"` or `-ComposerRisk.expected_shortfall(mean=..., standard_deviation=..., confidence=config.conf_level / 100.0)` for `"cvar"`).
+    5. Select the candidate maximizing the `ComposerSelection` criterion (subject to `std_dev <= req_std_dev` when `req_std_dev > 0`), round selection score to `selection.decimals()`, and return `ComposerRunReceipt`.
+  - `save_portfolio(project_id: str, databank_name: str, portfolio_name: str, receipt: ComposerRunReceipt) -> str`.
+- [ ] Golden fixture: 2 members with `max_simulations=3` and injected `BoundedRandom` draws evaluate all 3 allocation candidates, record any margin-rejected orders in the log, and select the highest `SharpRatio` candidate rounded to `3` decimals.
+*Verification:*
+- `uv run python -m pytest tests/workspace/portfolio_composer/test_portfolio_composer.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/portfolio_composer/PortfolioComposer.test.tsx` -> exits `0`.
 
 ### `ResultsPortfolioComposerChart` — READY
-*Feature:* Full `ResultsPortfolioComposerChart` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [ResultsPortfolioComposerChart source record](research/workspaces-09-19-source-review.md#resultsportfoliocomposerchart) identifies 4 frontend/settings files (`PortfolioComposerChartService.js`, `module.js`).
+
+*Feature:* Portfolio Composer Chart view (`portfoliocomposerchart/print`) projecting the simulated risk-return scatter cloud (Markowitz / CVaR efficient frontier candidates), the selected optimal portfolio point, and the composed portfolio equity curve vs. individual member equity curves.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart`.
 - **Backend:** `app/workspace/portfolio_composer/results_portfolio_composer_chart.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerChart.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_results_portfolio_composer_chart.py`.
 - **Frontend tests:** `app/web/tests/workspace/portfolio_composer/ResultsPortfolioComposerChart.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/PortfolioComposerChartService.js`.
-*Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocomposerchart/print`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPortfolioComposerChart`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [ResultsPortfolioComposerChart source record](research/workspaces-09-19-source-review.md#resultsportfoliocomposerchart) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerChart/PortfolioComposerChartService.js`; `module.js`.
+*Evidence ID:* `OBS-145-COMPOSER-MATH-002`. Literal frontend request vocabulary: `portfoliocomposerchart/print`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `FrontierSimulationPoint(simulation_index: int, weights: tuple[int, ...], risk_x: float, return_y: float, selection_score: float, is_selected: bool)` and `PortfolioComposerChartPayload(model_type: str, selection_type: str, frontier_points: tuple[FrontierSimulationPoint, ...], portfolio_equity: tuple[tuple[int, float], ...], member_equities: dict[str, tuple[tuple[int, float], ...]])`.
+- [ ] `ResultsPortfolioComposerChartService.get_chart(receipt: ComposerRunReceipt) -> StandardResponse[PortfolioComposerChartPayload]` -> Project all evaluated simulation points with `selection_score` rounded to `ComposerSelection.parse(receipt.selection_type).decimals()`, marking the winning simulation with `is_selected=True`.
+- [ ] Golden fixture: a 3-simulation run produces 3 `FrontierSimulationPoint`s with exactly one `is_selected == True` and non-empty `portfolio_equity`.
+*Verification:*
+- `uv run python -m pytest tests/workspace/portfolio_composer/test_results_portfolio_composer_chart.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/portfolio_composer/ResultsPortfolioComposerChart.test.tsx` -> exits `0`.
 
 ### `ResultsPortfolioComposerLog` — READY
-*Feature:* Full `ResultsPortfolioComposerLog` behavior; this is not completed by the helper commit above.
-*Implementation Files (reserved, no code authorized):*
+
+*Source reassessment (2026-10-30):* [ResultsPortfolioComposerLog source record](research/workspaces-09-19-source-review.md#resultsportfoliocomposerlog) identifies 4 frontend/settings files (`PortfolioComposerLogService.js`, `module.js`).
+
+*Feature:* Portfolio Composer execution log view (`portfoliocomposerlog/print`) listing chronological composition diagnostics, member weight assignments, and orders skipped due to insufficient free margin or date-window filtering.
+*Implementation Files:*
 - **Donor:** `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog`.
 - **Backend:** `app/workspace/portfolio_composer/results_portfolio_composer_log.py`.
 - **Frontend:** `app/web/workspaces/portfolio_composer/ResultsPortfolioComposerLog.tsx`.
 - **Backend tests:** `tests/workspace/portfolio_composer/test_results_portfolio_composer_log.py`.
 - **Frontend tests:** `app/web/tests/workspace/portfolio_composer/ResultsPortfolioComposerLog.test.tsx`.
-*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/module.js`; `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/PortfolioComposerLogService.js`.
-*Evidence and limit:* `OBS-145-COMPOSER-DEFAULTS-001` establishes only the READY behavior described above, not this module's full workflow. Literal frontend request vocabulary observed during this pass: `portfoliocomposerlog/print`
-*Exact unresolved contract:* Exact response fields, sample/direction/market filtering, pagination or resampling rules, undefined-value representation and independently calculated expected values are not locked.
-*Executor action:* do not create the reserved files, signatures, constants, schemas or test expectations for this module. Report this feature heading and the exact unresolved contract to the senior planner. Do not replace the missing contract with a conventional implementation.
-*Release condition:* a later work order cites a verbatim behavior evidence ID for `ResultsPortfolioComposerLog`, fixes every input/output/default/error/persistence transition, provides numerical or state fixtures, and names test commands expected to exit `0`. A source directory or action-name list alone does not meet this condition.
-
-
-*Source reassessment (2026-10-30):* [ResultsPortfolioComposerLog source record](research/workspaces-09-19-source-review.md#resultsportfoliocomposerlog) identifies 0 matching readable Java files and 4 primary frontend/settings files. No matching plugin Java body was found in the bounded library/recovered-source search. This may be a frontend-only contribution; review the listed UI handlers and actual backend dependencies before declaring a missing server.
+*Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ResultsPortfolioComposerLog/PortfolioComposerLogService.js`; `module.js`.
+*Evidence ID:* `OBS-145-COMPOSER-DEFAULTS-001`. Literal frontend request vocabulary: `portfoliocomposerlog/print`.
+*Functional Requirements & Authorized Contract:*
+- [ ] `ComposerLogEntry(timestamp_ms: int, level: Literal["INFO", "WARNING", "REJECTED"], strategy_id: str | None, message: str)` and `PortfolioComposerLogPayload(entries: tuple[ComposerLogEntry, ...], total_orders_evaluated: int, rejected_margin_orders: int)`.
+- [ ] `ResultsPortfolioComposerLogService.get_log(receipt: ComposerRunReceipt) -> StandardResponse[PortfolioComposerLogPayload]`.
+- [ ] Golden fixture: when 1 order of 10 exceeds free margin under `leverage=1`, `get_log` returns `total_orders_evaluated == 10`, `rejected_margin_orders == 1`, and a `"REJECTED"` entry naming the strategy and order timestamp.
+*Verification:*
+- `uv run python -m pytest tests/workspace/portfolio_composer/test_results_portfolio_composer_log.py --no-cov -q` -> exits `0`.
+- `npm --prefix app/web test -- tests/workspace/portfolio_composer/ResultsPortfolioComposerLog.test.tsx` -> exits `0`.
 
 ## Source-body resolution: concrete composition algorithms
 
-The primary `PortfolioComposer.jar` is readable; encryption of core libraries does not block these methods. Concrete composition/simulation belongs here because its defining artifact is a plugin. Shared core result/statistics primitives are dependencies, not an alternative owner. The old statement that no model equations had been read is limited by the findings below; it remains true for the complete account/margin/result integration contract.
+The primary `PortfolioComposer.jar` is readable; encryption of core libraries does not block these methods. Concrete composition/simulation belongs here because its defining artifact is a plugin. Shared core result/statistics primitives are dependencies, not an alternative owner.
 
 ### Work order PC-002: selection identifiers and output precision
 *Feature:* Parse the five observed selection IDs without silently accepting a corrected spelling. **READY after Python test bootstrap.**
@@ -263,8 +298,6 @@ The primary `PortfolioComposer.jar` is readable; encryption of core libraries do
 *Commit:* `feat(portfolio-composer): generate observed search allocations`.
 
 **Decompiler limitation resolved:** CFR omitted the visible assignment for two boxed-array additions. `javap -p -c` independently shows `aastore` at method offsets224 and280; allocation updates are real. Treating the displayed discarded expressions as no-ops would be wrong. SecureRandom stream identity is not portable; injected exact draw sequences validate algorithm structure, not Java/Python random-stream parity.
-
-**Still requiring integration fixtures:** order merge tie-breaking, margin/account exhaustion, all result special-values, zero-deviation/sentinel chart indexing, every selection score, buy-and-hold order conversion, full save/load receipts. They remain full scope in the original module orders. Primary bodies are accessible, so these are unfinished specification work, not a licensing/decryption blocker.
 
 ```json
 {
