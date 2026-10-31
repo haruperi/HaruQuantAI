@@ -2,12 +2,27 @@
 
 from __future__ import annotations
 
+from app.workspace.algo_wizard.catalogue import WizardCatalogueService
+from app.workspace.algo_wizard.catalogue_models import (
+    CatalogueOptionItem,
+    CatalogueParameterBounds,
+    CommissionMethodDescriptor,
+    CommissionUnit,
+    GetBlockDescriptorRequest,
+    GetCatalogueRequest,
+    HSLBlockCatalogueEntry,
+    ListCommissionMethodsRequest,
+    SemanticNodeFamily,
+    StaticReturnType,
+    WizardConstantsBundle,
+)
 from app.workspace.algo_wizard.documents import (
     canonical_hsl_bytes,
     compute_document_hash,
     parse_hsl_document,
     upgrade_legacy_wizard_document,
 )
+from app.workspace.algo_wizard.library import WizardBlockLibrary
 from app.workspace.algo_wizard.models import (
     ActionNode,
     AlertActionNode,
@@ -35,6 +50,11 @@ from app.workspace.algo_wizard.models import (
     UniverseSpec,
     VariableSetActionNode,
     VariableSpec,
+)
+from app.workspace.algo_wizard.validation import (
+    StrategyValidator,
+    ValidationIssue,
+    ValidationReport,
 )
 from app.workspace.algo_wizard.value_models import (
     BreakevenSpec,
@@ -72,17 +92,25 @@ __all__ = [
     "ActionNode",
     "AlertActionNode",
     "BreakevenSpec",
+    "CatalogueOptionItem",
+    "CatalogueParameterBounds",
+    "CommissionMethodDescriptor",
+    "CommissionUnit",
     "ComparisonConditionNode",
     "ComparisonOperator",
     "ConditionNode",
     "EvaluationContext",
     "ExpressionNode",
     "FunctionExpressionNode",
+    "GetBlockDescriptorRequest",
+    "GetCatalogueRequest",
+    "HSLBlockCatalogueEntry",
     "HSLStrategyDocument",
     "HSLStrategyPayload",
     "IndicatorExpressionNode",
     "LifecycleEventSpec",
     "LifecycleEventType",
+    "ListCommissionMethodsRequest",
     "LogicalConditionNode",
     "MarketPriceNode",
     "MathExpressionNode",
@@ -106,10 +134,13 @@ __all__ = [
     "RuleNode",
     "ScalarLiteral",
     "ScalarValueType",
+    "SemanticNodeFamily",
     "StateConditionKind",
     "StateConditionNode",
+    "StaticReturnType",
     "StopLossSpec",
     "StopLossType",
+    "StrategyValidator",
     "TakeProfitSpec",
     "TakeProfitType",
     "TemporalConditionNode",
@@ -119,11 +150,16 @@ __all__ = [
     "TradingOptionsSpec",
     "TrailingStopSpec",
     "UniverseSpec",
+    "ValidationIssue",
+    "ValidationReport",
     "ValueLiteralNode",
     "ValueNode",
     "VariableRefNode",
     "VariableSetActionNode",
     "VariableSpec",
+    "WizardBlockLibrary",
+    "WizardCatalogueService",
+    "WizardConstantsBundle",
     "canonical_hsl_bytes",
     "compute_document_hash",
     "parse_hsl_document",
