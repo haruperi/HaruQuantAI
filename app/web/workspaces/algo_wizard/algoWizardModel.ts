@@ -297,3 +297,818 @@ export function downloadText(name: string, text: string) {
   anchor.click();
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
+
+
+// ============================================================================
+// HSL 1.0 Canonical AST, Catalogue, Lifecycle, Visual Block & Cloud Contracts
+// ============================================================================
+
+export type HSLNodeFamily =
+  | "VALUE"
+  | "EXPRESSION"
+  | "CONDITION"
+  | "ACTION"
+  | "RULE";
+
+export type HSLLifecycleEventType =
+  | "on_start"
+  | "on_stop"
+  | "on_timer"
+  | "on_tick"
+  | "on_bar_open"
+  | "on_bar_close"
+  | "on_order_submitted"
+  | "on_order_filled"
+  | "on_order_cancelled"
+  | "on_order_rejected"
+  | "on_position_opened"
+  | "on_position_closed"
+  | "on_session_open"
+  | "on_session_close";
+
+export interface HSLParameterSpec {
+  type: "int" | "float" | "bool" | "str";
+  default: number | boolean | string;
+  min?: number;
+  max?: number;
+  step?: number;
+  optimize: boolean;
+  description: string;
+}
+
+export interface HSLVariableSpec {
+  type: "int" | "float" | "bool" | "str";
+  initial: number | boolean | string;
+  scope: "strategy" | "session";
+}
+
+export interface HSLEvaluationContext {
+  symbol: string;
+  timeframe: string;
+  shift: number;
+}
+
+export type HSLComparisonOperator =
+  | "comparison.greater_than"
+  | "comparison.greater_or_equal"
+  | "comparison.less_than"
+  | "comparison.less_or_equal"
+  | "comparison.equal"
+  | "comparison.not_equal"
+  | "comparison.crosses_above"
+  | "comparison.crosses_below";
+
+export interface HSLOperandNode {
+  type:
+    | "value"
+    | "parameter"
+    | "variable"
+    | "market_price"
+    | "indicator"
+    | "math"
+    | "function"
+    | "position_attr";
+  value?: number | boolean | string;
+  name?: string;
+  field?: string;
+  indicator_id?: string;
+  operator?: string;
+  params?: Record<string, unknown>;
+  context?: HSLEvaluationContext;
+}
+
+export interface HSLConditionNode {
+  type: "logical" | "not" | "comparison" | "state" | "temporal";
+  operator?: "and" | "or" | HSLComparisonOperator;
+  conditions?: HSLConditionNode[];
+  condition?: HSLConditionNode;
+  left?: HSLOperandNode;
+  right?: HSLOperandNode;
+  state_id?: string;
+}
+
+export interface HSLActionNode {
+  type: "action";
+  action:
+    | "enter_market"
+    | "enter_pending"
+    | "exit_position"
+    | "modify_order"
+    | "cancel_order"
+    | "set_variable"
+    | "alert";
+  side?: "long" | "short";
+  name?: string;
+  message?: string;
+  value?: HSLOperandNode;
+}
+
+export interface HSLRuleNode {
+  id: string;
+  name: string;
+  priority: number;
+  enabled: boolean;
+  event: HSLLifecycleEventType;
+  when: HSLConditionNode;
+  then: HSLActionNode[];
+  else_actions: HSLActionNode[];
+}
+
+export interface HSLStrategyPayload {
+  id: string;
+  name: string;
+  description: string;
+  universe: {
+    symbols: string[];
+    primary_symbol: string;
+  };
+  timeframe: {
+    primary: string;
+    additional: string[];
+  };
+  parameters: Record<string, HSLParameterSpec>;
+  variables: Record<string, HSLVariableSpec>;
+  rules: HSLRuleNode[];
+}
+
+export interface HSLStrategyDocument {
+  schema_version: "1.0.0";
+  strategy_type: "single_asset" | "multi_asset";
+  document_hash?: string | null;
+  strategy: HSLStrategyPayload;
+}
+
+export interface CatalogueOptionItem {
+  key: string;
+  label: string;
+  description: string;
+}
+
+export interface CommissionMethodDescriptor {
+  method_id: string;
+  label: string;
+  unit: string;
+  default_value: number;
+}
+
+export interface HSLBlockParameterMeta {
+  key: string;
+  label: string;
+  value_type: string;
+  required: boolean;
+  default_value: number | boolean | string | null;
+  min_value?: number | null;
+  max_value?: number | null;
+  step?: number | null;
+}
+
+export interface HSLBlockCatalogueEntry {
+  semantic_id: string;
+  registry_block_id: string;
+  family: HSLNodeFamily;
+  category: string;
+  label: string;
+  return_type: string;
+  parameters: HSLBlockParameterMeta[];
+  allowed_children: string[];
+}
+
+export interface WizardConstantsBundle {
+  schema_version: string;
+  timeframes: CatalogueOptionItem[];
+  precisions: CatalogueOptionItem[];
+  lifecycle_events: CatalogueOptionItem[];
+  commission_methods: CommissionMethodDescriptor[];
+  blocks: HSLBlockCatalogueEntry[];
+}
+
+export interface ValidationIssue {
+  code: string;
+  message: string;
+  path: string;
+  node_id?: string | null;
+}
+
+export interface ValidationReport {
+  valid: boolean;
+  issues: ValidationIssue[];
+}
+
+export type StrategyRuntimeStatus = "IDLE" | "RUNNING" | "STOPPED" | "ERROR";
+
+export interface ManagedStrategyRecord {
+  strategy_id: string;
+  name: string;
+  status: StrategyRuntimeStatus;
+  revision: number;
+  document_hash: string;
+  document: HSLStrategyDocument;
+  validation: ValidationReport;
+  updated_at: string;
+}
+
+export interface CustomBlockDefinition {
+  block_id: string;
+  name: string;
+  category: "condition" | "expression" | "action";
+  description: string;
+  parameters: Record<string, HSLParameterSpec>;
+  condition?: HSLConditionNode | null;
+  expression?: HSLOperandNode | null;
+  action?: HSLActionNode | null;
+}
+
+export interface BlockGroupDefinition {
+  group_id: string;
+  name: string;
+  description: string;
+  block_ids: string[];
+}
+
+export interface ResourceCheckResult {
+  ready: boolean;
+  missing_symbols: string[];
+  missing_timeframes: string[];
+  missing_blocks: string[];
+}
+
+export interface WizardTradeLogEntry {
+  bar_index: number;
+  timestamp: string;
+  action: string;
+  side: string;
+  price: number;
+  quantity: number;
+}
+
+export interface WizardBacktestResult {
+  run_id: string;
+  strategy_id: string;
+  status: "COMPLETED" | "STOPPED" | "ERROR";
+  bars_processed: number;
+  orders_submitted: number;
+  ending_position: number;
+  net_pnl: number;
+  ending_equity: number;
+  trade_log: WizardTradeLogEntry[];
+}
+
+export interface WizardExampleSummary {
+  example_id: string;
+  name: string;
+  category: string;
+  description: string;
+  tags: string[];
+}
+
+export interface WizardExamplePayload {
+  summary: WizardExampleSummary;
+  document: HSLStrategyDocument;
+}
+
+export interface RetesterHandoffResult {
+  strategy_id: string;
+  name: string;
+  document_hash: string;
+  hsl_document: HSLStrategyDocument;
+  compiled_rule_count: number;
+  status: "READY";
+}
+
+export type CloudImportSource = "editor" | "file" | "databank" | "backtest_id";
+
+export type ExportTargetPlatform =
+  | "python"
+  | "mql4"
+  | "mql5"
+  | "easylanguage"
+  | "ninjatrader"
+  | "jforex"
+  | "pseudo_code"
+  | "hsl_json";
+
+export interface ExportTargetDescriptor {
+  platform: ExportTargetPlatform;
+  label: string;
+  extension: string;
+  description: string;
+}
+
+export interface CloudImportResult {
+  source: CloudImportSource;
+  document: HSLStrategyDocument;
+  validation: ValidationReport;
+}
+
+export interface ExportStrategyResult {
+  strategy_id: string;
+  target_platform: ExportTargetPlatform;
+  filename: string;
+  content: string;
+  sha256: string;
+}
+
+const COMPARISON_NEGATION_MAP: Record<
+  HSLComparisonOperator,
+  HSLComparisonOperator
+> = {
+  "comparison.greater_than": "comparison.less_or_equal",
+  "comparison.greater_or_equal": "comparison.less_than",
+  "comparison.less_than": "comparison.greater_or_equal",
+  "comparison.less_or_equal": "comparison.greater_than",
+  "comparison.equal": "comparison.not_equal",
+  "comparison.not_equal": "comparison.equal",
+  "comparison.crosses_above": "comparison.crosses_below",
+  "comparison.crosses_below": "comparison.crosses_above",
+};
+
+export function filterCatalogueBlocks(
+  blocks: readonly HSLBlockCatalogueEntry[],
+  family: HSLNodeFamily | "ALL",
+  query: string,
+): HSLBlockCatalogueEntry[] {
+  const normalizedQuery = query.trim().toLowerCase();
+  return blocks.filter((entry) => {
+    if (family !== "ALL" && entry.family !== family) {
+      return false;
+    }
+    if (!normalizedQuery) {
+      return true;
+    }
+    return (
+      entry.semantic_id.toLowerCase().includes(normalizedQuery) ||
+      entry.label.toLowerCase().includes(normalizedQuery) ||
+      entry.category.toLowerCase().includes(normalizedQuery) ||
+      entry.registry_block_id.toLowerCase().includes(normalizedQuery)
+    );
+  });
+}
+
+export function sortRulesByPriority(
+  rules: readonly HSLRuleNode[],
+): HSLRuleNode[] {
+  return [...rules].sort((left, right) => {
+    if (left.priority !== right.priority) {
+      return left.priority - right.priority;
+    }
+    return left.id.localeCompare(right.id);
+  });
+}
+
+export function negateHSLCondition(
+  condition: HSLConditionNode,
+  distributeLogical = false,
+): HSLConditionNode {
+  if (condition.type === "not" && condition.condition) {
+    return condition.condition;
+  }
+  if (
+    condition.type === "comparison" &&
+    condition.operator &&
+    condition.operator in COMPARISON_NEGATION_MAP
+  ) {
+    const inverted =
+      COMPARISON_NEGATION_MAP[condition.operator as HSLComparisonOperator];
+    return {
+      ...condition,
+      operator: inverted,
+    };
+  }
+  if (
+    distributeLogical &&
+    condition.type === "logical" &&
+    condition.conditions &&
+    (condition.operator === "and" || condition.operator === "or")
+  ) {
+    return {
+      type: "logical",
+      operator: condition.operator === "and" ? "or" : "and",
+      conditions: condition.conditions.map((item) =>
+        negateHSLCondition(item, true),
+      ),
+    };
+  }
+  return {
+    type: "not",
+    condition,
+  };
+}
+
+export const DEFAULT_WIZARD_CONSTANTS_BUNDLE: WizardConstantsBundle = {
+  schema_version: "1.0.0",
+  timeframes: [
+    { key: "M1", label: "1 Minute", description: "1-minute bars" },
+    { key: "M15", label: "15 Minutes", description: "15-minute bars" },
+    { key: "H1", label: "1 Hour", description: "Hourly bars" },
+    { key: "D1", label: "Daily", description: "Daily bars" },
+  ],
+  precisions: [
+    {
+      key: "selected_tf_only",
+      label: "Selected Timeframe Only",
+      description: "Fastest bar-open / bar-close simulation",
+    },
+    {
+      key: "m1_tick_simulation",
+      label: "1 Minute Data Tick Simulation",
+      description: "Intraday M1 bar interpolation",
+    },
+    {
+      key: "real_tick",
+      label: "Real Tick",
+      description: "Exact historical tick feed",
+    },
+  ],
+  lifecycle_events: [
+    {
+      key: "on_bar_open",
+      label: "On Bar Open",
+      description: "Triggered at bar open",
+    },
+    {
+      key: "on_bar_close",
+      label: "On Bar Close",
+      description: "Triggered at bar close",
+    },
+    {
+      key: "on_tick",
+      label: "On Tick",
+      description: "Triggered on every market tick",
+    },
+  ],
+  commission_methods: [
+    {
+      method_id: "percentage",
+      label: "Percentage Based",
+      unit: "%",
+      default_value: 0.01,
+    },
+    {
+      method_id: "fixed_per_lot",
+      label: "Size Based",
+      unit: "USD/lot",
+      default_value: 7.0,
+    },
+  ],
+  blocks: [
+    {
+      semantic_id: "market.close",
+      registry_block_id: "close",
+      family: "VALUE",
+      category: "market",
+      label: "Market Close",
+      return_type: "float",
+      parameters: [],
+      allowed_children: [],
+    },
+    {
+      semantic_id: "indicator.rsi",
+      registry_block_id: "rsi",
+      family: "EXPRESSION",
+      category: "indicator",
+      label: "Relative Strength Index (RSI)",
+      return_type: "float",
+      parameters: [
+        {
+          key: "period",
+          label: "Period",
+          value_type: "int",
+          required: true,
+          default_value: 14,
+          min_value: 2,
+          max_value: 200,
+          step: 1,
+        },
+      ],
+      allowed_children: ["VALUE"],
+    },
+    {
+      semantic_id: "comparison.crosses_above",
+      registry_block_id: "cross_over",
+      family: "CONDITION",
+      category: "comparison",
+      label: "Crosses Above",
+      return_type: "bool",
+      parameters: [],
+      allowed_children: ["VALUE", "EXPRESSION"],
+    },
+    {
+      semantic_id: "order.enter_market",
+      registry_block_id: "buy",
+      family: "ACTION",
+      category: "order",
+      label: "Enter At Market",
+      return_type: "action",
+      parameters: [],
+      allowed_children: ["VALUE", "EXPRESSION"],
+    },
+    {
+      semantic_id: "rule.if_then",
+      registry_block_id: "if_then",
+      family: "RULE",
+      category: "rule",
+      label: "If-Then Rule",
+      return_type: "rule",
+      parameters: [],
+      allowed_children: ["CONDITION", "ACTION"],
+    },
+  ],
+};
+
+export const DEFAULT_HSL_STRATEGY_DOCUMENT: HSLStrategyDocument = {
+  schema_version: "1.0.0",
+  strategy_type: "single_asset",
+  document_hash: "hsl-sha256-default",
+  strategy: {
+    id: "hsl_ema_crossover_v1",
+    name: "EMA Crossover Strategy",
+    description: "Canonical HSL 1.0 EMA crossover with RSI filter",
+    universe: {
+      symbols: ["EURUSD"],
+      primary_symbol: "EURUSD",
+    },
+    timeframe: {
+      primary: "H1",
+      additional: ["D1"],
+    },
+    parameters: {
+      fast_period: {
+        type: "int",
+        default: 12,
+        min: 2,
+        max: 100,
+        step: 1,
+        optimize: true,
+        description: "Fast EMA period",
+      },
+      slow_period: {
+        type: "int",
+        default: 26,
+        min: 5,
+        max: 200,
+        step: 1,
+        optimize: true,
+        description: "Slow EMA period",
+      },
+    },
+    variables: {
+      entry_count: {
+        type: "int",
+        initial: 0,
+        scope: "strategy",
+      },
+      session_active: {
+        type: "bool",
+        initial: true,
+        scope: "session",
+      },
+    },
+    rules: [
+      {
+        id: "rule_long_entry",
+        name: "Long Entry on Fast EMA Crosses Above Slow EMA",
+        priority: 10,
+        enabled: true,
+        event: "on_bar_open",
+        when: {
+          type: "comparison",
+          operator: "comparison.crosses_above",
+          left: {
+            type: "indicator",
+            indicator_id: "indicator.ema",
+            params: { period: { type: "parameter", name: "fast_period" } },
+            context: {
+              symbol: "$current_symbol",
+              timeframe: "$current_timeframe",
+              shift: 1,
+            },
+          },
+          right: {
+            type: "indicator",
+            indicator_id: "indicator.ema",
+            params: { period: { type: "parameter", name: "slow_period" } },
+            context: {
+              symbol: "$current_symbol",
+              timeframe: "$current_timeframe",
+              shift: 1,
+            },
+          },
+        },
+        then: [{ type: "action", action: "enter_market", side: "long" }],
+        else_actions: [],
+      },
+      {
+        id: "rule_short_exit",
+        name: "Exit Position on Opposite Signal",
+        priority: 20,
+        enabled: true,
+        event: "on_bar_close",
+        when: {
+          type: "comparison",
+          operator: "comparison.greater_than",
+          left: {
+            type: "indicator",
+            indicator_id: "indicator.rsi",
+            params: { period: { type: "value", value: 14 } },
+            context: {
+              symbol: "$current_symbol",
+              timeframe: "$current_timeframe",
+              shift: 1,
+            },
+          },
+          right: { type: "value", value: 70 },
+        },
+        then: [{ type: "action", action: "exit_position", side: "long" }],
+        else_actions: [],
+      },
+    ],
+  },
+};
+
+export const DEFAULT_WIZARD_EXAMPLES: WizardExampleSummary[] = [
+  {
+    example_id: "ema_crossover",
+    name: "EMA Crossover",
+    category: "Trend Following",
+    description: "Dual EMA crossover entry with ATR stop loss and take profit.",
+    tags: ["ema", "trend", "crossover"],
+  },
+  {
+    example_id: "rsi_mean_reversion",
+    name: "RSI Mean Reversion",
+    category: "Mean Reversion",
+    description: "Oversold/overbought RSI reversal strategy.",
+    tags: ["rsi", "oscillator", "mean-reversion"],
+  },
+  {
+    example_id: "atr_breakout",
+    name: "ATR Volatility Breakout",
+    category: "Breakout",
+    description: "Channel breakout scaled by Average True Range.",
+    tags: ["atr", "breakout", "volatility"],
+  },
+  {
+    example_id: "mtf_trend_filter",
+    name: "Multi-Timeframe Trend Filter",
+    category: "Multi-Timeframe",
+    description: "Higher timeframe D1 EMA trend filter with H1 pullback entry.",
+    tags: ["mtf", "d1", "h1"],
+  },
+];
+
+export const DEFAULT_EXPORT_TARGETS: ExportTargetDescriptor[] = [
+  {
+    platform: "python",
+    label: "HaruQuant Python",
+    extension: ".py",
+    description: "Native HaruQuant Python strategy module",
+  },
+  {
+    platform: "mql4",
+    label: "MetaTrader 4 (MQL4)",
+    extension: ".mq4",
+    description: "MetaTrader 4 Expert Advisor source code",
+  },
+  {
+    platform: "mql5",
+    label: "MetaTrader 5 (MQL5)",
+    extension: ".mq5",
+    description: "MetaTrader 5 Expert Advisor source code",
+  },
+  {
+    platform: "easylanguage",
+    label: "TradeStation EasyLanguage",
+    extension: ".eld",
+    description: "TradeStation / MultiCharts EasyLanguage strategy",
+  },
+  {
+    platform: "ninjatrader",
+    label: "NinjaTrader 8 (C#)",
+    extension: ".cs",
+    description: "NinjaScript C# strategy class",
+  },
+  {
+    platform: "jforex",
+    label: "Dukascopy JForex (Java)",
+    extension: ".java",
+    description: "JForex IStrategy Java implementation",
+  },
+  {
+    platform: "pseudo_code",
+    label: "Human-Readable PseudoCode",
+    extension: ".txt",
+    description: "Structured English specification of strategy rules",
+  },
+  {
+    platform: "hsl_json",
+    label: "Canonical HSL 1.0 JSON",
+    extension: ".json",
+    description: "Deterministic HSL 1.0 JSON strategy document",
+  },
+];
+
+export interface AlgoWizardApiClientOptions {
+  fetchFn?: typeof fetch;
+  baseUrl?: string;
+}
+
+export function createAlgoWizardApiClient(
+  options: AlgoWizardApiClientOptions = {},
+) {
+  const fetchFn = options.fetchFn ?? fetch;
+  const baseUrl = (options.baseUrl ?? "").replace(/\/$/, "");
+
+  async function postJson<T>(path: string, body: unknown): Promise<T> {
+    const response = await fetchFn(`${baseUrl}${path}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(body),
+    });
+    const payload = (await response.json()) as { data: T };
+    return payload.data;
+  }
+
+  async function getJson<T>(path: string): Promise<T> {
+    const response = await fetchFn(`${baseUrl}${path}`, {
+      method: "GET",
+    });
+    const payload = (await response.json()) as { data: T };
+    return payload.data;
+  }
+
+  return {
+    getConstantsBundle(requestId = "req-constants-all") {
+      return postJson<WizardConstantsBundle>("/constants/getAll", {
+        request_id: requestId,
+      });
+    },
+    listExamples() {
+      return getJson<WizardExampleSummary[]>(
+        "/AlgoWizard/examples/examples.json",
+      );
+    },
+    loadExample(exampleId: string, requestId = "req-load-example") {
+      return postJson<WizardExamplePayload>("/algowizard/loadExample", {
+        request_id: requestId,
+        example_id: exampleId,
+      });
+    },
+    saveToRetester(
+      document: HSLStrategyDocument,
+      requestId = "req-save-retester",
+    ) {
+      return postJson<RetesterHandoffResult>("/algowizard/saveToRetester", {
+        request_id: requestId,
+        document,
+      });
+    },
+    startStrategy(strategyId: string, requestId = "req-strategy-start") {
+      return postJson<ManagedStrategyRecord>("/strategy/start", {
+        request_id: requestId,
+        strategy_id: strategyId,
+      });
+    },
+    stopStrategy(strategyId: string, requestId = "req-strategy-stop") {
+      return postJson<ManagedStrategyRecord>("/strategy/stop", {
+        request_id: requestId,
+        strategy_id: strategyId,
+      });
+    },
+    removeStrategy(strategyId: string, requestId = "req-strategy-remove") {
+      return postJson<{ strategy_id: string; removed: boolean }>(
+        "/strategy/remove",
+        {
+          request_id: requestId,
+          strategy_id: strategyId,
+        },
+      );
+    },
+    importCloudStrategy(
+      request: {
+        source: CloudImportSource;
+        document?: HSLStrategyDocument;
+        file_id?: string;
+        databank_name?: string;
+        strategy_name?: string;
+        backtest_id?: string;
+      },
+      requestId = "req-cloud-import",
+    ) {
+      return postJson<CloudImportResult>("/algocloud/import", {
+        request_id: requestId,
+        ...request,
+      });
+    },
+    exportCloudStrategy(
+      document: HSLStrategyDocument,
+      targetPlatform: ExportTargetPlatform,
+      requestId = "req-cloud-export",
+    ) {
+      return postJson<ExportStrategyResult>("/algocloud/export", {
+        request_id: requestId,
+        document,
+        target_platform: targetPlatform,
+      });
+    },
+  };
+}
