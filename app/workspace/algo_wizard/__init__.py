@@ -16,6 +16,7 @@ from app.workspace.algo_wizard.catalogue_models import (
     StaticReturnType,
     WizardConstantsBundle,
 )
+from app.workspace.algo_wizard.compiler import BarEvent, StrategyCompiler
 from app.workspace.algo_wizard.documents import (
     canonical_hsl_bytes,
     compute_document_hash,
@@ -91,6 +92,7 @@ from app.workspace.algo_wizard.value_models import (
 __all__ = [
     "ActionNode",
     "AlertActionNode",
+    "BarEvent",
     "BreakevenSpec",
     "CatalogueOptionItem",
     "CatalogueParameterBounds",
@@ -140,6 +142,7 @@ __all__ = [
     "StaticReturnType",
     "StopLossSpec",
     "StopLossType",
+    "StrategyCompiler",
     "StrategyValidator",
     "TakeProfitSpec",
     "TakeProfitType",
