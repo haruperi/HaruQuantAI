@@ -22,6 +22,8 @@ Key Capabilities:
       HSL block catalogue bundle, block descriptors, and commission methods.
     - FR-wizard-http-routes-strategy: Exposes /strategy/* endpoints for strategy
       registration, retrieval, listing, start, stop, status, and removal.
+    - FR-wizard-http-routes-algocloud: Exposes /algocloud/* endpoints for
+      strategy import, target platform discovery, and multi-target code export.
 
 Python API Usage:
     from app.workspace.algo_wizard.routes import create_wizard_router
@@ -47,6 +49,12 @@ from app.workspace.algo_wizard.catalogue_models import (
     GetBlockDescriptorRequest,
     GetCatalogueRequest,
     ListCommissionMethodsRequest,
+)
+from app.workspace.algo_wizard.cloud_export import CloudExportService
+from app.workspace.algo_wizard.cloud_export_models import (
+    CloudImportRequest,
+    ExportStrategyRequest,
+    ListExportTargetsRequest,
 )
 from app.workspace.algo_wizard.strategies import StrategyDocumentService
 from app.workspace.algo_wizard.strategies_models import (
@@ -333,12 +341,37 @@ def _register_strategy_routes(
         return _invoke_route(lambda: strategy_svc.remove_strategy(request))
 
 
+def _register_cloud_export_routes(
+    router: APIRouter,
+    cloud_svc: CloudExportService,
+) -> None:
+    """Mount /algocloud/* endpoints on CloudExportService."""
+
+    @router.post("/algocloud/targets")
+    def list_export_targets(
+        request: ListExportTargetsRequest | None = None,
+    ) -> dict[str, Any]:
+        logger.debug("FR-wizard-http-routes-algocloud: POST /algocloud/targets")
+        return _invoke_route(lambda: cloud_svc.list_export_targets(request))
+
+    @router.post("/algocloud/import")
+    def import_strategy(request: CloudImportRequest) -> dict[str, Any]:
+        logger.debug("FR-wizard-http-routes-algocloud: POST /algocloud/import")
+        return _invoke_route(lambda: cloud_svc.import_strategy(request))
+
+    @router.post("/algocloud/export")
+    def export_strategy(request: ExportStrategyRequest) -> dict[str, Any]:
+        logger.debug("FR-wizard-http-routes-algocloud: POST /algocloud/export")
+        return _invoke_route(lambda: cloud_svc.export_strategy(request))
+
+
 def create_wizard_router(
     *,
     wizard_service: WizardService | None = None,
     catalogue_service: WizardCatalogueService | None = None,
     strategy_service: StrategyDocumentService | None = None,
     visual_block_service: VisualBlockService | None = None,
+    cloud_export_service: CloudExportService | None = None,
 ) -> APIRouter:
     """Create a FastAPI APIRouter for /algowizard/*, /constants/*, and /strategy/*."""
     svc = wizard_service or WizardService(
@@ -349,6 +382,12 @@ def create_wizard_router(
     cat_svc = catalogue_service or svc.catalogue_service
     strat_svc = strategy_service or svc.strategy_service
     vis_svc = visual_block_service or svc.visual_block_service
+    cloud_svc = cloud_export_service or CloudExportService(
+        validator=svc.validator,
+        compiler=svc.compiler,
+        wizard_service=svc,
+        strategy_service=strat_svc,
+    )
 
     router = APIRouter(tags=["algo_wizard"])
     _register_wizard_workspace_routes(router, svc)
@@ -356,6 +395,7 @@ def create_wizard_router(
     _register_visual_simulation_routes(router, vis_svc)
     _register_constants_routes(router, cat_svc)
     _register_strategy_routes(router, strat_svc)
+    _register_cloud_export_routes(router, cloud_svc)
 
     logger.info(
         "FR-wizard-http-routes-algowizard: mounted %d AlgoWizard routes",
