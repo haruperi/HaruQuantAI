@@ -52,6 +52,7 @@ from app.workspace.algo_wizard.models import (
     VariableSetActionNode,
     VariableSpec,
 )
+from app.workspace.algo_wizard.routes import create_wizard_router, wizard_router
 from app.workspace.algo_wizard.strategies import StrategyDocumentService
 from app.workspace.algo_wizard.strategies_models import (
     AddStrategyRequest,
@@ -127,6 +128,18 @@ from app.workspace.algo_wizard.visual_blocks_models import (
     WizardConfigResult,
     WizardTradeLogEntry,
 )
+from app.workspace.algo_wizard.workspace import WizardService
+from app.workspace.algo_wizard.workspace_models import (
+    ListWizardExamplesRequest,
+    LoadStrategyFileRequest,
+    LoadWizardExampleRequest,
+    RetesterHandoffResult,
+    SavedStrategyFileResult,
+    SaveStrategyFileRequest,
+    SaveToRetesterRequest,
+    WizardExamplePayload,
+    WizardExampleSummary,
+)
 
 __all__ = [
     "ActionNode",
@@ -161,8 +174,11 @@ __all__ = [
     "LifecycleEventType",
     "ListCommissionMethodsRequest",
     "ListStrategiesRequest",
+    "ListWizardExamplesRequest",
     "LoadBlockGroupsRequest",
     "LoadCustomBlocksRequest",
+    "LoadStrategyFileRequest",
+    "LoadWizardExampleRequest",
     "LogicalConditionNode",
     "ManagedStrategyRecord",
     "MarketPriceNode",
@@ -189,10 +205,14 @@ __all__ = [
     "RemoveStrategyRequest",
     "RemoveStrategyResult",
     "ResourceCheckResult",
+    "RetesterHandoffResult",
     "RiskManagementSpec",
     "RuleNode",
     "SaveBlockGroupsRequest",
     "SaveCustomBlocksRequest",
+    "SaveStrategyFileRequest",
+    "SaveToRetesterRequest",
+    "SavedStrategyFileResult",
     "ScalarLiteral",
     "ScalarValueType",
     "SemanticNodeFamily",
@@ -236,9 +256,14 @@ __all__ = [
     "WizardCatalogueService",
     "WizardConfigResult",
     "WizardConstantsBundle",
+    "WizardExamplePayload",
+    "WizardExampleSummary",
+    "WizardService",
     "WizardTradeLogEntry",
     "canonical_hsl_bytes",
     "compute_document_hash",
+    "create_wizard_router",
     "parse_hsl_document",
     "upgrade_legacy_wizard_document",
+    "wizard_router",
 ]
