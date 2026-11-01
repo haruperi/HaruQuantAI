@@ -1452,3 +1452,29 @@
 .root :global(.cq-layout-sync-row button[role='switch'][aria-checked='true'] span) {
   transform: translateX(18px);
 }
+
+
+.root :global(.cq-chart-splitter) {
+  position: absolute;
+  z-index: 7;
+  touch-action: none;
+  background: transparent;
+  user-select: none;
+}
+.root :global(.cq-chart-splitter-vertical) {
+  width: 9px;
+  transform: translateX(-50%);
+  cursor: col-resize;
+}
+.root :global(.cq-chart-splitter-horizontal) {
+  height: 9px;
+  transform: translateY(-50%);
+  cursor: row-resize;
+}
+.root :global(.cq-chart-splitter:hover),
+.root :global(.cq-chart-splitter:active) {
+  background: #2962ff88;
+}
+.root :global(.cq-chart-splitter:focus-visible) {
+  outline: 2px solid #2962ff;
+}
