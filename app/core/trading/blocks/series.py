@@ -13,7 +13,7 @@ import numpy as np
 from app.core.data.contracts import DataframeSeries
 
 if TYPE_CHECKING:
-    from app.include.blocks.price import BarPrice
+    from app.extend.blocks.price import BarPrice
 
 IndicatorSeries = DataframeSeries
 COMPUTED_PRICE_INPUTS = (
@@ -113,7 +113,7 @@ class BarData:
                 raise ValueError(
                     f"Input '{name}' must be a one-dimensional aligned series"
                 )
-        from app.include.blocks.price import BarPrice
+        from app.extend.blocks.price import BarPrice
 
         prices = BarPrice(
             **{

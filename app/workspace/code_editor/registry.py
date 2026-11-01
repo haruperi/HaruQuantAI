@@ -41,11 +41,11 @@ from types import ModuleType
 from typing import Protocol, cast
 
 from app.core.lib.errors import JSONValue, copy_json
-from app.extend.what_if.base import BaseWhatIf as _ExtendBaseWhatIf
-from app.include.blocks.indicators.base import BaseIndicator
-from app.include.blocks.money_management.base import (
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.money_management.base import (
     BasePositionSizer as _BasePositionSizer,
 )
+from app.extend.what_if.base import BaseWhatIf as _ExtendBaseWhatIf
 from app.include.metrics.base import BaseMetric as _BaseMetric
 from app.include.what_if.base import BaseWhatIf as _IncludeBaseWhatIf
 from app.workspace.code_editor._common import CodeEditorError

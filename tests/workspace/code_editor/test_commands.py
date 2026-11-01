@@ -12,7 +12,7 @@ from app.core.host.resources import ResourceMonitor
 from app.core.jobs.manager import JobManager
 from app.main import create_app
 from app.workspace.code_editor import catalogue
-from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR, PROJECT_ROOT
+from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 from app.workspace.code_editor._storage import StateStore
 from app.workspace.code_editor.command_models import (
     CompilationRequest,
@@ -475,7 +475,7 @@ def test_indicator_catalogue_disambiguates_multiple_classes_in_one_file():
     from app.workspace.code_editor._indicator_resolver import resolve_indicator
 
     with tempfile.TemporaryDirectory(
-        dir=INCLUDE_DIR / "blocks/indicators", prefix="catalogue_"
+        dir=EXTEND_DIR / "blocks/indicators", prefix="catalogue_"
     ) as name:
         path = Path(name) / "multiple.py"
         path.write_text(

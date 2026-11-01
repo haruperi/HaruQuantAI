@@ -22,7 +22,7 @@ import inspect
 import logging
 from pathlib import Path
 
-from app.include.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.indicators.base import BaseIndicator
 from app.workspace.code_editor._common import (
     EXTEND_DIR,
     INCLUDE_DIR,
@@ -68,7 +68,7 @@ def _safe_indicator_path(path: Path) -> Path:
                         return resolved
                     raise CodeEditorError(f"Indicator file not found: {path}")
         raise CodeEditorError(
-            "Choose a public Python file in app/include/blocks/indicators"
+            "Choose a public Python file in app/extend/blocks/indicators"
         )
 
     # Relative path without leading app/

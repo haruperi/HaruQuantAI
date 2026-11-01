@@ -16,8 +16,8 @@ from zoneinfo import ZoneInfo
 import numpy as np
 
 from app.core.trading.blocks.series import BarData, IndicatorSeries
-from app.include.blocks.indicators.volume.tpo_profile import TPOProfile
-from app.include.blocks.indicators.volume.volume_profile import VolumeProfile
+from app.extend.blocks.indicators.volume.tpo_profile import TPOProfile
+from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
 
 
 def resolve_decision_price(

@@ -39,9 +39,9 @@ def _gen_indicator(name: str) -> str:
 
 from typing import ClassVar, override
 from pydantic import Field
-from app.include.blocks.indicators.base import BaseIndicator
-from app.include.blocks.metadata import BlockSpec, InputPort, OutputPort
-from app.include.blocks.series import BarData, IndicatorSeries
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.metadata import BlockSpec, InputPort, OutputPort
+from app.extend.blocks.series import BarData, IndicatorSeries
 from app.include.calculators.average import sma_kernel
 
 
@@ -77,8 +77,8 @@ Evaluates entry or exit conditions across indicator and price series.
 """
 
 from dataclasses import dataclass
-from app.include.blocks.price import BarPrice
-from app.include.blocks.series import IndicatorSeries
+from app.extend.blocks.price import BarPrice
+from app.extend.blocks.series import IndicatorSeries
 
 
 @dataclass
@@ -215,7 +215,7 @@ Calculates trade order size (lots/contracts) based on risk parameters.
 """
 
 from dataclasses import dataclass
-from app.include.blocks.money_management.base import BasePositionSizer
+from app.extend.blocks.money_management.base import BasePositionSizer
 
 
 @dataclass

@@ -626,7 +626,7 @@ class BlockRegistry:
     ) -> int:
         """Discovers blocks and registers them within an atomic staging transaction."""
         if root_dir is None:
-            candidate = Path.cwd() / "app" / "include" / "blocks"
+            candidate = Path.cwd() / "app" / "extend" / "blocks"
             if candidate.is_dir():
                 dir_path = candidate.resolve()
             else:

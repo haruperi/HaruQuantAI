@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 from app.include.blocks.indicators.base import BaseIndicator
-from app.workspace.code_editor._common import INCLUDE_DIR, CodeEditorError
+from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR, CodeEditorError
 from app.workspace.code_editor.indicator_tester import IndicatorTester
 from app.workspace.code_editor.registry import registry, unresolved_symbols
 from app.workspace.code_editor.routes import CodeEditor
@@ -15,7 +15,7 @@ from app.workspace.code_editor.templates import render_template
 @pytest.fixture
 def indicator_folder():
     with TemporaryDirectory(
-        dir=INCLUDE_DIR / "blocks/indicators/custom", prefix="regression_"
+        dir=EXTEND_DIR / "blocks/indicators/custom", prefix="regression_"
     ) as folder:
         yield Path(folder)
 
@@ -40,7 +40,7 @@ def test_direct_path_ignores_imported_indicator_dependencies():
 
 
 def test_builtin_resolution_uses_current_compiled_buffer():
-    path = INCLUDE_DIR / "blocks/indicators/trend/sma.py"
+    path = EXTEND_DIR / "blocks/indicators/trend/sma.py"
     source = (
         "from typing import ClassVar\n"
         "from app.include.blocks.indicators.base import BaseIndicator\n"
@@ -102,7 +102,7 @@ def test_compile_all_accepts_the_real_unified_library():
     failures = [item for item in result["results"] if not item["success"]]
     assert not failures, failures
     assert result["total_files"] >= 45
-    assert not registry.blocks.get(str(INCLUDE_DIR / "blocks/indicators/base.py"))
+    assert not registry.blocks.get(str(EXTEND_DIR / "blocks/indicators/base.py"))
 
 
 def test_dynamic_modules_keep_relative_import_context():

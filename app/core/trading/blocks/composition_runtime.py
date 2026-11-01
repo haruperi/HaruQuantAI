@@ -16,12 +16,12 @@ from app.core.trading.blocks.series import (
     BarData,
     computed_price,
 )
-from app.include.blocks.comparisons.equals import equals
-from app.include.blocks.comparisons.is_greater import is_greater
-from app.include.blocks.comparisons.is_greater_or_equal import is_greater_or_equal
-from app.include.blocks.comparisons.is_lower import is_lower
-from app.include.blocks.comparisons.is_lower_or_equal import is_lower_or_equal
-from app.include.blocks.comparisons.not_equals import not_equals
+from app.extend.blocks.comparisons.equals import equals
+from app.extend.blocks.comparisons.is_greater import is_greater
+from app.extend.blocks.comparisons.is_greater_or_equal import is_greater_or_equal
+from app.extend.blocks.comparisons.is_lower import is_lower
+from app.extend.blocks.comparisons.is_lower_or_equal import is_lower_or_equal
+from app.extend.blocks.comparisons.not_equals import not_equals
 
 _COMPARISONS: Mapping[str, Callable[..., Any]] = MappingProxyType(
     {

@@ -35,8 +35,8 @@ from pydantic import ValidationError
 
 from app.core.jobs.manager import JobCancelledError, JobContext, JobManager
 from app.core.lib.responses import ErrorCode
-from app.include.blocks.indicators.base import BaseIndicator
-from app.include.blocks.price import BarPrice
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.price import BarPrice
 from app.workspace.code_editor._common import PROJECT_ROOT, CodeEditorError
 from app.workspace.code_editor._indicator_data import (
     calculate_indicator,

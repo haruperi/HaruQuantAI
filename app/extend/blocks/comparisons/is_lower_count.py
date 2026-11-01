@@ -1,0 +1,69 @@
+"""Is Lower Count condition persistence strategy block."""
+
+from __future__ import annotations
+
+import math
+from typing import Any
+
+from app.extend.blocks.base import block
+from app.extend.blocks.comparisons._common import (
+    DEFAULT_COUNT_PRECISION,
+    _pair,
+)
+from app.extend.blocks.metadata import (
+    BlockSpec,
+    ChartPane,
+    ExecutionKind,
+    InputPort,
+    OutputPort,
+    PortType,
+)
+
+is_lower_count_spec = BlockSpec(
+    id="condition.is_lower_count",
+    version="1.0.0",
+    name="Is Lower Count",
+    description="Evaluates whether left < right remains true across a window of bars",
+    category="comparisons",
+    tags=("condition", "comparison", "count", "lower_count"),
+    execution_kind=ExecutionKind.CONDITION,
+    chart_pane=ChartPane.MAIN,
+    inputs=(
+        InputPort("left", PortType.ANY, "Left operand"),
+        InputPort("right", PortType.ANY, "Right operand"),
+        InputPort("bars", PortType.NUMBER, "Number of lookback bars"),
+        InputPort("not_strict", PortType.BOOLEAN, "Allow equal values"),
+    ),
+    outputs=(OutputPort("condition", PortType.BOOLEAN, "True if condition persisted"),),
+    is_generation_eligible=True,
+    is_deterministic=True,
+    is_causal=True,
+)
+
+
+@block(is_lower_count_spec)
+def is_lower_count(
+    left: Any,
+    right: Any,
+    bars: int = 2,
+    *,
+    shift: int = 0,
+    not_strict: bool = False,
+    precision: int = DEFAULT_COUNT_PRECISION,
+) -> bool:
+    """Evaluate whether left < right remains true across a window of bars."""
+    if bars < 1:
+        return False
+    at_least_once = False
+    for i in range(bars):
+        l_val, r_val = _pair(left, right, shift + i, precision)
+        if math.isnan(l_val) or math.isnan(r_val) or l_val > r_val:
+            return False
+        if l_val == r_val and not not_strict:
+            return False
+        if l_val < r_val:
+            at_least_once = True
+    return at_least_once
+
+
+__all__ = ["is_lower_count", "is_lower_count_spec"]

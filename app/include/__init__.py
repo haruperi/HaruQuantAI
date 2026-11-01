@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from app.include.blocks.actions import ActionRecord, Actions
-from app.include.blocks.bar_time import (
+from app.extend.blocks.actions import ActionRecord, Actions
+from app.extend.blocks.bar_time import (
     BarTime,
     DateTime,
     TimeConditions,
     format_timestamp,
     normalize_timestamps,
 )
-from app.include.blocks.comparisons import (
+from app.extend.blocks.comparisons import (
     Comparisons,
     MAType,
     changes_down,
@@ -18,15 +18,15 @@ from app.include.blocks.comparisons import (
     crosses_above,
     is_greater,
 )
-from app.include.blocks.functions import Functions, convert_price_to_pips
-from app.include.blocks.functions.plus import plus
-from app.include.blocks.price import (
+from app.extend.blocks.functions import Functions, convert_price_to_pips
+from app.extend.blocks.functions.plus import plus
+from app.extend.blocks.price import (
     BarPrice,
     MTFPrice,
     QuotePrice,
     SessionPrice,
 )
-from app.include.blocks.types import BooleanConstant, NumberConstant, Types, Variable
+from app.extend.blocks.types import BooleanConstant, NumberConstant, Types, Variable
 from app.include.calculators import (
     AbstractCalculator,
     AverageCalculator,

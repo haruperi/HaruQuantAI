@@ -33,8 +33,8 @@ from dataclasses import dataclass, field
 import numpy as np
 
 from app.core.lib.errors import JSONValue
-from app.include.blocks.indicators.base import BaseIndicator
-from app.include.blocks.price import BarPrice
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.price import BarPrice
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._indicator_data import (
     calculate_indicator,

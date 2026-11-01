@@ -45,7 +45,7 @@ from app.core.enums import (
     TradeRetcode,
 )
 from app.core.host.logging import get_logger
-from app.include.blocks.order.types import normalize_price
+from app.extend.blocks.order.types import normalize_price
 
 from .base import (
     TradingClass,

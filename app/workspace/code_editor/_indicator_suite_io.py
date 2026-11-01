@@ -28,7 +28,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 
 from app.core.lib.errors import JSONValue
-from app.include.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.indicators.base import BaseIndicator
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._indicator_data import indicator_defaults
 from app.workspace.code_editor.command_models import (

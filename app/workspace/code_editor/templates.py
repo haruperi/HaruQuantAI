@@ -309,7 +309,7 @@ def render_template(
         class_name = _to_pascal_case(name)
         content += f'''
 from {candidates[0].module} import {cls.__name__} as SourceIndicator
-from app.include.blocks.series import BarData
+from app.extend.blocks.series import BarData
 
 
 def evaluate_indicator(bars: BarData, bar_idx: int, threshold: float = 0.0) -> bool:

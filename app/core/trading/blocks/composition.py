@@ -49,14 +49,14 @@ def _parsed_manifest(text: str) -> Mapping[str, Any]:
 def composition_manifest() -> Mapping[str, Any]:
     """Read content-addressed metadata; reloading sources sees current recipes."""
     try:
-        ref = importlib.resources.files("app.include.blocks.indicators").joinpath(
+        ref = importlib.resources.files("app.extend.blocks.indicators").joinpath(
             "donor_compositions.json"
         )
         text = ref.read_text(encoding="utf-8")
     except FileNotFoundError, ModuleNotFoundError, OSError:
         path = (
             Path(__file__).resolve().parent.parent.parent.parent
-            / "include"
+            / "extend"
             / "blocks"
             / "indicators"
             / "donor_compositions.json"
