@@ -1,3 +1,4 @@
+import { defaultCurvePoints } from '../../../workspaces/chart/src/tools/shapeTools';
 import { defaultPositionPoints } from '../../../workspaces/chart/src/tools/forecasting';
 import { anchoredVWAP, volumeBins } from '../../../workspaces/chart/src/tools/volumeTools';
 import {
@@ -562,4 +563,90 @@ it('one-click position defaults mirror a one-percent stop and equal target', () 
   expect(
     defaultPositionPoints({ time: 1000, price: 100 }, true, 10).map((point) => point.price),
   ).toEqual([100, 101, 99, 100]);
+});
+
+it('rotated rectangles retain perpendicular adjacent edges and their original first edge', () => {
+  const shape = tools.RotatedRectangle.build(drawing('RotatedRectangle'), projection)[0];
+  if (shape.kind !== 'path') throw new Error('Expected rectangle');
+  const [a, b, c] = shape.points;
+  expect(a).toEqual({ x: 0, y: 10 });
+  expect(b).toEqual({ x: 10, y: 20 });
+  expect((b.x - a.x) * (c.x - b.x) + (b.y - a.y) * (c.y - b.y)).toBeCloseTo(0);
+});
+it('paths have an arrowhead while polylines stay open, and marks are single-anchor tools', () => {
+  expect(tools.PathTool.build(drawing('PathTool'), projection)).toHaveLength(2);
+  const polyline = tools.Polyline.build(drawing('Polyline'), projection);
+  expect(polyline).toHaveLength(1);
+  if (polyline[0].kind !== 'path') throw new Error('Expected polyline');
+  expect(polyline[0].closed).toBe(false);
+  expect(tools.ArrowMarkUp.anchors).toBe(1);
+  expect(tools.ArrowMarkDown.anchors).toBe(1);
+});
+it('highlighter produces a broad translucent rounded stroke and hit tests its width', () => {
+  const shape = tools.Highlighter.build(
+    drawing('Highlighter', [
+      { time: 0, price: 10 },
+      { time: 100, price: 10 },
+    ]),
+    projection,
+  )[0];
+  expect(shape).toMatchObject({ strokeWidth: 18, strokeOpacity: 0.28, lineCap: 'round' });
+  expect(primitiveHit(shape, { x: 50, y: 19 })).toBe(true);
+  expect(primitiveHit(shape, { x: 50, y: 30 })).toBe(false);
+});
+it('Bezier curves reach their endpoints and control handles change the bend', () => {
+  const first = { time: 0, price: 100 },
+    last = { time: 100, price: 120 };
+  for (const [id, double] of [
+    ['Curve', false],
+    ['DoubleCurve', true],
+  ] as const) {
+    const points = defaultCurvePoints(first, last, double);
+    const shapes = tools[id].build(drawing(id, points), projection);
+    const shape = shapes[0];
+    if (shape.kind !== 'path') throw new Error('Expected curve');
+    expect(shape.points[0]).toEqual({ x: 0, y: 100 });
+    expect(shape.points.at(-1)).toEqual({ x: 100, y: 120 });
+    const changed = points.map((point, i) =>
+      i === 2 ? { ...point, price: point.price + 50 } : point,
+    );
+    expect(tools[id].build(drawing(id, changed), projection)).not.toEqual(shapes);
+    expect(shape.points.length).toBeLessThanOrEqual(97);
+  }
+});
+it('arcs pass through their bend anchor and partial or coincident shapes stay finite', () => {
+  const arc = tools.Arc.build(
+    drawing('Arc', [
+      { time: 0, price: 10 },
+      { time: 20, price: 10 },
+      { time: 10, price: 20 },
+    ]),
+    projection,
+  )[0];
+  expect(primitiveHit(arc, { x: 10, y: 20 })).toBe(true);
+  for (const id of [
+    'RotatedRectangle',
+    'Curve',
+    'DoubleCurve',
+    'Arc',
+    'ArrowMarker',
+    'ArrowMarkUp',
+    'ArrowMarkDown',
+    'PathTool',
+    'Polyline',
+    'Highlighter',
+  ] as const) {
+    for (const points of [
+      [],
+      [{ time: 10, price: 20 }],
+      [
+        { time: 10, price: 20 },
+        { time: 10, price: 20 },
+      ],
+    ]) {
+      expect(JSON.stringify(tools[id].build(drawing(id, points), projection))).not.toMatch(
+        /NaN|null/,
+      );
+    }
+  }
 });

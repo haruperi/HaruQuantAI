@@ -32,6 +32,7 @@ import {
   fibonacciSections,
   patternSections,
   forecastingSections,
+  shapeSections,
 } from '../../tools/catalog';
 import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
 import { ToolButton } from '../Tooltip';
@@ -169,6 +170,32 @@ function ForecastingToolIcon({ id }: { id: ToolId }) {
     PriceRange: 'M12 2v20M5 3h14M5 21h14M9 6l3-3 3 3M9 18l3 3 3-3',
     DateRange: 'M2 12h20M3 5v14M21 5v14M6 9l-3 3 3 3M18 9l3 3-3 3',
     DatePriceRange: 'M3 3h18v18H3zM12 6v12M6 12h12',
+  };
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <path d={glyphs[id]} />
+    </svg>
+  );
+}
+function ShapeToolIcon({ id }: { id: ToolId }) {
+  const glyphs: Partial<Record<ToolId, string>> = {
+    Brush: 'M2 20c8 4 4-7 9-10l5-7 5 4-7 6c-6 1-3 8-12 7',
+    Highlighter: 'M2 20h14M5 17l-3-3 12-12 6 6-12 12z',
+    ArrowMarker: 'M2 20L14 5l-1-3 9-1-1 9-3-2L4 22z',
+    Arrow: 'M2 22L21 3M12 3h9v9',
+    ArrowMarkUp: 'M12 2L2 12h6v10h8V12h6z',
+    ArrowMarkDown: 'M12 22L2 12h6V2h8v10h6z',
+    Rectangle: 'M3 4h18v16H3z',
+    RotatedRectangle: 'M2 13L14 2l8 9-12 11z',
+    PathTool: 'M2 19L8 6l6 9 8-11M16 4h6v6',
+    Polyline: 'M2 19L8 6l6 9 8-11',
+    Circle: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0',
+    Ellipse: 'M22 12a10 6 0 1 1-20 0 10 6 0 0 1 20 0',
+    Triangle: 'M12 2L2 22h20z',
+    Polygon: 'M2 8l8-6 12 8-4 12-14-4z',
+    Arc: 'M2 20A18 18 0 0 1 20 2',
+    Curve: 'M2 22Q3 2 22 3',
+    DoubleCurve: 'M2 20C4-5 20 30 22 4',
   };
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
@@ -333,7 +360,7 @@ export function LeftToolbar() {
             <div
               className={
                 'cq-flyout' +
-                (['Trend', 'Fibonacci', 'Patterns', 'Forecasting'].includes(name)
+                (['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes'].includes(name)
                   ? ' cq-line-menu'
                   : '')
               }
@@ -350,12 +377,14 @@ export function LeftToolbar() {
                     ? patternSections
                     : name === 'Forecasting'
                       ? forecastingSections
-                      : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
+                      : name === 'Shapes'
+                        ? shapeSections
+                        : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
               ).map((section) => (
                 <div
                   key={section.title}
                   className={
-                    ['Trend', 'Fibonacci', 'Patterns', 'Forecasting'].includes(name)
+                    ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes'].includes(name)
                       ? 'cq-line-section'
                       : undefined
                   }
@@ -375,6 +404,7 @@ export function LeftToolbar() {
                         {name === 'Fibonacci' && <FibonacciToolIcon id={id} />}
                         {name === 'Patterns' && <PatternToolIcon id={id} />}
                         {name === 'Forecasting' && <ForecastingToolIcon id={id} />}
+                        {name === 'Shapes' && <ShapeToolIcon id={id} />}
                         <span>{tools[id].label}</span>
                         <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>
                       </button>

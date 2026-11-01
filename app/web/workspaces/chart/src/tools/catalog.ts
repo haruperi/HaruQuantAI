@@ -1,3 +1,15 @@
+import { Highlighter } from './Highlighter';
+import {
+  ArrowMarker,
+  ArrowMarkUp,
+  ArrowMarkDown,
+  RotatedRectangle,
+  PathTool,
+  Polyline,
+  Arc,
+  Curve,
+  DoubleCurve,
+} from './shapeTools';
 import {
   LongPosition,
   ShortPosition,
@@ -146,7 +158,38 @@ export const forecastingSections: { title: string; ids: ToolId[] }[] = [
   { title: 'Volume-based', ids: ['AnchoredVWAP', 'FixedVolumeProfile', 'AnchoredVolumeProfile'] },
   { title: 'Measurers', ids: ['PriceRange', 'DateRange', 'DatePriceRange'] },
 ];
+export const shapeSections: { title: string; ids: ToolId[] }[] = [
+  { title: 'Brushes', ids: ['Brush', 'Highlighter'] },
+  { title: 'Arrows', ids: ['ArrowMarker', 'Arrow', 'ArrowMarkUp', 'ArrowMarkDown'] },
+  {
+    title: 'Shapes',
+    ids: [
+      'Rectangle',
+      'RotatedRectangle',
+      'PathTool',
+      'Circle',
+      'Ellipse',
+      'Polyline',
+      'Triangle',
+      'Arc',
+      'Curve',
+      'DoubleCurve',
+    ],
+  },
+  { title: 'Additional tools', ids: ['Polygon'] },
+];
 export const tools: Record<ToolId, Tool> = {
+  Highlighter,
+  ArrowMarker,
+  ArrowMarkUp,
+  ArrowMarkDown,
+  RotatedRectangle,
+  PathTool,
+  Polyline,
+  Arc,
+  Curve,
+  DoubleCurve,
+
   LongPosition,
   ShortPosition,
   PositionForecast,

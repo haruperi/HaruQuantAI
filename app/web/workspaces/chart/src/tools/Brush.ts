@@ -3,7 +3,7 @@ import { line, path, label } from './geometry';
 export const Brush: Tool = {
   label: 'Brush',
   anchors: 0,
-  group: 'Annotate',
+  group: 'Shapes',
   shortcut: '',
   build: (d, p) => {
     const pts = d.points.map(p.point),

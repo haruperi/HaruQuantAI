@@ -3,7 +3,7 @@ import { line, path, label } from './geometry';
 export const Arrow: Tool = {
   label: 'Arrow',
   anchors: 2,
-  group: 'Trend',
+  group: 'Shapes',
   shortcut: '',
   build: (d, p) => {
     const pts = d.points.map(p.point),

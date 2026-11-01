@@ -41,6 +41,17 @@ export interface XY {
   y: number;
 }
 export const toolIds = [
+  'Highlighter',
+  'ArrowMarker',
+  'ArrowMarkUp',
+  'ArrowMarkDown',
+  'RotatedRectangle',
+  'PathTool',
+  'Polyline',
+  'Arc',
+  'Curve',
+  'DoubleCurve',
+
   'LongPosition',
   'ShortPosition',
   'PositionForecast',

@@ -4,7 +4,14 @@ export type Primitive = (
   | { kind: 'ellipse'; center: XY; rx: number; ry: number }
   | { kind: 'text'; at: XY; text: string }
   | { kind: 'badge'; at: XY; text: string; background: string }
-) & { color?: string; fillOpacity?: number; dash?: number[] };
+) & {
+  color?: string;
+  fillOpacity?: number;
+  dash?: number[];
+  strokeWidth?: number;
+  strokeOpacity?: number;
+  lineCap?: CanvasLineCap;
+};
 export interface Projection {
   bars?: readonly Bar[];
   point: (p: Point) => XY;

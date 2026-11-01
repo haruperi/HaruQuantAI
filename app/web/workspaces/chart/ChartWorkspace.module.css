@@ -871,3 +871,8 @@
   width: 320px;
   max-height: calc(100vh - 265px);
 }
+
+.root :global(.cq-line-menu[aria-label='Shapes tools']) {
+  width: 300px;
+  max-height: calc(100vh - 305px);
+}

@@ -25,7 +25,6 @@ test('every drawing tool creates an editable persisted object with undo and redo
         ['Vertical line', 1],
         ['Horizontal ray', 1],
         ['Price line', 1],
-        ['Arrow', 2],
         ['Info line', 2],
         ['Extended line', 2],
         ['Trend angle', 2],
@@ -99,6 +98,18 @@ test('every drawing tool creates an editable persisted object with undo and redo
     {
       group: 'Shapes',
       names: [
+        ['Brush', -1],
+        ['Highlighter', -1],
+        ['Arrow marker', 2],
+        ['Arrow', 2],
+        ['Arrow mark up', 1],
+        ['Arrow mark down', 1],
+        ['Rotated rectangle', 3],
+        ['Path', 0],
+        ['Polyline', 0],
+        ['Arc', 3],
+        ['Curve', 2],
+        ['Double curve', 2],
         ['Rectangle', 2],
         ['Ellipse', 2],
         ['Triangle', 3],
@@ -112,7 +123,6 @@ test('every drawing tool creates an editable persisted object with undo and redo
         ['Text', 1],
         ['Anchored note', 1],
         ['Emoji / sticker', 1],
-        ['Brush', -1],
       ],
     },
   ];
@@ -688,4 +698,109 @@ test('one click places complete long and short positions with editable defaults'
     .toBe(2);
   await page.reload();
   await expect(host).toHaveAttribute('data-drawings', '2');
+});
+
+test('Shapes parity menu and freehand, path and curve mouse gestures', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(90000);
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const trigger = page.getByRole('button', { name: 'Shapes tools', exact: true });
+  const menu = page.getByRole('menu', { name: 'Shapes tools', exact: true });
+  await trigger.click();
+  await expect(menu.locator('.cq-line-heading')).toHaveText([
+    'Brushes',
+    'Arrows',
+    'Shapes',
+    'Additional tools',
+  ]);
+  await expect(menu.getByRole('menuitem')).toHaveCount(17);
+  await menu.getByRole('button', { name: 'Favorite Highlighter', exact: true }).click();
+  await page.screenshot({ path: testInfo.outputPath('shapes-menu.png') });
+  const select = async (name: string) => {
+    if (!(await menu.isVisible())) await trigger.click();
+    await menu
+      .getByRole('menuitem')
+      .filter({ has: page.getByText(name, { exact: true }) })
+      .click();
+  };
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  const x = box.x + 430,
+    y = box.y + 260;
+  let count = 0;
+  for (const name of ['Brush', 'Highlighter', 'Arrow marker', 'Curve', 'Double curve']) {
+    await select(name);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 150, y - 70, { steps: 12 });
+    await page.mouse.up();
+    await expect(host).toHaveAttribute('data-drawings', String(++count));
+    if (name === 'Curve') {
+      const readCurve = () =>
+        page.evaluate(() => {
+          const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+          return (state.drawings[state.chart.symbol + ':' + state.chart.interval]?.find(
+            (item: { tool: string }) => item.tool === 'Curve',
+          )?.points ?? []) as { time: number; price: number }[];
+        });
+      await expect.poll(readCurve).toHaveLength(3);
+      const before = await readCurve();
+      const cx = x + ((before[2].time - before[0].time) / (before[1].time - before[0].time)) * 150;
+      const cy =
+        y + ((before[2].price - before[0].price) / (before[1].price - before[0].price)) * -70;
+      await page.mouse.move(cx, cy);
+      await page.mouse.down();
+      await page.mouse.move(cx + 20, cy - 35, { steps: 5 });
+      await page.mouse.up();
+      await expect.poll(async () => (await readCurve())[2].price).not.toBe(before[2].price);
+      await page.getByRole('button', { name: 'Undo', exact: true }).click();
+      await expect.poll(readCurve).toEqual(before);
+    }
+  }
+  await select('Arrow mark up');
+  await page.mouse.click(x + 210, y);
+  await expect(host).toHaveAttribute('data-drawings', String(++count));
+  await select('Arrow mark down');
+  await page.mouse.click(x + 250, y);
+  await expect(host).toHaveAttribute('data-drawings', String(++count));
+  await select('Path');
+  await page.mouse.click(x, y + 100);
+  await page.mouse.click(x + 80, y + 30);
+  await page.keyboard.press('Enter');
+  await expect(host).toHaveAttribute('data-drawings', String(++count));
+  await select('Polyline');
+  await page.mouse.click(x, y + 160);
+  await page.mouse.click(x + 70, y + 90);
+  await page.mouse.dblclick(x + 140, y + 150);
+  await expect(host).toHaveAttribute('data-drawings', String(++count));
+  const read = () =>
+    page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+      return state.drawings[state.chart.symbol + ':' + state.chart.interval] as {
+        tool: string;
+        points: { time: number; price: number }[];
+      }[];
+    });
+  await expect.poll(async () => (await read()).at(-1)?.points.length).toBe(3);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(host).toHaveAttribute('data-drawings', String(count - 1));
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect(host).toHaveAttribute('data-drawings', String(count));
+  // Cancel an incomplete rotated rectangle.
+  await select('Rotated rectangle');
+  await page.mouse.click(x, y);
+  await page.keyboard.press('Escape');
+  await expect(host).toHaveAttribute('data-drawings', String(count));
+  await page.keyboard.press('Alt+Shift+r');
+  await expect(page.locator('.cq-hint')).toContainText('Rectangle');
+  await page.keyboard.press('Escape');
+  await expect.poll(async () => (await read()).length).toBe(count);
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', String(count));
+  await trigger.click();
+  await expect(
+    menu.getByRole('button', { name: 'Favorite Highlighter', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
 });

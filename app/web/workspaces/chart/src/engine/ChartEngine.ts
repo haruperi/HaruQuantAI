@@ -1,3 +1,4 @@
+import { defaultCurvePoints } from '../tools/shapeTools';
 import type { Bar, Drawing, Point, Quote, XY } from '../types';
 import { keyFor, uid } from '../types';
 import type { ChartStore } from '../store/chartStore';
@@ -159,8 +160,14 @@ export class ChartEngine {
       { passive: false },
     );
     listen('dblclick', () => {
-      if (this.store.getState().ui.tool === 'Polygon') this.finish();
-      else this.reset();
+      if (['Polygon', 'PathTool', 'Polyline'].includes(this.store.getState().ui.tool)) {
+        this.points = this.points.filter(
+          (point, i, points) =>
+            i === 0 || point.time !== points[i - 1].time || point.price !== points[i - 1].price,
+        );
+        this.preview = this.makeDrawing(this.points);
+        this.finish();
+      } else this.reset();
     });
     listen('contextmenu', (e) => {
       e.preventDefault();
@@ -676,8 +683,13 @@ export class ChartEngine {
         this.preview = this.makeDrawing(this.points);
         return;
       }
-      if (s.ui.tool === 'Brush') this.points = [point];
-      else this.points.push(point);
+      if (s.ui.tool === 'Brush' || s.ui.tool === 'Highlighter') this.points = [point];
+      else if ((s.ui.tool === 'Curve' || s.ui.tool === 'DoubleCurve') && this.points.length === 1) {
+        this.points = defaultCurvePoints(this.points[0], point, s.ui.tool === 'DoubleCurve');
+        this.preview = this.makeDrawing(this.points);
+        this.finish();
+        return;
+      } else this.points.push(point);
       this.preview = this.makeDrawing(this.points);
       if (tools[s.ui.tool].anchors === 1) this.finish();
       return;
@@ -784,8 +796,8 @@ export class ChartEngine {
             price: this.points[0].price,
           };
         this.preview = this.makeDrawing(this.points);
-      } else if (s.ui.tool === 'Brush') {
-        this.points.push(this.point(p));
+      } else if (s.ui.tool === 'Brush' || s.ui.tool === 'Highlighter') {
+        if (this.points.length < 10000) this.points.push(this.point(p));
         this.preview = this.makeDrawing(this.points);
       } else this.preview = this.makeDrawing([...this.points, this.point(p)]);
       this.invalidate(4);
@@ -851,8 +863,16 @@ export class ChartEngine {
     }
     if (this.gesture === 'draw' && s.ui.tool !== 'cursor') {
       const tool = tools[s.ui.tool];
-      if (s.ui.tool === 'Brush') this.finish();
-      else if (tool.anchors === 2 && this.moving) {
+      if (s.ui.tool === 'Brush' || s.ui.tool === 'Highlighter') this.finish();
+      else if ((s.ui.tool === 'Curve' || s.ui.tool === 'DoubleCurve') && this.moving) {
+        this.points = defaultCurvePoints(
+          this.points[0],
+          this.point(this.local(e)),
+          s.ui.tool === 'DoubleCurve',
+        );
+        this.preview = this.makeDrawing(this.points);
+        this.finish();
+      } else if (tool.anchors === 2 && this.moving) {
         this.points.push(this.point(this.local(e)));
         this.finish();
       } else if (tool.anchors > 0 && this.points.length >= tool.anchors) this.finish();

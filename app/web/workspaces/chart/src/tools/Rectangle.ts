@@ -4,7 +4,7 @@ export const Rectangle: Tool = {
   label: 'Rectangle',
   anchors: 2,
   group: 'Shapes',
-  shortcut: '',
+  shortcut: 'Alt+Shift+R',
   build: (d, p) => {
     const pts = d.points.map(p.point),
       a = pts[0] ?? { x: 0, y: 0 },

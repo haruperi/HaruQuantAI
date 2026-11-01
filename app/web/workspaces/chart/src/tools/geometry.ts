@@ -57,7 +57,10 @@ export function primitiveHit(shape: Primitive, p: XY): boolean {
     }
     if (inside) return true;
   }
-  return points.some((b, i) => i > 0 && segmentDistance(p, points[i - 1], b) < 7);
+  return points.some(
+    (b, i) =>
+      i > 0 && segmentDistance(p, points[i - 1], b) < Math.max(7, (shape.strokeWidth ?? 0) / 2 + 2),
+  );
 }
 export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[]): void {
   for (const shape of shapes) {
@@ -66,6 +69,9 @@ export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[]): void 
       ctx.strokeStyle = shape.color;
       ctx.fillStyle = shape.color;
     }
+    if (shape.strokeWidth) ctx.lineWidth = shape.strokeWidth;
+    if (shape.strokeOpacity !== undefined) ctx.globalAlpha *= shape.strokeOpacity;
+    if (shape.lineCap) ctx.lineCap = shape.lineCap;
     if (shape.dash) ctx.setLineDash(shape.dash);
     ctx.beginPath();
     if (shape.kind === 'badge') {

@@ -136,9 +136,13 @@ export function ChartArea() {
           {s.ui.tool} ·{' '}
           {s.ui.tool === 'LongPosition' || s.ui.tool === 'ShortPosition'
             ? 'Click to place; drag to set width'
-            : s.ui.tool === 'Polygon'
-              ? 'Click vertices, Enter to finish'
-              : 'Place anchors on the chart'}{' '}
+            : ['Polygon', 'PathTool', 'Polyline'].includes(s.ui.tool)
+              ? 'Click vertices; Enter or double-click to finish'
+              : s.ui.tool === 'Brush' || s.ui.tool === 'Highlighter'
+                ? 'Drag to draw'
+                : s.ui.tool === 'Curve' || s.ui.tool === 'DoubleCurve'
+                  ? 'Drag endpoints; adjust bend handles afterward'
+                  : 'Place anchors on the chart'}{' '}
           · Esc to cancel
         </div>
       )}

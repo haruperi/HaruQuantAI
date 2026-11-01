@@ -3,6 +3,7 @@ import { useChart } from './useChartEngine';
 import { keyFor, type ToolId } from '../types';
 import { fullscreen } from '../engine/export';
 export const shortcuts = [
+  ['Alt+Shift+R', 'Rectangle'],
   ['Alt+T', 'Trend line'],
   ['Alt+H', 'Horizontal line'],
   ['Alt+J', 'Horizontal ray'],
@@ -43,6 +44,11 @@ export function useShortcuts() {
       )
         return;
       const key = e.key.toLowerCase();
+      if (e.altKey && e.shiftKey && key === 'r') {
+        e.preventDefault();
+        s.setUI({ tool: 'Rectangle' });
+        return;
+      }
       if (e.altKey) {
         const tool: Record<string, ToolId> = {
           t: 'TrendLine',

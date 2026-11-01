@@ -4,6 +4,7 @@ import {
   fibonacciSections,
   patternSections,
   forecastingSections,
+  shapeSections,
 } from '../../../workspaces/chart/src/tools/catalog';
 import { it, expect } from 'vitest';
 import { createChartStore } from '../../../workspaces/chart/src/store/chartStore';
@@ -51,12 +52,13 @@ it('round-trips every sectioned drawing menu tool with all anchors and favorites
     ...fibonacciSections,
     ...patternSections,
     ...forecastingSections,
+    ...shapeSections,
   ].flatMap((section) => section.ids);
   const state = persisted(store);
   state.drawings['XAUUSD:3m'] = ids.map((tool) => ({
     id: tool,
     tool,
-    points: Array.from({ length: tools[tool].anchors }, (_, i) => ({
+    points: Array.from({ length: tools[tool].anchors || (tool === 'Polygon' ? 3 : 2) }, (_, i) => ({
       time: 1000 + i * 60000,
       price: 100 + i,
     })),
