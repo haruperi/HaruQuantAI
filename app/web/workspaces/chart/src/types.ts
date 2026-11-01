@@ -228,6 +228,29 @@ export interface Settings {
   title: string;
   range: string;
   paneHeight: number;
+  // Appearance and visibility preferences used by the chart-settings dialog.
+  colorBarsByPreviousClose: boolean;
+  candleBody: boolean;
+  candleBorders: boolean;
+  candleWicks: boolean;
+  candleUpColor: string;
+  candleDownColor: string;
+  candleBorderUpColor: string;
+  candleBorderDownColor: string;
+  candleWickUpColor: string;
+  candleWickDownColor: string;
+  backgroundColor: string;
+  gridColor: string;
+  textColor: string;
+  showGrid: boolean;
+  showSymbolTitle: boolean;
+  showOhlc: boolean;
+  showIndicatorLegend: boolean;
+  showBuySellButtons: boolean;
+  showLastPriceLine: boolean;
+  showPriceScaleLabels: boolean;
+  showAlertLines: boolean;
+  showPositions: boolean;
 }
 export interface DocumentState {
   chart: Settings;
