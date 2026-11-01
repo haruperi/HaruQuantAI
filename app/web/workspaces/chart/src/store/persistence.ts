@@ -185,6 +185,10 @@ export function decode(raw: string): Persisted {
   return {
     chart: {
       ...defaults,
+      // Old light-theme charts had no custom canvas colors; use their previous palette.
+      ...(c.theme === 'light'
+        ? { backgroundColor: '#ffffff', gridColor: '#e6e8ed', textColor: '#787b86' }
+        : {}),
       ...validated.chart,
       // Preserve existing v1 chart documents saved before magnet options existed.
       magnetStrength: c.magnetStrength === 'strong' ? 'strong' : 'weak',
