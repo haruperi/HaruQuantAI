@@ -336,6 +336,53 @@ test('magnet menu supports weak, strong and indicator snapping with persistence'
   await expect(menu.getByRole('switch', { name: 'Snap to indicators' })).toHaveAttribute('aria-checked', 'true');
 });
 
+test('drawing group icons follow the last selected tool across placement and reload', async ({ page }) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+
+  const selections = [
+    { group: 'Trend', label: 'Parallel channel', id: 'ParallelChannel' },
+    { group: 'Fibonacci', label: 'Fib spiral', id: 'FibSpiral' },
+    { group: 'Patterns', label: 'Head and shoulders', id: 'HeadShoulders' },
+    { group: 'Forecasting', label: 'Long position', id: 'LongPosition' },
+    { group: 'Shapes', label: 'Rectangle', id: 'Rectangle' },
+    { group: 'Annotate', label: 'Price note', id: 'PriceNote' },
+  ];
+
+  for (const { group, label, id } of selections) {
+    const trigger = page.getByRole('button', { name: group + ' tools', exact: true });
+    const menu = page.getByRole('menu', { name: group + ' tools', exact: true });
+    await trigger.click();
+    await menu.getByRole('menuitem').filter({ has: page.getByText(label, { exact: true }) }).click();
+    await expect(trigger).toHaveAttribute('data-last-tool', id);
+    await trigger.click();
+    const selected = menu.getByRole('menuitem').filter({ has: page.getByText(label, { exact: true }) });
+    await expect(selected).toHaveAttribute('aria-current', 'true');
+    expect(await trigger.locator('svg').first().innerHTML()).toBe(await selected.locator('svg').first().innerHTML());
+    await selected.click();
+  }
+
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  await page.mouse.click(box.x + 350, box.y + 220);
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  const dialog = page.getByRole('dialog');
+  if (await dialog.isVisible())
+    await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Annotate tools', exact: true })).toHaveAttribute('data-last-tool', 'PriceNote');
+
+  await expect.poll(async () => page.evaluate(() => {
+    const raw = localStorage.getItem('haruquantai.chart.v1');
+    return raw ? JSON.parse(raw).state.lastGroupTools : null;
+  })).toEqual(Object.fromEntries(selections.map(({ group, id }) => [group, id])));
+
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  for (const { group, id } of selections)
+    await expect(page.getByRole('button', { name: group + ' tools', exact: true }))
+      .toHaveAttribute('data-last-tool', id);
+});
+
 test('cursor menu modes, effects, tooltip and eraser undo', async ({ page }, testInfo) => {
   test.setTimeout(60000);
   await page.goto('/chart');
