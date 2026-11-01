@@ -459,7 +459,8 @@
   color: var(--cq-muted);
 }
 .root :global(.cq-form) input,
-.root :global(.cq-form) select {
+.root :global(.cq-form) select,
+.root :global(.cq-form) textarea {
   color: var(--cq-text);
   height: 34px;
   width: 100%;
@@ -930,4 +931,15 @@
 .root :global(.cq-text-menu .cq-tool-option:focus-within) {
   outline: 1px solid var(--cq-border);
   outline-offset: -1px;
+}
+
+.root :global(.cq-form) textarea {
+  min-height: 84px;
+  padding: 9px 10px;
+  resize: vertical;
+  background: var(--cq-panel);
+  border: 1px solid var(--cq-border);
+  border-radius: 5px;
+  font: inherit;
+  line-height: 1.5;
 }
