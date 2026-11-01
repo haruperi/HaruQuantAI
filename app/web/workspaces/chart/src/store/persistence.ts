@@ -1,4 +1,4 @@
-import type { ChartStore } from './chartStore';
+import { defaults, type ChartStore } from './chartStore';
 import { drawingGroups, intervals, chartStyles, toolIds, indicatorIds, type Persisted, type ToolId } from '../types';
 import { symbols } from '../feed/symbols';
 import { tools } from '../tools/catalog';
@@ -34,6 +34,22 @@ export function decode(raw: string): Persisted {
     c.paneHeight > 300
   )
     throw new Error('Invalid chart settings.');
+  const appearanceToggles = [
+    'colorBarsByPreviousClose', 'candleBody', 'candleBorders', 'candleWicks',
+    'showGrid', 'showSymbolTitle', 'showOhlc', 'showIndicatorLegend',
+    'showBuySellButtons', 'showLastPriceLine', 'showPriceScaleLabels',
+    'showAlertLines', 'showPositions',
+  ] as const;
+  for (const key of appearanceToggles)
+    if (c[key] !== undefined && typeof c[key] !== 'boolean')
+      throw new Error('Invalid chart appearance toggle.');
+  const appearanceColors = [
+    'candleUpColor', 'candleDownColor', 'candleBorderUpColor', 'candleBorderDownColor',
+    'candleWickUpColor', 'candleWickDownColor', 'backgroundColor', 'gridColor', 'textColor',
+  ] as const;
+  for (const key of appearanceColors)
+    if (c[key] !== undefined && (!text(c[key]) || !/^#[0-9a-fA-F]{6}$/.test(c[key])))
+      throw new Error('Invalid chart appearance color.');
   if (c.magnetStrength !== undefined && !['weak', 'strong'].includes(String(c.magnetStrength)))
     throw new Error('Invalid magnet strength.');
   if (c.snapToIndicators !== undefined && typeof c.snapToIndicators !== 'boolean')
@@ -168,6 +184,7 @@ export function decode(raw: string): Persisted {
   const validated = s as unknown as Persisted;
   return {
     chart: {
+      ...defaults,
       ...validated.chart,
       // Preserve existing v1 chart documents saved before magnet options existed.
       magnetStrength: c.magnetStrength === 'strong' ? 'strong' : 'weak',
