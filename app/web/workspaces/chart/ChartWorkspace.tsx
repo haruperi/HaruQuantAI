@@ -31,6 +31,27 @@ function Shortcuts() {
   useShortcuts();
   return null;
 }
+function ChartPane({ services, index, active, onSelect }: {
+  services: ChartServices;
+  index: number;
+  active: boolean;
+  onSelect: (index: number) => void;
+}) {
+  const theme = useStore(services.store, state => state.chart.theme);
+  return (
+    <div role="group" aria-label={'Chart ' + (index + 1)}
+      className={'cq-chart-cell' + (active ? ' cq-chart-cell-active' : '')}
+      data-chart-theme={theme}
+      data-testid="chart-pane" data-pane-index={index}
+      style={{ gridArea: 'c' + index }}
+      onPointerDown={() => onSelect(index)}
+      onFocusCapture={() => onSelect(index)}>
+      <ChartContext.Provider value={services}>
+        <ChartArea />
+      </ChartContext.Provider>
+    </div>
+  );
+}
 const paneStorageKey = (index: number) => index === 0 ? storageKey : storageKey + '.pane.' + index;
 
 /** Keeps all eight chart instances alive in memory while unused panes are hidden.
@@ -218,16 +239,8 @@ export function ChartWorkspace() {
         <LeftToolbar />
         <div className="cq-chart-board" style={boardStyle} data-layout={layout.id}>
           {Array.from({ length: definition.count }, (_, index) => (
-            <div key={index} role="group" aria-label={'Chart ' + (index + 1)}
-              className={'cq-chart-cell' + (active === index ? ' cq-chart-cell-active' : '')}
-              data-testid="chart-pane" data-pane-index={index}
-              style={{ gridArea: 'c' + index }}
-              onPointerDown={() => selectPane(index)}
-              onFocusCapture={() => selectPane(index)}>
-              <ChartContext.Provider value={paneServices[index]}>
-                <ChartArea />
-              </ChartContext.Provider>
-            </div>
+            <ChartPane key={index} index={index} active={active === index}
+              services={paneServices[index]} onSelect={selectPane} />
           ))}
           {splits.map(split => {
             const vertical = split.axis === 'columns';
