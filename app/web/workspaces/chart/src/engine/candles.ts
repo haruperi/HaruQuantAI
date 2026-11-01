@@ -1,4 +1,4 @@
-import type { Bar, ChartStyle } from '../types';
+import type { Bar, ChartStyle, Settings } from '../types';
 export function heikinAshi(bars: readonly Bar[]): Bar[] {
   let prev: Bar | undefined;
   return bars.map((b) => {
@@ -24,10 +24,14 @@ export function paintSeries(
   spacing: number,
   style: ChartStyle,
   bottom: number,
+  settings?: Pick<Settings,
+    'colorBarsByPreviousClose' | 'candleBody' | 'candleBorders' | 'candleWicks' |
+    'candleUpColor' | 'candleDownColor' | 'candleBorderUpColor' | 'candleBorderDownColor' |
+    'candleWickUpColor' | 'candleWickDownColor'>,
 ): void {
-  const up = '#089981',
-    down = '#f23645',
-    width = Math.max(1, Math.floor((spacing * 0.7) / 2) * 2 + 1);
+  const up = settings?.candleUpColor ?? '#089981';
+  const down = settings?.candleDownColor ?? '#f23645';
+  const width = Math.max(1, Math.floor((spacing * 0.7) / 2) * 2 + 1);
   if (['Line', 'Area', 'Baseline'].includes(style)) {
     const first = bars[start];
     if (!first) return;
@@ -78,35 +82,53 @@ export function paintSeries(
     }
     return;
   }
-  for (const rising of [true, false]) {
-    ctx.strokeStyle = rising ? up : down;
-    ctx.fillStyle = ctx.strokeStyle;
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    for (let i = start; i <= end; i++) {
-      const b = bars[i];
-      if (!b || b.close >= b.open !== rising) continue;
-      const cx = Math.round(x(i)) + 0.5;
-      ctx.moveTo(cx, y(b.high));
-      ctx.lineTo(cx, y(b.low));
-      if (style === 'Bars') {
-        ctx.moveTo(cx - width / 2, y(b.open));
-        ctx.lineTo(cx, y(b.open));
-        ctx.moveTo(cx, y(b.close));
-        ctx.lineTo(cx + width / 2, y(b.close));
-      }
+
+  ctx.save();
+  ctx.lineWidth = 1;
+  for (let i = start; i <= end; i++) {
+    const bar = bars[i];
+    if (!bar) continue;
+    const reference = settings?.colorBarsByPreviousClose && i > 0
+      ? bars[i - 1].close : bar.open;
+    const rising = bar.close >= reference;
+    const bodyColor = rising ? up : down;
+    const borderColor = rising
+      ? settings?.candleBorderUpColor ?? up
+      : settings?.candleBorderDownColor ?? down;
+    const wickColor = rising
+      ? settings?.candleWickUpColor ?? up
+      : settings?.candleWickDownColor ?? down;
+    const cx = Math.round(x(i)) + .5;
+    if (style === 'Bars') {
+      ctx.strokeStyle = bodyColor;
+      ctx.beginPath();
+      ctx.moveTo(cx, y(bar.high));
+      ctx.lineTo(cx, y(bar.low));
+      ctx.moveTo(cx - width / 2, y(bar.open));
+      ctx.lineTo(cx, y(bar.open));
+      ctx.moveTo(cx, y(bar.close));
+      ctx.lineTo(cx + width / 2, y(bar.close));
+      ctx.stroke();
+      continue;
     }
-    ctx.stroke();
-    if (style === 'Bars') continue;
-    ctx.beginPath();
-    for (let i = start; i <= end; i++) {
-      const b = bars[i];
-      if (!b || b.close >= b.open !== rising) continue;
-      const top = Math.min(y(b.open), y(b.close)),
-        height = Math.max(1, Math.abs(y(b.open) - y(b.close)));
-      ctx.rect(Math.round(x(i) - width / 2) + 0.5, top, width, height);
+    if (settings?.candleWicks !== false) {
+      ctx.strokeStyle = wickColor;
+      ctx.beginPath();
+      ctx.moveTo(cx, y(bar.high));
+      ctx.lineTo(cx, y(bar.low));
+      ctx.stroke();
     }
-    if (style === 'Hollow Candles' && rising) ctx.stroke();
-    else ctx.fill();
+    const left = Math.round(x(i) - width / 2) + .5;
+    const top = Math.min(y(bar.open), y(bar.close));
+    const height = Math.max(1, Math.abs(y(bar.open) - y(bar.close)));
+    if (settings?.candleBody !== false && !(style === 'Hollow Candles' && rising)) {
+      ctx.fillStyle = bodyColor;
+      ctx.fillRect(left, top, width, height);
+    }
+    if (settings?.candleBorders !== false) {
+      ctx.strokeStyle = borderColor;
+      ctx.strokeRect(left, top, width, height);
+    }
   }
+  ctx.restore();
 }
