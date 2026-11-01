@@ -7,6 +7,8 @@ export interface ChartServices {
   root: RefObject<HTMLDivElement | null>;
   onCrosshairTime?: (time: number | null) => void;
   onViewport?: (range: readonly [number, number]) => void;
+  onReady?: (engine: ChartEngine) => void;
+  onDispose?: (range: readonly [number, number] | null) => void;
 }
 export const ChartContext = createContext<ChartServices | null>(null);
 export function useChart() {
