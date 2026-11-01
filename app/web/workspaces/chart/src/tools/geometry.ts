@@ -31,14 +31,17 @@ export function segmentDistance(p: XY, a: XY, b: XY): number {
   return Math.hypot(p.x - a.x - t * dx, p.y - a.y - t * dy);
 }
 export function primitiveHit(shape: Primitive, p: XY): boolean {
+  if (shape.kind === 'image')
+    return p.x >= shape.at.x && p.x <= shape.at.x + shape.width &&
+      p.y >= shape.at.y - shape.height && p.y <= shape.at.y;
   if (shape.kind === 'badge')
     return Math.abs(p.x - shape.at.x) < 100 && Math.abs(p.y - shape.at.y) < 18;
-  if (shape.kind === 'text')
-    return (
-      p.x >= shape.at.x - 4 &&
-      p.x <= shape.at.x + Math.max(30, shape.text.length * 7) &&
-      Math.abs(p.y - shape.at.y) < 18
-    );
+  if (shape.kind === 'text') {
+    const rows = shape.text.split('\n');
+    return p.x >= shape.at.x - 4 &&
+      p.x <= shape.at.x + Math.max(30, ...rows.map(row => row.length * 7)) &&
+      p.y >= shape.at.y - 18 && p.y <= shape.at.y + (rows.length - 1) * 16 + 5;
+  }
   if (shape.kind === 'ellipse') {
     const r = Math.hypot(
       (p.x - shape.center.x) / (shape.rx || 1),
@@ -62,7 +65,38 @@ export function primitiveHit(shape: Primitive, p: XY): boolean {
       i > 0 && segmentDistance(p, points[i - 1], b) < Math.max(7, (shape.strokeWidth ?? 0) / 2 + 2),
   );
 }
-export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[]): void {
+type CachedImage = { image: HTMLImageElement; state: 'loading' | 'ready' | 'failed'; notify: Set<() => void> };
+const images = new Map<string, CachedImage>();
+function getImage(url: string, onLoad?: () => void): CachedImage | null {
+  if (!/^https?:\/\/\S+$/i.test(url) || typeof Image === 'undefined') return null;
+  const cached = images.get(url);
+  if (cached) {
+    if (onLoad && cached.state === 'loading') cached.notify.add(onLoad);
+    return cached;
+  }
+  // Keep the resource cache bounded. Images are loaded via CORS to avoid tainting the chart canvas.
+  if (images.size > 64) {
+    const oldest = images.keys().next().value;
+    if (oldest) images.delete(oldest);
+  }
+  const image = new Image();
+  const entry: CachedImage = { image, state: 'loading', notify: new Set(onLoad ? [onLoad] : []) };
+  images.set(url, entry);
+  image.crossOrigin = 'anonymous';
+  image.onload = () => {
+    entry.state = 'ready';
+    for (const listener of entry.notify) listener();
+    entry.notify.clear();
+  };
+  image.onerror = () => {
+    entry.state = 'failed';
+    for (const listener of entry.notify) listener();
+    entry.notify.clear();
+  };
+  image.src = url;
+  return entry;
+}
+export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[], onAssetLoad?: () => void): void {
   for (const shape of shapes) {
     ctx.save();
     if (shape.color) {
@@ -93,8 +127,17 @@ export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[]): void 
       ctx.restore();
       continue;
     }
+    if (shape.kind === 'image') {
+      const entry = getImage(shape.url, onAssetLoad);
+      const x = shape.at.x, y = shape.at.y - shape.height;
+      ctx.strokeRect(x, y, shape.width, shape.height);
+      if (entry?.state === 'ready') ctx.drawImage(entry.image, x, y, shape.width, shape.height);
+      else ctx.fillText(entry?.state === 'failed' ? 'Image unavailable' : 'Loading image…', x + 10, y + 23);
+      ctx.restore();
+      continue;
+    }
     if (shape.kind === 'text') {
-      ctx.fillText(shape.text, shape.at.x, shape.at.y);
+      shape.text.split('\\n').forEach((row, i) => ctx.fillText(row, shape.at.x, shape.at.y + i * 16));
       ctx.restore();
       continue;
     }
