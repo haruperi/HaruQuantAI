@@ -6,7 +6,7 @@ import {
 import { useStore } from 'zustand';
 import { useChart } from '../../hooks/useChartEngine';
 import { defaults } from '../../store/chartStore';
-import { chartStyles, type Settings } from '../../types';
+import type { Settings } from '../../types';
 import { zones } from '../bottombar/BottomBar';
 import { Modal } from '../Modal';
 
@@ -187,13 +187,6 @@ export function SettingsDialog() {
         <div className="cq-settings-main" role="region" aria-label={sections.find((s) => s.id === section)?.label + ' settings'}>
           {section === 'symbol' && (
             <>
-              <div className="cq-setting-heading">CHART TYPE</div>
-              <label className="cq-setting-field">
-                Style
-                <select value={draft.style} onChange={(e) => change({ style: e.target.value as Settings['style'] })}>
-                  {chartStyles.map((style) => <option key={style} value={style}>{style}</option>)}
-                </select>
-              </label>
               <div className="cq-setting-heading">CANDLES</div>
               <Checkbox label="Color bars based on previous close" checked={draft.colorBarsByPreviousClose} onChange={toggle('colorBarsByPreviousClose')} />
               <ColorPair label="Body" enabled={draft.candleBody} onEnabled={toggle('candleBody')}
