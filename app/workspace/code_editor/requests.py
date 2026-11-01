@@ -10,7 +10,7 @@ Key Capabilities:
       malformed nested records; DEBUG acceptance/WARNING rejection logs are
       verified without logging input contents.
 Python API Usage:
-    request = SaveFileRequest(file_path="app/include/example.py", content="")
+    request = SaveFileRequest(file_path="app/extend/example.py", content="")
 CLI Usage:
     uv run python -m pytest tests/workspace/code_editor/test_contracts.py --no-cov
 """

@@ -10,7 +10,11 @@ from pathlib import Path
 
 import pytest
 from app.main import create_app
-from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT, CodeEditorError
+from app.workspace.code_editor._common import (
+    EXTEND_DIR,
+    PROJECT_ROOT,
+    CodeEditorError,
+)
 from app.workspace.code_editor._storage import StateStore
 from app.workspace.code_editor.command_models import (
     ImportSessionActionRequest,
@@ -25,7 +29,7 @@ from fastapi.testclient import TestClient
 
 @pytest.fixture
 def user_sandbox():
-    with tempfile.TemporaryDirectory(dir=INCLUDE_DIR, prefix="impsess_") as raw_dir:
+    with tempfile.TemporaryDirectory(dir=EXTEND_DIR, prefix="impsess_") as raw_dir:
         root = Path(raw_dir).resolve()
         yield root
 
@@ -67,7 +71,7 @@ def test_import_session_builtin_protection_and_java_rejection(
     rel_dir = user_sandbox.relative_to(PROJECT_ROOT).as_posix()
     new_py = f"{rel_dir}/fresh_mod.py"
     java_entry = f"{rel_dir}/LegacySnippet.java"
-    builtin_entry = "app/include/blocks/indicators/volatility/atr.py"
+    builtin_entry = "app/extend/what_if/by_days.py"
 
     archive = _make_archive(
         tmp_path / "mixed_pack.sxp",

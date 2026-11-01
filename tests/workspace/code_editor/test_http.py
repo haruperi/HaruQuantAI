@@ -9,11 +9,11 @@ def test_http_save_as_identity_collision_and_validation(client):
     import tempfile
     from pathlib import Path
 
-    from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+    from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 
-    with tempfile.TemporaryDirectory(dir=INCLUDE_DIR, prefix="http_save_as_") as name:
+    with tempfile.TemporaryDirectory(dir=EXTEND_DIR, prefix="http_save_as_") as name:
         folder = Path(name).resolve()
-        assert folder.is_relative_to(INCLUDE_DIR.resolve())
+        assert folder.is_relative_to(EXTEND_DIR.resolve())
         source = folder / "source.py"
         target = folder / "new.py"
         source.write_text("original = 1", encoding="utf-8")

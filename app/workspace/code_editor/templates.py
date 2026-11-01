@@ -70,7 +70,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Custom indicator inheriting BaseIndicator with calculate(bars)",
         category="building_blocks",
         default_filename="custom_indicator.py",
-        target_subdir="app/include/blocks/indicators/custom",
+        target_subdir="app/extend/blocks/indicators/custom",
         generator_func_name="_gen_indicator",
     ),
     "BlocksSignal": SnippetTemplate(
@@ -79,7 +79,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Entry/exit condition rule evaluating indicator series",
         category="building_blocks",
         default_filename="custom_signal.py",
-        target_subdir="app/include/signals",
+        target_subdir="app/extend/signals",
         generator_func_name="_gen_signal",
     ),
     "BlocksOrder": SnippetTemplate(
@@ -88,7 +88,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Custom order action rule (Open, Modify, Close order)",
         category="building_blocks",
         default_filename="custom_order.py",
-        target_subdir="app/include/orders",
+        target_subdir="app/extend/orders",
         generator_func_name="_gen_order",
     ),
     "BlocksOtherActions": SnippetTemplate(
@@ -97,7 +97,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Side-effects: variable assignment, alert, logger, chart mark",
         category="building_blocks",
         default_filename="custom_action.py",
-        target_subdir="app/include/actions",
+        target_subdir="app/extend/actions",
         generator_func_name="_gen_other_actions",
     ),
     "ColumnsDatabanks": SnippetTemplate(
@@ -106,7 +106,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Custom strategy performance metric / Databank column",
         category="databanks",
         default_filename="custom_metric.py",
-        target_subdir="app/include/metrics",
+        target_subdir="app/extend/metrics",
         generator_func_name="_gen_databank_column",
     ),
     "ColumnsTrades": SnippetTemplate(
@@ -115,7 +115,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Custom per-trade metric computed over trade execution records",
         category="databanks",
         default_filename="custom_trade_column.py",
-        target_subdir="app/include/trade_columns",
+        target_subdir="app/extend/trade_columns",
         generator_func_name="_gen_trade_column",
     ),
     "MoneyManagement": SnippetTemplate(
@@ -124,7 +124,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Position sizing algorithm computing trade order volume",
         category="money_management",
         default_filename="custom_position_sizer.py",
-        target_subdir="app/include/money_management",
+        target_subdir="app/extend/money_management",
         generator_func_name="_gen_money_management",
     ),
     "MonteCarloManipulation": SnippetTemplate(
@@ -133,7 +133,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Trade list manipulation (resample, reshuffle, skip, slippage)",
         category="robustness",
         default_filename="custom_mc_manipulation.py",
-        target_subdir="app/include/monte_carlo/manipulation",
+        target_subdir="app/extend/monte_carlo/manipulation",
         generator_func_name="_gen_monte_carlo_manipulation",
     ),
     "MonteCarloRetest": SnippetTemplate(
@@ -142,7 +142,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Simulation parameter perturbation to test robustness",
         category="robustness",
         default_filename="custom_mc_retest.py",
-        target_subdir="app/include/monte_carlo/retest",
+        target_subdir="app/extend/monte_carlo/retest",
         generator_func_name="_gen_monte_carlo_retest",
     ),
     "WhatIf": SnippetTemplate(
@@ -151,7 +151,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Scenario filtering rule (e.g. drop worst N trades)",
         category="robustness",
         default_filename="custom_what_if.py",
-        target_subdir="app/include/what_if",
+        target_subdir="app/extend/what_if",
         generator_func_name="_gen_what_if",
     ),
     "CustomAnalysis": SnippetTemplate(
@@ -160,7 +160,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Standalone analytical script running over projects/databanks",
         category="analysis",
         default_filename="custom_analysis.py",
-        target_subdir="app/include/analysis",
+        target_subdir="app/extend/analysis",
         generator_func_name="_gen_custom_analysis",
     ),
     "AITools": SnippetTemplate(
@@ -169,7 +169,7 @@ _TEMPLATES: dict[str, SnippetTemplate] = {
         description="Dynamically registered tool callable by AI agents",
         category="ai_tools",
         default_filename="custom_ai_tool.py",
-        target_subdir="app/include/ai_tools",
+        target_subdir="app/extend/ai_tools",
         generator_func_name="_gen_ai_tools",
     ),
 }
@@ -208,17 +208,17 @@ def list_templates(file_path: str | None = None) -> list[TemplateInfo]:
 
 
 def _template_matches_path(template: SnippetTemplate, file_path: str) -> bool:
-    from app.workspace.code_editor._common import INCLUDE_DIR, resolve_safe_path
+    from app.workspace.code_editor._common import EXTEND_DIR, resolve_safe_path
 
     path = resolve_safe_path(file_path)
-    if path == INCLUDE_DIR.resolve() or path.name == "user":
+    if path == EXTEND_DIR.resolve() or path.name == "user":
         return True
-    user_root = INCLUDE_DIR / "user"
+    user_root = EXTEND_DIR / "user"
     if path.is_relative_to(user_root):
-        path = INCLUDE_DIR / path.relative_to(user_root)
+        path = EXTEND_DIR / path.relative_to(user_root)
     target = resolve_safe_path(template.target_subdir)
     if template.template_id == "BlocksIndicators":
-        target = INCLUDE_DIR / "blocks" / "indicators"
+        target = EXTEND_DIR / "blocks" / "indicators"
     if "code_templates" in path.parts:
         return False
     return path.is_relative_to(target) or target.is_relative_to(path)
@@ -271,7 +271,7 @@ def render_template(
                 "Indicator category must be a public Python identifier"
             )
         cat = _to_snake_case(category).strip("_") or "custom"
-        target_dir = f"app/include/blocks/indicators/{cat}"
+        target_dir = f"app/extend/blocks/indicators/{cat}"
         content = content.replace('category="custom"', f'category="{cat}"').replace(
             'id="indicator.custom.', f'id="indicator.{cat}.'
         )
@@ -291,9 +291,15 @@ def render_template(
         cls = resolve_indicator(indicator)
         target_dir += "/" + _to_snake_case(cls.__name__)
         content += f"\n# Canonical indicator identity used by this signal.\nINDICATOR = {indicator!r}\nOUTPUT = {cls.spec.outputs[0].name!r}\n"
+        from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR
         from app.workspace.code_editor.catalogue import symbol_catalogue
 
-        candidates = [s for s in symbol_catalogue() if s.name == cls.__name__]
+        indicator_root = EXTEND_DIR / "blocks" / "indicators"
+        if not any(indicator_root.rglob("*.py")):
+            indicator_root = INCLUDE_DIR / "blocks" / "indicators"
+        candidates = [
+            s for s in symbol_catalogue(indicator_root) if s.name == cls.__name__
+        ]
         if "/" in indicator:
             candidates = [
                 s for s in candidates if s.file_path == indicator.split("::", 1)[0]

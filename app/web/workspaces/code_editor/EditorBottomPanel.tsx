@@ -146,7 +146,7 @@ export function EditorBottomPanel({ workspace }: { workspace: CodeEditorState })
                     <input type="checkbox" checked={searchOptions[key]} onChange={e => setSearchOptions(previous => ({ ...previous, [key]: e.target.checked }))} />
                     {key === 'caseSensitive' ? 'Case sensitive' : key === 'regex' ? 'Regular expression' : 'Whole word'}
                   </label>)}
-                  <label>Search directory <input aria-label="Search directory" value={searchOptions.searchDir} onChange={e => setSearchOptions(previous => ({ ...previous, searchDir: e.target.value }))} placeholder="app/include" /></label>
+                  <label>Search directory <input aria-label="Search directory" value={searchOptions.searchDir} onChange={e => setSearchOptions(previous => ({ ...previous, searchDir: e.target.value }))} placeholder="app/extend" /></label>
                 </div>
                 {searchResults.map((m, i) => (
                   <div

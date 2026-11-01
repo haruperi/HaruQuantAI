@@ -8,7 +8,7 @@ Key Capabilities:
     - FR-editor-command-validation: Reject malformed requests; route tests verify
       acceptance/rejection logs without source or secret-bearing values.
 Python API Usage:
-    request = ReloadRequest(file_path="app/include/user/example.py")
+    request = ReloadRequest(file_path="app/extend/user/example.py")
 CLI Usage:
     uv run python -m pytest tests/workspace/code_editor --no-cov
 """

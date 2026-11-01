@@ -35,7 +35,7 @@ from pathlib import Path, PurePosixPath
 
 from app.core.lib.responses import ErrorCode
 from app.workspace.code_editor._common import (
-    INCLUDE_DIR,
+    EXTEND_DIR,
     PROJECT_ROOT,
     CodeEditorError,
     resolve_safe_path,
@@ -104,17 +104,21 @@ def list_exportable_tree(filter_text: str = "") -> NavigatorItem:
 
 
 def normalize_archive_entry_path(raw_name: str) -> Path:
-    """Normalize an archive entry path to a destination inside app/include."""
+    """Normalize an archive entry path to a destination inside app/extend."""
     posix = PurePosixPath(raw_name.replace("\\", "/"))
     if posix.is_absolute() or ".." in posix.parts:
         raise CodeEditorError(f"Unsafe archive entry path: {raw_name}")
     parts = posix.parts
     if not parts:
         raise CodeEditorError("Empty archive entry path")
-    if len(parts) >= 2 and parts[0] == "app" and parts[1] == "include":
+    if (
+        len(parts) >= 2
+        and parts[0] == "app"
+        and (parts[1] == "extend" or parts[1] == "include")
+    ):
         target = PROJECT_ROOT.joinpath(*parts)
     else:
-        target = INCLUDE_DIR.joinpath(*parts)
+        target = EXTEND_DIR.joinpath(*parts)
     return resolve_safe_path(target)
 
 

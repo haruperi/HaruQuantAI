@@ -66,9 +66,9 @@ def test_rename_directory_preserves_dirty_descendants(snippets):
     "path",
     [
         "app/main.py",
-        "app/include",
-        "app/include/blocks/indicators/__init__.py",
-        "app/include/blocks/actions/__init__.py",
+        "app/extend",
+        "app/extend/__init__.py",
+        "app/extend/checker/__init__.py",
         ".",
     ],
 )

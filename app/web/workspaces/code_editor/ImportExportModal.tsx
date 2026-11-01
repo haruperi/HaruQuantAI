@@ -34,14 +34,14 @@ export function ImportExportModal({ onClose, openFiles = [], onImportComplete }:
   const [description, setDescription] = useState<string>(
     'Custom indicator and strategy extension pack including snippets.'
   );
-  const [outputFilePath, setOutputFilePath] = useState<string>('app/include/my_pack.zip');
+  const [outputFilePath, setOutputFilePath] = useState<string>('app/extend/my_pack.zip');
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [exportMessage, setExportMessage] = useState<string | null>(null);
   const [exportFilter, setExportFilter] = useState<string>('');
   const [userExportFiles, setUserExportFiles] = useState<string[] | null>(null);
 
   // Import state
-  const [importFilePath, setImportFilePath] = useState<string>('app/include/my_pack.zip');
+  const [importFilePath, setImportFilePath] = useState<string>('app/extend/my_pack.zip');
   const [importOption, setImportOption] = useState<'merge' | 'overwrite' | 'rename'>('overwrite');
   const [isInspecting, setIsInspecting] = useState<boolean>(false);
   const [isImporting, setIsImporting] = useState<boolean>(false);

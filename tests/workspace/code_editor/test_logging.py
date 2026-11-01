@@ -38,12 +38,12 @@ def test_search_and_compilation_logs_do_not_copy_source_queries_or_exceptions(ca
     editor = CodeEditor()
     assert (
         editor.find_in_files(
-            "credential-marker", search_dir="app/include/absent_contract_test"
+            "credential-marker", search_dir="app/extend/absent_contract_test"
         )
         == []
     )
     result = editor.compile_file(
-        "app/include/contract_logging_example.py",
+        "app/extend/contract_logging_example.py",
         "raise RuntimeError('credential-marker')",
     )
     assert not result["success"]

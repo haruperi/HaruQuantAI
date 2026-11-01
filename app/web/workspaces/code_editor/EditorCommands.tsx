@@ -70,7 +70,7 @@ export function EditorCommands({ workspace: w }: { workspace: CodeEditorState })
   const start = async (scope: 'file' | 'package' | 'all' | 'registered') => {
     let path = w.activeFilePath ?? undefined;
     if (scope === 'package') {
-      const answer = prompt('Python package directory:', w.selectedNavPath ?? 'app/include/user');
+      const answer = prompt('Python package directory:', w.selectedNavPath ?? 'app/extend/user');
       if (!answer) return;
       path = answer;
     }
@@ -100,7 +100,7 @@ export function EditorCommands({ workspace: w }: { workspace: CodeEditorState })
     if (!w.activeFilePath) return;
     const extension = formats.find(item => item.format_id === format)?.extension;
     if (!extension) return;
-    const path = prompt('Export template destination:', `app/include/user/code_templates/${format}/template${extension}`);
+    const path = prompt('Export template destination:', `app/extend/user/code_templates/${format}/template${extension}`);
     if (!path) return;
     setBusy(true); setError('');
     try {

@@ -19,7 +19,7 @@ import logging
 from pathlib import Path
 
 from app.core.lib.errors import copy_json
-from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR, PROJECT_ROOT
 from app.workspace.code_editor._indicator_resolver import resolve_indicator
 from app.workspace.code_editor.command_models import IndicatorInfo, SymbolInfo
 from app.workspace.code_editor.path_policy import inspect_path
@@ -27,7 +27,7 @@ from app.workspace.code_editor.path_policy import inspect_path
 logger = logging.getLogger(__name__)
 
 
-def symbol_catalogue(root: Path = INCLUDE_DIR) -> list[SymbolInfo]:
+def symbol_catalogue(root: Path = EXTEND_DIR) -> list[SymbolInfo]:
     """Return deterministic declarations, excluding symlinks and private paths."""
     logger.debug("FR-editor-catalogue: invoked")
     symbols: list[SymbolInfo] = []
@@ -101,7 +101,10 @@ def indicator_catalogue() -> list[IndicatorInfo]:
     """List concrete indicators using canonical defaults and output metadata."""
     logger.debug("FR-editor-catalogue: indicators invoked")
     records: list[IndicatorInfo] = []
-    for symbol in symbol_catalogue(INCLUDE_DIR / "blocks" / "indicators"):
+    indicator_root = EXTEND_DIR / "blocks" / "indicators"
+    if not any(indicator_root.rglob("*.py")):
+        indicator_root = INCLUDE_DIR / "blocks" / "indicators"
+    for symbol in symbol_catalogue(indicator_root):
         if symbol.kind != "class":
             continue
         try:

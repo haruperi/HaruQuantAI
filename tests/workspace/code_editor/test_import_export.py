@@ -15,7 +15,7 @@ def impexp():
 def test_export_inspect_and_import(impexp: ImportExport, tmp_path: Path):
     """Verify exporting snippet files to zip, inspecting, and extracting with overwrite."""
     # Create test source snippet
-    sample_rel = "app/include/blocks/indicators/custom/test_export_sample.py"
+    sample_rel = "app/extend/user/test_export_sample.py"
     sample_abs = PROJECT_ROOT / sample_rel
     sample_abs.parent.mkdir(parents=True, exist_ok=True)
     sample_abs.write_text("# Test export content\n", encoding="utf-8")
@@ -42,10 +42,7 @@ def test_export_inspect_and_import(impexp: ImportExport, tmp_path: Path):
         # 4. Import with rename rule
         imp_rename = impexp.overwrite_confirm(archive_path, {sample_rel: "rename"})
         assert imp_rename["extracted_count"] == 1
-        renamed_path = (
-            PROJECT_ROOT
-            / "app/include/blocks/indicators/custom/test_export_sample_imported.py"
-        )
+        renamed_path = PROJECT_ROOT / "app/extend/user/test_export_sample_imported.py"
         assert renamed_path.exists()
         renamed_path.unlink()
 

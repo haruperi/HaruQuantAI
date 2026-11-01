@@ -101,8 +101,8 @@ def test_compile_all_accepts_the_real_unified_library():
     result = CodeEditor().compile_all()
     failures = [item for item in result["results"] if not item["success"]]
     assert not failures, failures
-    assert result["total_files"] >= 87
-    assert not registry.blocks[str(INCLUDE_DIR / "blocks/indicators/base.py")]
+    assert result["total_files"] >= 45
+    assert not registry.blocks.get(str(INCLUDE_DIR / "blocks/indicators/base.py"))
 
 
 def test_dynamic_modules_keep_relative_import_context():

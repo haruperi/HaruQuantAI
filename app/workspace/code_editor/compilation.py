@@ -26,7 +26,7 @@ from pydantic import ValidationError
 from app.core.jobs.manager import JobCancelledError, JobContext, JobManager
 from app.core.lib.responses import ErrorCode
 from app.workspace.code_editor._common import (
-    INCLUDE_DIR,
+    EXTEND_DIR,
     CodeEditorError,
     resolve_safe_path,
 )
@@ -79,18 +79,18 @@ class CompilationService:
             root = (
                 resolve_safe_path(request.file_path)
                 if request.scope == "package" and request.file_path
-                else INCLUDE_DIR
+                else EXTEND_DIR
             )
-            if not root.is_dir() or not root.is_relative_to(INCLUDE_DIR.resolve()):
+            if not root.is_dir() or not root.is_relative_to(EXTEND_DIR.resolve()):
                 raise CodeEditorError(
-                    "Package compilation requires an include directory"
+                    "Package compilation requires an extend directory"
                 )
             paths = sorted(root.rglob("*.py"))
         paths = [
             p
             for p in paths
             if not p.is_symlink()
-            and p.resolve().is_relative_to(INCLUDE_DIR.resolve())
+            and p.resolve().is_relative_to(EXTEND_DIR.resolve())
             and not any(
                 part.startswith(".") or part == "__pycache__" for part in p.parts
             )

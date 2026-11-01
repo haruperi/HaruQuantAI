@@ -12,7 +12,7 @@ from app.core.host.resources import ResourceMonitor
 from app.core.jobs.manager import JobManager
 from app.main import create_app
 from app.workspace.code_editor import catalogue
-from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR, PROJECT_ROOT
 from app.workspace.code_editor._storage import StateStore
 from app.workspace.code_editor.command_models import (
     CompilationRequest,
@@ -36,9 +36,9 @@ from fastapi.testclient import TestClient
 
 @pytest.fixture
 def source_tree():
-    with tempfile.TemporaryDirectory(dir=INCLUDE_DIR, prefix="commands_") as name:
+    with tempfile.TemporaryDirectory(dir=EXTEND_DIR, prefix="commands_") as name:
         root = Path(name).resolve()
-        assert root.is_relative_to(INCLUDE_DIR.resolve())
+        assert root.is_relative_to(EXTEND_DIR.resolve())
         yield root
 
 
@@ -113,14 +113,14 @@ def test_corrupt_session_is_not_rewritten(isolated_editor):
 
 
 def test_builtin_policy_clone_and_mutation(source_tree):
-    source = "app/include/blocks/indicators/trend/sma.py"
+    source = "app/extend/what_if/by_days.py"
     info = inspect_path(source)
     assert info.protected and info.ownership == "builtin"
-    assert info.clone_target.startswith("app/include/user/")
+    assert info.clone_target.startswith("app/extend/user/")
     with pytest.raises(CodeEditorError):
         AppCodeEditor().save_file(source, "do_not_write = 1")
     with pytest.raises(CodeEditorError):
-        CodeEditor().delete_file("app/include/blocks/indicators/trend")
+        CodeEditor().delete_file("app/extend/what_if")
     target = source_tree / "cloned.py"
     CodeEditor().clone(source, str(target))
     assert "class Cloned" in target.read_text(encoding="utf-8")
@@ -214,9 +214,9 @@ def test_monte_carlo_subtype_and_path_catalogues(kind):
     assert kind.lower() in path
     assert all(
         item["template_id"].startswith("MonteCarlo")
-        for item in list_templates("app/include/monte_carlo")
+        for item in list_templates("app/extend/monte_carlo")
     )
-    assert list_templates("app/include/user/code_templates") == []
+    assert list_templates("app/extend/user/code_templates") == []
 
 
 @pytest.mark.parametrize("action", ["Open", "Modify", "Close"])
@@ -256,7 +256,7 @@ def test_export_template_formats_and_collisions(source_tree, format_id, extensio
     with pytest.raises(CodeEditorError):
         create_export_template(request)
     assert [
-        f.format_id for f in supported_formats("app/include/user/code_templates/python")
+        f.format_id for f in supported_formats("app/extend/user/code_templates/python")
     ] == ["python"]
 
 
@@ -427,7 +427,7 @@ def test_code_types_and_path_catalogue_http(service):
         "Close",
     ]
     templates = client.get(
-        base + "/templates", params={"file_path": "app/include/monte_carlo"}
+        base + "/templates", params={"file_path": "app/extend/monte_carlo"}
     ).json()["data"]
     assert len(templates) == 2
     assert (
@@ -459,15 +459,15 @@ def test_editor_worker_lifecycle_is_host_owned(monkeypatch, caplog):
 
 def test_path_catalogue_maps_indicator_categories_and_user_clones():
     for path in (
-        "app/include/blocks/indicators/trend/sma.py",
-        "app/include/user/blocks/indicators/trend/sma_copy.py",
+        "app/extend/blocks/indicators/trend/sma.py",
+        "app/extend/user/blocks/indicators/trend/sma_copy.py",
     ):
         assert [item["template_id"] for item in list_templates(path)] == [
             "BlocksIndicators"
         ]
     assert [
         item["template_id"]
-        for item in list_templates("app/include/user/orders/close/example.py")
+        for item in list_templates("app/extend/user/orders/close/example.py")
     ] == ["BlocksOrder"]
 
 

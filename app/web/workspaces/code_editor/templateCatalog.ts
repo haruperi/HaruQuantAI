@@ -40,7 +40,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Create custom technical indicators using price, volume, and other market data. This template provides a clean structure for building indicators with configurable parameters and easy integration with the HaruQuantAI backtesting framework.',
     defaultName: 'MyIndicator',
-    targetDir: 'app/include/blocks/indicators/',
+    targetDir: 'app/extend/blocks/indicators/',
     color: 'bg-blue-600/20 text-blue-400 border-blue-500/30',
     icon: BarChart2,
   },
@@ -52,7 +52,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Evaluates conditions across indicator and price series to generate entry or exit triggers for trading strategies.',
     defaultName: 'MySignalCondition',
-    targetDir: 'app/include/signals/',
+    targetDir: 'app/extend/signals/',
     color: 'bg-emerald-600/20 text-emerald-400 border-emerald-500/30',
     icon: Zap,
   },
@@ -64,7 +64,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Custom logic for opening, modifying, and closing trading orders with fine-grained slippage and magic number control.',
     defaultName: 'MyOrderAction',
-    targetDir: 'app/include/orders/',
+    targetDir: 'app/extend/orders/',
     color: 'bg-amber-600/20 text-amber-400 border-amber-500/30',
     icon: Layers,
   },
@@ -76,7 +76,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Side-effect actions triggered on events: logging, sound alerts, email/webhook alerts, and chart markers.',
     defaultName: 'MyAction',
-    targetDir: 'app/include/actions/',
+    targetDir: 'app/extend/actions/',
     color: 'bg-purple-600/20 text-purple-400 border-purple-500/30',
     icon: Settings,
   },
@@ -88,7 +88,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Computes custom strategy performance metrics and statistics displayed as filterable columns in Databanks.',
     defaultName: 'MyDatabankMetric',
-    targetDir: 'app/include/metrics/',
+    targetDir: 'app/extend/metrics/',
     color: 'bg-cyan-600/20 text-cyan-400 border-cyan-500/30',
     icon: Database,
   },
@@ -99,7 +99,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     description: 'Trade and position data columns',
     detailedDoc: 'Computes per-trade analytic columns evaluated over individual historical trade execution records.',
     defaultName: 'MyTradeColumn',
-    targetDir: 'app/include/trade_columns/',
+    targetDir: 'app/extend/trade_columns/',
     color: 'bg-pink-600/20 text-pink-400 border-pink-500/30',
     icon: CandlestickChart,
   },
@@ -111,7 +111,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Calculates order volume (lots/contracts) dynamically based on risk percentage, equity, and stop-loss distance.',
     defaultName: 'MyPositionSizer',
-    targetDir: 'app/include/money_management/',
+    targetDir: 'app/extend/money_management/',
     color: 'bg-yellow-600/20 text-yellow-400 border-yellow-500/30',
     icon: Shield,
   },
@@ -123,7 +123,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Performs trade sequence manipulation: reshuffling, resampling with replacement, randomized skipping, and slippage jitter.',
     defaultName: 'MyMcManipulation',
-    targetDir: 'app/include/monte_carlo/manipulation/',
+    targetDir: 'app/extend/monte_carlo/manipulation/',
     color: 'bg-teal-600/20 text-teal-400 border-teal-500/30',
     icon: Network,
   },
@@ -134,7 +134,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     description: 'Monte Carlo strategy retest',
     detailedDoc: 'Simulates parameter perturbations to test strategy robustness and sensitivity against overfitting.',
     defaultName: 'MyMcRetest',
-    targetDir: 'app/include/monte_carlo/retest/',
+    targetDir: 'app/extend/monte_carlo/retest/',
     color: 'bg-indigo-600/20 text-indigo-400 border-indigo-500/30',
     icon: TrendingUp,
   },
@@ -146,7 +146,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Hypothetical scenario filtering rule (e.g. drop worst N consecutive trades, filter by day of week or session hours).',
     defaultName: 'MyWhatIfScenario',
-    targetDir: 'app/include/what_if/',
+    targetDir: 'app/extend/what_if/',
     color: 'bg-red-600/20 text-red-400 border-red-500/30',
     icon: FlaskConical,
   },
@@ -158,7 +158,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Batch analytical processor and reporting script operating over databanks and multiple strategy results.',
     defaultName: 'MyCustomAnalysis',
-    targetDir: 'app/include/analysis/',
+    targetDir: 'app/extend/analysis/',
     color: 'bg-sky-600/20 text-sky-400 border-sky-500/30',
     icon: Search,
   },
@@ -170,7 +170,7 @@ export const TEMPLATE_METADATA: TemplateMetadata[] = [
     detailedDoc:
       'Defines custom tools exposed via Model Context Protocol (MCP) and callable by autonomous AI research agents.',
     defaultName: 'MyAIAssistantTool',
-    targetDir: 'app/include/ai_tools/',
+    targetDir: 'app/extend/ai_tools/',
     color: 'bg-fuchsia-600/20 text-fuchsia-400 border-fuchsia-500/30',
     icon: Cpu,
   },

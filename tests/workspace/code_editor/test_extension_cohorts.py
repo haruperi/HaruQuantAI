@@ -38,7 +38,7 @@ from app.include.trading_options import (
     MinMaxSLPT,
     UseInitialSLPT,
 )
-from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 from app.workspace.code_editor.path_policy import builtin_files, inspect_path
 from app.workspace.code_editor.routes import CodeEditor
 
@@ -75,7 +75,7 @@ def test_builtin_manifest_and_editor_compilation_of_new_cohorts():
     builtin_files.cache_clear()
     shipped = {
         p.relative_to(PROJECT_ROOT).as_posix()
-        for p in INCLUDE_DIR.rglob("*")
+        for p in EXTEND_DIR.rglob("*")
         if p.is_file()
         and "__pycache__" not in p.parts
         and not any(
@@ -85,18 +85,17 @@ def test_builtin_manifest_and_editor_compilation_of_new_cohorts():
     }
     assert shipped == set(builtin_files())
     for rel_path in (
-        "app/include/blocks/money_management/sizers.py",
-        "app/include/trading/commissions.py",
-        "app/include/trading_options/options.py",
+        "app/extend/what_if/by_days.py",
+        "app/extend/checker/checkers.py",
+        "app/extend/columns/trades.py",
     ):
         info = inspect_path(rel_path)
         assert info.ownership == "builtin"
         assert info.protected is True
 
     editor = CodeEditor()
-    mm_res = editor.compile_file("app/include/blocks/money_management/sizers.py")
+    mm_res = editor.compile_file("app/extend/what_if/by_days.py")
     assert mm_res["success"] is True
-    assert len(mm_res.get("registered_classes", [])) == 12
 
 
 def test_all_12_money_management_sizers():

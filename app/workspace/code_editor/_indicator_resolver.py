@@ -24,6 +24,7 @@ from pathlib import Path
 
 from app.include.blocks.indicators.base import BaseIndicator
 from app.workspace.code_editor._common import (
+    EXTEND_DIR,
     INCLUDE_DIR,
     PROJECT_ROOT,
     CodeEditorError,
@@ -35,7 +36,10 @@ from app.workspace.code_editor.registry import registry
 logger = logging.getLogger(__name__)
 
 
-INDICATOR_ROOTS: tuple[Path, ...] = (INCLUDE_DIR / "blocks" / "indicators",)
+INDICATOR_ROOTS: tuple[Path, ...] = (
+    EXTEND_DIR / "blocks" / "indicators",
+    INCLUDE_DIR / "blocks" / "indicators",
+)
 
 
 def _normalize(name: str) -> str:

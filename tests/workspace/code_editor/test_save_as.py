@@ -7,16 +7,16 @@ from pathlib import Path
 import pytest
 from app.core.lib.responses import ErrorCode
 from app.workspace.code_editor import _storage
-from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 from app.workspace.code_editor.editor import AppCodeEditor
 from app.workspace.code_editor.errors import CodeEditorError
 
 
 @pytest.fixture
 def documents():
-    with tempfile.TemporaryDirectory(dir=INCLUDE_DIR, prefix="save_as_") as name:
+    with tempfile.TemporaryDirectory(dir=EXTEND_DIR, prefix="save_as_") as name:
         folder = Path(name).resolve()
-        assert folder.is_relative_to(INCLUDE_DIR.resolve())
+        assert folder.is_relative_to(EXTEND_DIR.resolve())
         source = folder / "source.py"
         other = folder / "other.py"
         source.write_text("original = 1\n", encoding="utf-8")
@@ -100,10 +100,10 @@ def test_collisions_preserve_disk_and_session(documents, target_kind):
 @pytest.mark.parametrize(
     "target",
     [
-        "app/include/__init__.py",
-        "app/include/.protected/new.py",
+        "app/extend/__init__.py",
+        "app/extend/.protected/new.py",
         "app/main.py",
-        "app/include",
+        "app/extend",
     ],
 )
 def test_protected_destinations_are_rejected_before_publication(documents, target):

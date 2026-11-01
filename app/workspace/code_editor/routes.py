@@ -79,7 +79,7 @@ from pathlib import Path
 from typing import override
 
 from app.workspace.code_editor._common import (
-    INCLUDE_DIR,
+    EXTEND_DIR,
     PROJECT_ROOT,
     CodeEditorError,
     dynamic_import_source,
@@ -172,7 +172,7 @@ class CodeEditor:
     ) -> NavigatorItem:
         """FR-CODEEDITOR-NAVIGATOR: Build hierarchical file tree of snippet repository."""
         logger.debug("FR-code-editor-routes-navigator: invoked")
-        target_root = resolve_safe_path(root_dir) if root_dir else INCLUDE_DIR
+        target_root = resolve_safe_path(root_dir) if root_dir else EXTEND_DIR
         from app.workspace.code_editor.path_policy import inspect_path
 
         if ownership not in ("all", "builtin", "user"):
@@ -411,7 +411,7 @@ class CodeEditor:
     ) -> list[SearchMatch]:
         """FR-CODEEDITOR-FIND: Search for text or patterns across snippets."""
         logger.debug("FR-code-editor-routes-find-in-files: invoked")
-        root = resolve_safe_path(search_dir) if search_dir else INCLUDE_DIR
+        root = resolve_safe_path(search_dir) if search_dir else EXTEND_DIR
         flags = 0 if case_sensitive else re.IGNORECASE
         pattern_str = query
         if not regex:
@@ -512,8 +512,8 @@ class CodeEditor:
         for path in list(registry.blocks):
             if not Path(path).exists():
                 registry.unregister(path)
-        if INCLUDE_DIR.exists():
-            for p in INCLUDE_DIR.rglob("*.py"):
+        if EXTEND_DIR.exists():
+            for p in EXTEND_DIR.rglob("*.py"):
                 if not p.name.startswith((".", "__")):
                     results.append(self.compile_file(str(p)))
 

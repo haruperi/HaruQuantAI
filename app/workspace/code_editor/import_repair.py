@@ -9,7 +9,7 @@ Key Capabilities:
     - FR-editor-import-repair: Log completion and invalid selection rejection;
       tests verify ambiguity, idempotence and future/docstring placement.
 Python API Usage:
-    result = repair_imports(RepairRequest(file_path="app/include/user/a.py", content=""))
+    result = repair_imports(RepairRequest(file_path="app/extend/user/a.py", content=""))
 CLI Usage:
     uv run python -m pytest tests/workspace/code_editor --no-cov
 """

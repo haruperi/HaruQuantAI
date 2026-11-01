@@ -16,13 +16,13 @@ describe('ImportExportModal interactive conflict session and user listing contra
       expect.objectContaining({ method: 'GET' })
     );
 
-    await client.startImportSession(['app/include/pack.sxp'], 60);
+    await client.startImportSession(['app/extend/pack.sxp'], 60);
     expect(fetchFn).toHaveBeenLastCalledWith(
       '/api/v1/code-editor/import-export/session/start',
       expect.objectContaining({
         method: 'POST',
         body: JSON.stringify({
-          archive_paths: ['app/include/pack.sxp'],
+          archive_paths: ['app/extend/pack.sxp'],
           timeout_seconds: 60,
         }),
       })

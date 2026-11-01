@@ -9,7 +9,7 @@ Key Capabilities:
     - FR-editor-path-policy: Log policy evaluation and rejection; tests verify
       builtin protection, user mutation and clone destinations.
 Python API Usage:
-    info = inspect_path("app/include/user/example.py")
+    info = inspect_path("app/extend/user/example.py")
 CLI Usage:
     uv run python -m pytest tests/workspace/code_editor --no-cov
 """
@@ -38,28 +38,28 @@ def builtin_files() -> frozenset[str]:
 
 def inspect_path(file_path: str | Path) -> PathInfo:
     """Describe ownership, protected descendants and a safe default clone path."""
-    from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+    from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 
     logger.debug("FR-editor-path-policy: evaluated")
     path = Path(file_path)
     path = (PROJECT_ROOT / path).resolve() if not path.is_absolute() else path.resolve()
     relative = path.relative_to(PROJECT_ROOT).as_posix()
-    inside = path.is_relative_to(INCLUDE_DIR.resolve())
+    inside = path.is_relative_to(EXTEND_DIR.resolve())
     builtin = relative in builtin_files()
     protected = (
         not inside
-        or path == INCLUDE_DIR.resolve()
+        or path == EXTEND_DIR.resolve()
         or builtin
         or any(part.startswith((".", "__")) for part in Path(relative).parts)
         or (
             path.is_dir() and any(p.startswith(relative + "/") for p in builtin_files())
         )
     )
-    tail = path.relative_to(INCLUDE_DIR).as_posix() if inside else path.name
+    tail = path.relative_to(EXTEND_DIR).as_posix() if inside else path.name
     tail = tail.removeprefix("user/")
     if tail in (".", ""):
         tail = "snippet.py"
-    clone = f"app/include/user/{Path(tail).with_name(path.stem + '_copy' + path.suffix).as_posix()}"
+    clone = f"app/extend/user/{Path(tail).with_name(path.stem + '_copy' + path.suffix).as_posix()}"
     return PathInfo(
         file_path=relative,
         ownership="builtin" if builtin else "user" if inside else "host",

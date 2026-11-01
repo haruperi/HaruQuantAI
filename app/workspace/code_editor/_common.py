@@ -53,6 +53,7 @@ __all__ = [
     "SyntaxDiagnostic",
     "EditorTab",
     "PROJECT_ROOT",
+    "EXTEND_DIR",
     "INCLUDE_DIR",
     "SNIPPETS_DIR",
     "resolve_safe_path",
@@ -66,8 +67,9 @@ logger = logging.getLogger(__name__)
 
 # Canonical roots for user extensions and standard include blocks
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
+EXTEND_DIR = PROJECT_ROOT / "app" / "extend"
 INCLUDE_DIR = PROJECT_ROOT / "app" / "include"
-SNIPPETS_DIR = INCLUDE_DIR
+SNIPPETS_DIR = EXTEND_DIR
 
 
 @dataclass
@@ -174,13 +176,13 @@ def dynamic_import_from_path(file_path: Path) -> ModuleType:
 
 
 def writable_snippet_path(target_path: str | Path) -> Path:
-    """Reject mutations outside authorized include directory and protected files."""
+    """Reject mutations outside authorized extend directory and protected files."""
     logger.debug("FR-code-editor-common-writable-snippet-path: invoked")
     resolved = resolve_safe_path(target_path)
     try:
-        parts = resolved.relative_to(INCLUDE_DIR.resolve()).parts
+        parts = resolved.relative_to(EXTEND_DIR.resolve()).parts
     except ValueError as exc:
-        raise CodeEditorError("Only files in app/include can be modified") from exc
+        raise CodeEditorError("Only files in app/extend can be modified") from exc
     if not parts or any(part.startswith((".", "__")) for part in parts):
         raise CodeEditorError("Protected snippet package path")
     from app.workspace.code_editor.path_policy import inspect_path

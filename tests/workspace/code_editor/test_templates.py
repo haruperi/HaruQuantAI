@@ -38,7 +38,7 @@ def test_list_templates_returns_12_templates():
 def test_each_template_renders_valid_python(tmpl_id: str):
     """Verify that rendering each template produces syntactically valid Python code."""
     content, file_path = render_template(tmpl_id, "SampleSnippet")
-    assert file_path.startswith("app/include/")
+    assert file_path.startswith("app/extend/")
     assert file_path.endswith(".py")
     assert len(content) > 50
 
@@ -58,9 +58,9 @@ def test_render_indicator_with_custom_category():
     content, path_vol = render_template(
         "BlocksIndicators", "CustomVol", category="volatility"
     )
-    assert path_vol == "app/include/blocks/indicators/volatility/custom_vol.py"
+    assert path_vol == "app/extend/blocks/indicators/volatility/custom_vol.py"
     assert 'id="indicator.volatility.custom_vol"' in content
     assert 'category="volatility"' in content
 
     _, path_custom = render_template("BlocksIndicators", "CustomAlpha")
-    assert path_custom == "app/include/blocks/indicators/custom/custom_alpha.py"
+    assert path_custom == "app/extend/blocks/indicators/custom/custom_alpha.py"

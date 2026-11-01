@@ -40,10 +40,21 @@ export function RenderTreeItem({
     what_if: 'What-if',
     analysis: 'Analysis',
     ai_tools: 'AI tool',
+    checker: 'Checker',
+    code: 'Code',
+    columns: 'Columns',
+    correlation_of: 'Correlation',
+    custom_analysis: 'Analysis',
+    engine_charts: 'Charts',
+    formulas: 'Formulas',
+    negater: 'Negater',
+    portfolio_master_fitness: 'Fitness',
+    stats: 'Stats',
+    trade_analysis: 'Trade Analysis',
   };
   const domainIndex = parts[2] === 'blocks' ? 3 : 2;
   const badge =
-    parts[0] === 'app' && parts[1] === 'include'
+    parts[0] === 'app' && (parts[1] === 'extend' || parts[1] === 'include')
       ? parts[domainIndex] === 'indicators' && parts[domainIndex + 1] && (isDir || parts.length > domainIndex + 2)
         ? parts[domainIndex + 1]
         : domains[parts[domainIndex]]

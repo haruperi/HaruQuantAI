@@ -14,7 +14,7 @@ import numpy as np
 import pytest
 from app.include.blocks.price import BarPrice
 from app.main import create_app
-from app.workspace.code_editor._common import INCLUDE_DIR, PROJECT_ROOT
+from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 from app.workspace.code_editor.command_models import (
     SuiteConfigModel,
     SuiteTestCaseModel,
@@ -25,7 +25,7 @@ from fastapi.testclient import TestClient
 
 @pytest.fixture
 def acceptance_env(isolated_editor, tmp_path: Path):
-    sandbox = (INCLUDE_DIR / f"accept_{uuid.uuid4().hex[:8]}").resolve()
+    sandbox = (EXTEND_DIR / f"accept_{uuid.uuid4().hex[:8]}").resolve()
     sandbox.mkdir(parents=True, exist_ok=True)
     tests_dir = tmp_path / "suite_tests"
     tests_dir.mkdir(parents=True, exist_ok=True)
