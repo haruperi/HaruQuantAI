@@ -25,6 +25,27 @@ it('round-trips the chart document and rejects malformed/future versions', () =>
     ),
   ).toThrow();
 });
+it('persists magnet options and upgrades older chart documents without losing drawings', () => {
+  const state = persisted(createChartStore());
+  state.chart.magnet = true;
+  state.chart.magnetStrength = 'strong';
+  state.chart.snapToIndicators = true;
+  expect(decode(JSON.stringify({ version: 1, state }))).toEqual(state);
+
+  const legacy = structuredClone(state);
+  delete (legacy.chart as Partial<typeof legacy.chart>).magnetStrength;
+  delete (legacy.chart as Partial<typeof legacy.chart>).snapToIndicators;
+  const decoded = decode(JSON.stringify({ version: 1, state: legacy }));
+  expect(decoded.chart).toMatchObject({ magnet: true, magnetStrength: 'weak', snapToIndicators: false });
+
+  const invalid = structuredClone(state);
+  (invalid.chart as unknown as Record<string, unknown>).magnetStrength = 'extra';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid magnet strength.');
+  (invalid.chart as unknown as Record<string, unknown>).magnetStrength = 'weak';
+  (invalid.chart as unknown as Record<string, unknown>).snapToIndicators = 'yes';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid indicator snapping setting.');
+});
+
 it('preserves unknown data instead of overwriting it', () => {
   const map = new Map([[storageKey, '{"version":99}']]);
   const storage = {
