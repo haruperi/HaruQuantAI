@@ -77,6 +77,31 @@ it('remembers the last chosen tool per group through cursor reset and saved-char
   }
 });
 
+it('round-trips appearance options and restores defaults for pre-settings charts', () => {
+  const state = persisted(createChartStore());
+  state.chart.candleUpColor = '#123456';
+  state.chart.gridColor = '#112233';
+  state.chart.showGrid = false;
+  state.chart.showBuySellButtons = false;
+  state.chart.showAlertLines = false;
+  expect(decode(JSON.stringify({ version: 1, state })).chart).toEqual(state.chart);
+  const older = structuredClone(state);
+  for (const key of ['candleUpColor', 'gridColor', 'showGrid', 'showBuySellButtons', 'showAlertLines'])
+    delete (older.chart as unknown as Record<string, unknown>)[key];
+  const decoded = decode(JSON.stringify({ version: 1, state: older }));
+  expect(decoded.chart.candleUpColor).toBe('#089981');
+  expect(decoded.chart.gridColor).toBe('#2a2e39');
+  expect(decoded.chart.showGrid).toBe(true);
+  expect(decoded.chart.showBuySellButtons).toBe(true);
+  expect(decoded.chart.showAlertLines).toBe(true);
+  const invalid = structuredClone(state);
+  invalid.chart.candleUpColor = 'rgb(255, 0, 0)';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid chart appearance color.');
+  invalid.chart.candleUpColor = '#123456';
+  (invalid.chart as unknown as Record<string, unknown>).showGrid = 'yes';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid chart appearance toggle.');
+});
+
 it('preserves unknown data instead of overwriting it', () => {
   const map = new Map([[storageKey, '{"version":99}']]);
   const storage = {
