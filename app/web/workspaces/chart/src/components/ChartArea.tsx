@@ -9,7 +9,7 @@ import { formatPrice } from '../utils/format';
 import { pnl } from '../store/positions';
 import { ToolButton } from './Tooltip';
 export function ChartArea() {
-  const { store, engine, root } = useChart(),
+  const { store, engine, root, onCrosshairTime, onViewport } = useChart(),
     s = useStore(store),
     host = useRef<HTMLDivElement>(null),
     legend = useRef<HTMLDivElement>(null),
@@ -21,6 +21,8 @@ export function ChartArea() {
     if (!host.current) return;
     const instance = new ChartEngine(host.current, store, new MockFeed());
     engine.current = instance;
+    instance.onCrosshairTime = onCrosshairTime;
+    instance.onViewport = onViewport;
     instance.onLoading = setLoading;
     instance.onReadout = (r) => {
       const c = store.getState().chart;
@@ -64,7 +66,7 @@ export function ChartArea() {
       instance.destroy();
       engine.current = null;
     };
-  }, [store, engine, root]);
+  }, [store, engine, root, onCrosshairTime, onViewport]);
   const symbol = symbolInfo(s.chart.symbol);
   return (
     <div className="cq-chart" aria-label="Chart" role="region">
