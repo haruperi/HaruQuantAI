@@ -288,6 +288,54 @@ test('drawing menu hover closes on leave and permits menu selection', async ({ p
   }
 });
 
+test('magnet menu supports weak, strong and indicator snapping with persistence', async ({ page }) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+
+  const trigger = page.getByRole('button', { name: 'Magnet', exact: true });
+  const caret = trigger.locator('.cq-caret');
+  const menu = page.getByRole('menu', { name: 'Magnet modes', exact: true });
+  await caret.hover();
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('menuitemradio')).toHaveText(['Weak magnet', 'Strong magnet']);
+  await expect(menu.getByRole('switch', { name: 'Snap to indicators' })).toBeDisabled();
+
+  await menu.getByRole('menuitemradio', { name: 'Weak magnet' }).click();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await caret.hover();
+  await expect(menu.getByRole('menuitemradio', { name: 'Weak magnet' })).toHaveAttribute('aria-checked', 'true');
+  await menu.getByRole('menuitemradio', { name: 'Strong magnet' }).click();
+
+  await page.getByRole('button', { name: 'Indicators', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Indicators' });
+  await dialog.getByRole('button', { name: /SMA/ }).click();
+  await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+
+  await caret.hover();
+  const toggle = menu.getByRole('switch', { name: 'Snap to indicators' });
+  await expect(toggle).toBeEnabled();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-checked', 'true');
+  await expect(menu.getByRole('menuitemradio', { name: 'Strong magnet' })).toHaveAttribute('aria-checked', 'true');
+
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'false');
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('Saved locally', { exact: true })).toBeVisible();
+  await expect.poll(async () => page.evaluate(() => {
+    const chart = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state.chart;
+    return { magnet: chart.magnet, magnetStrength: chart.magnetStrength, snapToIndicators: chart.snapToIndicators };
+  })).toEqual({ magnet: true, magnetStrength: 'strong', snapToIndicators: true });
+
+  await page.reload();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await caret.hover();
+  await expect(menu.getByRole('menuitemradio', { name: 'Strong magnet' })).toHaveAttribute('aria-checked', 'true');
+  await expect(menu.getByRole('switch', { name: 'Snap to indicators' })).toHaveAttribute('aria-checked', 'true');
+});
+
 test('cursor menu modes, effects, tooltip and eraser undo', async ({ page }, testInfo) => {
   test.setTimeout(60000);
   await page.goto('/chart');
