@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import {
-  AlarmClock, AlignLeft, Bell, CalendarDays, ChartCandlestick, ChartNoAxesCombined,
+  AlignLeft, Bell, CalendarDays, ChartCandlestick, ChartNoAxesCombined,
   ChevronDown, Paintbrush, Scaling, X,
 } from 'lucide-react';
 import { useStore } from 'zustand';
