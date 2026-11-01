@@ -137,7 +137,7 @@ export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[], onAsse
       continue;
     }
     if (shape.kind === 'text') {
-      shape.text.split('\\n').forEach((row, i) => ctx.fillText(row, shape.at.x, shape.at.y + i * 16));
+      shape.text.split('\n').forEach((row, i) => ctx.fillText(row, shape.at.x, shape.at.y + i * 16));
       ctx.restore();
       continue;
     }
