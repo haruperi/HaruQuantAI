@@ -416,7 +416,7 @@ export function LeftToolbar() {
                 <div
                   key={section.title}
                   className={
-                    ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes'].includes(name)
+                    ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes', 'Annotate'].includes(name)
                       ? 'cq-line-section'
                       : undefined
                   }
