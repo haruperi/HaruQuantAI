@@ -121,7 +121,6 @@ export function ChartArea() {
         ))}
       </div>
       <div className="cq-save">
-        <span className="cq-sim-tag">SIMULATED DATA</span>
         <small>{s.ui.saved}</small>
       </div>
       {loading && (

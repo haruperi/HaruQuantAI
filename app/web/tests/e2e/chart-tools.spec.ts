@@ -147,3 +147,32 @@ test('drawing body move, endpoint resize, style, lock and delete are undoable', 
   ).toBeDisabled();
   await expect.poll(async () => (await read()).text).toBe('Support study');
 });
+
+
+test('drawing menu hover closes on leave and permits menu selection', async ({ page }) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const connection = page.getByRole('dialog', { name: 'Connect to HaruQuantAI host' });
+  if (await connection.isVisible())
+    await connection.getByRole('button', { name: 'Close', exact: true }).click();
+
+  for (const group of ['Trend', 'Fibonacci', 'Shapes', 'Annotate']) {
+    const trigger = page.getByRole('button', { name: group + ' tools', exact: true });
+    const caret = trigger.locator('.cq-caret');
+    const menu = page.getByRole('menu', { name: group + ' tools', exact: true });
+    await caret.hover();
+    await expect(menu).toBeVisible();
+    await page.getByRole('button', { name: 'Cursor mode', exact: true }).hover();
+    await expect(menu).toBeHidden();
+
+    await caret.hover();
+    await expect(menu).toBeVisible();
+    await menu.hover();
+    // Remain inside beyond the closing delay to verify crossing the gap is safe.
+    await page.waitForTimeout(250);
+    await expect(menu).toBeVisible();
+    await menu.getByRole('menuitem').first().click();
+    await expect(menu).toBeHidden();
+  }
+});

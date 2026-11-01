@@ -1039,9 +1039,6 @@ export class ChartEngine {
           ctx.fillText(formatPrice(lastValue, 2), this.plotWidth + 4, chipY + 4);
         }
       }
-      ctx.fillStyle = muted;
-      ctx.font = 'bold 14px Trebuchet MS';
-      ctx.fillText('TradingView-clone', 14, this.mainHeight - 18);
       ctx.strokeStyle = grid;
       ctx.beginPath();
       ctx.moveTo(this.plotWidth + 0.5, 0);

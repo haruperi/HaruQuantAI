@@ -89,7 +89,7 @@ test('Chart follows Data Manager and supports navigation, reload and direct link
   await expect(page).toHaveURL(/\/chart(?:\?|$)/);
   await expect(chart).toHaveClass(/active/);
   await expect(page.getByRole('region', { name: 'Chart', exact: true })).toBeVisible();
-  await expect(page.getByText('SIMULATED DATA', { exact: true })).toBeVisible();
+  await expect(page.getByText('SIMULATED DATA', { exact: true })).toHaveCount(0);
   await expect(navigation.locator('.nav-flyout')).toHaveCSS('width', '49px');
   await page.reload();
   await expect(chart).toHaveClass(/active/);

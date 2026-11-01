@@ -37,8 +37,22 @@ export function LeftToolbar() {
     [open, setOpen] = useState<string | null>(null);
   const longPress = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const longPressed = useRef(false);
-  useEffect(() => () => clearTimeout(longPress.current), []);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const cancelClose = () => clearTimeout(closeTimer.current);
+  const scheduleClose = () => {
+    clearTimeout(longPress.current);
+    cancelClose();
+    closeTimer.current = setTimeout(() => setOpen(null), 150);
+  };
+  useEffect(
+    () => () => {
+      clearTimeout(longPress.current);
+      clearTimeout(closeTimer.current);
+    },
+    [],
+  );
   const choose = (id: ToolId) => {
+    cancelClose();
     s.setUI({ tool: id });
     setOpen(null);
   };
@@ -66,7 +80,12 @@ export function LeftToolbar() {
       </ToolButton>
       <hr />
       {groups.map(({ name, icon: Icon }) => (
-        <div className="cq-tool-group" key={name}>
+        <div
+          className="cq-tool-group"
+          key={name}
+          onPointerEnter={cancelClose}
+          onPointerLeave={scheduleClose}
+        >
           <ToolButton
             label={name + ' tools'}
             className={s.ui.tool !== 'cursor' && tools[s.ui.tool].group === name ? 'cq-active' : ''}
@@ -87,7 +106,13 @@ export function LeftToolbar() {
             <ChevronRight className="cq-caret" size={10} onPointerEnter={() => setOpen(name)} />
           </ToolButton>
           {open === name && (
-            <div className="cq-flyout" role="menu" aria-label={name + ' tools'}>
+            <div
+              className="cq-flyout"
+              role="menu"
+              aria-label={name + ' tools'}
+              onPointerEnter={cancelClose}
+              onPointerLeave={scheduleClose}
+            >
               {toolIds
                 .filter((id) => tools[id].group === name)
                 .map((id) => (
