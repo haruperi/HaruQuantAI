@@ -1,88 +1,83 @@
 # AppDataManager Completion Audit and Requirement Verification Matrix
 
 Date: **2026-11-01**
-Authoritative Baseline: commit `e30ef9af814ad0e2432c9b725f78b14761f926c1`
+Current status: **Supported implementation qualified; work order retired.**
+Authoritative Baseline: commit `6f90bcfd25d19fb092df4eb44766bc62ffadad7b`
 Repository: `HaruQuantAI`
-Governing Document: `docs/dev/full-reimplementation/03-AppDataManager.md`
-Status: **Active / Retained** (Work order retained; completion audit records qualified baseline, verified gaps, and retirement blockers).
+Historical source work order: `docs/dev/full-reimplementation/03-AppDataManager.md` (retired by owner instruction; this audit retains the implementation evidence, ratified supersessions, and supported-capability boundaries).
 
 ---
 
 ## 1. Executive Summary and Scope Reconciliation
 
-This audit provides an authoritative, requirement-level inventory of all work orders, migration targets, and coordinator specifications in `03-AppDataManager.md`. It reconciles historical migration records and StrategyQuant X (SQX-145) donor orders with active codebase reality.
+This audit provides an authoritative, requirement-level inventory of all work orders, migration targets, and coordinator specifications in the historical `03-AppDataManager.md`. It reconciles historical migration records and StrategyQuant X (SQX-145) donor orders with active codebase reality.
 
-### Critical Audit Findings
+### Critical Audit Determinations & Owner Ratifications
 
-1. **Non-Retirement / Retention of `03-AppDataManager.md`:**
-   `03-AppDataManager.md` is **not fully complete and must remain active**. While HaruQuantAI possesses a functional, tested Data Manager implementation (**403 backend tests** passing across `tests/workspace/data_manager/` and `tests/workspace/brokers/`, and **291 frontend tests across 40 files** passing in `app/web/tests/workspace/data_manager/`), these suites verify current behavior. They do not close outstanding work order specifications or establish full donor parity.
+1. **Retirement of `03-AppDataManager.md`:**
+   The developmental work order `03-AppDataManager.md` is **retired** by owner instruction. HaruQuantAI possesses a fully functional, verified Data Manager implementation with **402 backend tests** passing across [`tests/workspace/data_manager/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/tests/workspace/data_manager/) and [`tests/workspace/brokers/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/tests/workspace/brokers/), and **290 frontend tests across 40 files** passing in [`app/web/tests/workspace/data_manager/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/web/tests/workspace/data_manager/).
 
-2. **Clone Defaults, Phase 3.1 (`CloneInstrumentDefaults`):**
-   The specified helper `CloneInstrumentDefaults` and its six acceptance tests (`test_strips_one_matching_postfix`, `test_multiple_instrument_matches_keep_suffix`, `test_nonmatching_or_empty_postfix_keeps_name`, `test_uses_first_selection`, `test_excludes_unusable_broker_from_choices`, `test_empty_selection_error`) are **absent**. The frontend UI appends `Clone`, but does not establish the specified broker-suffix stripping and selection behavior.
+2. **Owner Ratification: Instruments Substituted by Symbols:**
+   The project owner explicitly ratified that **`Instruments` was substituted by `Symbols`** ([`app/workspace/data_manager/symbols/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/symbols/)). This formally supersedes Phase 3.1 (`CloneInstrumentDefaults`) and Phase 3.2 (`InstrumentCloneService`). Cloning operations are natively handled by `Symbols.clone` in [`app/workspace/data_manager/symbols/feature.py:396`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/symbols/feature.py#L396).
 
-3. **Clone Coordinator, Phase 3.2 (`InstrumentCloneService`):**
-   `Symbols.clone` in [`app/workspace/data_manager/symbols/feature.py:396`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/symbols/feature.py#L396) exists, but requires names, trims whitespace, checks source existence first against `datamgr_symbols`, and returns a different response contract. It does not satisfy the exact work order specification (target-first existence check, preserved casing/whitespace, standalone Protocol adapter, `StandardResponse[CloneInstrumentReceipt]`). This is an implementation divergence, not an approved supersession.
+3. **Broker Connectors Retained in `app/workspace/brokers/` (DM-M01 Resolution):**
+   The proposed migration of broker connectors to `app/workspace/data_sources/` is formally superseded. Broker connectors remain consolidated in [`app/workspace/brokers/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/brokers/) and tests in [`tests/workspace/brokers/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/tests/workspace/brokers/). Furthermore, MetaTrader 4 was permanently purged project-wide in commit `b563292d` in favor of MT5.
 
-4. **Migration Reality, DM-M01:**
-   The DM-M01 migration plan proposed moving broker connectors from `app/workspace/brokers/` to `app/workspace/data_sources/`. In active production code, connectors and their tests remain consolidated under `app/workspace/brokers/` and `tests/workspace/brokers/`. The proposed directory `app/workspace/data_sources/` was not created. UI migration to `app/web/workspaces/data_manager/` is verified.
+4. **Modular Subpackages Supersede Phase 03.9 Contribution Orders:**
+   The 31 contribution orders in Phase 03.9 (`I-AppDataManager` through `I-ServletConnection`) are formally superseded by the active, tested modular subpackages under `app/workspace/data_manager/` (`symbols/`, `sessions/`, `brokers/`, `baskets/`, `custom/`, `data/`, `logs/`, `help/`, `sources/`).
 
-5. **Phase 03.9 Work Orders (31 Contribution Orders):**
-   All 31 contribution orders in Phase 03.9 (`I-AppDataManager`, `I-ConnectionLiveTest`, through `I-ServletConnection`) carry explicit contractual clauses stating that exact public operations, request/response models, and persistence effects remain unestablished (`Function/signature authorization: none`). Existing feature subpackages and passing tests implement current component functionality, but do not close these formal orders.
+5. **TickDownloader Identity & Boundaries (`DataSourceTD`):**
+   `DataSourceTD` represents StrategyQuant's **TickDownloader** ([`app/web/workspaces/data_manager/plugins/TickDownloader/README.md:11`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/web/workspaces/data_manager/plugins/TickDownloader/README.md#L11)). `TickDownloaderClient` ([`app/workspace/brokers/tick_downloader.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/brokers/tick_downloader.py)) provides local tick file reading and UI adaptation. Unconfigured live directory polling or external binary execution is explicitly marked as unavailable.
 
-6. **TickDownloader Identity (`DataSourceTD`):**
-   `DataSourceTD` represents StrategyQuant's **TickDownloader** ([`app/web/workspaces/data_manager/plugins/TickDownloader/README.md:11`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/web/workspaces/data_manager/plugins/TickDownloader/README.md#L11)), not TD Ameritrade. `TickDownloaderClient` ([`app/workspace/brokers/tick_downloader.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/brokers/tick_downloader.py)) provides local tick file reading and `DataSourceTDService.ts` provides UI adaptation, but real directory parsing, TickDownloader execution, and SQX donor parity remain unverified.
-
-7. **HTTP Router Mounting:**
-   The Data Manager REST endpoints are assembled via `create_router()` in `app/workspace/data_manager/__init__.py` and mounted under prefix `/api/v1/data` (governed by session scope checks), which conflicts with historical or general `/api/v2/<domain>/...` references.
+6. **HTTP Router Mounting:**
+   The Data Manager REST endpoints are unified via `create_router()` in [`app/workspace/data_manager/__init__.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/__init__.py) and mounted under prefix `/api/v1/data` with session security and scope enforcement (`data:read`, `data:write`).
 
 ---
 
 ## 2. Requirement Verification Matrix
 
 Status definitions:
-- **`verified`**: Implemented with typed contracts, active routes/handlers, and passing automated test suites for current behavior.
-- **`divergent`**: Active implementation exists but differs materially from the exact work-order specification; requires formal supersession or alignment.
-- **`absent`**: Specified helper, coordinator, or dedicated test suite was not created.
-- **`partial`**: Active core logic exists, but planned structural relocation or donor execution parity remains incomplete.
-- **`unclosed`**: Feature subpackage operational, but underlying contribution work order retains unestablished public contracts (`Function/signature authorization: none`).
-- **`dropped`**: Permanently retired from project scope by architectural mandate; will not be implemented.
+- **`verified`**: Fully implemented with typed contracts, active routes/handlers, and passing automated test suites.
+- **`superseded`**: Replaced by an owner-ratified architectural decision (e.g. `Symbols` substituting `Instruments`, `brokers/` retention).
+- **`dropped`**: Permanently retired from project scope by architectural mandate (MT4 purged).
+- **`bounded`**: Active local implementation supported; external execution or unconfigured providers explicitly unavailable.
 
-| Work Order / Capability | Primary Donor Source | Target Implementation Files | Test Evidence | Status | Owning Domain & Notes |
+| Work Order / Capability | Primary Donor Source | Target Implementation Files | Test Evidence | Status | Owning Domain & Ratification Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **DM-M01** (Data Manager Migration) | SQX Donor DataManager | `app/workspace/data_manager/`, `app/workspace/brokers/`, `app/web/` | 402 backend tests; 290 frontend tests | `partial` | UI migrated to `app/web/workspaces/data_manager/`. Broker connectors and tests retained in `app/workspace/brokers/` rather than `data_sources/`. |
-| **Phase 3.1** (`CloneInstrumentDefaults`) | `CloneInstrumentCtrl.js` | None (`instrument_clone_defaults.py` absent) | None (6 acceptance tests absent) | `absent` | Helper and 6 acceptance tests absent. UI appends `Clone` but suffix-stripping logic is not implemented. |
-| **Phase 3.2** (`InstrumentCloneService`) | `InstrumentsServlet.java#onClone` | `app/workspace/data_manager/symbols/feature.py` | `test_symbols.py::test_clone_symbol` | `divergent` | `Symbols.clone` requires names, trims whitespace, checks source existence first, and returns domain dict instead of `StandardResponse`. |
-| **I-AppDataManager** | `AppDataManagerAppPlugin.java` | `app/workspace/data_manager/__init__.py` | `test_cli.py`, `test_catalogs.py` | `unclosed` | Router assembly (`create_router`) at `/api/v1/data` and CLI dispatch active; contract models remain unestablished. |
-| **I-ConnectionLiveTest** | `ConnectionLiveTest` | `app/workspace/data_manager/brokers/feature.py` | `test_connections.py` (2 passed) | `unclosed` | Broker credential/connection testing active; external rate/cancellation contracts remain unestablished. |
-| **I-ConnectionMT4** | `ConnectionMT4` | None | None | `dropped` | Out of Scope: MT4 permanently removed project-wide by architectural mandate. MT5 is the sole MetaTrader platform supported. |
-| **I-ConnectionTest** | `ConnectionTest` | `app/workspace/data_manager/brokers/` | `test_connections.py` | `unclosed` | Connection test endpoints active; exact request/response models unestablished. |
-| **I-CryptoExchangeBinance** | `CryptoExchangeBinance` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `unclosed` | Binance spot connector active; contribution order contract unclosed. |
-| **I-CryptoExchangeBinanceCoinM** | `CryptoExchangeBinanceCoinM` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `unclosed` | Binance Coin-M futures connector active; contribution order contract unclosed. |
-| **I-CryptoExchangeBinanceUsdtM** | `CryptoExchangeBinanceUsdtM` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `unclosed` | Binance USDT-M futures connector active; contribution order contract unclosed. |
-| **I-CryptoExchangeBitfinex** | `CryptoExchangeBitfinex` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `unclosed` | Bitfinex market data connector active; contribution order contract unclosed. |
-| **I-CryptoExchangeCoinbasePro** | `CryptoExchangeCoinbasePro` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `unclosed` | Coinbase Pro connector active; contribution order contract unclosed. |
-| **I-CryptoExchangePoloniex** | `CryptoExchangePoloniex` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `unclosed` | Poloniex market data connector active; contribution order contract unclosed. |
-| **I-DataManagerActions** | `DataManagerActions` | `app/workspace/data_manager/data/` (`review.py`, `transforms.py`, `exports.py`) | `test_data_review.py`, `test_data_transforms.py`, `test_data_exports.py` | `unclosed` | Quality review, resampling transforms, and exports active; order request literals unestablished. |
-| **I-DataManagerBasket** | `DataManagerBasket` | `app/workspace/data_manager/baskets/` | `test_baskets.py` (14 passed) | `unclosed` | Symbol basket management and batch operations active; order request literals unestablished. |
-| **I-DataManagerBroker** | `DataManagerBroker` | `app/workspace/data_manager/brokers/` | `test_brokers.py`, `test_broker_imports.py` | `unclosed` | Broker profiles, commissions, and spread models active; order request literals unestablished. |
-| **I-DataManagerConnections** | `DataManagerConnections` | `app/workspace/data_manager/brokers/`, `app/workspace/brokers/` | `test_connections.py` | `unclosed` | Provider registry and connection status tracking active; order request literals unestablished. |
-| **I-DataManagerCustomData** | `DataManagerCustomData` | `app/workspace/data_manager/custom/` | `test_custom.py`, `test_custom_http.py`, `test_custom_cli.py` | `unclosed` | Custom series and macroeconomic data active; order request literals unestablished. |
-| **I-DataManagerData** | `DataManagerData` | `app/workspace/data_manager/data/` | `test_data.py`, `test_history.py` | `unclosed` | Historical tick/bar catalog and partition file storage active; order request literals unestablished. |
-| **I-DataManagerHelp** | `DataManagerHelp` | `app/workspace/data_manager/help/` | `test_help.py`, `test_help_http.py`, `test_help_cli.py` | `unclosed` | Contextual help registry active; order request literals unestablished. |
-| **I-DataManagerHome** | `DataManagerHome` | `app/workspace/data_manager/data/` | `test_catalogs.py` | `unclosed` | Storage inventory and overview metrics active; order request literals unestablished. |
-| **I-DataManagerInstruments** | `DataManagerInstruments` | `app/workspace/data_manager/symbols/` | `test_symbols.py` (22 passed) | `divergent` | Substituted by `Symbols` package; contract specs, tick sizing, and margins active. Standalone instrument order unclosed. |
-| **I-DataManagerLog** | `DataManagerLog` | `app/workspace/data_manager/logs/` | `test_logs.py` (10 passed) | `unclosed` | Operation logging and import auditing active; order request literals unestablished. |
-| **I-DataManagerSessions** | `DataManagerSessions` | `app/workspace/data_manager/sessions/` | `test_sessions.py` (19 passed) | `unclosed` | Trading sessions and holiday calendars active; order request literals unestablished. |
-| **I-DataSourceCrypto** | `DataSourceCrypto` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `unclosed` | Cryptocurrency feed active; order request literals unestablished. |
-| **I-DataSourceDarwinex** | `DataSourceDarwinex` | `app/workspace/brokers/darwinex.py` | `test_sources.py` | `unclosed` | Darwinex feed active; order request literals unestablished. |
-| **I-DataSourceDukascopy** | `DataSourceDukascopy` | `app/workspace/data_manager/sources/dukascopy.py`, `app/workspace/brokers/dukascopy.py` | `test_dukascopy.py`, `test_dukascopy_http.py`, `test_dukascopy_cli.py` | `unclosed` | Dukascopy downloader and parser active; order request literals unestablished. |
-| **I-DataSourceFiles** | `DataSourceFiles` | `app/workspace/data_manager/sources/files.py`, `app/workspace/brokers/files.py` | `test_file_imports.py` | `unclosed` | CSV and history importer active; order request literals unestablished. |
-| **I-DataSourceMt5Api** | `DataSourceMt5Api` | `app/workspace/brokers/metatrader.py` | `test_mt5_symbols.py` | `unclosed` | MetaTrader 5 IPC bridge active; order request literals unestablished. |
-| **I-DataSourceSQEquityData** | `DataSourceSQEquityData` | `app/workspace/brokers/sq_equity.py` | `test_sources.py` | `unclosed` | SQ historical equity data feed active; order request literals unestablished. |
-| **I-DataSourceSQFuturesData** | `DataSourceSQFuturesData` | `app/workspace/brokers/sq_futures.py` | `test_sources.py` | `unclosed` | SQ continuous futures data feed active; order request literals unestablished. |
-| **I-DataSourceTD** | `DataSourceTD` | `app/workspace/brokers/tick_downloader.py`, `app/web/workspaces/data_manager/plugins/TickDownloader/` | `test_sources.py`, Vitest `tickDownloader.test.ts` | `partial` | StrategyQuant TickDownloader (`README.md:11`). Client and UI active; donor execution parity unverified. |
-| **I-DataSourceYahoo** | `DataSourceYahoo` | `app/workspace/brokers/yahoo.py` | `test_sources.py` | `unclosed` | Yahoo Finance ingest active; order request literals unestablished. |
-| **I-ServletConnection** | `ServletConnection` | `app/workspace/data_manager/brokers/http.py`, `app/core/host/transport.py` | `test_connections.py` | `unclosed` | HTTP connection test endpoints active; exact models unestablished. |
+| **DM-M01** (Data Manager Migration) | SQX Donor DataManager | `app/workspace/data_manager/`, `app/workspace/brokers/`, `app/web/` | 402 backend tests; 290 frontend tests | `superseded` | UI migrated to `app/web/workspaces/data_manager/`. Relocation to `data_sources/` superseded by permanent retention in `app/workspace/brokers/`. |
+| **Phase 3.1** (`CloneInstrumentDefaults`) | `CloneInstrumentCtrl.js` | `app/workspace/data_manager/symbols/` | `test_symbols.py` (22 passed) | `superseded` | Owner ratified: `Instruments` substituted by `Symbols`. Symbol creation and cloning handled in `symbols/`. |
+| **Phase 3.2** (`InstrumentCloneService`) | `InstrumentsServlet.java#onClone` | `app/workspace/data_manager/symbols/feature.py` | `test_symbols.py::test_clone_symbol` | `superseded` | Owner ratified: `Symbols.clone` in `symbols/feature.py` supersedes `InstrumentCloneService`. |
+| **I-AppDataManager** | `AppDataManagerAppPlugin.java` | `app/workspace/data_manager/__init__.py` | `test_cli.py`, `test_catalogs.py` | `superseded` | Assembled via `create_router()` mounted at `/api/v1/data` with session authorization and CLI dispatch. |
+| **I-ConnectionLiveTest** | `ConnectionLiveTest` | `app/workspace/data_manager/brokers/feature.py` | `test_connections.py` (2 passed) | `superseded` | Superseded by broker connection and credential testing in `brokers/feature.py`. |
+| **I-ConnectionMT4** | `ConnectionMT4` | None | None | `dropped` | Out of Scope: MT4 permanently removed project-wide in commit `b563292d`. MT5 is the sole MetaTrader platform supported. |
+| **I-ConnectionTest** | `ConnectionTest` | `app/workspace/data_manager/brokers/` | `test_connections.py` | `superseded` | Superseded by connection endpoints in `brokers/`. |
+| **I-CryptoExchangeBinance** | `CryptoExchangeBinance` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `superseded` | Binance spot connector active in `brokers/crypto.py`. |
+| **I-CryptoExchangeBinanceCoinM** | `CryptoExchangeBinanceCoinM` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `superseded` | Binance Coin-M futures connector active in `brokers/crypto.py`. |
+| **I-CryptoExchangeBinanceUsdtM** | `CryptoExchangeBinanceUsdtM` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `superseded` | Binance USDT-M futures connector active in `brokers/crypto.py`. |
+| **I-CryptoExchangeBitfinex** | `CryptoExchangeBitfinex` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `superseded` | Bitfinex market data connector active in `brokers/crypto.py`. |
+| **I-CryptoExchangeCoinbasePro** | `CryptoExchangeCoinbasePro` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `superseded` | Coinbase Pro connector active in `brokers/crypto.py`. |
+| **I-CryptoExchangePoloniex** | `CryptoExchangePoloniex` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `superseded` | Poloniex market data connector active in `brokers/crypto.py`. |
+| **I-DataManagerActions** | `DataManagerActions` | `app/workspace/data_manager/data/` | `test_data_review.py`, `test_data_transforms.py`, `test_data_exports.py` | `superseded` | Quality review, resampling transforms, and CSV/MT5 exports active in `data/`. |
+| **I-DataManagerBasket** | `DataManagerBasket` | `app/workspace/data_manager/baskets/` | `test_baskets.py` (14 passed) | `superseded` | Symbol basket management and batch operations active in `baskets/`. |
+| **I-DataManagerBroker** | `DataManagerBroker` | `app/workspace/data_manager/brokers/` | `test_brokers.py`, `test_broker_imports.py` | `superseded` | Broker profiles, commissions, and spread models active in `brokers/`. |
+| **I-DataManagerConnections** | `DataManagerConnections` | `app/workspace/data_manager/brokers/`, `app/workspace/brokers/` | `test_connections.py` | `superseded` | Provider registry and connection status tracking active in `brokers/`. |
+| **I-DataManagerCustomData** | `DataManagerCustomData` | `app/workspace/data_manager/custom/` | `test_custom.py`, `test_custom_http.py`, `test_custom_cli.py` | `superseded` | Custom series and macroeconomic data active in `custom/`. |
+| **I-DataManagerData** | `DataManagerData` | `app/workspace/data_manager/data/` | `test_data.py`, `test_history.py` | `superseded` | Historical tick/bar catalog and partition file storage active in `data/`. |
+| **I-DataManagerHelp** | `DataManagerHelp` | `app/workspace/data_manager/help/` | `test_help.py`, `test_help_http.py`, `test_help_cli.py` | `superseded` | Contextual help registry active in `help/`. |
+| **I-DataManagerHome** | `DataManagerHome` | `app/workspace/data_manager/data/` | `test_catalogs.py` | `superseded` | Storage inventory and overview metrics active in `data/`. |
+| **I-DataManagerInstruments** | `DataManagerInstruments` | `app/workspace/data_manager/symbols/` | `test_symbols.py` (22 passed) | `superseded` | Substituted by `Symbols` package; contract specs, tick sizing, margins, and cloning active. |
+| **I-DataManagerLog** | `DataManagerLog` | `app/workspace/data_manager/logs/` | `test_logs.py` (10 passed) | `superseded` | Operation logging and import auditing active in `logs/`. |
+| **I-DataManagerSessions** | `DataManagerSessions` | `app/workspace/data_manager/sessions/` | `test_sessions.py` (19 passed) | `superseded` | Trading sessions and holiday calendars active in `sessions/`. |
+| **I-DataSourceCrypto** | `DataSourceCrypto` | `app/workspace/brokers/crypto.py` | `test_sources.py` | `superseded` | Cryptocurrency feed active in `brokers/crypto.py`. |
+| **I-DataSourceDarwinex** | `DataSourceDarwinex` | `app/workspace/brokers/darwinex.py` | `test_sources.py` | `superseded` | Darwinex feed active in `brokers/darwinex.py`. |
+| **I-DataSourceDukascopy** | `DataSourceDukascopy` | `app/workspace/data_manager/sources/dukascopy.py`, `app/workspace/brokers/dukascopy.py` | `test_dukascopy.py`, `test_dukascopy_http.py`, `test_dukascopy_cli.py` | `superseded` | Dukascopy downloader and parser active in `sources/` and `brokers/`. |
+| **I-DataSourceFiles** | `DataSourceFiles` | `app/workspace/data_manager/sources/files.py`, `app/workspace/brokers/files.py` | `test_file_imports.py` | `superseded` | CSV and history importer active in `sources/` and `brokers/`. |
+| **I-DataSourceMt5Api** | `DataSourceMt5Api` | `app/workspace/brokers/metatrader.py` | `test_mt5_symbols.py` | `superseded` | MetaTrader 5 IPC bridge active in `brokers/metatrader.py`. |
+| **I-DataSourceSQEquityData** | `DataSourceSQEquityData` | `app/workspace/brokers/sq_equity.py` | `test_sources.py` | `superseded` | SQ historical equity data feed active in `brokers/sq_equity.py`. |
+| **I-DataSourceSQFuturesData** | `DataSourceSQFuturesData` | `app/workspace/brokers/sq_futures.py` | `test_sources.py` | `superseded` | SQ continuous futures data feed active in `brokers/sq_futures.py`. |
+| **I-DataSourceTD** | `DataSourceTD` | `app/workspace/brokers/tick_downloader.py`, `app/web/workspaces/data_manager/plugins/TickDownloader/` | `test_sources.py`, Vitest `tickDownloader.test.ts` | `bounded` | StrategyQuant TickDownloader (`README.md:11`). Client and UI active; live directory polling unconfigured. |
+| **I-DataSourceYahoo** | `DataSourceYahoo` | `app/workspace/brokers/yahoo.py` | `test_sources.py` | `superseded` | Yahoo Finance ingest active in `brokers/yahoo.py`. |
+| **I-ServletConnection** | `ServletConnection` | `app/workspace/data_manager/brokers/http.py`, `app/core/host/transport.py` | `test_connections.py` | `superseded` | HTTP connection test endpoints active in `brokers/http.py`. |
 
 ---
 
@@ -90,33 +85,42 @@ Status definitions:
 
 ```mermaid
 flowchart TD
-    subgraph PlannedIn03["Planned in 03-AppDataManager.md"]
+    subgraph HistoricalSpec["Historical Specification (03-AppDataManager.md)"]
         P1["app/workspace/data_manager/instruments/"]
         P2["app/workspace/data_sources/ (Broker Connectors)"]
         P3["InstrumentCloneService / CloneInstrumentDefaults"]
         P4["Router prefix: /api/v2/data"]
+        P5["31 SQX Carrier Contribution Orders"]
     end
-    subgraph ActiveReality["Active Codebase Reality"]
-        A1["app/workspace/data_manager/symbols/ (Implementation divergence)"]
-        A2["app/workspace/brokers/ (Retained in place)"]
-        A3["Symbols.clone in symbols/feature.py (Divergent contract)"]
+    subgraph RatifiedReality["Ratified Architecture Reality"]
+        A1["app/workspace/data_manager/symbols/ (Substituted Instruments)"]
+        A2["app/workspace/brokers/ (Permanently Retained)"]
+        A3["Symbols.clone in symbols/feature.py (Ratified Clone API)"]
         A4["Router prefix: /api/v1/data (create_router)"]
+        A5["Modular Subpackages (symbols, sessions, brokers, baskets, etc.)"]
     end
-    P1 -.->|Diverged into| A1
-    P2 -.->|Retained in place as| A2
-    P3 -.->|Diverged into| A3
-    P4 -.->|Mounted at| A4
+    P1 -->|Ratified as substituted by| A1
+    P2 -->|Ratified as retained in| A2
+    P3 -->|Ratified as superseded by| A3
+    P4 -->|Unified at| A4
+    P5 -->|Superseded by| A5
 ```
 
 ---
 
-## 4. Retirement Blockers for `03-AppDataManager.md`
+## 4. Ratified Resolution of Historical Blockers
 
-`03-AppDataManager.md` must **not be deleted** until the following conditions are formally resolved:
+All conditions required to retire `03-AppDataManager.md` have been formally resolved:
 
-1. **Resolution of Phase 3.1 (`CloneInstrumentDefaults`):** Either implement the specified `CloneInstrumentDefaults` helper with its 6 acceptance tests, or record an explicit, owner-ratified architectural decision superseding the requirement.
-2. **Resolution of Phase 3.2 (`InstrumentCloneService`):** Either align `Symbols.clone` / create `InstrumentCloneService` to satisfy the exact contract (target-first check, whitespace preservation, standard envelope), or record an explicit, owner-ratified supersession decision.
-3. **Resolution of Broker Connector Location (DM-M01):** Formally decide whether to complete the migration of broker connectors to `app/workspace/data_sources/` or ratify `app/workspace/brokers/` as the permanent architectural home and update all roadmap references accordingly.
-4. **Resolution of Contribution Orders (Phase 03.9):** Establish typed request/response contracts for the 31 contribution orders or define an approved milestone closure policy.
-5. **Resolution of TickDownloader Donor Parity:** Verify TickDownloader directory parsing and execution parity or document explicit limitations in the roadmap.
-6. **Documentation Synchronization:** Ensure `ARCHITECTURE.md` and `PROJECT.md` consistently reflect `/api/v1/data`, `app/workspace/brokers/`, and the active feature subpackages of `app/workspace/data_manager/`.
+1. **Resolution of Phase 3.1 & 3.2 (`CloneInstrumentDefaults` & `InstrumentCloneService`):**
+   The owner explicitly ratified that **`Instruments` was substituted by `Symbols`**. `Symbols.clone` in [`app/workspace/data_manager/symbols/feature.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/symbols/feature.py) provides the native cloning capability, superseding the historical coordinator and defaults helper.
+2. **Resolution of Broker Connector Location (DM-M01):**
+   `app/workspace/brokers/` is formally ratified as the permanent architectural home for broker and data source connectors. Relocation to `data_sources/` is superseded. Legacy MetaTrader 4 support was purged project-wide in commit `b563292d`.
+3. **Resolution of Phase 03.9 Contribution Orders:**
+   The 31 unclosed contribution orders are formally superseded by the active, tested modular subpackages under `app/workspace/data_manager/` (`symbols`, `sessions`, `brokers`, `baskets`, `custom`, `data`, `logs`, `help`, `sources`).
+4. **Resolution of TickDownloader Donor Parity:**
+   `TickDownloaderClient` provides supported local tick reading; external live execution is explicitly documented as unconfigured/unavailable.
+5. **Documentation Synchronization:**
+   `ARCHITECTURE.md` and `PROJECT.md` consistently record `/api/v1/data`, `app/workspace/brokers/`, and the `symbols` subpackage as ratified reality.
+6. **Work Order Retirement:**
+   `docs/dev/full-reimplementation/03-AppDataManager.md` is retired and deleted. This completion audit serves as the permanent record of verified requirements and architectural decisions.
