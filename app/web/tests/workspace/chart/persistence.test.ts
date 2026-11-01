@@ -46,6 +46,37 @@ it('persists magnet options and upgrades older chart documents without losing dr
   expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid indicator snapping setting.');
 });
 
+it('remembers the last chosen tool per group through cursor reset and saved-chart reload', () => {
+  const store = createChartStore();
+  store.getState().setUI({ tool: 'ParallelChannel' });
+  store.getState().setUI({ tool: 'FibSpiral' });
+  store.getState().setUI({ tool: 'PriceNote' });
+  expect(store.getState().lastGroupTools).toEqual({
+    Trend: 'ParallelChannel', Fibonacci: 'FibSpiral', Annotate: 'PriceNote',
+  });
+  store.getState().setUI({ tool: 'cursor' });
+  expect(store.getState().lastGroupTools.Trend).toBe('ParallelChannel');
+  store.getState().setUI({ tool: 'HorizontalRay' });
+  expect(store.getState().lastGroupTools).toEqual({
+    Trend: 'HorizontalRay', Fibonacci: 'FibSpiral', Annotate: 'PriceNote',
+  });
+  const state = persisted(store);
+  expect(decode(JSON.stringify({ version: 1, state })).lastGroupTools).toEqual(state.lastGroupTools);
+
+  const older = structuredClone(state) as unknown as Record<string, unknown>;
+  delete older.lastGroupTools;
+  expect(decode(JSON.stringify({ version: 1, state: older })).lastGroupTools).toEqual({});
+  for (const lastGroupTools of [
+    [],
+    { Unknown: 'ParallelChannel' },
+    { Trend: 'PriceNote' },
+    { Shapes: 'NotARealTool' },
+  ]) {
+    expect(() => decode(JSON.stringify({ version: 1, state: { ...state, lastGroupTools } })))
+      .toThrow('Invalid last drawing tools.');
+  }
+});
+
 it('preserves unknown data instead of overwriting it', () => {
   const map = new Map([[storageKey, '{"version":99}']]);
   const storage = {
