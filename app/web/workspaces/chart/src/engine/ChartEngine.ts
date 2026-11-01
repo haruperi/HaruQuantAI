@@ -960,10 +960,10 @@ export class ChartEngine {
       c = s.chart,
       bars = this.visible;
     const dark = c.theme === 'dark',
-      bg = dark ? '#131722' : '#ffffff',
+      bg = c.backgroundColor,
       fg = dark ? '#d1d4dc' : '#131722',
-      muted = '#787b86',
-      grid = dark ? 'rgba(42,46,57,0.6)' : '#e6e8ed';
+      muted = c.textColor,
+      grid = c.showGrid ? c.gridColor : 'transparent';
     const start = clamp(Math.floor(this.indexAt(0)) - 1, 0, Math.max(0, bars.length - 1)),
       end = clamp(Math.ceil(this.indexAt(this.plotWidth)) + 1, 0, Math.max(0, bars.length - 1));
     const paneConfigs = s.indicators.filter((i) => indicators[i.kind].pane);
@@ -1072,6 +1072,7 @@ export class ChartEngine {
         this.spacing,
         c.style,
         this.mainHeight,
+        c,
       );
       const ik = String(this.barsVersion) + ':' + bars.length + JSON.stringify(s.indicators);
       if (this.indicatorKey !== ik) {
@@ -1232,15 +1233,18 @@ export class ChartEngine {
       ctx.lineTo(this.plotWidth, y);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = color;
-      ctx.fillRect(this.plotWidth, y - 10, 64, 20);
-      ctx.fillStyle = '#fff';
-      ctx.fillText(text, this.plotWidth + 4, y + 4);
+      if (c.showPriceScaleLabels) {
+        ctx.fillStyle = color;
+        ctx.fillRect(this.plotWidth, y - 10, 64, 20);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(text, this.plotWidth + 4, y + 4);
+      }
     };
     const quote = this.quotes.get(c.symbol);
     const direction = quote ? quote.price >= quote.previous : last.close >= last.open;
     const liveColor = direction ? '#089981' : '#f23645';
-    chip(last.close, formatPrice(last.close, c.precision), liveColor);
+    if (c.showLastPriceLine)
+      chip(last.close, formatPrice(last.close, c.precision), liveColor);
     if (!s.ui.replay && this.now() - this.tickAt < 180) {
       ctx.save();
       ctx.globalAlpha = 0.18 * (1 - (this.now() - this.tickAt) / 180);
@@ -1282,10 +1286,10 @@ export class ChartEngine {
       );
     this.positionChips = [];
     for (const a of s.alerts)
-      if (a.symbol === c.symbol && a.active)
+      if (c.showAlertLines && a.symbol === c.symbol && a.active)
         chip(a.value, '♧ ' + formatPrice(a.value, c.precision), '#ff9800');
     for (const p of s.positions)
-      if (p.symbol === c.symbol && (p.status === 'open' || p.status === 'pending')) {
+      if (c.showPositions && p.symbol === c.symbol && (p.status === 'open' || p.status === 'pending')) {
         const color = p.side === 'buy' ? '#2962ff' : '#f23645';
         chip(
           p.entry,
