@@ -34,6 +34,10 @@ export function decode(raw: string): Persisted {
     c.paneHeight > 300
   )
     throw new Error('Invalid chart settings.');
+  if (c.magnetStrength !== undefined && !['weak', 'strong'].includes(String(c.magnetStrength)))
+    throw new Error('Invalid magnet strength.');
+  if (c.snapToIndicators !== undefined && typeof c.snapToIndicators !== 'boolean')
+    throw new Error('Invalid indicator snapping setting.');
   for (const k of [
     'reverse',
     'auto',
@@ -152,7 +156,12 @@ export function decode(raw: string): Persisted {
     throw new Error('Invalid chart preferences.');
   const validated = s as unknown as Persisted;
   return {
-    chart: validated.chart,
+    chart: {
+      ...validated.chart,
+      // Preserve existing v1 chart documents saved before magnet options existed.
+      magnetStrength: c.magnetStrength === 'strong' ? 'strong' : 'weak',
+      snapToIndicators: c.snapToIndicators === true,
+    },
     drawings: validated.drawings,
     indicators: validated.indicators,
     alerts: validated.alerts,
