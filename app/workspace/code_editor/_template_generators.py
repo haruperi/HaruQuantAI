@@ -303,7 +303,7 @@ Filters or modifies historical trades under hypothetical conditions.
 from collections.abc import Sequence
 from typing import ClassVar, override
 
-from app.include.what_if.base import BaseWhatIf, WhatIfRecord
+from app.extend.what_if.base import BaseWhatIf, WhatIfRecord
 
 
 class {cls_name}(BaseWhatIf):
