@@ -44,9 +44,20 @@ test('every drawing tool creates an editable persisted object with undo and redo
       group: 'Fibonacci',
       names: [
         ['Fib retracement', 2],
-        ['Fib extension', 3],
-        ['Fib timezone', 2],
+        ['Trend-based fib extension', 3],
+        ['Fib time zone', 2],
         ['Gann fan', 2],
+        ['Fib channel', 3],
+        ['Fib speed resistance fan', 2],
+        ['Trend-based fib time', 3],
+        ['Fib circles', 2],
+        ['Fib spiral', 2],
+        ['Fib speed resistance arcs', 2],
+        ['Fib wedge', 3],
+        ['Pitchfan', 3],
+        ['Gann box', 2],
+        ['Gann square fixed', 2],
+        ['Gann square', 2],
       ],
     },
     {
@@ -78,9 +89,8 @@ test('every drawing tool creates an editable persisted object with undo and redo
       else {
         await page.getByRole('button', { name: group.group + ' tools', exact: true }).click();
         await page
-          .getByRole('menuitem', {
-            name: new RegExp('^' + name.replace(/[.*+?^$()|[\]\\]/g, '\\$&')),
-          })
+          .getByRole('menuitem')
+          .filter({ has: page.getByText(name, { exact: true }) })
           .click();
       }
       const x = box.x + 340 + (count % 4) * 30,
@@ -349,5 +359,73 @@ test('line parity menu sections, favorites, shortcuts and channel editing', asyn
   await page.keyboard.press('Escape');
   await page.keyboard.press('Alt+c');
   await expect(page.locator('.cq-hint')).toContainText('CrossLine');
+  await page.keyboard.press('Escape');
+});
+
+test('Fibonacci parity menu, curve editing, favorites, locks and reload', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(60000);
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const trigger = page.getByRole('button', { name: 'Fibonacci tools', exact: true });
+  const menu = page.getByRole('menu', { name: 'Fibonacci tools', exact: true });
+  await trigger.click();
+  await expect(menu.locator('.cq-line-heading')).toHaveText(['Fibonacci', 'Gann']);
+  await expect(menu.getByRole('menuitem')).toHaveCount(15);
+  const favorite = menu.getByRole('button', { name: 'Favorite Fib spiral', exact: true });
+  await favorite.click();
+  await expect(favorite).toHaveAttribute('aria-pressed', 'true');
+  await menu.getByRole('menuitem', { name: 'Fib circles', exact: true }).click();
+  await trigger.click();
+  await expect(menu.getByRole('menuitem', { name: 'Fib circles', exact: true })).toHaveAttribute(
+    'aria-current',
+    'true',
+  );
+  await menu.getByRole('menuitem', { name: 'Fib circles', exact: true }).click();
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  const x = box.x + 350,
+    y = box.y + 240;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 120, y + 60, { steps: 5 });
+  await page.mouse.up();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  const read = () =>
+    page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+      return (state.drawings[state.chart.symbol + ':' + state.chart.interval]?.[0]?.points ??
+        []) as { time: number; price: number }[];
+    });
+  await expect.poll(read).toHaveLength(2);
+  const before = await read();
+  await page.mouse.move(x + 120, y + 60);
+  await page.mouse.down();
+  await page.mouse.move(x + 160, y + 80, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(async () => (await read())[1].price).not.toBe(before[1].price);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(read).toEqual(before);
+  await page.getByRole('button', { name: 'Redo', exact: true }).click();
+  await expect.poll(async () => (await read())[1].price).not.toBe(before[1].price);
+  const after = await read();
+  await page.getByRole('button', { name: 'Lock all drawings', exact: true }).click();
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 30, y + 30, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(read).toEqual(after);
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await trigger.click();
+  await expect(favorite).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: testInfo.outputPath('fibonacci-menu.png') });
+  await menu.getByRole('menuitem', { name: 'Gann fan', exact: true }).scrollIntoViewIfNeeded();
+  await expect(menu.getByRole('menuitem', { name: 'Gann fan', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Zoom in', exact: true }).hover();
+  await expect(menu).toBeHidden();
+  await page.keyboard.press('Alt+f');
+  await expect(page.locator('.cq-hint')).toContainText('FibRetracement');
   await page.keyboard.press('Escape');
 });

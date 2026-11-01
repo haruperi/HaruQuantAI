@@ -1,4 +1,8 @@
-import { tools, lineSections } from '../../../workspaces/chart/src/tools/catalog';
+import {
+  tools,
+  lineSections,
+  fibonacciSections,
+} from '../../../workspaces/chart/src/tools/catalog';
 import { it, expect } from 'vitest';
 import { createChartStore } from '../../../workspaces/chart/src/store/chartStore';
 import {
@@ -38,9 +42,9 @@ it('preserves unknown data instead of overwriting it', () => {
   expect(s.getState().ui.saved).toBe('Storage needs attention');
 });
 
-it('round-trips every line menu tool with all anchors and favorites', () => {
+it('round-trips every line, Fibonacci and Gann menu tool with all anchors and favorites', () => {
   const store = createChartStore();
-  const ids = lineSections.flatMap((section) => section.ids);
+  const ids = [...lineSections, ...fibonacciSections].flatMap((section) => section.ids);
   const state = persisted(store);
   state.drawings['XAUUSD:3m'] = ids.map((tool) => ({
     id: tool,

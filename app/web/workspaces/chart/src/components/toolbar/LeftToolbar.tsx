@@ -25,7 +25,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
-import { tools, lineSections } from '../../tools/catalog';
+import { tools, lineSections, fibonacciSections } from '../../tools/catalog';
 import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
 import { ToolButton } from '../Tooltip';
 const cursors = [
@@ -82,6 +82,38 @@ function LineToolIcon({ id }: { id: ToolId }) {
           <circle cx={vertical ? 12 : 4} cy={horizontal ? 12 : 19} r="1.5" />
           <circle cx={vertical ? 12 : 20} cy={horizontal ? 12 : 4} r="1.5" />
         </>
+      )}
+    </svg>
+  );
+}
+function FibonacciToolIcon({ id }: { id: ToolId }) {
+  const circles = ['FibCircles', 'FibSpeedArcs', 'FibWedge'].includes(id);
+  const time = ['FibTimezone', 'TrendFibTime'].includes(id);
+  const fan = ['FibSpeedFan', 'Pitchfan', 'GannFan'].includes(id);
+  const box = id.startsWith('Gann') && id !== 'GannFan';
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      {id === 'FibSpiral' ? (
+        <path d="M12 12c-3-4-7 0-4 3 5 5 12-2 7-7C8 1-3 10 4 18c7 9 21 0 16-11" />
+      ) : box ? (
+        <>
+          <rect x="3" y="3" width="18" height="18" />
+          <path d="M3 9h18M3 15h18M9 3v18M15 3v18" />
+          {id !== 'GannBox' && <path d="M3 21L21 3M3 3L21 21" />}
+        </>
+      ) : circles ? (
+        <>
+          <path d="M3 12a9 9 0 0 0 18 0M6 12a6 6 0 0 0 12 0M9 12a3 3 0 0 0 6 0" />
+          {id === 'FibCircles' && <path d="M3 12a9 9 0 0 1 18 0M6 12a6 6 0 0 1 12 0" />}
+        </>
+      ) : time ? (
+        <path d="M3 3v18M7 3v18M13 3v18M21 3v18M2 12l9 6 9-12" />
+      ) : fan ? (
+        <path d="M3 21L21 3M3 21L21 10M3 21h18M3 21L10 3" />
+      ) : id === 'FibChannel' ? (
+        <path d="M3 20L21 4M3 15L16 3M8 22L21 11" />
+      ) : (
+        <path d="M3 4h18M3 9h18M3 15h18M3 21h18M3 21L21 4" />
       )}
     </svg>
   );
@@ -241,7 +273,9 @@ export function LeftToolbar() {
           </ToolButton>
           {open === name && (
             <div
-              className={'cq-flyout' + (name === 'Trend' ? ' cq-line-menu' : '')}
+              className={
+                'cq-flyout' + (['Trend', 'Fibonacci'].includes(name) ? ' cq-line-menu' : '')
+              }
               role="menu"
               aria-label={name + ' tools'}
               onPointerEnter={cancelClose}
@@ -249,11 +283,13 @@ export function LeftToolbar() {
             >
               {(name === 'Trend'
                 ? lineSections
-                : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
+                : name === 'Fibonacci'
+                  ? fibonacciSections
+                  : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
               ).map((section) => (
                 <div
                   key={section.title}
-                  className={name === 'Trend' ? 'cq-line-section' : undefined}
+                  className={['Trend', 'Fibonacci'].includes(name) ? 'cq-line-section' : undefined}
                 >
                   {section.title && <div className="cq-line-heading">{section.title}</div>}
                   {section.ids.map((id) => (
@@ -267,6 +303,7 @@ export function LeftToolbar() {
                         onClick={() => choose(id)}
                       >
                         {name === 'Trend' && <LineToolIcon id={id} />}
+                        {name === 'Fibonacci' && <FibonacciToolIcon id={id} />}
                         <span>{tools[id].label}</span>
                         <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>
                       </button>

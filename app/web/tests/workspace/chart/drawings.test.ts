@@ -171,3 +171,96 @@ it('new geometry handles coincident and vertical anchors without nonfinite value
     }
   }
 });
+
+it('Fibonacci channel places the 1 level through the third anchor and fans preserve ratios', () => {
+  const channel = tools.FibChannel.build(drawing('FibChannel'), projection);
+  const levels = channel.filter((shape) => shape.kind === 'path');
+  const one = levels[6];
+  expect(primitiveHit(one, { x: 6, y: 30 })).toBe(true);
+  const fan = tools.FibSpeedFan.build(drawing('FibSpeedFan'), projection).filter(
+    (shape) => shape.kind === 'path',
+  );
+  expect(fan).toHaveLength(6);
+  const last = fan.at(-1)!;
+  expect(primitiveHit(last, { x: 10, y: 20 })).toBe(true);
+});
+it('Fibonacci time tools distinguish sequence spacing from third-anchor trend projections', () => {
+  const time = tools.FibTimezone.build(drawing('FibTimezone'), projection).filter(
+    (shape) => shape.kind === 'path',
+  );
+  expect(time.map((shape) => shape.points[0].x)).toEqual([0, 10, 20, 30, 50, 80, 130, 210]);
+  const trend = tools.TrendFibTime.build(drawing('TrendFibTime'), projection).filter(
+    (shape) => shape.kind === 'path',
+  );
+  expect(trend[1].points[0].x).toBe(6);
+  expect(trend[3].points[0].x).toBe(16);
+});
+it('retracements calculate price ratios before nonlinear projection and honor both extensions', () => {
+  const d = { ...drawing('FibRetracement'), extendLeft: true, extendRight: true };
+  const shapes = tools.FibRetracement.build(d, {
+    ...projection,
+    point: (p) => ({ x: p.time, y: Math.log(p.price) }),
+  });
+  const half = shapes.filter((shape) => shape.kind === 'path')[3];
+  expect(half.points[0]).toEqual({ x: 0, y: Math.log(15) });
+  expect(half.points[1].x).toBe(1000);
+});
+it('trend extensions project the measured price move from the third anchor', () => {
+  const shapes = tools.FibExtension.build(drawing('FibExtension'), projection);
+  const levels = shapes.filter((shape) => shape.kind === 'path').slice(1);
+  expect(levels[0].points[0].y).toBe(30);
+  expect(levels[6].points[0].y).toBeCloseTo(46.18);
+});
+it('Fibonacci curves have bounded samples and golden spiral reaches its radius anchor', () => {
+  const spiral = paths('FibSpiral')[0];
+  expect(spiral.points).toHaveLength(257);
+  // theta=0 at sample 2/3 of the six-pi range, within one sampling step.
+  const radius = Math.hypot(10, 10);
+  const radii = spiral.points.map((p) => Math.hypot(p.x, p.y - 10));
+  const quarterTurn = 256 / 12;
+  const i = 128,
+    j = i + Math.round(quarterTurn);
+  expect(radii[j] / radii[i]).toBeCloseTo(((1 + Math.sqrt(5)) / 2) ** ((j - i) / quarterTurn));
+  expect(radii.some((r) => Math.abs(r - radius) < 1)).toBe(true);
+  for (const id of ['FibCircles', 'FibSpeedArcs', 'FibWedge'] as const) {
+    const curves = paths(id);
+    expect(curves.every((shape) => shape.points.length <= 97)).toBe(true);
+    const point = curves.at(-1)!.points[20];
+    expect(primitiveHit(curves.at(-1)!, point)).toBe(true);
+    expect(primitiveHit(curves.at(-1)!, { x: 10000, y: 10000 })).toBe(false);
+  }
+});
+it('Gann box, square and fixed square have distinct calibrated geometry', () => {
+  const d = drawing('GannSquareFixed', [
+    { time: 0, price: 10 },
+    { time: 40, price: 30 },
+  ]);
+  const fixed = tools.GannSquareFixed.build(d, projection)[0];
+  if (fixed.kind !== 'path') throw new Error('Expected fixed-square outline');
+  expect(fixed.points[2]).toEqual({ x: 40, y: 50 });
+  const square = tools.GannSquare.build({ ...d, tool: 'GannSquare' }, projection)[0];
+  if (square.kind !== 'path') throw new Error('Expected square outline');
+  expect(square.points[2]).toEqual({ x: 40, y: 30 });
+  expect(paths('GannBox').length).toBeLessThan(paths('GannSquare').length);
+  expect(paths('GannFan')).toHaveLength(9);
+});
+it('all Fibonacci and Gann tools stay finite with coincident and reversed anchors', () => {
+  for (const id of toolIds.filter((id) => tools[id].group === 'Fibonacci')) {
+    for (const points of [
+      [
+        { time: 1, price: 10 },
+        { time: 1, price: 10 },
+        { time: 1, price: 10 },
+      ],
+      [
+        { time: 30, price: 40 },
+        { time: 10, price: 20 },
+        { time: 20, price: 10 },
+      ],
+    ]) {
+      const shapes = tools[id].build(drawing(id, points), projection);
+      expect(shapes.length).toBeGreaterThan(0);
+      expect(JSON.stringify(shapes)).not.toMatch(/null|NaN/);
+    }
+  }
+});

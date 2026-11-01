@@ -853,3 +853,11 @@
 .root :global(.cq-line-menu .cq-selected-tool > button:hover) {
   background: transparent;
 }
+
+/* Sectioned drawing flyouts share viewport bounds and visible keyboard focus. */
+.root :global(.cq-line-menu .cq-tool-option > button:first-child svg) {
+  flex-shrink: 0;
+}
+.root :global(.cq-line-menu .cq-tool-option > button:first-child span) {
+  white-space: normal;
+}

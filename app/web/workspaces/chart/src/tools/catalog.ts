@@ -1,3 +1,14 @@
+import {
+  FibChannel,
+  FibSpeedFan,
+  TrendFibTime,
+  FibCircles,
+  FibSpiral,
+  FibSpeedArcs,
+  FibWedge,
+  Pitchfan,
+} from './fibonacciTools';
+import { GannBox, GannSquareFixed, GannSquare } from './gannTools';
 import { InfoLine, ExtendedLine, TrendAngle, CrossLine } from './lineVariants';
 import { ParallelChannel, RegressionTrend, FlatTopBottom, DisjointChannel } from './channels';
 import { SchiffPitchfork, ModifiedSchiffPitchfork, InsidePitchfork } from './pitchforkVariants';
@@ -51,7 +62,37 @@ export const lineSections: { title: string; ids: ToolId[] }[] = [
   },
   { title: 'Additional tools', ids: ['Segment', 'PriceLine', 'Arrow'] },
 ];
+export const fibonacciSections: { title: string; ids: ToolId[] }[] = [
+  {
+    title: 'Fibonacci',
+    ids: [
+      'FibRetracement',
+      'FibExtension',
+      'FibChannel',
+      'FibTimezone',
+      'FibSpeedFan',
+      'TrendFibTime',
+      'FibCircles',
+      'FibSpiral',
+      'FibSpeedArcs',
+      'FibWedge',
+      'Pitchfan',
+    ],
+  },
+  { title: 'Gann', ids: ['GannBox', 'GannSquareFixed', 'GannSquare', 'GannFan'] },
+];
 export const tools: Record<ToolId, Tool> = {
+  FibChannel,
+  FibSpeedFan,
+  TrendFibTime,
+  FibCircles,
+  FibSpiral,
+  FibSpeedArcs,
+  FibWedge,
+  Pitchfan,
+  GannBox,
+  GannSquareFixed,
+  GannSquare,
   InfoLine,
   ExtendedLine,
   TrendAngle,

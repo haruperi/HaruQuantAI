@@ -1,27 +1,28 @@
 import type { Tool } from './types';
-import { line, path, label } from './geometry';
+import { line, label } from './geometry';
+import { anchors } from './fibonacciTools';
 export const GannFan: Tool = {
   label: 'Gann fan',
   anchors: 2,
   group: 'Fibonacci',
-  shortcut: '',
   build: (d, p) => {
-    const pts = d.points.map(p.point),
-      a = pts[0] ?? { x: 0, y: 0 },
-      b = pts[1] ?? a,
-      c = pts[2] ?? b;
-    void line;
-    void path;
-    void label;
-    void c;
-    return [0.125, 0.25, 0.5, 1, 2, 4, 8].flatMap((r) => {
-      const endpoint = p.point({
-        time: d.points[1]?.time ?? d.points[0].time + p.barMs,
-        price:
-          d.points[0].price +
-          ((d.points[1]?.price ?? d.points[0].price + 1) - d.points[0].price) * r,
-      });
-      return [line(a, endpoint, false, true, p.width, p.height), label(endpoint, r + ':1')];
+    const [a, b] = anchors(d, p);
+    return [
+      [1, 8],
+      [1, 4],
+      [1, 3],
+      [1, 2],
+      [1, 1],
+      [2, 1],
+      [3, 1],
+      [4, 1],
+      [8, 1],
+    ].flatMap(([price, time]) => {
+      const endpoint = { x: b.x, y: a.y + ((b.y - a.y) * price) / time };
+      return [
+        line(a, endpoint, d.extendLeft, true, p.width, p.height),
+        label(endpoint, `${price}�${time}`),
+      ];
     });
   },
 };
