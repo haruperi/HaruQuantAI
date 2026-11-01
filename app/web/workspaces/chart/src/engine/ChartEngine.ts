@@ -1271,7 +1271,7 @@ export class ChartEngine {
         Math.floor((remaining / 1000) % 60)
           .toString()
           .padStart(2, '0');
-    if (c.countdown && c.showPriceScaleLabels && !s.ui.replay) {
+    if (c.countdown && c.showLastPriceLine && c.showPriceScaleLabels && !s.ui.replay) {
       ctx.fillStyle = muted;
       ctx.fillText(
         marketOpen(c.symbol, this.now()) ? countdown : 'Closed',
