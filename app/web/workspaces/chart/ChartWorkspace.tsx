@@ -42,6 +42,7 @@ export function ChartWorkspace() {
   const engines = useMemo(() =>
     Array.from({ length: 8 }, () => ({ current: null as ChartEngine | null })), []);
   const root = useRef<HTMLDivElement>(null);
+  const viewRanges = useRef<(readonly [number, number] | null)[]>(Array(8).fill(null));
   const [layout, setLayout] = useState<LayoutState>(() =>
     typeof window === 'undefined' ? { id: 's', active: 0,
       sync: { symbol: false, interval: false, crosshair: true, time: false, dateRange: false } }
@@ -64,11 +65,26 @@ export function ChartWorkspace() {
       });
     },
     onViewport: (range: readonly [number, number]) => {
+      viewRanges.current[index] = range;
       const config = currentLayout.current;
       if (!config.sync.time || config.active !== index) return;
       engines.forEach((target, i) => {
-        if (i !== index) target.current?.setVisibleTimeRange(range);
+        if (i !== index) {
+          target.current?.setVisibleTimeRange(range);
+          viewRanges.current[i] = range;
+        }
       });
+    },
+    onReady: (chartEngine: ChartEngine) => {
+      const config = currentLayout.current;
+      const synchronizedRange = config.sync.time && config.active !== index
+        ? engines[config.active].current?.getVisibleTimeRange() : null;
+      const range = synchronizedRange ?? viewRanges.current[index];
+      if (range) chartEngine.setVisibleTimeRange(range);
+      viewRanges.current[index] = chartEngine.getVisibleTimeRange();
+    },
+    onDispose: (range: readonly [number, number] | null) => {
+      if (range) viewRanges.current[index] = range;
     },
   })), [stores, engines]);
   const services = paneServices[active];
@@ -120,6 +136,18 @@ export function ChartWorkspace() {
       stops.forEach(stop => stop());
     };
   }, [stores]);
+
+  // Chart engines are resized by ResizeObserver; restore the visible time window
+  // after CSS grid cells acquire their new dimensions.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      engines.forEach((engine, index) => {
+        const range = viewRanges.current[index];
+        if (range) engine.current?.setVisibleTimeRange(range);
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [layout.id, engines]);
 
   useEffect(() => {
     try {
