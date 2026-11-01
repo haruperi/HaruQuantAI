@@ -2,7 +2,26 @@ import { createDomainClient, type BatchExecutionResult } from '../../shell/trans
 
 // Route base mirrors the pre-reset gateway path; provisional until the backend
 // host architecture ratifies the mounting scheme.
-const client = createDomainClient('/executions');
+const executionClient = createDomainClient('/executions');
+const optimizerClient = createDomainClient('/api/optimizer');
+
+export interface OptimizerWorkspaceStateDto {
+  project_id: string;
+  status: 'IDLE' | 'RUNNING' | 'PAUSED' | 'COMPLETED' | 'STOPPED' | 'FAILED';
+  progress_pct: number;
+  evaluations_completed: number;
+  evaluations_total: number;
+  best_fitness: number;
+  active_result_tab: string;
+}
+
+export function startOptimization(projectId: string): Promise<OptimizerWorkspaceStateDto> {
+  return optimizerClient.post<OptimizerWorkspaceStateDto>('/start', { project_id: projectId });
+}
+
+export function getOptimizerState(projectId: string): Promise<OptimizerWorkspaceStateDto> {
+  return optimizerClient.get<OptimizerWorkspaceStateDto>(`/state?project_id=${encodeURIComponent(projectId)}`);
+}
 
 const demoGraphDocument = () => ({
   schema_version: 1,
@@ -14,7 +33,7 @@ const demoGraphDocument = () => ({
 });
 
 export function runOptimizationTrials(): Promise<BatchExecutionResult> {
-  return client.post('/batch', {
+  return executionClient.post('/batch', {
     graph_document: demoGraphDocument(),
     inputs: { values: [44.0, 44.5, 45.0, 44.8, 45.2, 46.0] },
     trials: [
