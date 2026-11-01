@@ -1284,3 +1284,171 @@
   .root :global(.cq-setting-inline .cq-setting-check) { flex-basis: 95px; }
   .root :global(.cq-settings-footer) { padding: 10px; }
 }
+
+
+/* Multi-chart workspace: grid-cell chart engines, selection, and the TradingView-style picker. */
+.root :global(.cq-chart-board) {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  gap: 3px;
+  background: var(--cq-border);
+}
+.root :global(.cq-chart-cell) {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  position: relative;
+  background: var(--cq-bg);
+  outline: none;
+}
+.root :global(.cq-chart-board .cq-chart) {
+  grid-column: auto;
+  grid-row: auto;
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  min-height: 0;
+}
+.root :global(.cq-chart-board:not([data-layout='s']) .cq-chart-cell-active) {
+  box-shadow: inset 0 0 0 2px #2962ff;
+  z-index: 1;
+}
+.root :global(.cq-chart-board:not([data-layout='s']) .cq-chart-cell-active::after) {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 2px solid #2962ff;
+  pointer-events: none;
+  z-index: 4;
+}
+.root :global(.cq-top) {
+  z-index: 12;
+}
+.root :global(.cq-layout-control) {
+  position: relative;
+  flex-shrink: 0;
+}
+.root :global(.cq-layout-control > button) {
+  min-width: 52px;
+  min-height: 32px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+.root :global(.cq-layout-popover) {
+  position: absolute;
+  top: calc(100% + 7px);
+  right: 0;
+  width: 360px;
+  max-width: min(360px, calc(100vw - 54px));
+  max-height: min(730px, calc(100vh - 95px));
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 8px 13px 13px;
+  color: var(--cq-text);
+  border: 1px solid var(--cq-border);
+  border-radius: 9px;
+  background: var(--cq-panel);
+  box-shadow: 0 12px 35px #0008;
+  z-index: 50;
+  scrollbar-width: thin;
+}
+.root :global(.cq-layout-option-group) {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  padding: 7px 0;
+  border-bottom: 1px solid var(--cq-border);
+}
+.root :global(.cq-layout-group-count) {
+  display: inline-flex;
+  min-width: 14px;
+  font-size: 12px;
+  color: var(--cq-muted);
+  justify-content: center;
+}
+.root :global(.cq-layout-option-list) {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.root :global(.cq-layout-choice) {
+  width: 38px;
+  height: 36px;
+  min-height: 36px;
+  padding: 4px;
+  background: transparent;
+  border: 1px solid transparent;
+  color: var(--cq-text);
+  border-radius: 5px;
+}
+.root :global(.cq-layout-choice:hover),
+.root :global(.cq-layout-choice-active) {
+  border-color: #2962ff;
+  background: #2962ff30;
+}
+.root :global(.cq-layout-preview) {
+  display: grid;
+  gap: 1.5px;
+  width: 28px;
+  height: 26px;
+}
+.root :global(.cq-layout-preview > span) {
+  border: 1px solid currentColor;
+  border-radius: 2px;
+  opacity: .8;
+}
+.root :global(.cq-layout-choice-active .cq-layout-preview > span) {
+  border-color: #fff;
+  background: #2962ff;
+}
+.root :global(.cq-layout-sync) {
+  padding-top: 12px;
+}
+.root :global(.cq-layout-sync-heading) {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--cq-muted);
+  margin: 0 0 9px;
+}
+.root :global(.cq-layout-sync-row) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 15px;
+  min-height: 42px;
+  font-size: 13px;
+}
+.root :global(.cq-layout-sync-row button[role='switch']) {
+  min-width: 42px;
+  width: 42px;
+  height: 24px;
+  min-height: 24px;
+  padding: 3px;
+  border-radius: 14px;
+  background: #6f7480;
+  justify-content: flex-start;
+  flex-shrink: 0;
+}
+.root :global(.cq-layout-sync-row button[role='switch'][aria-checked='true']) {
+  background: #2962ff;
+}
+.root :global(.cq-layout-sync-row button[role='switch'] span) {
+  display: block;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  border-radius: 50%;
+  background: #fff;
+  transition: transform .12s ease;
+}
+.root :global(.cq-layout-sync-row button[role='switch'][aria-checked='true'] span) {
+  transform: translateX(18px);
+}
