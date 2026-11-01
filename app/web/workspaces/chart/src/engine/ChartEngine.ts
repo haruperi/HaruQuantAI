@@ -8,6 +8,7 @@ import { marketOpen } from '../feed/sessions';
 import { clamp, priceToY, yToPrice, niceTicks, zoomAt, transformPrice } from './scales';
 import { paintSeries, heikinAshi } from './candles';
 import { tools } from '../tools/catalog';
+import { resolveMagnetSnap } from './magnet';
 import { isTextNote } from '../tools/textNotes';
 import { sourceCandles, positionPoints, defaultPositionPoints } from '../tools/forecasting';
 import { paint, primitiveHit } from '../tools/geometry';
@@ -546,18 +547,27 @@ export class ChartEngine {
     );
   }
   private point(p: XY): Point {
-    const i = this.indexAt(p.x),
-      near = Math.round(i),
-      bar = this.visible[clamp(near, 0, this.visible.length - 1)],
-      c = this.store.getState().chart;
-    let price = this.price(p.y);
-    if (c.magnet && bar)
-      price = [bar.open, bar.high, bar.low, bar.close].reduce((a, b) =>
-        Math.abs(this.y(a) - p.y) < Math.abs(this.y(b) - p.y) ? a : b,
-      );
-    const index = c.magnet ? near : i,
-      low = Math.floor(index),
-      fraction = index - low;
+    const i = this.indexAt(p.x);
+    const state = this.store.getState(), c = state.chart;
+    const price = this.price(p.y);
+    const overlays = c.snapToIndicators
+      ? this.indicatorCache.flatMap((series, index) =>
+          state.indicators[index] && !indicators[state.indicators[index].kind].pane ? series : [])
+      : [];
+    const snapped = c.magnet
+      ? resolveMagnetSnap({
+          cursor: p,
+          fractionalIndex: i,
+          bars: this.visible,
+          strength: c.magnetStrength,
+          snapToIndicators: c.snapToIndicators,
+          priceOverlaySeries: overlays,
+          xAtIndex: (index) => this.x(index),
+          yAtPrice: (value) => this.y(value),
+        })
+      : null;
+    if (snapped) return { time: this.visible[snapped.index].time, price: snapped.price };
+    const low = Math.floor(i), fraction = i - low;
     const a = this.visible[low]?.time ?? (this.visible[0]?.time ?? 0) + low * this.barMs(),
       b = this.visible[low + 1]?.time ?? a + this.barMs();
     return { time: a + (b - a) * fraction, price };
