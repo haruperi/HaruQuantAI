@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { builtInCsvFormats, csvArtifacts, exportPreset, exportRange, mt4Manifest, mt5Artifact, parseMt4Properties, renderCsvLine, safeFilename, selectExportTargets, type ExportTarget } from '../../../../../workspaces/data_manager/plugins/Export/dataExport';
+import { builtInCsvFormats, csvArtifacts, exportPreset, exportRange, mt5Artifact, renderCsvLine, safeFilename, selectExportTargets, type ExportTarget } from '../../../../../workspaces/data_manager/plugins/Export/dataExport';
 
 const tick: ExportTarget = { id: 'd3', symbol: 'NQ', symbolDefinition: 'NQ', source: 'Futures', timeframe: 'Tick → D1', timezone: 'America/Chicago', from: '2024-01-02', to: '2026-08-31', bars: 1000, category: 'Futures' };
 const bar: ExportTarget = { id: 'd1', symbol: 'EURUSD', symbolDefinition: 'EURUSD', source: 'Dukascopy', timeframe: 'M1 → H1', timezone: 'UTC', from: '2025-01-01', to: '2025-12-31', bars: 500, category: 'Forex' };
@@ -7,9 +7,7 @@ const bar: ExportTarget = { id: 'd1', symbol: 'EURUSD', symbolDefinition: 'EURUS
 describe('Data export contracts', () => {
   it('enforces per-export selection and data eligibility', () => {
     expect(selectExportTargets([tick, bar], ['d1', 'd3'], 'csv')).toHaveLength(2);
-    expect(selectExportTargets([tick], ['d3'], 'mt4')).toEqual([tick]);
     expect(selectExportTargets([tick], ['d3'], 'mt5')).toEqual([tick]);
-    expect(() => selectExportTargets([bar], ['d1'], 'mt4')).toThrow('Tick');
     expect(() => selectExportTargets([tick, bar], ['d1', 'd3'], 'mt5')).toThrow('exactly one');
     expect(() => selectExportTargets([{ ...bar, bars: 0 }], ['d1'], 'csv')).toThrow('with data');
   });
@@ -29,14 +27,6 @@ describe('Data export contracts', () => {
     expect(renderCsvLine('[Symbol],[Text:ok]', bar, { date: new Date('2025-01-01T00:00:00Z'), open: 1, high: 1, low: 1, close: 1, bid: 1, ask: 1, volume: 1, spread: 1 })).toBe('EURUSD,ok');
   });
 
-  it('parses bounded MT4 properties and emits an honest manifest', () => {
-    const properties = parseMt4Properties('# mock\nSYMBOL=GBPUSD\nDIGITS=5\nBAD KEY=x');
-    expect(properties).toEqual({ SYMBOL: 'GBPUSD', DIGITS: '5' });
-    const artifact = mt4Manifest({ target: tick, from: tick.from, to: tick.to, installation: 'MT4', dataFolder: 'history', server: 'Demo', specificationSymbol: 'NQ', mt4Name: 'NQ', timeframe: 'All', timezone: 'original', encoding: 'windows-1252', mode: 'all', properties });
-    expect(artifact.name).toBe('NQ-mt4-export-manifest.json');
-    expect(JSON.parse(artifact.content)).toMatchObject({ nativeCompatible: false, request: { nativeTargets: ['NQ.fxt', 'NQ.hst'] } });
-    expect(() => parseMt4Properties('not properties')).toThrow('No supported');
-  });
 
   it('creates MT5 Tick and M1 CSV shapes and validates real spread', () => {
     const tickFile = mt5Artifact({ target: tick, from: tick.from, to: tick.to, timeframe: 'tick', spreadMode: 'real', spread: 10, timezone: 'original', filename: 'NQ' });

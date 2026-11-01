@@ -1,5 +1,5 @@
 # AppDataManager — Market Data Engine
-> **COMPLETION AUDIT ACTIVE (2026-11-01):** See [AppDataManager Completion Audit](research/appdatamanager-completion-audit.md). This workspace document is **retained** and not ready for retirement. HaruQuantAI architecturally substituted `Instruments` with `Symbols` (e.g., `Symbols.clone` in `app/workspace/data_manager/symbols/feature.py`), and broker connectors remain consolidated in `app/workspace/brokers/`.
+> **COMPLETION AUDIT ACTIVE (2026-11-01):** See [AppDataManager Completion Audit](research/appdatamanager-completion-audit.md). This workspace development document is **retained** and remains active. Outstanding work orders (Phase 3.1 clone defaults helper and 6 acceptance tests, Phase 3.2 coordinator contract, DM-M01 broker relocation, and Phase 03.9 contribution order specifications) remain open. Existing feature subpackages (`symbols`, `sessions`, `brokers`, etc.) represent implementation differences that have not been ratified as formal supersession.
 
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
@@ -71,7 +71,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 *Commit:* refactor(data-manager): migrate data manager and broker workspaces.
 
-> **Migration Reality Note (2026-11-01):** Broker connectors remain in `app/workspace/brokers/` and tests in `tests/workspace/brokers/`; the planned `app/workspace/data_sources/` was not created. Furthermore, `instruments` was architecturally substituted by `symbols` (`app/workspace/data_manager/symbols/`). See [audit](research/appdatamanager-completion-audit.md).
+> **Migration Reality Note (2026-11-01):** Broker connectors remain in `app/workspace/brokers/` and tests in `tests/workspace/brokers/`; the planned `app/workspace/data_sources/` was not created. UI migration to `app/web/workspaces/data_manager/` is verified. Current subpackages in `app/workspace/data_manager/` implement active functionality, but formal relocation or permanent retention in `app/workspace/brokers/` remains an open decision. See [audit](research/appdatamanager-completion-audit.md).
 
 
 ### Phase 3.1: Instrument clone defaults — `DataManagerInstruments`
@@ -91,8 +91,8 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 *Exact types:* frozen dataclasses `InstrumentBrokerRef(instrument: str, broker_id: int)`, `CloneBroker(id: int, name: str, postfix: str, mt_use: bool)`, `CloneDefaults(source_name: str, clone_name: str, broker_id: int, choices: tuple[CloneBroker, ...])`. No field has an implicit default. `CloneInstrumentDefaults` contains only static method `build`.
 
-*Functional Requirements & Implementation (Reconciled 2026-11-01: Substituted by Symbols):*
-> *Note:* Standalone `CloneInstrumentDefaults` was not created. Instrument functionality was substituted into `Symbols` (`app/workspace/data_manager/symbols/`), where default clone naming and parameter handling are unified in `Symbols.clone`. Checkboxes corrected to reflect actual codebase state:
+*Functional Requirements & Implementation (Audit Finding 2026-11-01: Absent):*
+> *Note:* Standalone `CloneInstrumentDefaults` and its six acceptance tests were not created. While `Symbols.clone` handles symbol cloning in `app/workspace/data_manager/symbols/feature.py`, it does not implement the specified broker-suffix stripping or selection defaults from this order. Checkboxes remain open `[ ]`:
 - [ ] `CloneInstrumentDefaults.build(selected_names: Sequence[str], instruments: Sequence[InstrumentBrokerRef], brokers: Sequence[CloneBroker]) -> CloneDefaults` -> if selected_names is empty, raise `DomainError(code="INSTRUMENT_SELECTION_REQUIRED", message="You have to select some instrument.", details={})` before any other operation.
 - [ ] `CloneInstrumentDefaults.build(...)` -> use selected_names[0], without trimming or case conversion. Start the clone base as this full name. Find exact-name instrument records; strip a broker postfix only when there is exactly one matching instrument and exactly one broker with that instrument's broker_id, the postfix is nonempty, and the name ends with it. Remove exactly one suffix occurrence.
 - [ ] `CloneInstrumentDefaults.build(...)` -> return clone_name as the resulting base followed by literal `Clone`; return broker_id=-1. choices begins with `CloneBroker(-1,"SQ default","",True)`, followed by input brokers whose mt_use is True in input order. Do not deduplicate/sort or filter the broker used for suffix removal by mt_use.
@@ -113,7 +113,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ### Phase 3.2: Clone command orchestration — `DataManagerInstruments`
 
-> **Architectural Substitution Note (2026-11-01):** `InstrumentCloneService` was not created as an independent coordinator. In HaruQuantAI, `Instruments` was substituted by `Symbols` (`app/workspace/data_manager/symbols/`). Symbol cloning is fulfilled by `Symbols.clone` in `app/workspace/data_manager/symbols/feature.py:396`, which trims whitespace and validates source record existence against `datamgr_symbols` before adding the cloned symbol.
+> **Implementation Divergence Note (2026-11-01):** `InstrumentCloneService` was not created as specified. `Symbols.clone` in `app/workspace/data_manager/symbols/feature.py:396` implements symbol cloning with material differences (requires names, trims whitespace, checks source existence first against `datamgr_symbols`, and returns a domain dictionary instead of `StandardResponse[CloneInstrumentReceipt]`). This is an implementation divergence, not an approved supersession. This work order remains open.
 
 *Feature:* clone an existing instrument through a supplied storage/naming adapter.
 **Task ID:** `WO-DM-INSTRUMENT-CLONE-COMMAND`. **Readiness:** READY-AFTER-CORE-CONTRACTS for this coordinator only; production repository/HTTP integration is BLOCKED by `I-DataManagerInstruments`. **Evidence:** `OBS145-INSTRUMENT-CLONE-001`.
@@ -142,7 +142,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 ## Phase 03.9: Full workspace feature orders — evidence-gated contracts
 
-> **Audit Reconciliation Note (2026-11-01):** All 31 contribution orders below carry `Readiness: READY` headings but retain explicit contractual clauses stating that exact public operations, request/response models, and persistence effects remain unestablished (`Function/signature authorization: none`). Active implementations exist across Data Manager feature packages (`symbols`, `sessions`, `brokers`, `baskets`, `custom`, `data`, `logs`, `help`, `sources`) and `app/workspace/brokers/`. See [AppDataManager Completion Audit](research/appdatamanager-completion-audit.md) for full status reconciliation.
+> **Audit Reconciliation Note (2026-11-01):** All 31 contribution orders below carry `Readiness: READY` headings but retain explicit contractual clauses stating that exact public operations, request/response models, and persistence effects remain unestablished (`Function/signature authorization: none`). While active components exist across Data Manager feature packages (`symbols`, `sessions`, `brokers`, `baskets`, `custom`, `data`, `logs`, `help`, `sources`), `app/workspace/brokers/`, and `app/web/`, passing component tests do not close these formal orders until exact request/response contracts are specified and ratified. See [AppDataManager Completion Audit](research/appdatamanager-completion-audit.md).
 
 ### `AppDataManager`
 
@@ -189,7 +189,7 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Source reassessment — 2026-10-30:* [Exact available source and declarations](research/workspaces-03-08-source-review.md#connectionmt4). Readable shared-library context is now available in `DONOR_REFERENCE_ROOT/internal/libs/`; this removes the shared-bytecode-access obstacle, but does not by itself release this complete-workflow order. Located 0 current plugin JavaScript files and decompiled primary Java files recovered in data/reference-donor/internal/plugins/`ConnectionMT4`. The linked review replaces carrier-only lookup as the research starting point; original unresolved target-model and acceptance gates below remain in force.
 
 
-*Feature:* `ConnectionMT4` complete observed workspace contribution. **Task ID:** `I-ConnectionMT4`. **Readiness:** READY. **Evidence:** `OBS145-ConnectionMT4-SURFACE-001`.
+*Feature:* `ConnectionMT4` complete observed workspace contribution. **Task ID:** `I-ConnectionMT4`. **Status:** PERMANENTLY DROPPED / OUT OF SCOPE (MetaTrader 4 permanently retired project-wide by architectural mandate; MT5 is the sole supported MetaTrader platform). **Evidence:** `OBS145-ConnectionMT4-SURFACE-001`.
 
 *Implementation Files (reserved exact paths; do not create them while blocked):*
 - **Backend:** `app/workspace/data_manager/connections/mt4.py` → `ConnectionMT4Service`.

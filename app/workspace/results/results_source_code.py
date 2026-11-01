@@ -3,7 +3,7 @@
 Description:
     Implements ResultsSourceCodeService emitting compiled or formatted source
     code across target platforms (EasyLanguage, MetaTrader4, MetaTrader5,
-    NinjaScript, PseudoCode, JForex, cTrader), managing MT4/MT5 terminal path
+    NinjaScript, PseudoCode, JForex, cTrader), managing MT5 terminal path
     preferences, and exporting Walk-Forward parameter schedules.
 
 Purpose:
@@ -52,19 +52,6 @@ SUPPORTED_PLATFORMS: dict[str, dict[str, str]] = {
             "Begin\n"
             "    // Strategy Logic\n"
             "End;\n"
-        ),
-    },
-    "MetaTrader4": {
-        "title": "MetaTrader 4",
-        "file_extension": ".mq4",
-        "scaffold": (
-            "//+------------------------------------------------------------------+\n"
-            "//| Expert initialization / tick function                             |\n"
-            "//+------------------------------------------------------------------+\n"
-            "int start() {\n"
-            "    // MT4 Trading Logic\n"
-            "    return(0);\n"
-            "}\n"
         ),
     },
     "MetaTrader5": {
@@ -157,15 +144,13 @@ class SourceCodeProjection:
 
 @dataclass(frozen=True, slots=True)
 class MTPathsConfig:
-    """MetaTrader 4 and 5 terminal directory preferences."""
+    """MetaTrader 5 terminal directory preferences."""
 
-    mt4_terminal_dir: str
     mt5_terminal_dir: str
 
     def to_dict(self) -> dict[str, Any]:
         """Convert config to dictionary."""
         return {
-            "mt4_terminal_dir": self.mt4_terminal_dir,
             "mt5_terminal_dir": self.mt5_terminal_dir,
         }
 
@@ -178,7 +163,6 @@ class ResultsSourceCodeService:
         self.store = store
         self._in_memory_results: dict[str, RunResult] = {}
         self._mt_paths = MTPathsConfig(
-            mt4_terminal_dir="",
             mt5_terminal_dir="",
         )
 
@@ -251,7 +235,7 @@ class ResultsSourceCodeService:
         )
 
     def get_mt_paths(self) -> StandardResponse[MTPathsConfig]:
-        """Get current MT4/MT5 directory paths configuration."""
+        """Get current MT5 directory paths configuration."""
         logger.info("FR-results-source-mtpaths: retrieved MT terminal directory paths")
         return wrap_response(
             request_id="req_get_mt_paths",
@@ -260,11 +244,10 @@ class ResultsSourceCodeService:
         )
 
     def save_mt_paths(self, config: MTPathsConfig) -> StandardResponse[MTPathsConfig]:
-        """Save updated MT4/MT5 directory paths configuration."""
+        """Save updated MT5 directory paths configuration."""
         self._mt_paths = config
         logger.info(
-            "FR-results-source-mtpaths: saved MT paths mt4='%s' mt5='%s'",
-            config.mt4_terminal_dir,
+            "FR-results-source-mtpaths: saved MT paths mt5='%s'",
             config.mt5_terminal_dir,
         )
         return wrap_response(

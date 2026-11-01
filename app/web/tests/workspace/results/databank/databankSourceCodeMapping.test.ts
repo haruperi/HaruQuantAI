@@ -33,15 +33,6 @@ const scopes: MappingScope[] = [
   {
     domain: "databank",
     js: 0,
-    plugin: "ResultsDatabankActions/save/sourceCode/mt4",
-    allowFrontendExclusions: true,
-    css: 0,
-    html: 0,
-    excluded: 1,
-  },
-  {
-    domain: "databank",
-    js: 0,
     plugin: "ResultsDatabankActions/save/sourceCode/mt5",
     allowFrontendExclusions: true,
     css: 0,

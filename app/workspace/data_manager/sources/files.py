@@ -22,7 +22,6 @@ from fastapi import APIRouter, Request
 from app.core.host.transport import TransportError
 from app.core.lib.responses import ErrorCode
 from app.workspace.brokers.darwinex import decode_darwinex_dat
-from app.workspace.brokers.files import decode_fxt_bytes, decode_hst_bytes
 from app.workspace.data_manager.data._helpers import validate_dataset_updates
 from app.workspace.data_manager.data.storage import publish_frame, require_data
 
@@ -168,13 +167,8 @@ def preview_import(
         raise ValueError("Choose a nonempty input up to 25 MB")
     suffix = Path(name).suffix.lower()
     errors: list[str] = []
-    if suffix in {".hst", ".fxt", ".dat"}:
-        decoder = {
-            ".hst": decode_hst_bytes,
-            ".fxt": decode_fxt_bytes,
-            ".dat": decode_darwinex_dat,
-        }[suffix]
-        frame = _binary_frame(content, decoder)
+    if suffix == ".dat":
+        frame = _binary_frame(content, decode_darwinex_dat)
     elif suffix == ".parquet":
         frame = pd.read_parquet(io.BytesIO(content))
         if "DateTime" in frame:

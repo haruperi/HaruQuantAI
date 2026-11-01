@@ -50,13 +50,13 @@ flowchart LR
     H --> I["9. Deployment<br/>(Export & Live Trading)"]
 ```
 
-1. **Acquire & Ingest:** Ingest multi-asset tick and bar series via pluggable data feeds (Dukascopy, Darwinex, MT4/5, Parquet, CSV); clean, resample, and inspect quality.
+1. **Acquire & Ingest:** Ingest multi-asset tick and bar series via pluggable data feeds (Dukascopy, Darwinex, MT5, Parquet, CSV); clean, resample, and inspect quality.
 2. **Author or Generate:** Formulate trading logic via visual rule blocks in AlgoWizard or Python/MQL in CodeEditor, or evolve strategy populations using the Builder genetic engine.
 3. **Simulate & Retest:** Execute precise multi-timeframe historical backtests with explicit spread, slippage, and commission models.
 4. **Validate & Stress-Test:** Apply Walk-Forward Optimization (WFO/WFM), Monte Carlo permutations, and parameter sensitivity matrices to challenge overfitting.
 5. **Curate & Filter:** Aggregate candidates into databanks filtered by fitness functions, Sharpe ratio, max drawdown, and profit factor.
 6. **Compose Portfolios:** Combine uncorrelated strategies, optimize asset weights, and evaluate aggregate portfolio risk.
-7. **Automate & Export:** Orchestrate end-to-end pipelines in Custom Projects and export verified strategy code (MQL5, MQL4, EasyLanguage, cTrader C#, Python).
+7. **Automate & Export:** Orchestrate end-to-end pipelines in Custom Projects and export verified strategy code (MQL5, EasyLanguage, cTrader C#, Python).
 
 ---
 
@@ -68,7 +68,7 @@ The clean-room reimplementation is organized into 20 domain phases detailed in [
 | :---: | :--- | :--- | :--- | :---: |
 | **01** | [Completion audit](dev/full-reimplementation/research/appcore-completion-audit.md) | **AppCore** | Pure quant engine, time series, trading primitives, grid protocol, host lifecycle, persistence WAL, jobs, wizard code transforms. | **Verified & Audited**<br/>(34 WOs, see [audit](dev/full-reimplementation/research/appcore-completion-audit.md)) |
 | **02** | [Completion audit](dev/full-reimplementation/research/apphome-completion-audit.md) | **AppHome** | Central hub, native revisioned projects/settings/Notes, shared Core execution, stored results/charts, analysis definitions and persisted themes. | **Implementation Work Order Retired**<br/>(Supported capabilities and limitations in audit) |
-| **03** | [`03-AppDataManager.md`](dev/full-reimplementation/03-AppDataManager.md) | **AppDataManager** | Market data catalog, tick/bar storage, instrument specs, sessions, baskets, broker profiles, data quality review, bar transforms. | **Audit Active / Retained**<br/>(See [audit](dev/full-reimplementation/research/appdatamanager-completion-audit.md); Symbols substituted, brokers retained) |
+| **03** | [`03-AppDataManager.md`](dev/full-reimplementation/03-AppDataManager.md) | **AppDataManager** | Market data catalog, tick/bar storage, symbol specs, sessions, baskets, broker profiles, data quality review, bar transforms. | **Active / Retained**<br/>(See [audit](dev/full-reimplementation/research/appdatamanager-completion-audit.md); 403 backend / 291 frontend tests passed; work order retained pending open contracts) |
 | **04** | [`04-AppCodeEditor.md`](dev/full-reimplementation/04-AppCodeEditor.md) | **AppCodeEditor** | Multi-language code editor, compilation hooks, syntax trees, algorithmic snippets, and template integration. | *Planned* |
 | **05** | [`05-AppWizard.md`](dev/full-reimplementation/05-AppWizard.md) | **AppWizard** | AlgoWizard visual rule builder, conditions, indicators, actions, multi-timeframe logic, code generator backends. | *Core Transform Done* |
 | **06** | [`06-AppResults.md`](dev/full-reimplementation/06-AppResults.md) | **AppResults** | High-capacity databanks, multi-metric performance evaluation, equity/drawdown charts, trade lists, PDF/HTML exports. | *Planned* |
@@ -97,6 +97,8 @@ pytest/plugin imports. This supersedes the incomplete 72.99% startup measurement
 The implementation work order is retired; its [completion audit](dev/full-reimplementation/research/apphome-completion-audit.md)
 retains supported execution, browser evidence and unavailable-provider limitations.
 Other workspace work orders remain independently active.
+
+AppDataManager status on 2026-11-01: **402 backend tests passed** across `tests/workspace/data_manager/` and `tests/workspace/brokers/`; **290 frontend tests passed across 40 files** in `app/web/tests/workspace/data_manager/`. MetaTrader 4 support is permanently retired project-wide by architectural mandate in favor of MT5. The developmental work order [`03-AppDataManager.md`](dev/full-reimplementation/03-AppDataManager.md) remains **active and retained** pending resolution of Phase 3.1 clone defaults, Phase 3.2 coordinator contracts, DM-M01 broker relocation decisions, and public contracts for Phase 03.9 contribution orders. See the [AppDataManager completion audit](dev/full-reimplementation/research/appdatamanager-completion-audit.md) for full requirement mapping and retirement blockers.
 
 ## 5. System Invariants & Non-Negotiable Rules
 

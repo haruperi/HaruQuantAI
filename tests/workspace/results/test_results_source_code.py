@@ -63,9 +63,9 @@ class TestResultsSourceCodeService:
     def test_mt_paths_configuration(self) -> None:
         """Verify get and save MT paths."""
         service = ResultsSourceCodeService()
-        cfg = MTPathsConfig(mt4_terminal_dir="C:/MT4", mt5_terminal_dir="C:/MT5")
+        cfg = MTPathsConfig(mt5_terminal_dir="C:/MT5")
         save_resp = service.save_mt_paths(cfg)
-        assert save_resp.data.mt4_terminal_dir == "C:/MT4"
+        assert save_resp.data.mt5_terminal_dir == "C:/MT5"
 
         get_resp = service.get_mt_paths()
         assert get_resp.data.mt5_terminal_dir == "C:/MT5"
@@ -108,5 +108,5 @@ class TestResultsSourceCodeService:
         )
         assert proj.to_dict()["target_id"] == "t1"
 
-        cfg = MTPathsConfig(mt4_terminal_dir="a", mt5_terminal_dir="b")
-        assert cfg.to_dict()["mt4_terminal_dir"] == "a"
+        cfg = MTPathsConfig(mt5_terminal_dir="b")
+        assert cfg.to_dict()["mt5_terminal_dir"] == "b"

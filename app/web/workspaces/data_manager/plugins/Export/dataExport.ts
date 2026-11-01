@@ -1,6 +1,6 @@
 import { presetRange, today, validDate, type Preset } from '../Dukascopy/dukascopyDownload';
 
-export type ExportKind = 'csv' | 'mt4' | 'mt5';
+export type ExportKind = 'csv' | 'mt5';
 export type ExportJobState = 'running' | 'paused' | 'cancelled' | 'completed' | 'failed';
 
 export interface ExportTarget {
@@ -41,22 +41,6 @@ export interface CsvExportRequest {
   includeHeader: boolean;
   header: string;
   format: string;
-}
-
-export interface Mt4ExportRequest {
-  target: ExportTarget;
-  from: string;
-  to: string;
-  installation: string;
-  dataFolder: string;
-  server: string;
-  specificationSymbol: string;
-  mt4Name: string;
-  timeframe: string;
-  timezone: string;
-  encoding: string;
-  mode: 'all' | 'hst' | 'fxt';
-  properties: Record<string, string>;
 }
 
 export interface Mt5ExportRequest {
@@ -103,11 +87,6 @@ export const builtInCsvFormats: readonly CsvFormat[] = [
   { name: 'Tradestation bar format', predefined: true, header: 'Date,Time,Open,High,Low,Close,Volume', format: '[Date:MM/dd/yyyy],[Time:HH:mm],[Open],[High],[Low],[Close],[Volume]' },
 ] as const;
 
-export const defaultMt4Properties: Record<string, string> = {
-  SYMBOL: 'EURUSD', DIGITS: '5', POINT: '0.00001', SPREAD: '12', CONTRACT_SIZE: '100000',
-  LOT_MIN: '0.01', LOT_MAX: '100', LOT_STEP: '0.01', STOPS_LEVEL: '0', TICK_SIZE: '0.00001',
-  TICK_VALUE: '1', SWAP_LONG: '-6.8', SWAP_SHORT: '2.1', MARGIN_INITIAL: '0', MARGIN_MAINTENANCE: '0',
-};
 
 export function safeFilename(value: string): string {
   const result = value.trim().replace(/[<>:"/\\|?*\x00-\x1f]/g, '_').replace(/[. ]+$/g, '');
@@ -126,7 +105,6 @@ export function selectExportTargets(rows: ExportTarget[], ids: string[], mode: E
   const row = selected[0];
   if (!row.bars || !row.from || !row.to) throw new Error('There is no data to export.');
   const frames = row.timeframe.toUpperCase();
-  if (mode === 'mt4' && !frames.includes('TICK')) throw new Error('MT4 FXT/HST export requires Tick data.');
   if (mode === 'mt5' && !(frames.startsWith('TICK') || frames.startsWith('M1'))) throw new Error('MT5 export requires Tick or M1 source data.');
   return [row];
 }
@@ -154,22 +132,6 @@ export function validateCsvFormat(format: CsvFormat): void {
   if (!format.format.trim() || format.format.length > 1000 || format.header.length > 1000) throw new Error('Enter a valid row format (maximum 1,000 characters).');
   const tokens = [...format.format.matchAll(/\[([A-Za-z]+)(?::[^\]]*)?\]/g)].map(match => match[1]);
   if (!tokens.length || tokens.some(token => !['DateTime', 'Date', 'Time', 'Open', 'High', 'Low', 'Close', 'Bid', 'Ask', 'Volume', 'Spread', 'Symbol', 'Text'].includes(token))) throw new Error('The row format contains an unsupported or missing token.');
-}
-
-export function parseMt4Properties(text: string): Record<string, string> {
-  if (!text.trim() || text.length > 200_000) throw new Error('Choose a non-empty MT4 properties file smaller than 200 KB.');
-  const result: Record<string, string> = {};
-  for (const raw of text.replace(/^\uFEFF/, '').split(/\r?\n/)) {
-    const line = raw.trim();
-    if (!line || line.startsWith('#') || line.startsWith(';')) continue;
-    const index = line.indexOf('=');
-    if (index < 1) continue;
-    const key = line.slice(0, index).trim().toUpperCase();
-    const value = line.slice(index + 1).trim();
-    if (/^[A-Z][A-Z0-9_]{0,63}$/.test(key) && value.length <= 200) result[key] = value;
-  }
-  if (!Object.keys(result).length) throw new Error('No supported KEY=value properties were found.');
-  return result;
 }
 
 function pad(value: number, length = 2): string { return String(value).padStart(length, '0'); }
@@ -222,18 +184,6 @@ export function csvArtifacts(request: CsvExportRequest): ExportArtifact[] {
     const suffix = `${target.symbol}-${request.timeframe}-${request.session.replace(/\s+/g, '_')}.csv`;
     return { name: `${namePrefix}-${safeFilename(suffix)}`, mime: 'text/csv;charset=utf-8', content, targetId: target.id };
   });
-}
-
-export function mt4Manifest(request: Mt4ExportRequest): ExportArtifact {
-  const range = exportRange([request.target]); validateRange(request.from, request.to, range);
-  if (!request.installation || !request.dataFolder || !request.server) throw new Error('Select the MT4 installation, data folder, and server.');
-  if (!['all', 'hst', 'fxt'].includes(request.mode) || !['All', 'M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'].includes(request.timeframe)) throw new Error('Choose valid MT4 export options.');
-  const symbol = safeFilename(request.mt4Name);
-  const nativeTargets = request.mode === 'all' ? [`${symbol}.fxt`, `${symbol}.hst`] : [`${symbol}.${request.mode}`];
-  const content = JSON.stringify({ kind: 'HaruQuantAI MT4 mock export manifest', nativeCompatible: false,
-    notice: 'No FXT or HST binary was generated. A backend MT4 writer is required.', createdAt: new Date().toISOString(),
-    request: { ...request, target: { id: request.target.id, symbol: request.target.symbol }, nativeTargets } }, null, 2);
-  return { name: `${symbol}-mt4-export-manifest.json`, mime: 'application/json;charset=utf-8', content, targetId: request.target.id };
 }
 
 export function mt5Artifact(request: Mt5ExportRequest): ExportArtifact {

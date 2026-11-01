@@ -10,7 +10,6 @@ import {
 
 export interface RemoteIndicatorValue {
   name: string;
-  mt4?: string;
   mt5?: string;
   el?: string;
 }
@@ -74,7 +73,6 @@ export function toExternalIndicatorDefinition(record: RemoteIndicatorRecord): Ex
     const item = record.values?.[index];
     return {
       name: item?.name ?? '',
-      mt4: item?.mt4 ?? '',
       mt5: item?.mt5 ?? '',
       el: item?.el ?? '',
     };
@@ -84,8 +82,7 @@ export function toExternalIndicatorDefinition(record: RemoteIndicatorRecord): Ex
       const item = record.values[i];
       lineValues.push({
         name: item?.name ?? '',
-        mt4: item?.mt4 ?? '',
-        mt5: item?.mt5 ?? '',
+          mt5: item?.mt5 ?? '',
         el: item?.el ?? '',
       });
     }

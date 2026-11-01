@@ -2,7 +2,7 @@
 
 Description:
     Provides the core business service implementation for AppSQXBusiness,
-    including plugin descriptor provision, MT4/MT5 compiler configuration,
+    including plugin descriptor provision, MT5 compiler configuration,
     commercial MQL Market project persistence, EA parameter extraction, and
     build job lifecycle execution.
 
@@ -75,7 +75,6 @@ class SQXBusinessService:
 
         self._lock = threading.Lock()
         self._settings_file = self.projects_dir / "config.xml"
-        self._mt4_path: str = ""
         self._mt5_path: str = ""
         self._projects: dict[str, MQLMarketProjectModel] = {}
         self._build_jobs: dict[str, MQLMarketBuildJobModel] = {}
@@ -94,9 +93,6 @@ class SQXBusinessService:
             return
         try:
             text = self._settings_file.read_text(encoding="utf-8")
-            m_mt4 = re.search(r'<MetaTrader4\s+path="([^"]*)"', text)
-            if m_mt4:
-                self._mt4_path = m_mt4.group(1)
             m_mt5 = re.search(r'<MetaTrader5\s+path="([^"]*)"', text)
             if m_mt5:
                 self._mt5_path = m_mt5.group(1)
@@ -144,25 +140,19 @@ class SQXBusinessService:
         """
         with self._lock:
             return SQXBusinessMainSettingsModel(
-                mt4_path=self._mt4_path,
                 mt5_path=self._mt5_path,
             )
 
-    def save_main_settings(self, mt4_path: str, mt5_path: str) -> None:
-        """Save MetaTrader compiler paths to persistent XML.
+    def save_main_settings(self, mt5_path: str) -> None:
+        """Save MetaTrader 5 compiler path to persistent XML.
 
         Args:
-            mt4_path: Path to MetaTrader 4 terminal/metaeditor executable.
             mt5_path: Path to MetaTrader 5 terminal/metaeditor executable.
         """
         with self._lock:
-            self._mt4_path = mt4_path
             self._mt5_path = mt5_path
             xml_content = (
-                f"<Settings>\n"
-                f'  <MetaTrader4 path="{mt4_path}"/>\n'
-                f'  <MetaTrader5 path="{mt5_path}"/>\n'
-                f"</Settings>\n"
+                f'<Settings>\n  <MetaTrader5 path="{mt5_path}"/>\n</Settings>\n'
             )
             self._settings_file.write_text(xml_content, encoding="utf-8")
             logger.info("FR-BUSINESS-SETTINGS: Saved compiler settings")

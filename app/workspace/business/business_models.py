@@ -57,11 +57,10 @@ class SQXBusinessPluginDescriptor(BaseModel):
 
 
 class SQXBusinessMainSettingsModel(BaseModel):
-    """Configuration paths for external MetaTrader 4 and 5 compilers."""
+    """Configuration paths for external MetaTrader 5 compiler."""
 
     model_config = ConfigDict(frozen=True)
 
-    mt4_path: str = ""
     mt5_path: str = ""
 
 

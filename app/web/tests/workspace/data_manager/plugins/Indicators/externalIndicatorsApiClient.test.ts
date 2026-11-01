@@ -32,7 +32,7 @@ const mockRecord: RemoteIndicatorRecord = {
   data_type: 'custom',
   timeframe: 'D1',
   system: false,
-  values: [{ name: 'Score', mt4: '0', mt5: '0', el: '0' }],
+  values: [{ name: 'Score', mt5: '0', el: '0' }],
   total_records: 10,
   date_from: '2026-01-01',
   date_to: '2026-01-10',
@@ -90,7 +90,7 @@ describe('externalIndicatorsApiClient', () => {
     expect(saved.name).toBe('Sentiment');
     expect(JSON.parse(String(fetchFn.mock.calls[0][1].body))).toEqual({
       name: 'Sentiment',
-      values: [{ name: 'Score', mt4: '0', mt5: '0', el: '0' }],
+      values: [{ name: 'Score', mt5: '0', el: '0' }],
       data_type: 'custom',
       timeframe: 'D1',
     });
@@ -101,7 +101,7 @@ describe('externalIndicatorsApiClient', () => {
     expect(JSON.parse(String(fetchFn.mock.calls[1][1].body))).toEqual({
       indicator_name: 'Sentiment',
       name: 'SentimentV2',
-      values: [{ name: 'Score', mt4: '0', mt5: '0', el: '0' }],
+      values: [{ name: 'Score', mt5: '0', el: '0' }],
       data_type: 'custom',
       timeframe: 'D1',
     });

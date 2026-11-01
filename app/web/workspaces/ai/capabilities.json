@@ -253,9 +253,9 @@
         "prompt": "Add a custom databank column AvgTradeDurationHours — the average time from a trade's open to its close in hours, excluding balance orders like deposits and withdrawals. Compile it and confirm I can add it to my databank views."
       },
       {
-        "key": "indicator-triple-ema-mt4",
-        "label": "Create a custom Triple EMA indicator and translate it to MT4",
-        "prompt": "Create a simple custom indicator called TripleEMA: three exponential moving averages of the close with periods Fast, Medium and Slow (defaults 8, 21, 55), one output line each. Compile it and confirm it appears as a building block. Then translate it to MQL4 and prove that the MT4 values match the HaruQuantAI values."
+        "key": "indicator-triple-ema-mt5",
+        "label": "Create a custom Triple EMA indicator and translate it to MT5",
+        "prompt": "Create a simple custom indicator called TripleEMA: three exponential moving averages of the close with periods Fast, Medium and Slow (defaults 8, 21, 55), one output line each. Compile it and confirm it appears as a building block. Then translate it to MQL5 and prove that the MT5 values match the HaruQuantAI values."
       }
     ]
   },

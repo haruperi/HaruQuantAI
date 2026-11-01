@@ -61,7 +61,7 @@ def test_schema_catalog_and_definition_crud(service):
         [{"name": "a b"}],
         [{"name": "A"}, {"name": "a"}],
         [{"name": "A", "extra": 1}],
-        [{"name": "A", "mt4": 5}],
+        [{"name": "A", "mt5": 5}],
         [None],
     ],
 )

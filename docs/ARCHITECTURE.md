@@ -11,7 +11,7 @@
 HaruQuantAI is a high-performance quantitative research, strategy generation, and backtesting workstation engineered in Python 3.14 and TypeScript. It replaces the legacy StrategyQuant X (SQX-145) monolithic Java/Swing/Electron desktop architecture with an elegant, modern **4-Tier Spatial Architecture**:
 
 1. **Tier 1: AppCore (`app/core/`):** The foundational engine layer. Houses both the host platform services (lifecycle, persistence, logging, telemetry, resources, async event transports, background multiprocessing job coordinator) and pure quantitative domain primitives (columnar time series, trading order models, distributed grid protocols, wizard code transforms, and standard error/response envelopes).
-2. **Tier 2: Domain Workspaces (`app/workspace/`):** Independent business domain centers housing domain logic, data models, and REST routers (mounted under `/api/v2/<domain>/...`). Key workspaces include the **Home Workspace** (`app/workspace/home/`), the **Data Manager Workspace** (`app/workspace/data_manager/`), and future workspaces for Strategy Building, Retesting, Optimization, and Project Automation.
+2. **Tier 2: Domain Workspaces (`app/workspace/`):** Independent business domain centers housing domain logic, data models, and REST routers (mounted under `/api/v1/<domain>/...`, e.g., `/api/v1/data` for Data Manager). Key workspaces include the **Home Workspace** (`app/workspace/home/`), the **Data Manager Workspace** (`app/workspace/data_manager/`), and future workspaces for Strategy Building, Retesting, Optimization, and Project Automation.
 3. **Tier 3: Frontend Web Shell (`app/web/`):** A unified single-page application engineered in React 19, TypeScript, and Vite. Served directly by FastAPI via `install_web_build` in [`app/main.py`](../app/main.py), completely eliminating Electron and JVM desktop dependencies.
 4. **Tier 4: Extensions & Dynamic Plugins (`app/extend/` & `app/plugins/`):** User-defined and donor building blocks: custom indicators, signals, stop-loss/take-profit rules, money management algorithms, export code templates (`ctemplate/`), and dynamically loaded provider plugins declaring typed extension slots.
 
@@ -41,10 +41,14 @@ HaruQuantAI is a high-performance quantitative research, strategy generation, an
 |  +--------------------------------+  +-----------------------------------------+  |
 |  | Home Workspace (home/)         |  | Data Manager Workspace (data_manager/)  |  |
 |  |  * Project Registry            |  |  * Storage Health & Symbol Catalog      |  |
-|  |  * Dashboard Panels            |  |  * Instruments & Trading Sessions       |  |
+|  |  * Dashboard Panels            |  |  * Symbols & Trading Sessions           |  |
 |  |  * ATM Visibility Rules        |  |  * Baskets & Broker Profiles            |  |
 |  |  * Application Settings        |  |  * Quality Review & Bar Transforms      |  |
 |  +--------------------------------+  +-----------------------------------------+  |
+|  | Broker Connectors & Feeds (brokers/)                                        |  |
+|  |  * dukascopy   * darwinex   * metatrader (MT5)   * sq_equity   * sq_futures |  |
+|  |  * crypto      * files      * yahoo              * tick_downloader          |  |
+|  +-----------------------------------------------------------------------------+  |
 |                                                                                   |
 |  [Future Workspaces: Code Editor | AlgoWizard | Results | Retester | Builder ...]  |
 +-----------------------------------------------------------------------------------+
@@ -55,9 +59,7 @@ HaruQuantAI is a high-performance quantitative research, strategy generation, an
 |              Tier 4: Extensions & Dynamic Plugins (app/plugins/ & app/extend/)    |
 |                                                                                   |
 |  +-----------------------------------------------------------------------------+  |
-|  | Market Data Providers (app/plugins/data_source/)                            |  |
-|  |  * dukascopy        * darwinex        * metatrader        * sq_equity       |  |
-|  |  * sq_futures       * crypto          * files             * yahoo           |  |
+|  | Dynamic Extension Plugins (app/plugins/ declaring slot: "data.provider")     |  |
 |  +-----------------------------------------------------------------------------+  |
 |  | Custom Indicators, Signals & Building Blocks (app/extend/)                   |  |
 |  +-----------------------------------------------------------------------------+  |
@@ -136,7 +138,7 @@ CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES -> READY
 * **Walk-Forward Execution:** `OptimizationEngine.run_walk_forward` searches each half-open IS window, selects the highest-scoring candidate with stable first-grid-order ties, and evaluates that candidate once on the OOS window. Callbacks receive the relevant bar slice and must supply comparable, additive scores. Aggregate WFE is `100 * sum(OOS scores) / sum(IS scores)`, or zero for a non-positive IS denominator. Invalid windows and non-finite scores fail explicitly; cancellation is cooperative and evaluator failures propagate.
 * **`app/core/trading/project/`:** Native `.haru` container format (atomic ZIP package enclosing `manifest.json`, `project.json`, and `tasks/*.json`) with strict path traversal defenses. Supersedes historical XML `.cfx` envelope instructions (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)).
 * **`app/core/grid/`:** Distributed grid compute protocol, worker node discovery, message serialization, and task slicing.
-* **`app/core/wizard/`:** Multi-platform strategy AST normalizer and Jinja2 code generator supporting MQL5, MQL4, EasyLanguage, cTrader C#, and Python with fail-closed validation and Python AST syntax verification. Declared parameters and state variables use instance attributes in generated Python. Unsupported comparators, unresolved operands and indicator compositions without code emitters return export errors. Python syntax parsing and synthetic execution tests do not establish external-platform compilation; MQL, cTrader and EasyLanguage compiler validation remains unverified.
+* **`app/core/wizard/`:** Multi-platform strategy AST normalizer and Jinja2 code generator supporting MQL5, EasyLanguage, cTrader C#, and Python with fail-closed validation and Python AST syntax verification. Declared parameters and state variables use instance attributes in generated Python. Unsupported comparators, unresolved operands and indicator compositions without code emitters return export errors. Python syntax parsing and synthetic execution tests do not establish external-platform compilation; MQL, cTrader and EasyLanguage compiler validation remains unverified.
 
 ---
 
@@ -145,11 +147,11 @@ CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES -> READY
 Domain Workspaces encapsulate business logic, domain models, and REST endpoints under `/api/v1/<domain>/...`:
 
 ### 5.1 Authoritative Data Manager Workspace (`app/workspace/data_manager/`)
-Re-architected from StrategyQuant X (SQX-145) reference donors into cohesive feature subpackages assembled via `create_router()`:
+Re-architected from StrategyQuant X (SQX-145) reference donors into cohesive feature subpackages assembled via `create_router()` (see [AppDataManager completion audit](dev/full-reimplementation/research/appdatamanager-completion-audit.md)):
 
 | Subpackage | SQX Donor Component | Functional Responsibility |
 | :--- | :--- | :--- |
-| [`symbols/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/symbols/) | `DataManagerInstruments` | Master symbol registry, contract specifications, tick sizing, margins, and point values (substitutes `Instruments`). |
+| [`symbols/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/symbols/) | `DataManagerInstruments` | Master symbol registry, contract specifications, tick sizing, margins, and point values (active implementation; see audit). |
 | [`sessions/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/sessions/) | `DataManagerSessions` | Trading session schedules, day-of-week windows, holiday calendars. |
 | [`brokers/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/brokers/) | `DataManagerBroker` / `DataManagerConnections` | Broker configuration, spread models, commission rates, slippage models, credential testing. |
 | [`baskets/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/baskets/) | `DataManagerBasket` | Synthetic/composite instruments, custom weightings, basket batch operations. |
@@ -163,7 +165,18 @@ Re-architected from StrategyQuant X (SQX-145) reference donors into cohesive fea
 ### 5.2 Home Workspace (`app/workspace/home/` & `app/web/workspaces/home/`)
 Coordinates workstation entry, project registry, dashboard configuration (`dashboardPanels.ts`), and advanced money-management ATM visibility rules (`atmVisibility.ts`).
 
-### 5.3 Planned Workspaces
+### 5.3 Active Broker and Data Connectors (`app/workspace/brokers/`)
+1. **`dukascopy`:** Historical Forex and CFD tick and minute data.
+2. **`darwinex`:** Institutional tick data with true bid/ask spreads.
+3. **`metatrader`:** MetaTrader 5 TCP bridge socket protocol for ticks, bars, and trading execution (MetaTrader 4 is permanently dropped project-wide).
+4. **`sq_equity`:** StrategyQuant stock/equity historical data.
+5. **`sq_futures`:** StrategyQuant futures historical data.
+6. **`crypto`:** Binance and cryptocurrency exchange feeds.
+7. **`files`:** Generic local filesystem market data client (CSV, TSV, Parquet).
+8. **`yahoo`:** Yahoo Finance daily and intraday bar provider.
+9. **`tick_downloader`:** High-precision tick downloader engine.
+
+### 5.4 Planned Workspaces
 * **`app/workspace/code_editor/`:** Multi-language algorithmic code authoring.
 * **`app/workspace/wizard/`:** AlgoWizard visual strategy rule trees and condition blocks.
 * **`app/workspace/results/`:** Databank management, trade analysis, and report generation.
@@ -190,38 +203,36 @@ The user interface is an integrated single-page application built with React 19,
 Extensions provide pluggable capabilities through typed slots:
 
 ### 7.1 Extension Slot Contract: `data.provider`
-Market data provider plugins declare compliance with `slot: "data.provider"` in `plugin.json` and implement `BrokerClient` (`app/workspace/brokers/base.py`):
+Dynamic plugins in `app/plugins/` or custom blocks in `app/extend/` declare compliance with `slot: "data.provider"` in `plugin.json` and implement `BrokerClient` ([`app/workspace/brokers/base.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/brokers/base.py) / [`app/core/trading/connection/base.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/core/trading/connection/base.py)):
 ```python
-class BaseDataProvider(ABC):
-    provider_id: str
+class BrokerClient:
+    name: str
 
-    @abstractmethod
-    def get_available_symbols(self) -> list[str]: ...
+    def connect(self) -> bool: ...
+    def disconnect(self) -> None: ...
 
-    @abstractmethod
-    def fetch_bars(
-        self, symbol: str, timeframe: str, start: datetime, end: datetime
-    ) -> list[Bar]: ...
+    def get_bars(
+        self,
+        symbol: str,
+        timeframe: Timeframe | str = Timeframe.PERIOD_H1,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        start_pos: int | None = None,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> pd.DataFrame | Awaitable[pd.DataFrame]: ...
 
-    @abstractmethod
-    def fetch_ticks(
-        self, symbol: str, start: datetime, end: datetime
-    ) -> list[Tick]: ...
-
-    @abstractmethod
-    def test_connection(self) -> bool: ...
+    def get_ticks(
+        self,
+        symbol: str,
+        date_from: datetime | None = None,
+        date_to: datetime | None = None,
+        *,
+        count: int | None = None,
+        limit: int = 1000,
+    ) -> pd.DataFrame | Awaitable[pd.DataFrame]: ...
 ```
-
-### 7.2 Active Broker and Data Connectors (`app/workspace/brokers/`)
-1. **`dukascopy`:** Historical Forex and CFD tick and minute data.
-2. **`darwinex`:** Institutional tick data with true bid/ask spreads.
-3. **`metatrader`:** MetaTrader 4 / 5 CSV and binary history parser.
-4. **`sq_equity`:** StrategyQuant stock/equity historical data.
-5. **`sq_futures`:** StrategyQuant futures historical data.
-6. **`crypto`:** Binance and cryptocurrency exchange feeds.
-7. **`files`:** Generic local file importer (CSV, Parquet, TSV).
-8. **`yahoo`:** Yahoo Finance daily and intraday bar provider.
-9. **`tick_downloader`:** High-precision tick downloader engine.
 
 ---
 

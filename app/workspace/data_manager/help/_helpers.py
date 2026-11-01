@@ -108,7 +108,7 @@ _TOPICS: dict[str, dict[str, Any]] = {
             "CFTC COT reports."
         ),
         "key_capabilities": [
-            "Up to five named output lines with MT4, MT5, and EasyLanguage",
+            "Up to five named output lines with MT5 and EasyLanguage",
             "CFTC legacy futures Commitments of Traders (COT) annual reports",
             "MQL source recognition (#property indicator_label)",
             "Dated observation import, review, and JSON transfers",
@@ -189,14 +189,14 @@ _DONOR_ARTICLES: list[dict[str, Any]] = [
     {
         "id": "historical-data-import",
         "test_id": "dm-help-openlink-btn-3",
-        "title": "Import history data from MetaTrader 4",
+        "title": "Import history data from MetaTrader 5",
         "url": (
             "https://strategyquant.com/doc/quantdatamanager/"
-            "import-history-data-metatrader-4/"
+            "import-history-data-metatrader-5/"
         ),
         "topic": "import",
         "summary": (
-            "Extracting historical price history from an existing MT4 terminal "
+            "Extracting historical price history from an existing MT5 terminal "
             "installation into Data Manager."
         ),
     },
@@ -261,7 +261,7 @@ _TUTORIALS: list[dict[str, Any]] = [
         ),
         "steps": [
             "Navigate to External indicators and click Add new or Recognize.",
-            "Define up to five named lines and platform codes (MT4/MT5/EL).",
+            "Define up to five named lines and platform codes (MT5/EL).",
             "Click Import indicator data and map date and line columns.",
             "Inspect observations using View & Analyze.",
         ],

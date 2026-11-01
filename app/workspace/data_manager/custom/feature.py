@@ -3,7 +3,7 @@
 CustomData uses HostPersistence exclusively. Its additive schema is installed on
 first operation in an existing database. Imports validate before transactional
 merge/replacement; optional host jobs support pause/resume/stop and activity logs.
-Definitions contain one to five named outputs and MT4/MT5/EasyLanguage mappings.
+Definitions contain one to five named outputs and MT5/EasyLanguage mappings.
 
 Python API Usage:
     service = CustomData()
@@ -494,7 +494,7 @@ class CustomData:
                 )
                 if not labels:
                     raise _CustomError("No supported indicator output labels found")
-                platform = "mt4" if path.suffix.lower() == ".mq4" else "mt5"
+                platform = "mt5"
                 item = {
                     "name": path.stem,
                     "values": [

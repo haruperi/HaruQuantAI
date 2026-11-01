@@ -146,7 +146,7 @@ export const MTAnalyzerWorkspace: React.FC = () => {
         <div className="absolute inset-0 z-50 bg-indigo-950/80 backdrop-blur-sm border-2 border-dashed border-indigo-400 flex flex-col items-center justify-center p-8">
           <Upload className="w-16 h-16 text-indigo-400 animate-bounce mb-4" />
           <h2 className="text-2xl font-bold text-white">Drop MetaTrader Statement Here</h2>
-          <p className="text-slate-300 text-sm mt-2">Supports standard MT4 / MT5 HTML and CSV reports</p>
+          <p className="text-slate-300 text-sm mt-2">Supports standard MT5 HTML and CSV reports</p>
         </div>
       )}
 
@@ -160,7 +160,7 @@ export const MTAnalyzerWorkspace: React.FC = () => {
             <div className="flex items-center gap-2">
               <h1 className="text-lg font-bold text-slate-100 tracking-tight">QuantAnalyzer for MetaTrader</h1>
               <span className="px-2 py-0.5 rounded text-[10px] font-semibold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
-                MT4 / MT5
+                MT5
               </span>
             </div>
             <p className="text-xs text-slate-400">

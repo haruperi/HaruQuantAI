@@ -1,12 +1,11 @@
-"""Local filesystem market data client, partition parsers, and HST/FXT codecs.
+"""Local filesystem market data client and partition parsers.
 
 Description:
     Implements the local filesystem market data and symbol catalog client
     (`FilesClient`) along with shared delimited (CSV, TSV, semicolon-separated),
-    columnar (Parquet), and MetaTrader 4 binary (`HST` v400/v401, `FXT` v405)
-    parsers, exporters, and deterministic partition discovery helpers.
+    columnar (Parquet) parsers, exporters, and deterministic partition discovery helpers.
 Key Capabilities:
-    - FR-BROKER-FILES-PARSING: CSV, Parquet, HST, and FXT Bar and Tick Ingestion
+    - FR-BROKER-FILES-PARSING: CSV and Parquet Bar and Tick Ingestion
       Associated: `[FilesClient.get_bars()]`, `[FilesClient.get_ticks()]`,
         `parse_delimited_bars()`, `parse_delimited_ticks()`, `read_parquet_bars()`
       Logging: Emits INFO/DEBUG on parsed record counts, and WARNING on absent paths.
@@ -14,21 +13,13 @@ Key Capabilities:
       Associated: `[FilesClient.get_symbol_info()]`, `[FilesClient.get_symbols()]`,
         `find_matching_partitions()`
       Logging: Emits INFO/DEBUG upon resolving symbol info or partition matches.
-    - FR-BROKER-CODECS-HST: Decode and encode MT4 HST files across versions 400 and 401.
-      Associated: `decode_hst_bytes()`, `encode_hst_bytes()`
-      Logging: Emits DEBUG on detecting HST version, symbol, and record count.
-    - FR-BROKER-CODECS-FXT: Decode and encode MT4 FXT tick model files (version 405).
-      Associated: `decode_fxt_bytes()`, `encode_fxt_bytes()`
-      Logging: Emits DEBUG on parsing FXT header and model records.
 """
 
 from __future__ import annotations
 
 import csv
-import io
 import math
 import re
-import struct
 import tempfile
 from datetime import UTC, datetime
 from pathlib import Path
@@ -66,22 +57,12 @@ SYMBOLS_FR = "FR-BROKER-FILES-SYMBOLS"
 DELIMITED_FR = "FR-BROKER-FILES-PARSING-DELIMITED"
 PARQUET_FR = "FR-BROKER-FILES-PARSING-PARQUET"
 PARTITION_FR = "FR-BROKER-FILES-PARTITION-SELECTION"
-HST_FR = "FR-BROKER-CODECS-HST"
-FXT_FR = "FR-BROKER-CODECS-FXT"
 
 DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market"
 
-# Compile-time byte-layout verification against canonical MT4 specifications
-assert struct.calcsize("<iddddd") == 44, "MT4 HST v400 record must be 44 bytes"
-assert struct.calcsize("<qddddqiq") == 60, "MT4 HST v401 record must be 60 bytes"
-assert struct.calcsize("<qddddqii") == 56, "MT4 FXT v405 record must be 56 bytes"
 
 __all__ = [
     "FilesClient",
-    "decode_fxt_bytes",
-    "decode_hst_bytes",
-    "encode_fxt_bytes",
-    "encode_hst_bytes",
     "export_bars_to_csv",
     "export_bars_to_parquet",
     "find_matching_partitions",
@@ -395,193 +376,7 @@ def read_parquet_bars(
     return rows
 
 
-def decode_hst_bytes(data: bytes, count: int | None = None) -> list[dict[str, Any]]:
-    """Decode MetaTrader 4 HST binary files (version 400 or 401)."""
-    if len(data) < 148:
-        raise BridgeError("HST file too small to contain valid 148-byte header")
-
-    version, _raw_cr, raw_sym, period, digits = struct.unpack_from(
-        "<i64s12sii", data, 0
-    )
-    if version not in (400, 401):
-        raise BridgeError(f"Unsupported HST version: {version}")
-
-    rec_size = 44 if version == 400 else 60
-    payload_len = len(data) - 148
-    if payload_len % rec_size != 0:
-        msg = f"HST file contains truncated records: {payload_len} bytes not divisible by record size {rec_size}"
-        raise BridgeError(msg)
-
-    symbol = raw_sym.split(b"\x00")[0].decode("ascii", errors="replace").strip()
-    logger.debug(
-        "%s: Decoding HST for %s (version=%d, period=%d, digits=%d)",
-        HST_FR,
-        symbol,
-        version,
-        period,
-        digits,
-        extra={"fr_id": HST_FR, "symbol": symbol, "version": version},
-    )
-
-    offset = 148
-    rows: list[dict[str, Any]] = []
-    num_records = payload_len // rec_size
-    max_recs = (
-        min(num_records, count) if count is not None and count > 0 else num_records
-    )
-
-    for _ in range(max_recs):
-        if version == 400:
-            ctm, o, l, h, c, v = struct.unpack_from("<iddddd", data, offset)
-            vol, spread, rvol = int(v), 0, int(v)
-        else:
-            ctm, o, h, l, c, vol_raw, spread, rvol_raw = struct.unpack_from(
-                "<qddddqiq", data, offset
-            )
-            vol, spread, rvol = int(vol_raw), int(spread), int(rvol_raw)
-        offset += rec_size
-        rows.append(
-            _bar_row(
-                int(ctm), float(o), float(h), float(l), float(c), vol, spread, rvol
-            )
-        )
-    return rows
-
-
-def encode_hst_bytes(
-    rows: list[dict[str, Any]],
-    symbol: str,
-    period: int = 1,
-    digits: int = 5,
-    version: int = 401,
-) -> bytes:
-    """Encode market bars into MetaTrader 4 HST format."""
-    if version not in (400, 401):
-        raise BridgeError(f"Unsupported encode HST version: {version}")
-    hdr = struct.pack(
-        "<i64s12siiii52s",
-        version,
-        b"HaruQuantAI MT4 Codec",
-        symbol.encode("ascii")[:11],
-        period,
-        digits,
-        int(datetime.now(tz=UTC).timestamp()),
-        0,
-        b"\x00" * 52,
-    )
-    buf = io.BytesIO()
-    buf.write(hdr)
-    for r in rows:
-        t = int(r["time"])
-        o, h, l, c = (
-            float(r["open"]),
-            float(r["high"]),
-            float(r["low"]),
-            float(r["close"]),
-        )
-        v = r.get("tick_volume", 1)
-        packed = (
-            struct.pack("<iddddd", t, o, l, h, c, float(v))
-            if version == 400
-            else struct.pack(
-                "<qddddqiq",
-                t,
-                o,
-                h,
-                l,
-                c,
-                int(v),
-                int(r.get("spread", 0)),
-                int(r.get("real_volume", 1)),
-            )
-        )
-        buf.write(packed)
-    return buf.getvalue()
-
-
-def decode_fxt_bytes(data: bytes, count: int | None = None) -> list[dict[str, Any]]:
-    """Decode MetaTrader 4 FXT testing files (version 405)."""
-    if len(data) < 724:
-        raise BridgeError("FXT file too small to contain valid header")
-
-    version, _raw_desc, _raw_srv, raw_sym, period, _model, bars_count = (
-        struct.unpack_from("<i64s128s16siii", data, 0)
-    )
-    if version != 405:
-        raise BridgeError(f"Unsupported FXT version: {version}")
-
-    rec_size = 56
-    if len(data) >= 728 and (len(data) - 728) % rec_size == 0:
-        offset = 728
-    elif len(data) >= 724 and (len(data) - 724) % rec_size == 0:
-        offset = 724
-    else:
-        msg = f"FXT file contains truncated records: length {len(data)} does not match 724/728 + N*{rec_size}"
-        raise BridgeError(msg)
-
-    symbol = raw_sym.split(b"\x00")[0].decode("ascii", errors="replace").strip()
-    logger.debug(
-        "%s: Decoding FXT for %s (version=%d, period=%d, bars=%d)",
-        FXT_FR,
-        symbol,
-        version,
-        period,
-        bars_count,
-        extra={"fr_id": FXT_FR, "symbol": symbol, "version": version},
-    )
-
-    num_recs = (len(data) - offset) // rec_size
-    max_recs = min(num_recs, count) if count is not None and count > 0 else num_recs
-    keys = ("time", "open", "high", "low", "close", "volume", "tick_time", "flag")
-    types = (int, float, float, float, float, int, int, int)
-    rows: list[dict[str, Any]] = []
-    for _ in range(max_recs):
-        vals = struct.unpack_from("<qddddqii", data, offset)
-        offset += rec_size
-        rows.append({k: fn(v) for k, fn, v in zip(keys, types, vals, strict=True)})
-    return rows
-
-
-def encode_fxt_bytes(
-    rows: list[dict[str, Any]], symbol: str, period: int = 1, version: int = 405
-) -> bytes:
-    """Encode market bars into MetaTrader 4 FXT format."""
-    t0 = int(rows[0]["time"]) if rows else 0
-    t1 = int(rows[-1]["time"]) if rows else 0
-    sym_b = symbol.encode("ascii")[:15]
-    hdr = struct.pack(
-        "<i64s128s16siiiii492s",
-        version,
-        b"HaruQuantAI FXT Codec",
-        b"MetaQuotes-Demo",
-        sym_b,
-        period,
-        0,
-        len(rows),
-        t0,
-        t1,
-        b"\x00" * 492,
-    )
-    buf = io.BytesIO()
-    buf.write(hdr)
-    for r in rows:
-        t = int(r["time"])
-        o, h, l, c = (
-            float(r["open"]),
-            float(r["high"]),
-            float(r["low"]),
-            float(r["close"]),
-        )
-        v, tt, fl = (
-            int(r.get("volume", 1)),
-            int(r.get("tick_time", t)),
-            int(r.get("flag", 1)),
-        )
-        buf.write(struct.pack("<qddddqii", t, o, h, l, c, v, tt, fl))
-    return buf.getvalue()
-
-
-_PARTITION_EXTS = (".parquet", ".csv", ".tsv", ".txt", ".dat", ".hst", ".fxt", ".bi5")
+_PARTITION_EXTS = (".parquet", ".csv", ".tsv", ".txt", ".dat", ".bi5")
 
 
 def find_matching_partitions(
@@ -663,10 +458,6 @@ def load_local_partition_bars(
         batch: list[dict[str, Any]] = []
         if fp.suffix == ".parquet":
             batch = read_parquet_bars(fp, count=target if tail_only else None)
-        elif fp.suffix == ".hst":
-            batch = decode_hst_bytes(fp.read_bytes())
-        elif fp.suffix == ".fxt":
-            batch = decode_fxt_bytes(fp.read_bytes())
         elif fp.suffix in (".csv", ".txt", ".tsv"):
             txt = fp.read_text(encoding="utf-8", errors="replace")
             batch = parse_delimited_bars(txt, symbol=symbol, timeframe=timeframe)
@@ -777,7 +568,7 @@ class FilesClient(BrokerClient):
         catalog: dict[str, list[Path]] = {}
         if not self.data_dir.exists():
             return catalog
-        for ext in ("*.parquet", "*.csv", "*.txt", "*.hst", "*.fxt", "*.tsv"):
+        for ext in ("*.parquet", "*.csv", "*.txt", "*.tsv"):
             for p in self.data_dir.rglob(ext):
                 raw_sym = p.stem.upper()
                 for token in ("_M1", "_D1", "_H1", "_TICK", "_TICKS", "_BARS"):
@@ -797,7 +588,7 @@ class FilesClient(BrokerClient):
             return matches
 
         tf_token = timeframe.lower().strip() if timeframe else None
-        for ext in ("*.parquet", "*.csv", "*.txt", "*.hst", "*.fxt", "*.tsv"):
+        for ext in ("*.parquet", "*.csv", "*.txt", "*.tsv"):
             for p in self.data_dir.rglob(ext):
                 name_clean = re.sub(r"[/_\-]", "", p.stem.lower())
                 parent_clean = re.sub(r"[/_\-]", "", p.parent.name.lower())

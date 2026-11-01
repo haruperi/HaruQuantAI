@@ -88,7 +88,6 @@
 .timezone-tool-icon svg:last-child { position:absolute; right:0; bottom:0; background:var(--panel2); border-radius:50%; }
 .ribbon .export-actions .sq-button { min-width:90px; height:66px; gap:7px; }
 .export-csv svg { color:#68d391; }
-.export-mt4 svg { color:#63b3ed; }
 .export-mt5 svg { color:#b794f4; }
 .dm-body > .dataset-workspace { min-width:0; display:flex; flex-direction:column; padding:8px; overflow:hidden; }
 .dataset-filters { display:flex; align-items:center; gap:5px; flex-wrap:wrap; padding-bottom:5px; }

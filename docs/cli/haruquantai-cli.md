@@ -717,7 +717,7 @@ uv run python -m app.cli data-manager basket update-data --help
 All 18 `CustomData` methods are available under `data-manager custom`. They
 operate directly on the local database without an HTTP server or session token.
 Commands manage external indicator definitions with up to five named output
-lines (and optional platform-specific MT4, MT5, and EasyLanguage mappings), dated
+lines (and optional platform-specific MT5 and EasyLanguage mappings), dated
 numeric and signal observations, CSV/TSV imports, import-format presets, definition
 transfers, and Commitments of Traders (COT) report synchronization.
 
@@ -727,7 +727,7 @@ transfers, and Commitments of Traders (COT) report synchronization.
 uv run python -m app.cli data-manager custom list
 uv run python -m app.cli data-manager custom list --page 2 --page-size 25
 uv run python -m app.cli data-manager custom add --name Sentiment --values "Score" --data-type custom --timeframe D1
-uv run python -m app.cli data-manager custom add --name MACD_Ext --values '[{"name":"Macd","mt4":"0"},{"name":"Signal","mt4":"1"}]'
+uv run python -m app.cli data-manager custom add --name MACD_Ext --values '[{"name":"Macd","mt5":"0"},{"name":"Signal","mt5":"1"}]'
 uv run python -m app.cli data-manager custom edit Sentiment --timeframe H1
 uv run python -m app.cli data-manager custom edit Sentiment --values "Score,Momentum"
 uv run python -m app.cli data-manager custom clear Sentiment
@@ -736,7 +736,7 @@ uv run python -m app.cli data-manager custom delete Sentiment MACD_Ext
 
 `list` renders an ASCII table with indicator name, type, timeframe, value columns,
 date range, and record count. `add` requires `--name` and `--values` (comma-separated
-or JSON array of objects with `name`, `mt4`, `mt5`, `el`). Up to five output lines
+or JSON array of objects with `name`, `mt5`, `el`). Up to five output lines
 are supported. `edit` updates metadata and outputs; existing data must be cleared
 before changing the number of output lines. `clear` removes recorded observations
 while preserving definitions; `delete` removes both definitions and observations.

@@ -38,22 +38,6 @@ test('matches CSV popup, manages formats, downloads and uses shared status', asy
   await expect(page.getByLabel('Status for EURUSD', { exact: true })).toHaveText('Completed');
 });
 
-test('matches MT4 popup, accepts specification properties and exports a manifest', async ({ page }, info) => {
-  await launch(page); await page.getByLabel('Select NQ', { exact: true }).check(); await exportTab(page);
-  await page.getByRole('button', { name: 'Export MT4 (FXT & HST)', exact: true }).click();
-  const dialog = page.getByRole('dialog', { name: "Export to MetaTrader 4 FXT and HST for 'NQ'", exact: true });
-  await expect(dialog.getByText('Output folder', { exact: true })).toBeVisible();
-  await expect(dialog.getByText('MT4 data specification and properties', { exact: true })).toBeVisible();
-  await expect(dialog.getByText(/Build 8xx/)).toBeVisible();
-  const spec = info.outputPath('nq.properties');
-  await import('node:fs/promises').then(fs => fs.writeFile(spec, 'SYMBOL=NQ100\nDIGITS=2\nSPREAD=10\n'));
-  await dialog.getByLabel('Load MT4 specification file', { exact: true }).setInputFiles(spec);
-  await expect(dialog.getByLabel('Name in MT4', { exact: true })).toHaveValue('NQ100');
-  const download = page.waitForEvent('download'); await dialog.getByRole('button', { name: 'Start export', exact: true }).click();
-  expect((await download).suggestedFilename()).toBe('NQ100-mt4-export-manifest.json');
-  await expect(page.getByLabel('Status for NQ', { exact: true })).toHaveText('Completed', { timeout: 10000 });
-});
-
 test('matches MT5 popup, validates source selection and confirms overwrite', async ({ page }) => {
   await launch(page); await page.getByLabel('Select EURUSD', { exact: true }).check(); await exportTab(page);
   await page.getByRole('button', { name: 'Export to MT5 data (99% test)', exact: true }).click();

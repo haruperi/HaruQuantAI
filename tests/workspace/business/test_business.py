@@ -58,10 +58,9 @@ def test_business_descriptor_defaults() -> None:
 def test_business_models_validation() -> None:
     """Verify Pydantic models serialization and validation."""
     settings = SQXBusinessMainSettingsModel(
-        mt4_path="C:/MetaTrader4/metaeditor.exe",
         mt5_path="C:/MetaTrader5/metaeditor64.exe",
     )
-    assert settings.mt4_path == "C:/MetaTrader4/metaeditor.exe"
+    assert settings.mt5_path == "C:/MetaTrader5/metaeditor64.exe"
 
     param = EAParameterModel(
         name="TrailingStop",
@@ -84,22 +83,18 @@ def test_business_settings_save_and_load(tmp_path: Path) -> None:
     """Verify saving and reading compiler settings in XML."""
     service = SQXBusinessService(projects_dir=tmp_path)
     initial_settings = service.load_main_settings()
-    assert initial_settings.mt4_path == ""
     assert initial_settings.mt5_path == ""
 
     service.save_main_settings(
-        mt4_path="C:/MT4/metaeditor.exe",
         mt5_path="C:/MT5/metaeditor64.exe",
     )
 
     settings = service.load_main_settings()
-    assert settings.mt4_path == "C:/MT4/metaeditor.exe"
     assert settings.mt5_path == "C:/MT5/metaeditor64.exe"
 
     # Reload fresh service instance from disk
     service2 = SQXBusinessService(projects_dir=tmp_path)
     reloaded = service2.load_main_settings()
-    assert reloaded.mt4_path == "C:/MT4/metaeditor.exe"
     assert reloaded.mt5_path == "C:/MT5/metaeditor64.exe"
 
 

@@ -1,4 +1,4 @@
-"""Export recorded historical prices; MT4 output uses the existing binary codecs."""
+"""Export recorded historical prices to CSV and MT5."""
 
 from __future__ import annotations
 
@@ -16,11 +16,9 @@ from fastapi.responses import FileResponse
 from app.core.host.transport import TransportError
 from app.core.lib.responses import ErrorCode
 from app.include.market_storage import safe_component
-from app.workspace.brokers.files import encode_fxt_bytes, encode_hst_bytes
 
 from .review import DatasetReview
 
-_MT4_SYMBOL_BYTES = 11
 _MAX_EXPORTS = 100
 
 ARTIFACT_ROOT = Path("state/data-exports").resolve()
@@ -109,51 +107,6 @@ class DataExports:
                 for stamp, row in frame.iterrows():
                     writer.writerow([stamp.isoformat(), *row.tolist()])
 
-    def export_mt4(
-        self, frame: Any, folder: Path, symbol: str, options: dict[str, Any]
-    ) -> list[Path]:
-        """Deliver existing codecs' real bytes, with explicit supported model limits."""
-        if "Bid" in frame:
-            raise ValueError("Select a bar timeframe for HST/FXT output")
-        if len(symbol.encode("ascii")) > _MT4_SYMBOL_BYTES:
-            raise ValueError("MT4 history symbols must fit the 11-byte header field")
-        timeframe = str(options.get("timeframe") or "M1").upper()
-        if timeframe not in {"M1", "M5", "M15", "M30", "H1", "H4", "D1", "W1"}:
-            raise ValueError("Unsupported MT4 history timeframe")
-        period = int(timeframe[1:]) * {"M": 1, "H": 60, "D": 1440, "W": 10080}.get(
-            timeframe[0], 1
-        )
-        rows = [
-            {
-                "time": int(stamp.timestamp()),
-                "open": row.Open,
-                "high": row.High,
-                "low": row.Low,
-                "close": row.Close,
-                "tick_volume": int(row.Volume),
-                "real_volume": 0,
-                "volume": int(row.Volume),
-            }
-            for stamp, row in frame.iterrows()
-        ]
-        mode = options.get("mode", "all")
-        if mode not in {"all", "hst", "fxt"}:
-            raise ValueError("Choose HST, FXT, or both")
-        outputs = []
-        if mode in {"all", "hst"}:
-            path = folder / f"{symbol}{period}.hst"
-            path.write_bytes(
-                encode_hst_bytes(
-                    rows, symbol, period=period, digits=int(options.get("digits", 5))
-                )
-            )
-            outputs.append(path)
-        if mode in {"all", "fxt"}:
-            path = folder / f"{symbol}{period}_0.fxt"
-            path.write_bytes(encode_fxt_bytes(rows, symbol, period=period))
-            outputs.append(path)
-        return outputs
-
     def export_mt5(self, frame: Any, path: Path, options: dict[str, Any]) -> None:
         """Write MT5 import columns from recorded bars or bid/ask ticks."""
         tick = "Bid" in frame
@@ -231,9 +184,7 @@ class DataExports:
                 timezone = target.get("tz")
                 if timezone and timezone not in {"original", "Original", "UTC"}:
                     frame.index = frame.index.tz_convert(timezone)
-                symbol = safe_component(
-                    str(payload.get("mt4_name") or service.record["symbol"])
-                )
+                symbol = safe_component(str(service.record["symbol"]))
                 options = {
                     **payload,
                     "symbol": symbol,
@@ -250,16 +201,11 @@ class DataExports:
                         else f"{index + 1}-{symbol}"
                     )
                 )
-                if payload["format"] == "mt4":
-                    outputs.extend(self.export_mt4(frame, folder, symbol, options))
-                else:
-                    path = folder / f"{name}.csv"
-                    (
-                        self.export_mt5
-                        if payload["format"] == "mt5"
-                        else self.export_csv
-                    )(frame, path, options)
-                    outputs.append(path)
+                path = folder / f"{name}.csv"
+                (self.export_mt5 if payload["format"] == "mt5" else self.export_csv)(
+                    frame, path, options
+                )
+                outputs.append(path)
                 context.report_progress(
                     100 * (index + 1) / len(series), f"Exported {symbol}"
                 )
@@ -293,7 +239,7 @@ def register_export_routes(router: APIRouter) -> None:
     @router.post("/export")
     def export(request: Request, body: dict[str, Any]) -> dict[str, Any]:
         if (
-            body.get("format") not in {"csv", "mt4", "mt5"}
+            body.get("format") not in {"csv", "mt5"}
             or not isinstance(body.get("series"), list)
             or not 1 <= len(body["series"]) <= _MAX_EXPORTS
         ):

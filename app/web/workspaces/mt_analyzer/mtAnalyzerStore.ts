@@ -250,7 +250,7 @@ function applyFilters(trades: MTStatementTrade[], filters: MTFilterOptions): MTS
   });
 }
 
-// Helper to parse standard MT4 / MT5 Detailed Statement HTML without external XML/DOM dependencies
+// Helper to parse standard MT5 Detailed Statement HTML without external XML/DOM dependencies
 export function parseMetaTraderHtml(html: string): MTStatementTrade[] {
   const parsedTrades: MTStatementTrade[] = [];
 

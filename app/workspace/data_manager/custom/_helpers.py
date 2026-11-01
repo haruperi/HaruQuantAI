@@ -100,7 +100,7 @@ def validate_outputs(values: Any) -> list[dict[str, str]]:
         raise CustomDataError("Specify one to five named value columns")
     result: list[dict[str, str]] = []
     for item in values:
-        if not isinstance(item, dict) or set(item) - {"name", "mt4", "mt5", "el"}:
+        if not isinstance(item, dict) or set(item) - {"name", "mt5", "el"}:
             raise CustomDataError("Invalid output definition")
         name = validate_name(item.get("name"))
         if not re.fullmatch(r"[A-Za-z][A-Za-z0-9]*", name):
@@ -108,7 +108,7 @@ def validate_outputs(values: Any) -> list[dict[str, str]]:
                 "Output names require a leading letter and only letters or digits"
             )
         output = {"name": name}
-        for platform in ("mt4", "mt5", "el"):
+        for platform in ("mt5", "el"):
             mapping = item.get(platform)
             mapping = "" if mapping is None else mapping
             if not isinstance(mapping, str):

@@ -95,7 +95,7 @@ existing error/envelope adapter. `http.py` retains compatibility endpoints.
 | Indicators | Typed identity `file_path::ClassName`, canonical defaults, output names and protection. Class-qualified identities disambiguate files declaring multiple indicators |
 | Code types/templates | Twelve Python generator families, MonteCarlo alias with Manipulation/Retest choices, and CodeExport format choices. Template lists filter by selected path; the modal uses the server catalogue and retains local presentation metadata only |
 | Subtypes | Open/Modify/Close order actions map to subtype directories and returned action metadata. Derived signals bind the selected indicator/output and provide an evaluation function |
-| Export authoring | Only Python (`.py.tpl`) and pseudocode (`.txt.tpl`) source-authoring formats are supported; selected public symbols become import/use declarations. This does not claim Java/SQX, MT4/MT5 or other strategy compiler compatibility |
+| Export authoring | Only Python (`.py.tpl`) and pseudocode (`.txt.tpl`) source-authoring formats are supported; selected public symbols become import/use declarations. This does not claim Java/SQX, MT5 or other strategy compiler compatibility |
 | Import repair | Returns a proposed buffer, preserving module docstrings and future imports. Unique indexed/known standard imports are added; ambiguous candidates require an explicit valid module selection. No disk write occurs |
 | Recovery | Missing disk files retain their stored buffers, become dirty and produce recovery warnings for Save As. Invalid/corrupt sessions and compilation records fail closed without deletion/reset/migration; duplicate session identities are rejected |
 

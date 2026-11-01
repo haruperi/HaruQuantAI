@@ -39,9 +39,9 @@ function validateSaved(saved: Saved): void {
     if (format.predefined || builtInCsvFormats.some(row => row.name === format.name)) throw new Error('Invalid custom format.');
   }
   if (new Set(saved.formats.map(row => row.name)).size !== saved.formats.length) throw new Error('Duplicate custom formats.');
-  for (const item of saved.history) if (!item || !['csv', 'mt4', 'mt5'].includes(item.kind) || !Array.isArray(item.names) || !Array.isArray(item.targetIds) || typeof item.completedAt !== 'string') throw new Error('Invalid export history.');
+  for (const item of saved.history) if (!item || !['csv', 'mt5'].includes(item.kind) || !Array.isArray(item.names) || !Array.isArray(item.targetIds) || typeof item.completedAt !== 'string') throw new Error('Invalid export history.');
   const job = saved.job;
-  if (job && (!['csv', 'mt4', 'mt5'].includes(job.kind) || !['running', 'paused', 'cancelled', 'completed', 'failed'].includes(job.state) || !Number.isInteger(job.progress) || job.progress < 0 || job.progress > 100 || !Array.isArray(job.targetIds) || !job.targetIds.length || job.targetIds.length > 100 || !Array.isArray(job.artifacts) || job.artifacts.length > 100 || job.artifacts.some(item => typeof item.content !== 'string' || item.content.length > 1_000_000 || typeof item.name !== 'string' || typeof item.targetId !== 'string'))) throw new Error('Invalid saved export job.');
+  if (job && (!['csv', 'mt5'].includes(job.kind) || !['running', 'paused', 'cancelled', 'completed', 'failed'].includes(job.state) || !Number.isInteger(job.progress) || job.progress < 0 || job.progress > 100 || !Array.isArray(job.targetIds) || !job.targetIds.length || job.targetIds.length > 100 || !Array.isArray(job.artifacts) || job.artifacts.length > 100 || job.artifacts.some(item => typeof item.content !== 'string' || item.content.length > 1_000_000 || typeof item.name !== 'string' || typeof item.targetId !== 'string'))) throw new Error('Invalid saved export job.');
 }
 
 export const useDataExports = create<Store>((set, get) => {

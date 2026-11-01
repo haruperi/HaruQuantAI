@@ -99,7 +99,7 @@ test('Data sources exposes every provider workflow and remains mock-only', async
   await expect(page.getByRole('textbox', { name: 'Filter items' })).toHaveValue('EURUSD');
   await expect(page.getByRole('checkbox', { name: 'Select EURUSD', exact: true })).toBeChecked();
   await expect(page.getByLabel('Data export operations').getByRole('button')).toHaveText([
-    'Export to CSV', 'Export MT4 (FXT & HST)', 'Export to MT5 data (99% test)',
+    'Export to CSV', 'Export to MT5 data (99% test)',
   ]);
   await page.getByRole('button', { name: 'Tools', exact: true }).click();
   await expect(page.getByRole('table', { name: 'Historical data' })).toBeVisible();

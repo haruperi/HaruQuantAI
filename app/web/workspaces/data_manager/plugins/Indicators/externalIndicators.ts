@@ -7,7 +7,7 @@ export const externalIndicatorTypes = [
   { value: 10, label: 'Signal - 0 means false, anything else means true' },
 ] as const;
 export type ExternalIndicatorType = 1 | 2 | 3 | 10;
-export interface ExternalIndicatorLine { name: string; mt4: string; mt5: string; el: string }
+export interface ExternalIndicatorLine { name: string; mt5: string; el: string }
 export interface ExternalIndicatorRecord { timestamp: number; values: number[] }
 export interface ExternalIndicatorDefinition {
   name: string; type: ExternalIndicatorType; values: ExternalIndicatorLine[];
@@ -23,7 +23,7 @@ export interface ExternalImportJob {
   indicator: string; state: 'running' | 'paused' | 'cancelled' | 'failed' | 'completed';
   progress: number; records: ExternalIndicatorRecord[]; timeframe: string; ignored: number; error?: string;
 }
-export const emptyExternalLines = (): ExternalIndicatorLine[] => Array.from({ length: 3 }, () => ({ name: '', mt4: '', mt5: '', el: '' }));
+export const emptyExternalLines = (): ExternalIndicatorLine[] => Array.from({ length: 3 }, () => ({ name: '', mt5: '', el: '' }));
 export const externalDateFormats = ['yyyy.MM.dd', 'yyyy-MM-dd', 'ddMMyyyy', 'yyyyMMdd', 'dd.MM.yyyy', 'MM/dd/yyyy', 'yyyy-MM-dd HH:mm:ss', 'yyyy.MM.dd HH:mm:ss'];
 export const externalSeparators = [{ label: 'Comma', value: ',' }, { label: 'Semicolon', value: ';' }, { label: 'Tab', value: '\t' }, { label: 'Pipe', value: '|' }, { label: 'Space', value: ' ' }];
 export const builtInExternalFormats: ExternalImportFormat[] = [
@@ -43,10 +43,10 @@ export function validateExternalDefinition(item: ExternalIndicatorDefinition, ex
   if (!Array.isArray(item.values) || item.values.length !== 3) throw new Error('Exactly three indicator value lines are required.');
   const names: string[] = [];
   for (const line of item.values) {
-    if (!line || ['name', 'mt4', 'mt5', 'el'].some(key => typeof line[key as keyof ExternalIndicatorLine] !== 'string')) throw new Error('Invalid indicator value line.');
+    if (!line || ['name', 'mt5', 'el'].some(key => typeof line[key as keyof ExternalIndicatorLine] !== 'string')) throw new Error('Invalid indicator value line.');
     line.name = line.name.trim();
     if (!/^[a-zA-Z0-9]*$/.test(line.name)) throw new Error('Value name cannot contain any special characters!');
-    if ([line.name, line.mt4, line.mt5, line.el].some(value => value.length > 500)) throw new Error('Indicator value fields must be 500 characters or fewer.');
+    if ([line.name, line.mt5, line.el].some(value => value.length > 500)) throw new Error('Indicator value fields must be 500 characters or fewer.');
     if (line.name && names.includes(line.name)) throw new Error('Value names must be unique!');
     if (line.name) names.push(line.name);
   }
@@ -130,7 +130,7 @@ export function recognizeMq4(filename: string, source: string): ExternalIndicato
   const count = Math.max(declared, labels.size, bound.length); if (!count) throw new Error('Failed to recognize custom indicator from file. Reason: no output buffers found');
   if (count > 3) throw new Error('Recognized indicator has more than three output lines.');
   const values = emptyExternalLines(); const used = new Set<string>();
-  for (let index = 0; index < count; index++) { const fallback = bound.find(item => item.index === index)?.name?.replace(/(?:Ext)?(?:Buffer)?$/gi, '') || `Value${index + 1}`; const raw = labels.get(index) || fallback; const base = raw.replace(/[^a-zA-Z0-9]/g, '').slice(0, 76) || `Value${index + 1}`; let name = base; let suffix = 2; while (used.has(name)) name = `${base}${suffix++}`; used.add(name); values[index].name = name; values[index].mt4 = `iCustom(Symbol(), Period(), "${filename.replace(/\.mq4$/i, '')}", ${index}, shift)`; }
+  for (let index = 0; index < count; index++) { const fallback = bound.find(item => item.index === index)?.name?.replace(/(?:Ext)?(?:Buffer)?$/gi, '') || `Value${index + 1}`; const raw = labels.get(index) || fallback; const base = raw.replace(/[^a-zA-Z0-9]/g, '').slice(0, 76) || `Value${index + 1}`; let name = base; let suffix = 2; while (used.has(name)) name = `${base}${suffix++}`; used.add(name); values[index].name = name; }
   const item: ExternalIndicatorDefinition = { name: filename.replace(/\.mq4$/i, '').trim(), type: 2, values, timeframe: '—', dateFrom: '', dateTo: '', totalDays: 0, records: [] }; validateExternalDefinition(item); return item;
 }
 interface ExternalIndicatorsJson{version:1;kind:'external-indicators';indicators:Array<Pick<ExternalIndicatorDefinition,'name'|'type'|'values'>>}
