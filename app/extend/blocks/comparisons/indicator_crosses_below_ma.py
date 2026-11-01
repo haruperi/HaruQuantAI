@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from typing import Any
 
+from app.core.enums import MAType
 from app.extend.blocks.base import block
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
@@ -20,7 +21,6 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.include.enums import MAType
 
 indicator_crosses_below_ma_spec = BlockSpec(
     id="condition.indicator_crosses_below_ma",

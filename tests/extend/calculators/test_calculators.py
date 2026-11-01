@@ -1,4 +1,4 @@
-"""Unit tests for streaming rolling calculators under app.include.calculators.
+"""Unit tests for streaming rolling calculators under app.extend.calculators.
 
 FEAT-INC-CALCULATORS: Stateful streaming window calculators.
 FR-CALC-BUFFER, FR-CALC-AVERAGE, FR-CALC-EXTREMA, FR-CALC-RSI, FR-CALC-STDDEV, FR-CALC-SUM.
@@ -10,7 +10,7 @@ import math
 from typing import override
 
 import pytest
-from app.include.calculators import (
+from app.extend.calculators import (
     AbstractCalculator,
     AverageCalculator,
     AverageType,

@@ -23,7 +23,7 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.base import to_numpy
+from app.extend.calculators.base import to_numpy
 
 logger = get_logger(__name__)
 REGIME_TRANSITION: float = 1.0

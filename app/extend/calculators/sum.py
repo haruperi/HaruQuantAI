@@ -8,7 +8,7 @@ from __future__ import annotations
 
 from typing import override
 
-from app.include.calculators.base import AbstractCalculator
+from app.extend.calculators.base import AbstractCalculator
 
 
 class SumCalculator(AbstractCalculator):

@@ -11,7 +11,7 @@ from typing import Any, ClassVar, override
 
 import numpy as np
 
-from app.include.calculators.base import AbstractCalculator, CalculatorError
+from app.extend.calculators.base import AbstractCalculator, CalculatorError
 
 
 class AverageType(IntEnum):

@@ -21,8 +21,8 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.profile import VOLUME_OUTPUTS
-from app.include.calculators.profile_sessions import calculate_sessions
+from app.extend.calculators.profile import VOLUME_OUTPUTS
+from app.extend.calculators.profile_sessions import calculate_sessions
 
 
 class VolumeProfile(BaseIndicator):

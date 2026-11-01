@@ -17,7 +17,7 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.average import ema_kernel, sma_kernel
+from app.extend.calculators.average import ema_kernel, sma_kernel
 
 
 def _macd_kernel(

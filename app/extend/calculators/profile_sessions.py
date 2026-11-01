@@ -10,7 +10,7 @@ from zoneinfo import ZoneInfo
 import numpy as np
 
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.profile import (
+from app.extend.calculators.profile import (
     TPO_OUTPUTS,
     VOLUME_OUTPUTS,
     tpo_profile,

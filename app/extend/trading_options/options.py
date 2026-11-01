@@ -6,12 +6,12 @@ Description:
     MaxDistanceFromMarket, MaxTradesPerDay, MinMaxSLPT, and UseInitialSLPT.
 Purpose:
     FEAT-CODE-EDITOR-EXTENSION-COHORTS: Complete the 8-class TradingOptions
-    extension cohort under app/include/trading_options.
+    extension cohort under app/extend/trading_options.
 Key Capabilities:
     - FR-trading-option-evaluate: Evaluate session entry/exit gates, weekend/Friday
       cutoffs, maximum trades per day, order distance bounds, and SL/PT clamping.
 Python API Usage:
-    from app.include.trading_options.options import LimitTimeRange, MinMaxSLPT
+    from app.extend.trading_options.options import LimitTimeRange, MinMaxSLPT
 CLI Usage:
     uv run pytest tests/workspace/code_editor/test_extension_cohorts.py
 """

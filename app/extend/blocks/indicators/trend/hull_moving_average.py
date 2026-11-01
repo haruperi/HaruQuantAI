@@ -21,7 +21,7 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.average import lwma_kernel
+from app.extend.calculators.average import lwma_kernel
 
 logger = get_logger(__name__)
 

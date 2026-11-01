@@ -5,7 +5,7 @@ FEAT-INC-CALCULATORS: Stateful streaming window calculators.
 
 from __future__ import annotations
 
-from app.include.calculators.average import (
+from app.extend.calculators.average import (
     AverageCalculator,
     AverageType,
     ema_kernel,
@@ -14,11 +14,11 @@ from app.include.calculators.average import (
     smma_kernel,
     tema_kernel,
 )
-from app.include.calculators.base import AbstractCalculator, CalculatorError
-from app.include.calculators.extrema import HighestCalculator, LowestCalculator
-from app.include.calculators.rsi import RSICalculator, rsi_kernel
-from app.include.calculators.std_dev import StdDevCalculator
-from app.include.calculators.sum import SumCalculator
+from app.extend.calculators.base import AbstractCalculator, CalculatorError
+from app.extend.calculators.extrema import HighestCalculator, LowestCalculator
+from app.extend.calculators.rsi import RSICalculator, rsi_kernel
+from app.extend.calculators.std_dev import StdDevCalculator
+from app.extend.calculators.sum import SumCalculator
 
 __all__ = [
     "AbstractCalculator",

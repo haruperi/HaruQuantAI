@@ -7,12 +7,10 @@ from typing import Any, override
 
 import pytest
 from app.core.trading.statistics.base import BaseMetric
-from app.include.metrics.base import BaseMetric as OldBaseMetric
 
 
 def test_metric_interface_identity_and_abstractness() -> None:
     """Verify BaseMetric identity, abstractness, and default parameter behavior."""
-    assert BaseMetric is OldBaseMetric
     assert BaseMetric.name == "BaseMetric"
     assert BaseMetric.category == "Metrics"
 

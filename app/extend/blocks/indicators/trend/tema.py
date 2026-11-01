@@ -16,7 +16,7 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.average import tema_kernel
+from app.extend.calculators.average import tema_kernel
 
 
 class TEMA(BaseIndicator):

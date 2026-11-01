@@ -9,13 +9,13 @@ Description:
     (Scaling/NoScaling.java).
 Purpose:
     FEAT-CODE-EDITOR-EXTENSION-COHORTS: Complete the 6-class Trading extension
-    cohort under app/include/trading.
+    cohort under app/extend/trading.
 Key Capabilities:
     - FR-trading-commission-compute: Calculate round-turn trade commissions and
       scaling adjustments across fixed, percentage, per-lot, and stockpicker
       fee structures.
 Python API Usage:
-    from app.include.trading.commissions import PercentageBasedCommission
+    from app.extend.trading.commissions import PercentageBasedCommission
 CLI Usage:
     uv run pytest tests/workspace/code_editor/test_extension_cohorts.py
 """

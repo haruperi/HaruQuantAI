@@ -13,7 +13,7 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 
-from app.include.calculators.base import AbstractCalculator
+from app.extend.calculators.base import AbstractCalculator
 
 
 def rolling_extreme(

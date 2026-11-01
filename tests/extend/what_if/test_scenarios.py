@@ -229,7 +229,7 @@ def test_template_and_registration() -> None:
     module = ModuleType("test_what_if_extension")
     exec(_gen_what_if("loss_filter"), module.__dict__)
     registry = SnippetRegistry()
-    path = Path("app/include/what_if/loss_filter.py")
+    path = Path("app/extend/what_if/loss_filter.py")
     assert registry.register(path, module) == ["LossFilter"]
     scenario = module.LossFilter()
     assert scenario.filter_trades([record(profit=-1000.0)]) == []

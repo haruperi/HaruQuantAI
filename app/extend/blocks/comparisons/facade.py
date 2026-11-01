@@ -5,6 +5,7 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
+from app.core.enums import MAType
 from app.core.host.logging import get_logger
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
@@ -41,7 +42,6 @@ from app.extend.blocks.comparisons.is_lower_or_equal import is_lower_or_equal
 from app.extend.blocks.comparisons.is_lower_percentile import is_lower_percentile
 from app.extend.blocks.comparisons.is_rising import is_rising
 from app.extend.blocks.comparisons.not_equals import not_equals
-from app.include.enums import MAType
 
 logger = get_logger(__name__)
 

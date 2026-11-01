@@ -21,7 +21,7 @@ from app.extend.blocks.series import (
     IndicatorSeries,
     computed_price,
 )
-from app.include.calculators.std_dev import std_dev_kernel
+from app.extend.calculators.std_dev import std_dev_kernel
 
 
 class BBRange(BaseIndicator):

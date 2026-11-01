@@ -246,7 +246,7 @@ def schedule_calendar_session(
     custom: tuple[int, int] | None = None,
 ) -> tuple[datetime, datetime]:
     """Calculate session start and end datetimes in chart timezone."""
-    from app.include.calculators.profile_sessions import session_bounds
+    from app.extend.calculators.profile_sessions import session_bounds
 
     zone = ZoneInfo(timezone)
     kind = (session_type - 1) % 4 + 1

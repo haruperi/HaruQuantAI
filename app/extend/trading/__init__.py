@@ -8,12 +8,12 @@ Purpose:
 Key Capabilities:
     - FR-trading-commission-compute: Expose commission and scaling classes.
 Python API Usage:
-    from app.include.trading import PerTradeCommission, NoScaling
+    from app.extend.trading import PerTradeCommission, NoScaling
 CLI Usage:
     uv run pytest tests/workspace/code_editor/test_extension_cohorts.py
 """
 
-from app.include.trading.commissions import (
+from app.extend.trading.commissions import (
     BaseCommissionModel,
     NoneCommission,
     NoScaling,

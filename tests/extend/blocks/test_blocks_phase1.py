@@ -10,6 +10,7 @@ from typing import Any, override
 
 import numpy as np
 import pytest
+from app.core.trading.statistics.base import BaseMetric
 from app.extend.blocks.actions.log_to_file import LogToFileAction
 from app.extend.blocks.base import BaseBlock
 from app.extend.blocks.comparisons.is_greater import is_greater
@@ -32,7 +33,6 @@ from app.extend.blocks.registry import (
     block_registry,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.metrics.base import BaseMetric
 from pydantic import Field, ValidationError
 
 

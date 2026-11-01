@@ -21,8 +21,8 @@ from app.extend.blocks.series import (
     IndicatorSeries,
     computed_price,
 )
-from app.include.calculators.average import AverageCalculator, AverageType
-from app.include.calculators.std_dev import centered_deviation
+from app.extend.calculators.average import AverageCalculator, AverageType
+from app.extend.calculators.std_dev import centered_deviation
 
 
 class BBWidthRatio(BaseIndicator):

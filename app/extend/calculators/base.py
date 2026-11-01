@@ -11,8 +11,8 @@ from typing import Any, ClassVar
 
 import numpy as np
 
+from app.core.data.contracts import DataframeSeries
 from app.core.host.logging import get_logger
-from app.include.contracts import DataframeSeries
 
 logger = get_logger(__name__)
 

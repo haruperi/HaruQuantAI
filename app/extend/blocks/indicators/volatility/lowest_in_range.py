@@ -15,7 +15,7 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.extrema import time_window_extreme, validate_hhmm
+from app.extend.calculators.extrema import time_window_extreme, validate_hhmm
 
 
 class LowestInRange(BaseIndicator):

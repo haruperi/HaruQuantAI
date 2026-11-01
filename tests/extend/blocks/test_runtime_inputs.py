@@ -17,7 +17,7 @@ from app.extend.blocks.runtime_inputs import (
     schedule_calendar_session,
 )
 from app.extend.blocks.series import BarData
-from app.include.calculators.profile_sessions import session_bounds
+from app.extend.calculators.profile_sessions import session_bounds
 
 
 @pytest.fixture(scope="module")

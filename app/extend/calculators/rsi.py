@@ -10,8 +10,8 @@ from typing import Any, override
 
 import numpy as np
 
-from app.include.calculators.average import AverageCalculator, AverageType
-from app.include.calculators.base import AbstractCalculator
+from app.extend.calculators.average import AverageCalculator, AverageType
+from app.extend.calculators.base import AbstractCalculator
 
 
 class RSICalculator(AbstractCalculator):

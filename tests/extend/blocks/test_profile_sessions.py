@@ -12,8 +12,8 @@ import pytest
 from app.extend.blocks.indicators.volume.tpo_profile import TPOProfile
 from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
 from app.extend.blocks.series import BarData
-from app.include.calculators.profile import TPO_OUTPUTS, VOLUME_OUTPUTS
-from app.include.calculators.profile_sessions import session_bounds
+from app.extend.calculators.profile import TPO_OUTPUTS, VOLUME_OUTPUTS
+from app.extend.calculators.profile_sessions import session_bounds
 from pydantic import ValidationError
 
 REFERENCE = json.loads(

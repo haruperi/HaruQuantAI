@@ -42,7 +42,7 @@ from pydantic import Field
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import BlockSpec, InputPort, OutputPort
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.average import sma_kernel
+from app.extend.calculators.average import sma_kernel
 
 
 class {cls_name}(BaseIndicator):
@@ -162,7 +162,7 @@ Computes a strategy performance metric displayed in Databanks.
 
 from dataclasses import dataclass
 from typing import Any, Sequence
-from app.include.metrics.base import BaseMetric
+from app.core.trading.statistics.base import BaseMetric
 
 
 @dataclass

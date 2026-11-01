@@ -112,7 +112,7 @@ def test_dynamic_modules_keep_relative_import_context():
 
 def test_nested_ai_tools_register_and_enforce_contract():
     with TemporaryDirectory(
-        dir=INCLUDE_DIR / "ai_tools", prefix="regression_"
+        dir=EXTEND_DIR / "ai_tools", prefix="regression_"
     ) as folder:
         path = Path(folder) / "probe.py"
         service = CodeEditor()
@@ -153,7 +153,7 @@ def test_modular_actions_preserve_the_public_facade():
     assert record.params["shift"] == 3
 
 
-def test_validator_accepts_either_base_what_if_and_rejects_unrelated_or_abstract() -> (
+def test_validator_accepts_extend_base_what_if_and_rejects_unrelated_or_abstract() -> (
     None
 ):
     import types
@@ -161,21 +161,9 @@ def test_validator_accepts_either_base_what_if_and_rejects_unrelated_or_abstract
 
     from app.extend.what_if.base import BaseWhatIf as ExtBaseWhatIf
     from app.extend.what_if.base import WhatIfRecord as ExtRecord
-    from app.include.what_if.base import BaseWhatIf as IncBaseWhatIf
-    from app.include.what_if.base import WhatIfRecord as IncRecord
     from app.workspace.code_editor.registry import SnippetRegistry
 
     reg = SnippetRegistry()
-
-    class ConcreteIncludeWhatIf(IncBaseWhatIf):
-        def filter_trades(self, trades: Sequence[IncRecord]) -> list[IncRecord]:
-            return list(trades)
-
-    mod_inc = types.ModuleType("custom_inc_mod")
-    mod_inc.ConcreteIncludeWhatIf = ConcreteIncludeWhatIf  # type: ignore[attr-defined]
-    ConcreteIncludeWhatIf.__module__ = "custom_inc_mod"
-    res_inc = reg.register(Path("app/include/what_if/inc.py"), mod_inc)
-    assert "ConcreteIncludeWhatIf" in res_inc
 
     class ConcreteExtendWhatIf(ExtBaseWhatIf):
         def filter_trades(self, trades: Sequence[ExtRecord]) -> list[ExtRecord]:
@@ -184,7 +172,7 @@ def test_validator_accepts_either_base_what_if_and_rejects_unrelated_or_abstract
     mod_ext = types.ModuleType("custom_ext_mod")
     mod_ext.ConcreteExtendWhatIf = ConcreteExtendWhatIf  # type: ignore[attr-defined]
     ConcreteExtendWhatIf.__module__ = "custom_ext_mod"
-    res_ext = reg.register(Path("app/include/what_if/ext.py"), mod_ext)
+    res_ext = reg.register(Path("app/extend/what_if/ext.py"), mod_ext)
     assert "ConcreteExtendWhatIf" in res_ext
 
     class UnrelatedClass:
@@ -194,13 +182,13 @@ def test_validator_accepts_either_base_what_if_and_rejects_unrelated_or_abstract
     mod_unrelated.UnrelatedClass = UnrelatedClass  # type: ignore[attr-defined]
     UnrelatedClass.__module__ = "custom_unrelated_mod"
     with pytest.raises(CodeEditorError, match="must implement BaseWhatIf"):
-        reg.register(Path("app/include/what_if/unrelated.py"), mod_unrelated)
+        reg.register(Path("app/extend/what_if/unrelated.py"), mod_unrelated)
 
-    class AbstractWhatIf(IncBaseWhatIf):
+    class AbstractWhatIf(ExtBaseWhatIf):
         pass
 
     mod_abstract = types.ModuleType("custom_abstract_mod")
     mod_abstract.AbstractWhatIf = AbstractWhatIf  # type: ignore[attr-defined]
     AbstractWhatIf.__module__ = "custom_abstract_mod"
     with pytest.raises(CodeEditorError, match="must implement BaseWhatIf"):
-        reg.register(Path("app/include/what_if/abstract.py"), mod_abstract)
+        reg.register(Path("app/extend/what_if/abstract.py"), mod_abstract)

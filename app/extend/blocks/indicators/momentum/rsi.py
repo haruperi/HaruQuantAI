@@ -16,7 +16,7 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
-from app.include.calculators.rsi import rsi_kernel
+from app.extend.calculators.rsi import rsi_kernel
 
 
 class RSI(BaseIndicator):

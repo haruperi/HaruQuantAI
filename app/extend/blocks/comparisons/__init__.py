@@ -5,6 +5,7 @@ FEAT-INC-BLOCKS-CONDITIONS: Modular comparison condition building blocks.
 
 from __future__ import annotations
 
+from app.core.enums import MAType
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
     DEFAULT_COUNT_PRECISION,
@@ -97,7 +98,6 @@ from app.extend.blocks.comparisons.not_equals import (
     not_equals,
     not_equals_spec,
 )
-from app.include.enums import MAType
 
 __all__ = [
     "DEFAULT_COMPARISON_PRECISION",

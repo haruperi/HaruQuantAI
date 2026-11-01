@@ -11,7 +11,7 @@ from typing import Any, override
 
 import numpy as np
 
-from app.include.calculators.base import AbstractCalculator
+from app.extend.calculators.base import AbstractCalculator
 
 _MAX_WINDOW_ELEMENTS = 1_000_000
 

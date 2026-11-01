@@ -26,7 +26,7 @@ from app.extend.blocks.metadata import (
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.series import IndicatorSeries as Series
-from app.include.calculators.base import to_numpy
+from app.extend.calculators.base import to_numpy
 
 logger = get_logger(__name__)
 DEFAULT_FAST_PERIOD: int = 52

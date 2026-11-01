@@ -7,12 +7,12 @@ Purpose:
 Key Capabilities:
     - FR-trading-option-evaluate: Expose all 8 TradingOptions evaluators.
 Python API Usage:
-    from app.include.trading_options import DontTradeOnWeekends, LimitTimeRange
+    from app.extend.trading_options import DontTradeOnWeekends, LimitTimeRange
 CLI Usage:
     uv run pytest tests/workspace/code_editor/test_extension_cohorts.py
 """
 
-from app.include.trading_options.options import (
+from app.extend.trading_options.options import (
     BaseTradingOption,
     DontTradeOnWeekends,
     ExitAtEndOfDay,

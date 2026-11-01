@@ -8,9 +8,9 @@ from typing import Any
 
 import numpy as np
 
+from app.core.data.contracts import DataframeSeries
+from app.core.enums import MAType
 from app.extend.blocks.series import round_value
-from app.include.contracts import DataframeSeries
-from app.include.enums import MAType
 
 __all__ = [
     "DEFAULT_COMPARISON_PRECISION",
