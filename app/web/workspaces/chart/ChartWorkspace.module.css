@@ -876,3 +876,58 @@
   width: 300px;
   max-height: calc(100vh - 305px);
 }
+
+/* Compact TradingView-style Text and Notes flyout, with both catalog sections. */
+.root :global(.cq-text-menu) {
+  width: 218px;
+  max-height: min(620px, calc(100vh - 145px));
+  padding: 5px;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+}
+.root :global(.cq-text-menu .cq-line-heading) {
+  padding: 8px 8px 5px;
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: .035em;
+}
+.root :global(.cq-text-menu .cq-line-section + .cq-line-section) {
+  border-top: 1px solid var(--cq-border);
+  margin-top: 6px;
+  padding-top: 4px;
+}
+.root :global(.cq-text-menu .cq-tool-option) {
+  min-height: 36px;
+  align-items: center;
+}
+.root :global(.cq-text-menu .cq-tool-option > button:first-child) {
+  height: 36px;
+  padding: 6px 8px;
+  gap: 10px;
+  font-size: 12px;
+  border-radius: 5px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+.root :global(.cq-text-menu .cq-tool-option > button:first-child svg) {
+  width: 17px;
+  height: 17px;
+  stroke-width: 1.5;
+}
+.root :global(.cq-text-menu .cq-tool-option > button:first-child span) {
+  white-space: nowrap;
+}
+.root :global(.cq-text-menu .cq-tool-option > button:last-child) {
+  width: 23px;
+  height: 32px;
+  padding: 5px;
+}
+.root :global(.cq-text-menu .cq-selected-tool) {
+  background: var(--cq-text);
+  color: var(--cq-bg);
+}
+.root :global(.cq-text-menu .cq-tool-option:focus-within) {
+  outline: 1px solid var(--cq-border);
+  outline-offset: -1px;
+}
