@@ -12,6 +12,8 @@ Purpose:
 Key Capabilities:
     - FR-host-job-schema: Install additive job tables and reject incompatible
       existing columns; isolated persistence tests verify explicit result logs.
+    - FR-host-watchlist-schema: Install additive watchlists and watchlist items
+      tables and reject incompatible existing definitions; isolated tests verify logs.
 Python API Usage:
     response = HostPersistence(path).ensure_jobs_schema()
 CLI Usage:
@@ -358,6 +360,68 @@ class HostPersistence:
             return {"affected_rows": 0, "records": []}
 
         return self._run("databanks.schema", write=True, action=action)
+
+    def ensure_watchlists_schema(self) -> dict[str, Any]:
+        """Install additive watchlists and watchlist items tables atomically."""
+        statements = (
+            (
+                "CREATE TABLE IF NOT EXISTS watchlists ("
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "name TEXT NOT NULL UNIQUE, "
+                "description TEXT NOT NULL DEFAULT '', "
+                "is_default INTEGER NOT NULL DEFAULT 0, "
+                "sort_order INTEGER NOT NULL DEFAULT 0, "
+                "color TEXT DEFAULT NULL, "
+                "created_at_utc TEXT NOT NULL, "
+                "updated_at_utc TEXT NOT NULL)"
+            ),
+            (
+                "CREATE TABLE IF NOT EXISTS watchlist_items ("
+                "id INTEGER PRIMARY KEY AUTOINCREMENT, "
+                "watchlist_id INTEGER NOT NULL REFERENCES watchlists(id) "
+                "ON DELETE CASCADE, "
+                "symbol TEXT NOT NULL, "
+                "asset_class TEXT NOT NULL DEFAULT 'Stock', "
+                "exchange TEXT NOT NULL DEFAULT '', "
+                "broker TEXT NOT NULL DEFAULT '', "
+                "default_timeframe TEXT NOT NULL DEFAULT 'D1', "
+                "sort_order INTEGER NOT NULL DEFAULT 0, "
+                "target_price_high REAL DEFAULT NULL, "
+                "target_price_low REAL DEFAULT NULL, "
+                "alert_rules_json TEXT NOT NULL DEFAULT '{}', "
+                "notes TEXT NOT NULL DEFAULT '', "
+                "is_active INTEGER NOT NULL DEFAULT 1, "
+                "created_at_utc TEXT NOT NULL, "
+                "updated_at_utc TEXT NOT NULL, "
+                "UNIQUE(watchlist_id, symbol, broker))"
+            ),
+            (
+                "CREATE INDEX IF NOT EXISTS idx_watchlist_items_watchlist_id "
+                "ON watchlist_items (watchlist_id, sort_order)"
+            ),
+            (
+                "CREATE INDEX IF NOT EXISTS idx_watchlist_items_symbol "
+                "ON watchlist_items (symbol)"
+            ),
+        )
+
+        def action(connection: sqlite3.Connection) -> dict[str, Any]:
+            for statement in statements:
+                connection.execute(statement)
+            connection.execute(
+                "SELECT id, name, description, is_default, sort_order, color, "
+                "created_at_utc, updated_at_utc FROM watchlists LIMIT 0"
+            )
+            connection.execute(
+                "SELECT id, watchlist_id, symbol, asset_class, exchange, broker, "
+                "default_timeframe, sort_order, target_price_high, target_price_low, "
+                "alert_rules_json, notes, is_active, created_at_utc, updated_at_utc "
+                "FROM watchlist_items LIMIT 0"
+            )
+            logger.info("FR-host-watchlist-schema: verified")
+            return {"affected_rows": 0, "records": []}
+
+        return self._run("watchlists.schema", write=True, action=action)
 
     def _check_scope(self) -> None:
         if self._closed:
