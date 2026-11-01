@@ -56,10 +56,10 @@ test('toolbar edits active pane only until interval sync is enabled, then persis
     const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1.pane.1') || '{}').state;
     return state?.chart?.interval;
   })).toBe('1h');
-  await expect.poll(() => page.evaluate(() => {
-    const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1') || '{}').state;
-    return state?.chart?.interval;
-  })).toBe('3m');
+  await panes.nth(0).getByTestId('chart-input').click({ position: { x: 30, y: 65 } });
+  await expect(page.getByRole('combobox', { name: 'Interval', exact: true })).toHaveValue('3m');
+  await panes.nth(1).getByTestId('chart-input').click({ position: { x: 30, y: 65 } });
+  await expect(page.getByRole('combobox', { name: 'Interval', exact: true })).toHaveValue('1h');
 
   await picker.click();
   const menu = page.getByRole('dialog', { name: 'Select layout', exact: true });
@@ -99,4 +99,28 @@ test('sync options can be changed without collapsing the chart menu', async ({ p
     await expect(dialog.getByRole('switch', { name: 'Sync ' + name })).toHaveAttribute('aria-checked', value);
   }
   await expect(dialog).toBeVisible();
+});
+
+test('chart splitters resize the grid and double-click restores equal tracks', async ({ page }) => {
+  await page.goto('/chart');
+  await page.getByRole('button', { name: 'Select layout', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Select layout' })
+    .getByRole('button', { name: '2 charts · 2h' }).click();
+  const handle = page.getByRole('separator', { name: 'Resize charts columns:1:0' });
+  await expect(handle).toBeVisible();
+  const bounds = (await handle.boundingBox())!;
+  const from = { x: bounds.x + bounds.width / 2, y: bounds.y + bounds.height / 2 };
+  await page.mouse.move(from.x, from.y);
+  await page.mouse.down();
+  await page.mouse.move(from.x + 75, from.y, { steps: 8 });
+  await page.mouse.up();
+  await expect.poll(async () => page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem('haruquantai.chart.layout.v1') || '{}');
+    return saved.sizes?.['2h']?.columns?.[0] ?? 0;
+  })).toBeGreaterThan(50);
+  await handle.dblclick();
+  await expect.poll(async () => page.evaluate(() => {
+    const saved = JSON.parse(localStorage.getItem('haruquantai.chart.layout.v1') || '{}');
+    return saved.sizes?.['2h'];
+  })).toBeUndefined();
 });
