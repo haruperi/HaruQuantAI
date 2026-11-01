@@ -16,7 +16,15 @@ import { intervals, chartStyles } from '../../types';
 import { useChart } from '../../hooks/useChartEngine';
 import { ToolButton } from '../Tooltip';
 import { exportChart, fullscreen } from '../../engine/export';
-export function TopBar() {
+import { LayoutPicker } from '../../layout/LayoutPicker';
+import type { LayoutState, SyncSetting } from '../../layout/layouts';
+export function TopBar({
+  layout, onLayoutChange, onSyncChange,
+}: {
+  layout: LayoutState;
+  onLayoutChange: (id: string) => void;
+  onSyncChange: (setting: SyncSetting, enabled: boolean) => void;
+}) {
   const { store, engine, root } = useChart(),
     s = useStore(store);
   return (
@@ -88,6 +96,8 @@ export function TopBar() {
       >
         <Redo2 size={17} />
       </ToolButton>
+      <span className="cq-divider" />
+      <LayoutPicker value={layout} onLayoutChange={onLayoutChange} onSyncChange={onSyncChange} />
       <div className="cq-top-spacer" />
       <input
         className="cq-title"
