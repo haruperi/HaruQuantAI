@@ -124,3 +124,32 @@ test('chart splitters resize the grid and double-click restores equal tracks', a
     return saved.sizes?.['2h'];
   })).toBeUndefined();
 });
+
+test('crosshair and time window synchronization propagate to other chart canvases', async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto('/chart');
+  const picker = page.getByRole('button', { name: 'Select layout', exact: true });
+  await picker.click();
+  await page.getByRole('dialog', { name: 'Select layout' })
+    .getByRole('button', { name: '2 charts · 2h' }).click();
+  const panes = page.getByTestId('chart-pane');
+  await expect(panes.nth(0).getByTestId('chart-canvas-host')).toHaveAttribute('data-loading', 'false');
+  const secondHost = panes.nth(1).getByTestId('chart-canvas-host');
+  await expect(secondHost).toHaveAttribute('data-loading', 'false');
+
+  const input = panes.nth(0).getByTestId('chart-input');
+  const bounds = (await input.boundingBox())!;
+  await page.mouse.move(bounds.x + Math.min(140, bounds.width - 80), bounds.y + 90);
+  await expect.poll(() => secondHost.getAttribute('data-linked-crosshair-time')).not.toBe('');
+  await picker.click();
+  const menu = page.getByRole('dialog', { name: 'Select layout' });
+  await menu.getByRole('switch', { name: 'Sync Crosshair' }).click();
+  await expect(secondHost).toHaveAttribute('data-linked-crosshair-time', '');
+  await menu.getByRole('switch', { name: 'Sync Time', exact: true }).click();
+  await picker.click();
+  await expect.poll(() => secondHost.getAttribute('data-synced-time-window')).not.toBeNull();
+  const before = await secondHost.getAttribute('data-synced-time-window');
+  await input.hover({ position: { x: Math.min(160, bounds.width - 90), y: 105 } });
+  await page.mouse.wheel(0, -260);
+  await expect.poll(() => secondHost.getAttribute('data-synced-time-window')).not.toBe(before);
+});
