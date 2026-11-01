@@ -601,11 +601,13 @@ export class ChartEngine {
     if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
     this.spacing = clamp(this.plotWidth / (end - start), 0.2, 50);
     this.offset = -start * this.spacing;
+    this.host.dataset.syncedTimeWindow = range.map(Math.round).join(':');
     this.invalidate(7);
   }
   setLinkedCrosshairTime(time: number | null): void {
     if (this.linkedCrosshairTime === time) return;
     this.linkedCrosshairTime = time;
+    this.host.dataset.linkedCrosshairTime = time === null ? '' : String(Math.round(time));
     this.invalidate(4);
   }
   private publishViewport(): void {
