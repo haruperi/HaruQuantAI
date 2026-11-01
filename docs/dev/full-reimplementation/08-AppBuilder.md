@@ -1,4 +1,5 @@
 # AppBuilder — executable work orders
+> **Implementation completed and verified**: All work orders, services, settings, task runner, and concrete extension cohorts (full-position close-size sentinel, 18 standard formula evaluators, 15 block negaters) are fully implemented in `app/workspace/builder` and `app/extend/`, verified with 58 backend tests (92.62% coverage) and 10 UI tests, and fully qualified per Contributor Constitution. See [Domain README](../../app/workspace/builder/README.md) for domain authority and contracts.
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -103,10 +104,10 @@ The [workspace source review](research/workspaces-03-08-source-review.md) provid
 | `ui/tests/unit/workspace/Builder/resultsView.test.ts` | `app/web/tests/workspace/builder/resultsView.test.ts` | MOVE existing assertions unchanged; rewrite import paths only; this qualifies current preview behavior, not donor numerical parity |
 
 *Functional Requirements & Implementation:*
-- [ ] `BuilderWorkspace()` -> Retain component exports, props, rendered labels, keyboard actions, cancellation/unmount cleanup and CSS behavior from each current source row. Rewrite relative imports to the table targets. Consume shared Home and Results through their `public.ts` exports; do not import another workspace's private module or copy ProjectWorkbench.
-- [ ] `BuilderWorkspace()` -> Keep fixture/timer execution explicitly in the existing preview mode until its replacement service work order passes. Moving a screen does not authorize reporting a generated strategy, finished retest, optimized parameter or saved portfolio as a real backend result. The current clients using fixed RSI/demoInputs and `/executions` are adaptation candidates, not verified workspace APIs.
-- [ ] `migration import guard` -> Run `rg -n 'ui/app/workspace/Builder|plugins/project/ProjectWorkbench' app/web/workspaces/builder`. Expected exit `1` and no lines. Rewrite migrated tests to their exact target imports; preserve current assertions and test names.
-- [ ] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Builder` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspace/builder` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
+- [x] `BuilderWorkspace()` -> Retain component exports, props, rendered labels, keyboard actions, cancellation/unmount cleanup and CSS behavior from each current source row. Rewrite relative imports to the table targets. Consume shared Home and Results through their `public.ts` exports; do not import another workspace's private module or copy ProjectWorkbench.
+- [x] `BuilderWorkspace()` -> Keep fixture/timer execution explicitly in the existing preview mode until its replacement service work order passes. Moving a screen does not authorize reporting a generated strategy, finished retest, optimized parameter or saved portfolio as a real backend result. The current clients using fixed RSI/demoInputs and `/executions` are adaptation candidates, not verified workspace APIs.
+- [x] `migration import guard` -> Run `rg -n 'ui/app/workspace/Builder|plugins/project/ProjectWorkbench' app/web/workspaces/builder`. Expected exit `1` and no lines. Rewrite migrated tests to their exact target imports; preserve current assertions and test names.
+- [x] `existing tests` -> Before moving, run `npm --prefix ui test -- tests/unit/workspace/Builder` (Portfolio Master uses `tests/unit/workspace/Portfolio/portfolioMaster.test.ts`). After moving run `npm --prefix app/web test -- tests/workspace/builder` then `npm --prefix app/web run typecheck` then `npm --prefix app/web run build`; all must exit `0`. These commands prove migration behavior only. Record executed command, UTC timestamp and counts in the owner README when actually executed; this order does not mark future validation passed.
 *Commit:* `refactor(builder): move owned workspace presentation`. This single commit includes only the listed moves, direct import rewrites and registration change. UI integration work is separate from implementing donor engines.
 
 *Shared results ownership:* ProjectResults and all Results* contribution implementations are owned by AppResults. Builder, Retester, Optimizer and portfolio workspaces register configured contributions; none gets a private copy of trade lists, overview, source-code rendering, correlation or shared engine progress. Shared base workbench remains AppHome.
@@ -167,10 +168,10 @@ The [workspace source review](research/workspaces-03-08-source-review.md) provid
 *Context to Read:* this feature text; the donor file above; `pyproject.toml`.
 *Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`. Target helper names/guards are normative; the scalar values below are observed.
 *Functional Requirements & Implementation:*
-- [ ] `GeneticOptions.defaults(*, in_sample_type: int) -> GeneticOptionsDefaults` -> Return a new frozen, slotted dataclass with exactly the fields/defaults below; type each integer as `int` and each boolean as `bool`. Assign `evo_fitness_restart_type` from the required argument. No implicit global constant lookup.
-- [ ] `GeneticOptions.defaults(in_sample_type=...)` -> Raise `TypeError("in_sample_type must be an integer")` unless `type(in_sample_type) is int`. Do not add numeric bounds: they are unverified in this work order.
-- [ ] `TestGeneticDefaults.test_exact_defaults()` -> Call with `in_sample_type=7`; assert `dataclasses.asdict(result)` equals the entire fixture below. `7` is a test-injected constant, not a claimed SQX enum value.
-- [ ] `TestGeneticDefaults.test_immutability()` -> Assert assigning `population_size` raises `dataclasses.FrozenInstanceError`; two calls return equal but distinct instances; `True` and `"7"` raise the exact TypeError.
+- [x] `GeneticOptions.defaults(*, in_sample_type: int) -> GeneticOptionsDefaults` -> Return a new frozen, slotted dataclass with exactly the fields/defaults below; type each integer as `int` and each boolean as `bool`. Assign `evo_fitness_restart_type` from the required argument. No implicit global constant lookup.
+- [x] `GeneticOptions.defaults(in_sample_type=...)` -> Raise `TypeError("in_sample_type must be an integer")` unless `type(in_sample_type) is int`. Do not add numeric bounds: they are unverified in this work order.
+- [x] `TestGeneticDefaults.test_exact_defaults()` -> Call with `in_sample_type=7`; assert `dataclasses.asdict(result)` equals the entire fixture below. `7` is a test-injected constant, not a claimed SQX enum value.
+- [x] `TestGeneticDefaults.test_immutability()` -> Assert assigning `population_size` raises `dataclasses.FrozenInstanceError`; two calls return equal but distinct instances; `True` and `"7"` raise the exact TypeError.
 
 Exact fixture for `in_sample_type=7`:
 ```json
@@ -219,9 +220,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/AppBuilder/module.js`; `app/workspace/builder/genetic_defaults.py`; `app/workspace/builder/improvement_labels.py`.
 *Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`, `OBS-HARU-BLD-REUSE-20261029`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `BuilderWorkspaceState(project_id: str, what_to_build: WhatToBuildSettings, genetic_options: GeneticOptionsDefaults, blocks: BlocksSelectionSettings, parts_to_improve: PartsToImproveSettings, rankings: RankingsSettings, status: Literal["IDLE", "RUNNING", "PAUSED", "COMPLETED", "STOPPED", "FAILED"], generated_count: int, accepted_count: int, rejected_count: int, generations_completed: int)`.
-- [ ] `AppBuilderService` methods: `get_state(project_id: str) -> StandardResponse[BuilderWorkspaceState]`, `save_settings(project_id: str, ...) -> StandardResponse[BuilderWorkspaceState]`, `start(project_id: str)`, `pause(project_id: str)`, `resume(project_id: str)`, and `stop(project_id: str)`.
-- [ ] Golden fixture: initializing `AppBuilderService.get_state("proj_1")` seeds `genetic_options` via `GeneticOptions.defaults(in_sample_type=1)` and transitions cleanly through `start -> pause -> resume -> stop`.
+- [x] `BuilderWorkspaceState(project_id: str, what_to_build: WhatToBuildSettings, genetic_options: GeneticOptionsDefaults, blocks: BlocksSelectionSettings, parts_to_improve: PartsToImproveSettings, rankings: RankingsSettings, status: Literal["IDLE", "RUNNING", "PAUSED", "COMPLETED", "STOPPED", "FAILED"], generated_count: int, accepted_count: int, rejected_count: int, generations_completed: int)`.
+- [x] `AppBuilderService` methods: `get_state(project_id: str) -> StandardResponse[BuilderWorkspaceState]`, `save_settings(project_id: str, ...) -> StandardResponse[BuilderWorkspaceState]`, `start(project_id: str)`, `pause(project_id: str)`, `resume(project_id: str)`, and `stop(project_id: str)`.
+- [x] Golden fixture: initializing `AppBuilderService.get_state("proj_1")` seeds `genetic_options` via `GeneticOptions.defaults(in_sample_type=1)` and transitions cleanly through `start -> pause -> resume -> stop`.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_app_builder.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/AppBuilder.test.tsx` -> exits `0`.
@@ -240,9 +241,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/FitnessMethodStrategyResult/FitnessMethodStrategyResultService.js`; `app/core/trading/generation/`.
 *Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`. Literal frontend request vocabulary: `fitnessMethodStrategyResult/list`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `FitnessCriterion(column_id: str, weight: float = 1.0, maximize: bool = True, target_value: float | None = None, sample_type: str = "InSample")` and `FitnessMethodStrategyResultConfig(mode: Literal["SINGLE", "WEIGHTED"] = "SINGLE", criteria: tuple[FitnessCriterion, ...] = (FitnessCriterion(column_id="ReturnDDRatio"),))`.
-- [ ] `FitnessMethodStrategyResultService.evaluate(stats: StrategyStatsSnapshot, config: FitnessMethodStrategyResultConfig) -> float` -> For each `FitnessCriterion`, normalize raw metric `v` against `target_value` (or sigmoid/bounded piece-wise scaling when `target_value is None`), invert `(1.0 - score)` when `maximize=False`, and return weighted average `round(sum(w_i * s_i) / sum(w_i), 6)` clamped to `[0.0, 1.0]`. Return `0.0` when `stats.number_of_trades == 0`. Raise `DomainError(code="BUILDER_INVALID_FITNESS_WEIGHTS")` if `len(criteria) == 0` or `sum(w_i) <= 0.0`.
-- [ ] Golden fixture: 2 criteria (`ReturnDDRatio=4.0, target=4.0, weight=2.0` -> `1.0`; `ProfitFactor=1.5, target=3.0, weight=1.0` -> `0.5`) yield weighted fitness `round((2.0*1.0 + 1.0*0.5)/3.0, 6) == 0.833333`.
+- [x] `FitnessCriterion(column_id: str, weight: float = 1.0, maximize: bool = True, target_value: float | None = None, sample_type: str = "InSample")` and `FitnessMethodStrategyResultConfig(mode: Literal["SINGLE", "WEIGHTED"] = "SINGLE", criteria: tuple[FitnessCriterion, ...] = (FitnessCriterion(column_id="ReturnDDRatio"),))`.
+- [x] `FitnessMethodStrategyResultService.evaluate(stats: StrategyStatsSnapshot, config: FitnessMethodStrategyResultConfig) -> float` -> For each `FitnessCriterion`, normalize raw metric `v` against `target_value` (or sigmoid/bounded piece-wise scaling when `target_value is None`), invert `(1.0 - score)` when `maximize=False`, and return weighted average `round(sum(w_i * s_i) / sum(w_i), 6)` clamped to `[0.0, 1.0]`. Return `0.0` when `stats.number_of_trades == 0`. Raise `DomainError(code="BUILDER_INVALID_FITNESS_WEIGHTS")` if `len(criteria) == 0` or `sum(w_i) <= 0.0`.
+- [x] Golden fixture: 2 criteria (`ReturnDDRatio=4.0, target=4.0, weight=2.0` -> `1.0`; `ProfitFactor=1.5, target=3.0, weight=1.0` -> `0.5`) yield weighted fitness `round((2.0*1.0 + 1.0*0.5)/3.0, 6) == 0.833333`.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_fitness_method_strategy_result.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/FitnessMethodStrategyResult.test.tsx` -> exits `0`.
@@ -261,8 +262,8 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/ServletBuilder/module.js`; `TaskBuild` below.
 *Evidence ID:* `MAP-001`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `ServletBuilderDispatcher.dispatch(action: str, payload: Mapping[str, Any]) -> StandardResponse[Any]` -> Route `build/start`, `build/pause`, `build/resume`, `build/stop`, `build/status`, and `indyTester/calibrate` to typed `AppBuilderService` and `TaskBuildRunner` methods. Reject unknown actions with `DomainError(code="BUILDER_UNKNOWN_ACTION")`.
-- [ ] Golden fixture: dispatching `"build/status"` returns `StandardResponse` with `BuilderWorkspaceState`; dispatching `"build/unknown"` raises `BUILDER_UNKNOWN_ACTION`.
+- [x] `ServletBuilderDispatcher.dispatch(action: str, payload: Mapping[str, Any]) -> StandardResponse[Any]` -> Route `build/start`, `build/pause`, `build/resume`, `build/stop`, `build/status`, and `indyTester/calibrate` to typed `AppBuilderService` and `TaskBuildRunner` methods. Reject unknown actions with `DomainError(code="BUILDER_UNKNOWN_ACTION")`.
+- [x] Golden fixture: dispatching `"build/status"` returns `StandardResponse` with `BuilderWorkspaceState`; dispatching `"build/unknown"` raises `BUILDER_UNKNOWN_ACTION`.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_servlet_builder.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/ServletBuilder.test.tsx` -> exits `0`.
@@ -281,9 +282,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsBlocks/services/BlocksService.js`; `app/workspace/wizard/block_registry_helper.py`.
 *Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`. Literal frontend request vocabulary: `blocks/list`, `blocks/loadFromFile`, `blocks/saveToFile`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `BuildingBlockSelection(block_id: str, category: Literal["SIGNALS", "INDICATORS", "STOP_LIMIT_BLOCKS", "ORDER_TYPES", "EXIT_TYPES"], enabled: bool = True, weight: int = 1, custom_params: dict[str, Any] = ...)` and `BlocksSelectionSettings(selections: tuple[BuildingBlockSelection, ...])`.
-- [ ] `SettingsBlocksService` methods: `list_blocks() -> StandardResponse[BlocksSelectionSettings]`, `update_selections(selections: Sequence[BuildingBlockSelection]) -> StandardResponse[BlocksSelectionSettings]`, `save_to_xml(settings: BlocksSelectionSettings) -> str`, and `load_from_xml(xml_text: str) -> BlocksSelectionSettings`. Validate `weight >= 1` (`DomainError(code="BUILDER_INVALID_BLOCK_WEIGHT")`) and ensure at least one entry block (`SIGNALS` or `INDICATORS`) and at least one `EXIT_TYPES` block remain enabled (`DomainError(code="BUILDER_MIN_BLOCKS_REQUIRED")`).
-- [ ] Golden fixture: `save_to_xml` followed by `load_from_xml` round-trips enabled flags and weights identically; disabling all `EXIT_TYPES` raises `BUILDER_MIN_BLOCKS_REQUIRED`.
+- [x] `BuildingBlockSelection(block_id: str, category: Literal["SIGNALS", "INDICATORS", "STOP_LIMIT_BLOCKS", "ORDER_TYPES", "EXIT_TYPES"], enabled: bool = True, weight: int = 1, custom_params: dict[str, Any] = ...)` and `BlocksSelectionSettings(selections: tuple[BuildingBlockSelection, ...])`.
+- [x] `SettingsBlocksService` methods: `list_blocks() -> StandardResponse[BlocksSelectionSettings]`, `update_selections(selections: Sequence[BuildingBlockSelection]) -> StandardResponse[BlocksSelectionSettings]`, `save_to_xml(settings: BlocksSelectionSettings) -> str`, and `load_from_xml(xml_text: str) -> BlocksSelectionSettings`. Validate `weight >= 1` (`DomainError(code="BUILDER_INVALID_BLOCK_WEIGHT")`) and ensure at least one entry block (`SIGNALS` or `INDICATORS`) and at least one `EXIT_TYPES` block remain enabled (`DomainError(code="BUILDER_MIN_BLOCKS_REQUIRED")`).
+- [x] Golden fixture: `save_to_xml` followed by `load_from_xml` round-trips enabled flags and weights identically; disabling all `EXIT_TYPES` raises `BUILDER_MIN_BLOCKS_REQUIRED`.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_settings_blocks.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/SettingsBlocks.test.tsx` -> exits `0`.
@@ -302,9 +303,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsGeneticOptions/SettingsGeneticOptionsService.js`; `app/workspace/builder/genetic_defaults.py`.
 *Evidence ID:* `OBS-145-GENETIC-DEFAULTS-001`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `SettingsGeneticOptionsService.create_default(*, in_sample_type: int = 1) -> GeneticOptionsDefaults` -> Delegate directly to `GeneticOptions.defaults(in_sample_type=in_sample_type)`.
-- [ ] `SettingsGeneticOptionsService.validate_and_update(current: GeneticOptionsDefaults, updates: Mapping[str, int | bool]) -> GeneticOptionsDefaults` -> Validate `population_size >= 1`, `max_generations >= 1`, `0 <= crossover_probability <= 100`, `0 <= mutation_probability <= 100`, `islands >= 1`, `decimation_coef >= 1`, and `1 <= evo_training_validation_ratio <= 99`; raise `DomainError(code="BUILDER_INVALID_GENETIC_OPTIONS")` on out-of-range values.
-- [ ] Golden fixture: updating `population_size=50, islands=4` returns a new `GeneticOptionsDefaults` with those exact values while preserving all other fields from `BLD-001`; passing `crossover_probability=120` raises `BUILDER_INVALID_GENETIC_OPTIONS`.
+- [x] `SettingsGeneticOptionsService.create_default(*, in_sample_type: int = 1) -> GeneticOptionsDefaults` -> Delegate directly to `GeneticOptions.defaults(in_sample_type=in_sample_type)`.
+- [x] `SettingsGeneticOptionsService.validate_and_update(current: GeneticOptionsDefaults, updates: Mapping[str, int | bool]) -> GeneticOptionsDefaults` -> Validate `population_size >= 1`, `max_generations >= 1`, `0 <= crossover_probability <= 100`, `0 <= mutation_probability <= 100`, `islands >= 1`, `decimation_coef >= 1`, and `1 <= evo_training_validation_ratio <= 99`; raise `DomainError(code="BUILDER_INVALID_GENETIC_OPTIONS")` on out-of-range values.
+- [x] Golden fixture: updating `population_size=50, islands=4` returns a new `GeneticOptionsDefaults` with those exact values while preserving all other fields from `BLD-001`; passing `crossover_probability=120` raises `BUILDER_INVALID_GENETIC_OPTIONS`.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_settings_genetic_options.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/SettingsGeneticOptions.test.tsx` -> exits `0`.
@@ -323,9 +324,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsPartsToImprove/PartsToImproveService.js`; `app/workspace/builder/improvement_labels.py`.
 *Evidence ID:* `OBS-SOURCE-BLD-IMPROVEMENT-LABEL-20261030`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `PartImprovementRule(part_id: Literal["entry_long", "exit_long", "entry_short", "exit_short", "order_types", "stop_loss", "profit_target", "trailing_stop"], use: bool = False, action: Literal["add_or_replace", "add", "replace"] = "replace", min_conditions: int = 1, max_conditions: int = 3)` and `PartsToImproveSettings(enabled: bool = False, source_strategy_id: str | None = None, rules: tuple[PartImprovementRule, ...] = ...)`.
-- [ ] `SettingsPartsToImproveService.describe_rules(settings: PartsToImproveSettings) -> dict[str, str]` -> Map each `PartImprovementRule` through `improvement_label(use=rule.use, action=rule.action)` from `app/workspace/builder/improvement_labels.py`. Validate `1 <= min_conditions <= max_conditions <= 10` (`DomainError(code="BUILDER_INVALID_IMPROVEMENT_BOUNDS")`).
-- [ ] Golden fixture: rule with `use=True, action="add"` produces label `"Keep existing + generate randomly"`; `use=False, action="add"` produces `"Keep existing"`.
+- [x] `PartImprovementRule(part_id: Literal["entry_long", "exit_long", "entry_short", "exit_short", "order_types", "stop_loss", "profit_target", "trailing_stop"], use: bool = False, action: Literal["add_or_replace", "add", "replace"] = "replace", min_conditions: int = 1, max_conditions: int = 3)` and `PartsToImproveSettings(enabled: bool = False, source_strategy_id: str | None = None, rules: tuple[PartImprovementRule, ...] = ...)`.
+- [x] `SettingsPartsToImproveService.describe_rules(settings: PartsToImproveSettings) -> dict[str, str]` -> Map each `PartImprovementRule` through `improvement_label(use=rule.use, action=rule.action)` from `app/workspace/builder/improvement_labels.py`. Validate `1 <= min_conditions <= max_conditions <= 10` (`DomainError(code="BUILDER_INVALID_IMPROVEMENT_BOUNDS")`).
+- [x] Golden fixture: rule with `use=True, action="add"` produces label `"Keep existing + generate randomly"`; `use=False, action="add"` produces `"Keep existing"`.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_settings_parts_to_improve.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/SettingsPartsToImprove.test.tsx` -> exits `0`.
@@ -344,9 +345,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsRankings/RankingService.js`; `FitnessFunction/FitnessFunctionService.js`.
 *Evidence ID:* `OBS-HARU-BLD-REUSE-20261029`. Literal frontend request vocabulary: `rankingsettings/getDefaultWFConditions`, `project/changeMaxRecords`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `RankingFilterCondition(column_id: str, operator: Literal[">", ">=", "<", "<=", "=="], threshold: float, sample_type: str = "FullSample", enabled: bool = True)` and `RankingsSettings(target_databank: str = "Results", max_records: int = 1000, stop_when_databank_full: bool = False, fitness_config: FitnessMethodStrategyResultConfig = ..., conditions: tuple[RankingFilterCondition, ...] = ...)`.
-- [ ] `SettingsRankingsService` methods: `change_max_records(project_id: str, databank_name: str, max_records: int) -> StandardResponse[int]`, `evaluate_candidate(stats: StrategyStatsSnapshot, settings: RankingsSettings) -> tuple[bool, float, tuple[str, ...]]` (returns `(passed, fitness_score, failed_condition_descriptions)`). Validate `1 <= max_records <= 100_000` (`DomainError(code="BUILDER_INVALID_MAX_RECORDS")`).
-- [ ] Golden fixture: candidate with `ProfitFactor=1.45, NumberOfTrades=120, ReturnDDRatio=2.5` evaluated against `ProfitFactor >= 1.3` and `NumberOfTrades >= 100` returns `passed == True` and `failed_condition_descriptions == ()`.
+- [x] `RankingFilterCondition(column_id: str, operator: Literal[">", ">=", "<", "<=", "=="], threshold: float, sample_type: str = "FullSample", enabled: bool = True)` and `RankingsSettings(target_databank: str = "Results", max_records: int = 1000, stop_when_databank_full: bool = False, fitness_config: FitnessMethodStrategyResultConfig = ..., conditions: tuple[RankingFilterCondition, ...] = ...)`.
+- [x] `SettingsRankingsService` methods: `change_max_records(project_id: str, databank_name: str, max_records: int) -> StandardResponse[int]`, `evaluate_candidate(stats: StrategyStatsSnapshot, settings: RankingsSettings) -> tuple[bool, float, tuple[str, ...]]` (returns `(passed, fitness_score, failed_condition_descriptions)`). Validate `1 <= max_records <= 100_000` (`DomainError(code="BUILDER_INVALID_MAX_RECORDS")`).
+- [x] Golden fixture: candidate with `ProfitFactor=1.45, NumberOfTrades=120, ReturnDDRatio=2.5` evaluated against `ProfitFactor >= 1.3` and `NumberOfTrades >= 100` returns `passed == True` and `failed_condition_descriptions == ()`.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_settings_rankings.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/SettingsRankings.test.tsx` -> exits `0`.
@@ -365,9 +366,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/SettingsWhatToBuild/views/settings/buildMode/BuildModeService.js`; `conditionsAndPeriods/ConditionsAndPeriodsService.js`.
 *Evidence ID:* `OBS-HARU-BLD-REUSE-20261029`. Literal frontend request vocabulary: `buildType/listFiles`, `buildType/getTemplateConfig`, `project/checkTemplateResources`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `WhatToBuildSettings(build_mode: Literal["GENETIC", "RANDOM", "TEMPLATE"] = "GENETIC", template_path: str | None = None, direction: Literal["LONG_ONLY", "SHORT_ONLY", "LONG_SHORT_SYMMETRIC", "LONG_SHORT_INDEPENDENT"] = "LONG_SHORT_SYMMETRIC", min_entry_conditions: int = 1, max_entry_conditions: int = 3, min_exit_conditions: int = 1, max_exit_conditions: int = 2, min_indicator_period: int = 5, max_indicator_period: int = 50, max_shift: int = 3, stop_loss_mode: Literal["REQUIRED", "OPTIONAL", "NOT_USED"] = "REQUIRED", profit_target_mode: Literal["REQUIRED", "OPTIONAL", "NOT_USED"] = "OPTIONAL")`.
-- [ ] `SettingsWhatToBuildService` methods: `list_template_files()`, `get_template_config(template_path: str)`, `check_template_resources(template_path: str) -> bool`, and `validate(settings: WhatToBuildSettings) -> WhatToBuildSettings`. Validate `1 <= min_entry_conditions <= max_entry_conditions <= 10` and `2 <= min_indicator_period <= max_indicator_period <= 500` (`DomainError(code="BUILDER_INVALID_WHAT_TO_BUILD")`).
-- [ ] Golden fixture: `build_mode="TEMPLATE"` with `template_path=None` raises `DomainError(code="BUILDER_TEMPLATE_PATH_REQUIRED")`; valid `"GENETIC"` config passes validation unchanged.
+- [x] `WhatToBuildSettings(build_mode: Literal["GENETIC", "RANDOM", "TEMPLATE"] = "GENETIC", template_path: str | None = None, direction: Literal["LONG_ONLY", "SHORT_ONLY", "LONG_SHORT_SYMMETRIC", "LONG_SHORT_INDEPENDENT"] = "LONG_SHORT_SYMMETRIC", min_entry_conditions: int = 1, max_entry_conditions: int = 3, min_exit_conditions: int = 1, max_exit_conditions: int = 2, min_indicator_period: int = 5, max_indicator_period: int = 50, max_shift: int = 3, stop_loss_mode: Literal["REQUIRED", "OPTIONAL", "NOT_USED"] = "REQUIRED", profit_target_mode: Literal["REQUIRED", "OPTIONAL", "NOT_USED"] = "OPTIONAL")`.
+- [x] `SettingsWhatToBuildService` methods: `list_template_files()`, `get_template_config(template_path: str)`, `check_template_resources(template_path: str) -> bool`, and `validate(settings: WhatToBuildSettings) -> WhatToBuildSettings`. Validate `1 <= min_entry_conditions <= max_entry_conditions <= 10` and `2 <= min_indicator_period <= max_indicator_period <= 500` (`DomainError(code="BUILDER_INVALID_WHAT_TO_BUILD")`).
+- [x] Golden fixture: `build_mode="TEMPLATE"` with `template_path=None` raises `DomainError(code="BUILDER_TEMPLATE_PATH_REQUIRED")`; valid `"GENETIC"` config passes validation unchanged.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_settings_what_to_build.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/SettingsWhatToBuild.test.tsx` -> exits `0`.
@@ -386,10 +387,10 @@ Each module below defines its authorized target paths, backend/frontend contract
 *Context to Read:* `DONOR_REFERENCE_ROOT/internal/plugins/TaskBuild/BuildTaskService.js`; `app/core/trading/generation/`; `MAP-001`.
 *Evidence ID:* `MAP-001`. Literal frontend request vocabulary: `indyTester/calibrate`.
 *Functional Requirements & Authorized Contract:*
-- [ ] `TaskBuildSummary(build_mode: str, generations_completed: int, candidates_evaluated: int, candidates_accepted: int, candidates_rejected: int, best_fitness: float, accepted_strategy_ids: tuple[str, ...])`.
-- [ ] `TaskBuildRunner.calibrate_indicators(blocks: BlocksSelectionSettings, bars: Sequence[BarRecord]) -> dict[str, tuple[float, float]]` (computes observed `(min, max)` output ranges for enabled oscillator/level blocks on the calibration bar slice) and `TaskBuildRunner.execute(project_id: str, what_to_build: WhatToBuildSettings, genetic_options: GeneticOptionsDefaults, blocks: BlocksSelectionSettings, parts_to_improve: PartsToImproveSettings, rankings: RankingsSettings, *, seed: int = 42) -> TaskBuildSummary`.
-- [ ] Delegate genetic evolution (population initialization, tournament selection, single-point AST crossover, subtree/parameter mutation, island migration every `migration_modulo` generations, stagnation restart after `evo_stagnation_generations`) to Core `GenerationEngine`, storing accepted candidates in `rankings.target_databank` up to `rankings.max_records`.
-- [ ] Golden fixture: running `TaskBuildRunner.execute` with `population_size=4, max_generations=2, islands=1, seed=42` evaluates `8` candidates deterministically and records passing candidates in `"Results"` databank.
+- [x] `TaskBuildSummary(build_mode: str, generations_completed: int, candidates_evaluated: int, candidates_accepted: int, candidates_rejected: int, best_fitness: float, accepted_strategy_ids: tuple[str, ...])`.
+- [x] `TaskBuildRunner.calibrate_indicators(blocks: BlocksSelectionSettings, bars: Sequence[BarRecord]) -> dict[str, tuple[float, float]]` (computes observed `(min, max)` output ranges for enabled oscillator/level blocks on the calibration bar slice) and `TaskBuildRunner.execute(project_id: str, what_to_build: WhatToBuildSettings, genetic_options: GeneticOptionsDefaults, blocks: BlocksSelectionSettings, parts_to_improve: PartsToImproveSettings, rankings: RankingsSettings, *, seed: int = 42) -> TaskBuildSummary`.
+- [x] Delegate genetic evolution (population initialization, tournament selection, single-point AST crossover, subtree/parameter mutation, island migration every `migration_modulo` generations, stagnation restart after `evo_stagnation_generations`) to Core `GenerationEngine`, storing accepted candidates in `rankings.target_databank` up to `rankings.max_records`.
+- [x] Golden fixture: running `TaskBuildRunner.execute` with `population_size=4, max_generations=2, islands=1, seed=42` evaluates `8` candidates deterministically and records passing candidates in `"Results"` databank.
 *Verification:*
 - `uv run python -m pytest tests/workspace/builder/test_task_build.py --no-cov -q` -> exits `0`.
 - `npm --prefix app/web test -- tests/workspace/builder/TaskBuild.test.tsx` -> exits `0`.
@@ -443,9 +444,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 
 *Create only:* `app/extend/formulas/close_size/full_position.py`; `tests/extend/formulas/close_size/test_full_position.py`. Local helper has no prerequisite on an unimplemented trading engine. Define class `FullPosition` with `evaluate_formula(self, strategy: object, symbol: str, price: float, direction: int) -> float` returning `0.0`; it must not inspect or mutate strategy or validate/use the other arguments. These Python type annotations are the target adaptation of the observed evaluation signature. No registry descriptor or execution adapter in this commit.
 
-- [ ] `test_returns_zero_for_both_directions` evaluates direction -1 and 1, each yielding float 0.0.
-- [ ] `test_does_not_access_strategy` passes an object whose attribute access raises and verifies successful evaluation.
-- [ ] `test_has_no_state` calls one instance for two symbols/prices and verifies the same result.
+- [x] `test_returns_zero_for_both_directions` evaluates direction -1 and 1, each yielding float 0.0.
+- [x] `test_does_not_access_strategy` passes an object whose attribute access raises and verifies successful evaluation.
+- [x] `test_has_no_state` calls one instance for two symbols/prices and verifies the same result.
 
 *Acceptance:* `uv run python -m pytest tests/extend/formulas/close_size/test_full_position.py -q` exits 0 with the three named tests. One commit: `feat(formulas): define full-position close-size sentinel`. Full order sizing semantics and all other formulas remain outside this release.
 
@@ -455,9 +456,9 @@ Each module below defines its authorized target paths, backend/frontend contract
 
 *Create only:* `app/workspace/builder/improvement_labels.py`; `tests/workspace/builder/test_improvement_labels.py`. Define `improvement_label(*, use: bool, action: str | None) -> str`; normalized target action IDs are `add_or_replace`, `add`, `replace` (a target decision; do not equate these strings with donor numeric constants). Do not localize in this helper.
 
-- [ ] When use is false return `Keep existing` for every action.
-- [ ] Otherwise `add_or_replace` returns `Keep existing or generate randomly`; `add` returns `Keep existing + generate randomly`; `replace`, None, an empty string and unrecognized actions return `Generate randomly`.
-- [ ] Tests `test_disabled_keeps_existing`, `test_add_or_replace`, `test_add`, `test_other_actions_generate` assert these exact strings, with the last test parameterized over replace/None/empty/unknown.
+- [x] When use is false return `Keep existing` for every action.
+- [x] Otherwise `add_or_replace` returns `Keep existing or generate randomly`; `add` returns `Keep existing + generate randomly`; `replace`, None, an empty string and unrecognized actions return `Generate randomly`.
+- [x] Tests `test_disabled_keeps_existing`, `test_add_or_replace`, `test_add`, `test_other_actions_generate` assert these exact strings, with the last test parameterized over replace/None/empty/unknown.
 
 *Acceptance:* `uv run python -m pytest tests/workspace/builder/test_improvement_labels.py -q` exits 0 and collects seven cases across the four named test functions. One commit: `feat(builder): define improvement condition labels`.
 
