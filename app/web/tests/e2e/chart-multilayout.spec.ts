@@ -140,7 +140,7 @@ test('crosshair and time window synchronization propagate to other chart canvase
   const input = panes.nth(0).getByTestId('chart-input');
   const bounds = (await input.boundingBox())!;
   await page.mouse.move(bounds.x + Math.min(140, bounds.width - 80), bounds.y + 90);
-  await expect.poll(() => secondHost.getAttribute('data-linked-crosshair-time')).not.toBe('');
+  await expect.poll(() => secondHost.getAttribute('data-linked-crosshair-time')).toMatch(/^\\d+$/);
   await picker.click();
   const menu = page.getByRole('dialog', { name: 'Select layout' });
   await menu.getByRole('switch', { name: 'Sync Crosshair' }).click();
