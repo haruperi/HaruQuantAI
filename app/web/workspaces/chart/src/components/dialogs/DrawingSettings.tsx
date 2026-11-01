@@ -108,12 +108,30 @@ export function DrawingSettings() {
           </div>
         )}
         <label>
-          Text label
-          <input
-            aria-label="Drawing text"
-            value={drawing.text}
-            onChange={(e) => update({ text: e.target.value })}
-          />
+          {drawing.tool === 'Image' ? 'Image URL (HTTPS or HTTP)' : drawing.tool === 'Table' ? 'Table cells (pipe-separated columns)' : 'Text label'}
+          {drawing.tool === 'Image' ? (
+            <input
+              type="url"
+              aria-label="Image URL"
+              placeholder="https://example.com/chart.png"
+              value={drawing.text}
+              onChange={(e) => update({ text: e.target.value })}
+            />
+          ) : ['Note', 'PriceNote', 'Table', 'Callout', 'Comment', 'Post', 'Idea'].includes(drawing.tool) ? (
+            <textarea
+              aria-label="Drawing text"
+              rows={drawing.tool === 'Table' ? 5 : 4}
+              placeholder={drawing.tool === 'Table' ? 'Field | Value\nPrice | 123.45' : 'Enter annotation text'}
+              value={drawing.text}
+              onChange={(e) => update({ text: e.target.value })}
+            />
+          ) : (
+            <input
+              aria-label="Drawing text"
+              value={drawing.text}
+              onChange={(e) => update({ text: e.target.value })}
+            />
+          )}
         </label>
         {drawing.tool === 'TrendLine' && (
           <>
