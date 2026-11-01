@@ -1008,14 +1008,15 @@ export class ChartEngine {
         ctx.lineTo(this.plotWidth, y);
         ctx.stroke();
         const value = transformPrice(tick, c.scale, this.anchor());
-        ctx.fillText(
-          c.scale === 'log'
-            ? formatPrice(tick, c.precision)
-            : formatPrice(value, c.scale === 'percent' ? 2 : c.precision) +
-                (c.scale === 'percent' ? '%' : ''),
-          this.plotWidth + 6,
-          y + 4,
-        );
+        if (c.showPriceScaleLabels)
+          ctx.fillText(
+            c.scale === 'log'
+              ? formatPrice(tick, c.precision)
+              : formatPrice(value, c.scale === 'percent' ? 2 : c.precision) +
+                  (c.scale === 'percent' ? '%' : ''),
+            this.plotWidth + 6,
+            y + 4,
+          );
       }
       const step = Math.max(1, Math.ceil(85 / this.spacing));
       for (let i = Math.ceil(start / step) * step; i <= end; i += step) {
@@ -1152,9 +1153,9 @@ export class ChartEngine {
         const config = s.indicators.find((i) => i.id === pane.configId);
         ctx.fillStyle = muted;
         ctx.fillText(config?.kind ?? 'Volume', 12, pane.top + 16);
-        for (const tick of niceTicks(pane.min, pane.max, 3)) {
-          ctx.fillText(formatPrice(tick, 1), this.plotWidth + 5, y(tick) + 4);
-        }
+        if (c.showPriceScaleLabels)
+          for (const tick of niceTicks(pane.min, pane.max, 3))
+            ctx.fillText(formatPrice(tick, 1), this.plotWidth + 5, y(tick) + 4);
         ctx.save();
         ctx.beginPath();
         ctx.rect(0, pane.top, this.plotWidth, pane.height);
@@ -1163,7 +1164,7 @@ export class ChartEngine {
           ctx.globalAlpha = config?.opacity ?? 0.5;
           for (let i = start; i <= end; i++) {
             ctx.fillStyle =
-              config?.color ?? (bars[i].close >= bars[i].open ? '#089981' : '#f23645');
+              config?.color ?? (bars[i].close >= bars[i].open ? c.candleUpColor : c.candleDownColor);
             ctx.fillRect(
               this.x(i) - this.spacing * 0.35,
               y(bars[i].volume),
@@ -1242,10 +1243,10 @@ export class ChartEngine {
     };
     const quote = this.quotes.get(c.symbol);
     const direction = quote ? quote.price >= quote.previous : last.close >= last.open;
-    const liveColor = direction ? '#089981' : '#f23645';
+    const liveColor = direction ? c.candleUpColor : c.candleDownColor;
     if (c.showLastPriceLine)
       chip(last.close, formatPrice(last.close, c.precision), liveColor);
-    if (!s.ui.replay && this.now() - this.tickAt < 180) {
+    if (c.showLastPriceLine && c.showPriceScaleLabels && !s.ui.replay && this.now() - this.tickAt < 180) {
       ctx.save();
       ctx.globalAlpha = 0.18 * (1 - (this.now() - this.tickAt) / 180);
       ctx.fillStyle = '#ffffff';
@@ -1270,7 +1271,7 @@ export class ChartEngine {
         Math.floor((remaining / 1000) % 60)
           .toString()
           .padStart(2, '0');
-    if (c.countdown && !s.ui.replay) {
+    if (c.countdown && c.showPriceScaleLabels && !s.ui.replay) {
       ctx.fillStyle = muted;
       ctx.fillText(
         marketOpen(c.symbol, this.now()) ? countdown : 'Closed',
