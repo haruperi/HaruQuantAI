@@ -1017,6 +1017,31 @@ test('package compilation, compile all and extension reload use distinct scopes'
   expect(requests[0].file_path).toBe('app/include/user/package');
 });
 
+test('compilation results stay behind a compact status summary and surface failed files', async ({ page }) => {
+  await mockEditor(page);
+  const file = 'app/include/blocks/indicators/custom/example.py';
+  await page.route('**/code-editor/compilations', route => route.fulfill({ json: { status: 'success', data: {
+    job_id: 'editor-failed-file', status: 'COMPLETED', progress: 100,
+    message: 'Compilation completed with diagnostics', cancellation_requested: false,
+    results: [{ file, success: false, errors: [{ line: 1, column: 1, severity: 'error', message: 'Compilation failed' }] }],
+  } } }));
+  await page.goto('/codeeditor');
+
+  const commands = page.getByRole('region', { name: 'Editor commands' });
+  const summary = commands.getByRole('status', { name: 'Compilation status' });
+  await expect(summary).toContainText('COMPLETED');
+  await expect(summary).toContainText('1 failed');
+  await expect(commands.getByRole('region', { name: 'Compilation details panel' })).toHaveCount(0);
+
+  const details = commands.getByRole('button', { name: 'Compilation details', exact: true });
+  await details.click();
+  const panel = commands.getByRole('region', { name: 'Compilation details panel' });
+  await expect(panel.getByRole('button', { name: file + ' Failed' })).toBeVisible();
+  await expect(details).toHaveAttribute('aria-expanded', 'true');
+  await details.click();
+  await expect(panel).toHaveCount(0);
+});
+
 test('builtin protection makes the buffer read only and ownership filtering reaches the service', async ({ page }) => {
   await mockEditor(page);
   const filters: string[] = [];
@@ -1030,6 +1055,7 @@ test('builtin protection makes the buffer read only and ownership filtering reac
   });
   await page.goto('/codeeditor');
   await expect(page.getByRole('textbox', { name: 'Source code editor', exact: true })).toHaveAttribute('contenteditable', 'false');
+  await page.getByRole('button', { name: 'Options', exact: true }).click();
   await page.getByRole('combobox', { name: 'Navigator ownership', exact: true }).selectOption('builtin');
   await expect.poll(() => filters.includes('builtin')).toBe(true);
 });
@@ -1042,6 +1068,7 @@ test('code export creation uses the selected supported format', async ({ page })
     return route.fulfill({ json: { status: 'success', data: { file_path: 'app/include/user/code_templates/pseudocode/new.txt.tpl', status: 'saved', bytes_written: 10, diagnostics: [] } } });
   });
   await page.goto('/codeeditor');
+  await page.getByRole('button', { name: 'Options', exact: true }).click();
   await page.getByRole('combobox', { name: 'Export template format' }).selectOption('pseudocode');
   page.once('dialog', dialog => dialog.accept('app/include/user/code_templates/pseudocode/new.txt.tpl'));
   await page.getByRole('button', { name: 'Create export template', exact: true }).click();
