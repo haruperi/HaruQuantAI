@@ -23,6 +23,8 @@ export const defaults: Settings = {
   precision: 2,
   countdown: true,
   magnet: false,
+  magnetStrength: 'weak',
+  snapToIndicators: false,
   volume: true,
   previousClose: false,
   tooltip: false,
