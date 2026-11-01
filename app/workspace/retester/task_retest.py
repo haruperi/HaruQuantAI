@@ -1,9 +1,9 @@
 """Retester execution runner and cross-check pipeline orchestrator.
 
 Description:
-    Implements TaskRetestRunner coordinating preflight checks, same-databank
-    result clearing (preserving strategy definitions), main backtests,
-    and sequential robustness cross-checks.
+    Delegates validated native snapshots to actual Core main backtests and
+    preserves earlier results. Missing execution inputs and unimplemented
+    robustness modes fail closed.
 
 Purpose:
     FEAT-RETESTER-TASK-RUNNER: Core execution pipeline for strategy retesting.
@@ -24,24 +24,18 @@ CLI Usage:
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any, ClassVar
 
 from app.core.host.logging import get_logger
+from app.core.jobs.manager import JobContext
 from app.core.lib.errors import DomainError
-from app.workspace.retester.cross_check_what_if import (
-    CrossCheckWhatIfService,
-    WhatIfCrossCheckConfig,
-)
-from app.workspace.retester.preflight import RetestPreflight
+from app.workspace.home.execution import ExecutionSnapshot, ProjectExecutor
 from app.workspace.retester.settings_auto_retest_data import AutoRetestDataSettings
 from app.workspace.retester.settings_cross_checks import (
     CrossChecksSettingsSnapshot,
-    SettingsCrossChecksService,
 )
 from app.workspace.retester.settings_what_to_retest import (
-    SettingsWhatToRetestService,
     WhatToRetestSettings,
 )
 
@@ -77,71 +71,6 @@ class TaskRetestRunner:
     _running_projects: ClassVar[set[str]] = set()
 
     @classmethod
-    def _clear_same_databank_results(
-        cls,
-        what_to_retest: WhatToRetestSettings,
-        source_keys: Sequence[str],
-        stored_results: dict[str, dict[str, Any]] | None,
-        logs: list[str],
-    ) -> None:
-        """Clear previous sub-results while preserving strategy definitions."""
-        if (
-            what_to_retest.source_databank != what_to_retest.target_databank
-            or stored_results is None
-        ):
-            return
-
-        target_keys = (
-            what_to_retest.selected_keys
-            if what_to_retest.selected_keys is not None
-            else source_keys
-        )
-        for k in target_keys:
-            if k in stored_results:
-                stored_results[k] = {}
-
-        logs.append(
-            f"Cleared previous sub-results in databank {what_to_retest.target_databank}"
-        )
-
-    @classmethod
-    def _evaluate_cross_checks(
-        cls,
-        data_settings: AutoRetestDataSettings,
-        cross_checks: CrossChecksSettingsSnapshot,
-    ) -> bool:
-        """Evaluate enabled cross-checks in canonical pipeline order."""
-        if not cross_checks.enabled:
-            return True
-
-        if cross_checks.what_if.enabled:
-            wi_cfg = WhatIfCrossCheckConfig(
-                enabled=True,
-                acceptance_conditions=cross_checks.what_if.acceptance_conditions,
-            )
-            wi_res = CrossCheckWhatIfService.run(
-                (), data_settings.initial_capital, wi_cfg
-            )
-            if not wi_res.passed:
-                return False
-
-        return True
-
-    @classmethod
-    def _apply_dismissal(
-        cls,
-        strat_id: str,
-        what_to_retest: WhatToRetestSettings,
-        databank_strategies: dict[str, list[str]] | None,
-    ) -> None:
-        """Remove failed strategy from target databank if dismiss_failed is set."""
-        if not what_to_retest.dismiss_failed or databank_strategies is None:
-            return
-        target_list = databank_strategies.get(what_to_retest.target_databank)
-        if target_list is not None and strat_id in target_list:
-            target_list.remove(strat_id)
-
-    @classmethod
     def execute(
         cls,
         project_id: str,
@@ -151,6 +80,9 @@ class TaskRetestRunner:
         *,
         databank_strategies: dict[str, list[str]] | None = None,
         stored_results: dict[str, dict[str, Any]] | None = None,
+        execution: ProjectExecutor | None = None,
+        snapshot: ExecutionSnapshot | None = None,
+        context: JobContext | None = None,
     ) -> TaskRetestSummary:
         """Execute retest workflow following OBS-145-RETEST-PREFLIGHT-002 order.
 
@@ -160,7 +92,10 @@ class TaskRetestRunner:
             data_settings: Market/data configuration.
             cross_checks: Master cross-checks settings.
             databank_strategies: Optional in-memory map of databank -> strats.
-            stored_results: Optional in-memory map of strategy_id -> results.
+            stored_results: Legacy in-memory results, preserved unchanged.
+            execution: Injected Core-backed execution owner.
+            snapshot: Validated immutable native task inputs.
+            context: Host cooperative lifecycle context.
 
         Returns:
             TaskRetestSummary with total, processed, passed, and failed counts.
@@ -168,80 +103,33 @@ class TaskRetestRunner:
         Raises:
             DomainError: If retest is already active for this project.
         """
-        if project_id in cls._running_projects:
-            logger.error(
-                "FR-retest-task-execute: project %s already running", project_id
-            )
+        logger.info(
+            "FR-retest-task-execute: native snapshot supersedes legacy inputs "
+            "(source=%s, capital=%s, banks=%d, results=%d)",
+            what_to_retest.source_databank,
+            data_settings.initial_capital,
+            len(databank_strategies or {}),
+            len(stored_results or {}),
+        )
+        if execution is None or snapshot is None or context is None:
             raise DomainError(
-                code="RETESTER_ALREADY_RUNNING",
-                message=f"Retest task for project {project_id} is already in progress",
+                code="EXECUTION_CONTEXT_REQUIRED",
+                message="Retester requires a validated native execution snapshot",
             )
-
-        cls._running_projects.add(project_id)
-        logs: list[str] = []
-
-        try:
-            SettingsWhatToRetestService.validate_settings(what_to_retest)
-            db_map = (
-                databank_strategies
-                if databank_strategies is not None
-                else {"Results": ["s1", "s2"]}
+        if snapshot.project_id != project_id or cross_checks.enabled:
+            raise DomainError(
+                code="UNSUPPORTED_MODE",
+                message="Only snapshot-backed main retests are available",
             )
-            source_keys = tuple(db_map.get(what_to_retest.source_databank, []))
-
-            keys_to_retest = RetestPreflight.record_keys(
-                databank_keys=source_keys,
-                selected_keys=what_to_retest.selected_keys,
-            )
-
-            if len(keys_to_retest) == 0:
-                msg = "No strategies to retest"
-                logs.append(msg)
-                logger.info("FR-retest-task-execute: %s", msg)
-                return TaskRetestSummary(
-                    mode=1,
-                    total_keys=0,
-                    processed=0,
-                    passed=0,
-                    failed=0,
-                    log_messages=tuple(logs),
-                )
-
-            cls._clear_same_databank_results(
-                what_to_retest, source_keys, stored_results, logs
-            )
-
-            mode = SettingsCrossChecksService.resolve_mode(cross_checks)
-            logs.append(f"Initialized execution in mode {mode}")
-
-            processed = 0
-            passed_count = 0
-            failed_count = 0
-
-            for strat_id in keys_to_retest:
-                processed += 1
-                strat_passed = cls._evaluate_cross_checks(data_settings, cross_checks)
-
-                if strat_passed:
-                    passed_count += 1
-                else:
-                    failed_count += 1
-                    cls._apply_dismissal(strat_id, what_to_retest, databank_strategies)
-
-            logs.append(
-                f"Completed retesting {processed} strategies: "
-                f"{passed_count} passed, {failed_count} failed"
-            )
-            logger.info("FR-retest-task-execute: %s", logs[-1])
-
-            return TaskRetestSummary(
-                mode=mode,
-                total_keys=len(keys_to_retest),
-                processed=processed,
-                passed=passed_count,
-                failed=failed_count,
-                log_messages=tuple(logs),
-            )
-
-        finally:
-            cls._running_projects.discard(project_id)
+        logger.info(
+            "FR-retest-task-execute: evaluating validated snapshot for %s", project_id
+        )
+        receipt = execution.run(context, snapshot)
+        return TaskRetestSummary(
+            mode=1,
+            total_keys=int(receipt["candidates_evaluated"]),
+            processed=int(receipt["candidates_evaluated"]),
+            passed=int(receipt["candidates_accepted"]),
+            failed=int(receipt["candidates_rejected"]),
+            log_messages=("Evaluated actual bars; previous results preserved",),
+        )

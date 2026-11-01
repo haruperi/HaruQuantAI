@@ -1,3 +1,6 @@
+import { useState, type CSSProperties } from 'react';
+import { SqdModal } from '../../../common/project/ProjectModal';
+import { useProjectBinding } from '../projectController';
 import { NewAnalysisModal } from './newCustomPluginModal';
 import type {ResultSection} from '../../../common/project/contracts';
 import type { ResultDocument } from '../../../common/project/results/resultsModel';
@@ -30,13 +33,19 @@ export function ProjectResults({ result, extraSections=[], embedded=false, visib
     extraSections?:ResultSection[];
     result: ResultDocument | null;
 }) {
+    const binding = useProjectBinding();
+    const [analysisName, setAnalysisName] = useState('');
     const { activeId, setActiveId, customTabs, newOpen, setNewOpen, renameTarget, setRenameTarget, deleteTarget, setDeleteTarget, menuFor, setMenuFor, resetKey, tabs, active, onReload, onCreate, onRename, onDelete } = useProjectResults(result, extraSections, visibleTabIds);
-    return (<div className={`sqr-results${embedded ? ' sqr-embedded' : ''}`} key={resetKey}>
+    return (<div className={`sqr-results${embedded ? ' sqr-embedded' : ''}`} key={resetKey} style={binding ? { position: 'relative', flex: 1, minHeight: 0,
+        '--sqx-panel': 'var(--panel)', '--sqx-card': 'var(--panel)',
+        '--sqx-tab-bg': 'var(--panel2)', '--sqx-tab-border': 'var(--line)',
+        '--sqx-text': 'var(--text)', '--sqx-info-line': 'var(--muted)',
+      } as CSSProperties : undefined}>
       <div className="sqr-info-line">{result ? `${result.name} — Main backtest | Local mock results` : emptyMessage}</div>
       <div className="sqr-tabs-header" role="tablist" aria-label="Result views">
         {tabs.map(tab => {
             const isActive = tab.id === active.id;
-            return (<div key={tab.id} role="tab" tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") {
+            return (<div key={tab.id} role="tab" aria-label={tab.title} tabIndex={0} onKeyDown={e => { if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 setActiveId(tab.id);
             } }} aria-selected={isActive} className={`${isActive ? 'active' : ''}${tab.isCustom ? ' sqr-tab-custom' : ''}`} onClick={() => setActiveId(tab.id)}>
@@ -88,9 +97,13 @@ export function ProjectResults({ result, extraSections=[], embedded=false, visib
         {Object.entries({ overview: <OverviewTab result={result}/>, spOverview: <SpOverviewTab result={result}/>, tradeList: <TradeListTab result={result}/>, equityChart: <EquityChartTab result={result}/>, tradeAnalysis: <TradeAnalysisTab result={result}/>, profileChart: <ProfileChartTab result={result}/>, strategyConfig: <StrategyConfigTab result={result}/>, sourceCode: <SourceCodeTab result={result}/> }).map(([id, content]) => <div key={id} hidden={active.id !== id} className="sqr-panel-slot">{content}</div>)}
         {['monteCarloTests', 'tradesOnChart', 'stockpicker', 'correlation'].includes(active.id) && result && <ConditionalTabs id={active.id} result={result}/>}
         {extraSections.map(section=><div key={section.id} hidden={active.id!==section.id} className="sqr-panel-slot">{section.content}</div>)}
-        {active.id.startsWith('custom:') && <CustomAnalysisTab name={active.title} result={result}/>}
+        {active.id.startsWith('custom:') && (binding ? <div className="sqr-content"><h3>{active.title}</h3><p>This analysis definition is saved. No analysis provider is configured.</p></div> : <CustomAnalysisTab name={active.title} result={result}/>)}
       </div>
-      {newOpen && (<NewAnalysisModal existingNames={customTabs} onClose={() => setNewOpen(false)} onCreate={onCreate}/>)}
+      {newOpen && (binding ? <SqdModal title="Create custom analysis" onClose={() => setNewOpen(false)}>
+        <p>Save a named analysis definition in this project. An analysis provider can be configured separately.</p>
+        <label>Name<input aria-label="Name of custom plugin tab" className="sqd-input" value={analysisName} onChange={event => setAnalysisName(event.target.value)} /></label>
+        <button className="sqd-btn" disabled={binding.state.busy || !analysisName.trim() || customTabs.includes(analysisName.trim())} onClick={() => void onCreate(analysisName.trim())}>Create</button>
+      </SqdModal> : <NewAnalysisModal existingNames={customTabs} onClose={() => setNewOpen(false)} onCreate={onCreate}/>)}
       {renameTarget != null && (<RenameAnalysisModal currentName={renameTarget} existingNames={customTabs} onClose={() => setRenameTarget(null)} onRename={onRename}/>)}
       {deleteTarget != null && (<DeleteAnalysisModal name={deleteTarget} onClose={() => setDeleteTarget(null)} onDelete={onDelete}/>)}
     </div>);

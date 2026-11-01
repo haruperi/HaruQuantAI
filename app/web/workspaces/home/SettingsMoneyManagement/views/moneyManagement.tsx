@@ -3,7 +3,7 @@ import { SqdFieldset, SqdSpinner } from '../../../../common/project/settings/Set
 
 /** "Money management" tab (donor evidence retained target UI; current donor equivalence unverified). */
 export function MoneyManagementTab() {
-  const { initialCapital, setInitialCapital, methods, setMethods, patch } = useMoneyManagementController();
+  const { bound, clearMethod, initialCapital, setInitialCapital, methods, setMethods, patch } = useMoneyManagementController();
 
   return (
     <div className="money-management sqd-tab-content">
@@ -15,6 +15,7 @@ export function MoneyManagementTab() {
       </SqdFieldset>
 
       <SqdFieldset legend="Choose Money Management method">
+        {bound && <><p>Fixed size uses the shared position-sizing owner. Other methods are unavailable for this mode.</p><button type="button" className="sqd-btn" onClick={clearMethod}>Use strategy volumes</button></>}
         <div className="sqd-mm-grid" role="table" aria-label="Money management methods">
           {methods.map(method => (
             <div className={`sqd-mm-row${method.use ? ' active' : ''}`} role="row" key={method.key}>
@@ -22,6 +23,7 @@ export function MoneyManagementTab() {
                 <input
                   type="radio"
                   name="mmMethod"
+                  disabled={bound && method.key !== 'FixedSize'}
                   checked={method.use}
                   onChange={() => setMethods(current => current.map(m => ({ ...m, use: m.key === method.key })))}
                 />

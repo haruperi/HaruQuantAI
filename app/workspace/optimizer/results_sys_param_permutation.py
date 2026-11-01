@@ -192,7 +192,7 @@ class ResultsSysParamPermutationService:
         min_v = min(np_vals)
         max_v = max(np_vals)
         if min_v == max_v:
-            hist_bins = ((min_v, total_perms),)
+            hist_bins: tuple[tuple[float, int], ...] = ((min_v, total_perms),)
         else:
             num_bins = 5
             last_bin_idx = num_bins - 1

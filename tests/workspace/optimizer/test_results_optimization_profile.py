@@ -81,6 +81,9 @@ class TestResultsOptimizationProfileService:
     def test_results_table_and_params(self) -> None:
         """Verify get_available_params, get_results_table, and 1D chart grid."""
         service = ResultsOptimizationProfileService()
+        with pytest.raises(DomainError, match="store"):
+            service.get_available_params("Empty")
+        service.set_mock_runs("Empty", [])
         assert service.get_available_params("Empty") == ()
 
         runs = [

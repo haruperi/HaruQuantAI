@@ -1,61 +1,48 @@
-"""Unit tests for TaskRetestRunner."""
+"""Retester compatibility runner uses actual snapshot inputs and preserves results."""
 
+from dataclasses import replace
+from pathlib import Path
+from typing import Any
+
+import pytest
+from app.core.lib.errors import DomainError
 from app.workspace.retester.settings_auto_retest_data import AutoRetestDataSettings
-from app.workspace.retester.settings_cross_checks import (
-    CrossChecksSettingsSnapshot,
-    GenericCheckConfig,
-)
+from app.workspace.retester.settings_cross_checks import CrossChecksSettingsSnapshot
 from app.workspace.retester.settings_what_to_retest import WhatToRetestSettings
 from app.workspace.retester.task_retest import TaskRetestRunner
+from tests.workspace.home.test_execution_acceptance import context, project
+from tests.workspace.home.test_execution_acceptance import execution as execution  # noqa: PLC0414
 
 
-class TestTaskRetestRunner:
-    """Test suite for TaskRetestRunner."""
-
-    def test_golden_fixture_empty_selection(self) -> None:
-        """Assert running on selected_keys=() logs 'No strategies to retest' and processed=0."""
-        what = WhatToRetestSettings(selected_keys=())
-        data = AutoRetestDataSettings()
-        checks = CrossChecksSettingsSnapshot()
-
-        summary = TaskRetestRunner.execute("proj_empty", what, data, checks)
-
-        assert summary.processed == 0
-        assert summary.total_keys == 0
-        assert "No strategies to retest" in summary.log_messages
-
-    def test_golden_fixture_same_databank_clearing(self) -> None:
-        """Same source/target databank clears previous results while keeping strategies in databank."""
-        what = WhatToRetestSettings(
-            source_databank="Results",
-            target_databank="Results",
-            selected_keys=("s1", "s2"),
+def test_no_implicit_strategies_or_fabricated_success() -> None:
+    with pytest.raises(DomainError) as caught:
+        TaskRetestRunner.execute(
+            "draft",
+            WhatToRetestSettings(),
+            AutoRetestDataSettings(),
+            CrossChecksSettingsSnapshot(),
         )
-        data = AutoRetestDataSettings()
-        checks = CrossChecksSettingsSnapshot(
-            enabled=True,
-            what_if=GenericCheckConfig(enabled=True),
-        )
+    assert caught.value.code == "EXECUTION_CONTEXT_REQUIRED"
 
-        db_strategies = {"Results": ["s1", "s2"]}
-        stored_results = {
-            "s1": {"Main": 100.0, "Sub": 50.0},
-            "s2": {"Main": 80.0},
-        }
 
-        summary = TaskRetestRunner.execute(
-            "proj_clear",
-            what,
-            data,
-            checks,
-            databank_strategies=db_strategies,
-            stored_results=stored_results,
-        )
-
-        assert summary.processed == 2
-        assert summary.passed == 2
-        # Verify strategies were kept in databank
-        assert db_strategies["Results"] == ["s1", "s2"]
-        # Verify results were cleared
-        assert stored_results["s1"] == {}
-        assert stored_results["s2"] == {}
+def test_actual_retest_preserves_prior_records(execution: Any, tmp_path: Path) -> None:
+    executor, _, results = execution
+    results.save_result(
+        "bank", replace(results.get_result("source"), result_id="source-two")
+    )
+    before = results.get_result("source").to_dict()
+    snapshot = executor.prepare(
+        project(strategy_result_ids=["source", "source-two"]), "task", 1
+    )
+    summary = TaskRetestRunner.execute(
+        "project",
+        WhatToRetestSettings(source_databank="bank", target_databank="bank"),
+        AutoRetestDataSettings(),
+        CrossChecksSettingsSnapshot(enabled=False),
+        execution=executor,
+        snapshot=snapshot,
+        context=context(tmp_path, "retester-compat"),
+    )
+    assert summary.processed == summary.passed == 2
+    assert results.get_result("source").to_dict() == before
+    assert len(results.list_results("bank")) == 4

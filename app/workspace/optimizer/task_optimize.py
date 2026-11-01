@@ -1,10 +1,9 @@
 """Optimizer execution task verifier and runner service.
 
 Description:
-    Implements TaskOptimizeVerifier and TaskOptimizeRunner executing parameter
-    sweeps (Simple, Genetic, Walk-Forward, WF Matrix, SPP, Sequential) over
-    Core OptimizationEngine and BacktestRunner, recording result variants into
-    ResultStore and target databanks.
+    Validates optimizer preconditions and delegates native execution snapshots to
+    actual Core grid backtests. Unsupported modes and missing execution inputs
+    fail closed; no default database or mock profile rows are constructed.
 
 Purpose:
     FEAT-TASK-OPTIMIZE: Parameter search verification and execution engine.
@@ -26,23 +25,21 @@ CLI Usage:
 
 from __future__ import annotations
 
-import itertools
 from dataclasses import dataclass
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.core.host.persistence import HostPersistence
+from app.core.jobs.manager import JobContext
 from app.core.lib.errors import DomainError
 from app.core.trading.optimization.engine import (
     OptimizationEngine,
 )
 from app.core.trading.results.store import ResultStore
+from app.workspace.home.execution import ExecutionSnapshot, ProjectExecutor
 from app.workspace.optimizer.results_optimization_profile import (
-    OptimizationRunRow,
     ResultsOptimizationProfileService,
 )
 from app.workspace.optimizer.settings_optimization import (
-    EXHAUSTIVE_MAX_TESTS,
     OptimizationSettingsSnapshot,
     SettingsOptimizationService,
 )
@@ -136,10 +133,8 @@ class TaskOptimizeRunner:
     ) -> None:
         """Initialize runner with dependencies."""
         self.engine = engine or OptimizationEngine()
-        self.store = store or ResultStore(HostPersistence())
-        self.profile_service = profile_service or ResultsOptimizationProfileService(
-            self.store
-        )
+        self.store = store
+        self.profile_service = profile_service
 
     @classmethod
     def execute(
@@ -148,19 +143,32 @@ class TaskOptimizeRunner:
         settings: OptimizationSettingsSnapshot,
         *,
         seed: int = 42,
+        execution: ProjectExecutor | None = None,
+        snapshot: ExecutionSnapshot | None = None,
+        context: JobContext | None = None,
     ) -> TaskOptimizeSummary:
         """Execute complete optimization sweep across configured parameters.
 
         Args:
             project_id: Project identifier.
             settings: Validated optimization configuration snapshot.
-            seed: Deterministic random seed for reproducibility.
+            seed: Legacy seed; execution uses the captured native snapshot.
+            execution: Injected Core-backed execution owner.
+            snapshot: Validated immutable native task inputs.
+            context: Host cooperative lifecycle context.
 
         Returns:
             TaskOptimizeSummary with evaluations, best parameters, and fitness.
         """
         runner = cls()
-        return runner.run_task(project_id, settings, seed=seed)
+        return runner.run_task(
+            project_id,
+            settings,
+            seed=seed,
+            execution=execution,
+            snapshot=snapshot,
+            context=context,
+        )
 
     def run_task(
         self,
@@ -168,99 +176,37 @@ class TaskOptimizeRunner:
         settings: OptimizationSettingsSnapshot,
         *,
         seed: int = 42,
+        execution: ProjectExecutor | None = None,
+        snapshot: ExecutionSnapshot | None = None,
+        context: JobContext | None = None,
     ) -> TaskOptimizeSummary:
         """Execute task instance."""
         TaskOptimizeVerifier.verify(settings)
-        strategy_id = str(settings.strategy_id)
         logger.info(
-            "Executing task for project %s with seed %d",
-            project_id,
-            seed,
+            "FR-task-optimize-runner: native snapshot supersedes legacy seed %d", seed
         )
-
-        # Generate discrete values per parameter
-        param_dims: list[tuple[str, list[float | int | bool]]] = []
-        for p in settings.parameters:
-            if not p.enabled:
-                param_dims.append((p.name, [p.original_value]))
-            elif p.param_type == "BOOL":
-                param_dims.append((p.name, [False, True]))
-            else:
-                steps = SettingsOptimizationService.count_parameter_steps(p)
-                vals: list[float | int | bool] = []
-                for i in range(steps):
-                    v = p.start + i * p.step
-                    if p.param_type == "INT":
-                        vals.append(round(v))
-                    else:
-                        vals.append(round(v, 6))
-                param_dims.append((p.name, vals))
-
-        # Cartesian product of parameter combinations
-        dim_names = [d[0] for d in param_dims]
-        dim_values = [d[1] for d in param_dims]
-        all_combinations = list(itertools.product(*dim_values))
-
-        # Cap combinations if max_tests is set and not exhaustive
-        if (
-            settings.max_tests != EXHAUSTIVE_MAX_TESTS
-            and len(all_combinations) > settings.max_tests
-        ):
-            all_combinations = all_combinations[: settings.max_tests]
-
-        # Evaluate each parameter variant
-        run_rows: list[OptimizationRunRow] = []
-        best_params: dict[str, float | int | bool] = {}
-        best_fitness = float("-inf")
-
-        for idx, combo in enumerate(all_combinations, start=1):
-            param_map: dict[str, float | int | bool] = dict(
-                zip(dim_names, combo, strict=True)
+        if execution is None or snapshot is None or context is None:
+            raise DomainError(
+                code="EXECUTION_CONTEXT_REQUIRED",
+                message="Optimizer requires a validated native execution snapshot",
             )
-            # Deterministic fitness calculation based on parameter values
-            # (e.g. prioritizing higher Period / values for predictable golden tests)
-            numeric_sum = sum(
-                float(v)
-                for v in param_map.values()
-                if isinstance(v, (int, float)) and not isinstance(v, bool)
+        if snapshot.project_id != project_id or settings.optimization_type != "SIMPLE":
+            raise DomainError(
+                code="UNSUPPORTED_MODE",
+                message="Only snapshot-backed grid optimization is available",
             )
-            fitness = round(100.0 + numeric_sum * 5.0, 4)
-
-            if fitness > best_fitness:
-                best_fitness = fitness
-                best_params = param_map
-
-            run_rows.append(
-                OptimizationRunRow(
-                    run_index=idx,
-                    parameters={
-                        k: float(v)
-                        if isinstance(v, (int, float)) and not isinstance(v, bool)
-                        else (1.0 if v else 0.0)
-                        for k, v in param_map.items()
-                    },
-                    metrics={"NetProfit": fitness, "Fitness": fitness},
-                    passed=True,
-                )
-            )
-
-        # Register runs in profile service
-        self.profile_service.set_mock_runs(strategy_id, run_rows)
-
-        # Persist summary in ResultStore if existing run result exists
-        stored_ids = (strategy_id,)
         logger.info(
-            "TaskOptimize done for %s: %d evals, best=%f, params=%s",
-            strategy_id,
-            len(run_rows),
-            best_fitness,
-            best_params,
+            "FR-task-optimize-runner: evaluating validated snapshot for %s", project_id
         )
-
+        receipt = execution.run(context, snapshot)
+        if receipt["best_fitness"] is None:
+            raise DomainError(
+                code="NO_FINITE_RESULTS", message="All evaluations were rejected"
+            )
         return TaskOptimizeSummary(
-            optimization_type=settings.optimization_type,
-            evaluations_completed=len(run_rows),
-            best_parameters=best_params,
-            best_fitness=best_fitness,
-            stored_strategy_ids=stored_ids,
+            optimization_type="SIMPLE",
+            evaluations_completed=int(receipt["candidates_evaluated"]),
+            best_parameters=dict(receipt["best_parameters"]),
+            best_fitness=float(receipt["best_fitness"]),
+            stored_strategy_ids=tuple(str(key) for key in receipt["result_ids"]),
         )

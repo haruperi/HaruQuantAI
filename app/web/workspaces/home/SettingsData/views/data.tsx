@@ -10,6 +10,7 @@ import { dataTabDefaults, oosPresets, type DataTabState, type OosRange } from '.
  */
 export function DataTab({initialState=dataTabDefaults}: {initialState?:DataTabState} = {}) {
   const {
+    bound, source, setSource, splitTime, setSplitTime, model, setModel,
     state, precision, setPrecision, rangeError, graphShown, setGraphShown,
     patch, percents, totalDays, applyPreset,
   } = useDataController(initialState);
@@ -22,19 +23,19 @@ export function DataTab({initialState=dataTabDefaults}: {initialState?:DataTabSt
             ariaLabel="Engine"
             value={state.engine}
             onChange={engine => patch({ engine })}
-            options={['MetaTrader5 (hedging mode)', 'MetaTrader5 (netting mode)', 'MetaTrader4', 'Tick data (custom)'].map(v => ({ value: v, label: v }))}
+            options={(bound ? ['Core OHLC'] : ['MetaTrader5 (hedging mode)', 'MetaTrader5 (netting mode)', 'MetaTrader4', 'Tick data (custom)']).map(v => ({ value: v, label: v }))}
             width={210}
           />
         </div>
         <div className="sqd-setting-row">
           <label className="sqd-label fixed">Symbol</label>
           <div className="sqd-setting-right">
-            <SqdSelect ariaLabel="Symbol" value={state.symbol} onChange={symbol => patch({ symbol })} options={[{ value: state.symbol, label: state.symbol }]} width={170} />
+            <SqdTextInput ariaLabel="Symbol" value={state.symbol} onChange={symbol => patch({ symbol })} width={170} />
             <SqdSelect
               ariaLabel="Timeframe"
               value={state.timeframe}
               onChange={timeframe => patch({ timeframe })}
-              options={['M5', 'M15', 'M30', 'H1', 'H4', 'D1'].map(v => ({ value: v, label: v }))}
+              options={['M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1'].map(v => ({ value: v, label: v }))}
               width={100}
             />
           </div>
@@ -54,13 +55,18 @@ export function DataTab({initialState=dataTabDefaults}: {initialState?:DataTabSt
             ariaLabel="Test precision"
             value={precision}
             onChange={setPrecision}
-            options={[{ value: '1', label: 'Selected timeframe only' }, { value: '2', label: '1 minute data' }, { value: '3', label: 'Real ticks' }]}
+            options={(bound ? [{ value: '1', label: 'Core OHLC' }] : [{ value: '1', label: 'Selected timeframe only' }, { value: '2', label: '1 minute data' }, { value: '3', label: 'Real ticks' }])}
             width={210}
           />
         </div>
       </SqdFieldset>
 
-      <SqdFieldset legend="Data range parts">
+      {bound && <SqdFieldset legend="Catalog and model">
+        <label className="sqd-setting-row">Dataset source <input aria-label="Dataset source" value={source} onChange={event => setSource(event.target.value)} /></label>
+        {['pip_size', 'point_value'].map(key => <label className="sqd-setting-row" key={key}>{key.replaceAll('_', ' ')}<input aria-label={key.replaceAll('_', ' ')} type="number" value={Number(model[key] ?? (key === 'pip_size' ? 0.0001 : 1))} onChange={event => setModel(key, Number(event.target.value))} /></label>)}
+        <label className="sqd-setting-row">IS/OOS boundary (UTC, optional)<input aria-label="IS/OOS boundary" type="datetime-local" value={splitTime} onChange={event => setSplitTime(event.target.value)} /></label>
+      </SqdFieldset>}
+      {!bound && <SqdFieldset legend="Data range parts">
         <SqdHelpLink url="https://strategyquant.com/article/training-validation-test-periods" />
         <div className="sqd-oos-presets">
           Most used configs:
@@ -132,7 +138,7 @@ export function DataTab({initialState=dataTabDefaults}: {initialState?:DataTabSt
             </button>
           </div>
         </div>
-      </SqdFieldset>
+      </SqdFieldset>}
     </span>
   );
 }

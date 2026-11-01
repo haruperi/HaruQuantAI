@@ -32,13 +32,14 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.core.host.persistence import HostPersistence
 from app.core.lib.errors import DomainError
 from app.core.lib.responses import StandardResponse
+from app.core.trading.results.contracts import RunResult
 from app.core.trading.results.store import ResultStore
 from app.workspace.optimizer.common import wrap_response
 
 logger = get_logger(__name__)
+_PROFILE_PAGE_SIZE = 1000
 
 
 @dataclass(frozen=True, slots=True)
@@ -90,9 +91,9 @@ class ResultsOptimizationProfileService:
         """Initialize service with optional ResultStore.
 
         Args:
-            result_store: Core ResultStore instance, or None to use default.
+            result_store: Injected Core result owner; absent authority fails closed.
         """
-        self._result_store = result_store or ResultStore(HostPersistence())
+        self._result_store = result_store
         self._views: dict[str, dict[str, Any]] = {
             "default": {
                 "id": "default",
@@ -151,24 +152,65 @@ class ResultsOptimizationProfileService:
         if strategy_id in self._mock_runs:
             return self._mock_runs[strategy_id]
 
+        store = self._result_store
+        if store is None:
+            raise DomainError(
+                code="RESULT_STORE_UNAVAILABLE",
+                message="Inject the shared result store",
+            )
         try:
-            stored = self._result_store.get_result(strategy_id)
-            if stored and "optimization_runs" in stored.metrics_payload:
-                raw_runs = stored.metrics_payload["optimization_runs"]
-                return [
-                    OptimizationRunRow(
-                        run_index=int(r.get("run_index", 0)),
-                        parameters={
-                            k: float(v) for k, v in r.get("parameters", {}).items()
-                        },
-                        metrics={k: float(v) for k, v in r.get("metrics", {}).items()},
-                        passed=bool(r.get("passed", True)),
-                    )
-                    for r in raw_runs
-                ]
-        except DomainError:
+            selected = store.get_result(strategy_id)
+        except DomainError as error:
+            if error.code != "RESULT_NOT_FOUND":
+                raise
+            logger.info("FR-optimizer-profile-results: selected result is unavailable")
             return []
-        return []
+        records = self._run_results(store, selected)
+        runs: list[OptimizationRunRow] = []
+        for index, result in enumerate(records):
+            raw = result.parameters.get("parameters", {})
+            parameters = (
+                {
+                    key: float(value)
+                    for key, value in raw.items()
+                    if isinstance(value, (int, float))
+                }
+                if isinstance(raw, dict)
+                else {}
+            )
+            metrics = {
+                key: float(value)
+                for key, value in result.metrics.items()
+                if isinstance(value, (int, float))
+            }
+            if "net_profit" in metrics:
+                metrics["NetProfit"] = metrics["net_profit"]
+            runs.append(OptimizationRunRow(index + 1, parameters, metrics, True))
+        logger.info(
+            "FR-optimizer-profile-results: projected %d stored evaluations", len(runs)
+        )
+        return runs
+
+    @staticmethod
+    def _run_results(store: ResultStore, selected: RunResult) -> list[RunResult]:
+        """Read all parameter evaluations sharing the selected stored run identity."""
+        run_id = selected.parameters.get("run_id")
+        records = [selected]
+        if run_id:
+            records = []
+            offset = 0
+            while True:
+                page = store.list_results(
+                    selected.databank_id, limit=_PROFILE_PAGE_SIZE, offset=offset
+                )
+                for summary in page:
+                    result = store.get_result(summary.result_id)
+                    if result.parameters.get("run_id") == run_id:
+                        records.append(result)
+                if len(page) < _PROFILE_PAGE_SIZE:
+                    break
+                offset += len(page)
+        return records
 
     def get_available_params(self, strategy_id: str) -> tuple[str, ...]:
         """Get parameter names available in strategy optimization runs."""

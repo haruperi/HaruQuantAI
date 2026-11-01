@@ -26,20 +26,21 @@ CLI Usage:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Literal
+from collections.abc import Mapping
+from dataclasses import dataclass, field, replace
+from typing import Any
 
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
 from app.core.lib.responses import StandardResponse
+from app.workspace.home.service import HomeService
 from app.workspace.retester.settings_auto_retest_data import AutoRetestDataSettings
 from app.workspace.retester.settings_cross_checks import CrossChecksSettingsSnapshot
 from app.workspace.retester.settings_what_to_retest import WhatToRetestSettings
-from app.workspace.retester.task_retest import TaskRetestRunner
 
 logger = get_logger(__name__)
 
-RetesterStatus = Literal["IDLE", "RUNNING", "PAUSED", "COMPLETED", "STOPPED", "FAILED"]
+RetesterStatus = str
 
 
 @dataclass(frozen=True, slots=True)
@@ -60,10 +61,13 @@ class RetesterWorkspaceState:
     accepted_count: int = 0
     rejected_count: int = 0
 
+    job_id: str | None = None
+
     def to_dict(self) -> dict[str, Any]:
         """Convert state to dictionary."""
         return {
             "project_id": self.project_id,
+            "job_id": self.job_id,
             "what_to_retest": self.what_to_retest.to_dict(),
             "data_settings": self.data_settings.to_dict(),
             "cross_checks": self.cross_checks.to_dict(),
@@ -78,25 +82,19 @@ class RetesterWorkspaceState:
 class AppRetesterService:
     """Workspace service coordinating strategy retests and robustness evaluations."""
 
-    def __init__(self) -> None:
+    def __init__(self, home_service: HomeService | None = None) -> None:
         self._states: dict[str, RetesterWorkspaceState] = {}
-        self._mock_databanks: dict[str, dict[str, list[str]]] = {}
+        self._home_service = home_service
 
     def _get_or_create_state(self, project_id: str) -> RetesterWorkspaceState:
         if project_id not in self._states:
             self._states[project_id] = RetesterWorkspaceState(project_id=project_id)
         return self._states[project_id]
 
-    def set_mock_databank(
-        self, project_id: str, databank_name: str, strategies: list[str]
-    ) -> None:
-        """Helper to inject databank strategies for integration tests."""
-        if project_id not in self._mock_databanks:
-            self._mock_databanks[project_id] = {}
-        self._mock_databanks[project_id][databank_name] = list(strategies)
-
     def get_state(self, project_id: str) -> StandardResponse[dict[str, Any]]:
         """Get current Retester workspace state for a project."""
+        if self._home_service is not None:
+            return self.get_job_state(project_id)
         state = self._get_or_create_state(project_id)
         logger.info(
             "FR-retester-workspace-state: project %s state is %s",
@@ -135,101 +133,91 @@ class AppRetesterService:
             data=new_state.to_dict(),
         )
 
-    def start(self, project_id: str) -> StandardResponse[dict[str, Any]]:
-        """Start or execute strategy retest."""
-        curr = self._get_or_create_state(project_id)
-        if curr.status == "RUNNING":
+    def save_native_settings(
+        self,
+        project_id: str,
+        task_id: str,
+        settings: Mapping[str, Any],
+        expected_revision: int,
+    ) -> dict[str, Any]:
+        """Persist native configuration through the shared revision owner."""
+        return self._host().save_project_settings(
+            project_id, task_id, settings, expected_revision
+        )
+
+    def _host(self) -> HomeService:
+        """Require an injected project/job authority without opening a database."""
+        if self._home_service is None:
             raise DomainError(
-                code="RETESTER_ALREADY_RUNNING",
-                message=f"Retester for project {project_id} is already running",
+                code="EXECUTION_CONTEXT_REQUIRED",
+                message="Inject the shared Home project and job service",
             )
+        return self._home_service
 
-        db_strategies = self._mock_databanks.get(project_id, {"Results": ["s1", "s2"]})
-
-        # Transition to RUNNING then COMPLETED
-        summary = TaskRetestRunner.execute(
-            project_id=project_id,
-            what_to_retest=curr.what_to_retest,
-            data_settings=curr.data_settings,
-            cross_checks=curr.cross_checks,
-            databank_strategies=db_strategies,
+    def _apply_action(
+        self,
+        project_id: str,
+        action: str,
+        task_id: str | None = None,
+        expected_revision: int | None = None,
+        job_id: str | None = None,
+    ) -> StandardResponse[dict[str, Any]]:
+        """Delegate admission and transitions to the shared lifecycle owner."""
+        self._host().engine_action(
+            project_id, action, task_id, expected_revision, job_id
         )
-
-        final_state = RetesterWorkspaceState(
-            project_id=project_id,
-            what_to_retest=curr.what_to_retest,
-            data_settings=curr.data_settings,
-            cross_checks=curr.cross_checks,
-            status="COMPLETED",
-            progress_pct=100.0,
-            processed_count=summary.processed,
-            accepted_count=summary.passed,
-            rejected_count=summary.failed,
-        )
-        self._states[project_id] = final_state
         logger.info(
-            "FR-retester-workspace-lifecycle: completed retest for %s: %d processed",
-            project_id,
-            summary.processed,
+            "FR-retester-lifecycle: delegated %s to shared project authority", action
         )
-        return StandardResponse(
-            request_id=f"req_start_{project_id}",
-            data=final_state.to_dict(),
-        )
+        return self.get_job_state(project_id, job_id)
 
-    def pause(self, project_id: str) -> StandardResponse[dict[str, Any]]:
-        """Pause running retest."""
-        curr = self._get_or_create_state(project_id)
-        new_state = RetesterWorkspaceState(
-            project_id=project_id,
-            what_to_retest=curr.what_to_retest,
-            data_settings=curr.data_settings,
-            cross_checks=curr.cross_checks,
-            status="PAUSED",
-            progress_pct=curr.progress_pct,
-            processed_count=curr.processed_count,
-            accepted_count=curr.accepted_count,
-            rejected_count=curr.rejected_count,
-        )
-        self._states[project_id] = new_state
-        return StandardResponse(
-            request_id=f"req_pause_{project_id}", data=new_state.to_dict()
-        )
+    def start(
+        self,
+        project_id: str,
+        *,
+        task_id: str | None = None,
+        expected_revision: int | None = None,
+    ) -> StandardResponse[dict[str, Any]]:
+        """Submit the selected saved revision through the shared execution owner."""
+        return self._apply_action(project_id, "start", task_id, expected_revision)
 
-    def resume(self, project_id: str) -> StandardResponse[dict[str, Any]]:
-        """Resume paused retest."""
-        curr = self._get_or_create_state(project_id)
-        new_state = RetesterWorkspaceState(
-            project_id=project_id,
-            what_to_retest=curr.what_to_retest,
-            data_settings=curr.data_settings,
-            cross_checks=curr.cross_checks,
-            status="RUNNING",
-            progress_pct=curr.progress_pct,
-            processed_count=curr.processed_count,
-            accepted_count=curr.accepted_count,
-            rejected_count=curr.rejected_count,
-        )
-        self._states[project_id] = new_state
-        return StandardResponse(
-            request_id=f"req_resume_{project_id}", data=new_state.to_dict()
-        )
+    def pause(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[dict[str, Any]]:
+        """Pause the explicitly selected real job."""
+        return self._apply_action(project_id, "pause", job_id=job_id)
 
-    def stop(self, project_id: str) -> StandardResponse[dict[str, Any]]:
-        """Stop active retest."""
-        curr = self._get_or_create_state(project_id)
-        new_state = RetesterWorkspaceState(
-            project_id=project_id,
-            what_to_retest=curr.what_to_retest,
-            data_settings=curr.data_settings,
-            cross_checks=curr.cross_checks,
-            status="STOPPED",
-            progress_pct=curr.progress_pct,
-            processed_count=curr.processed_count,
-            accepted_count=curr.accepted_count,
-            rejected_count=curr.rejected_count,
+    def resume(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[dict[str, Any]]:
+        """Resume the explicitly selected real job."""
+        return self._apply_action(project_id, "resume", job_id=job_id)
+
+    def stop(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[dict[str, Any]]:
+        """Request cooperative cancellation of the explicitly selected job."""
+        return self._apply_action(project_id, "stop", job_id=job_id)
+
+    def get_job_state(
+        self,
+        project_id: str,
+        job_id: str | None = None,
+    ) -> StandardResponse[dict[str, Any]]:
+        """Project actual job observations and completed evaluation receipts."""
+        observation = self._host().get_engine_status(project_id, job_id)
+        receipt = observation.get("result") or {}
+        current = self._get_or_create_state(project_id)
+        state = replace(
+            current,
+            status=str(observation["status"]),
+            job_id=observation["job_id"],
+            progress_pct=float(observation["progress"]),
+            processed_count=int(receipt.get("candidates_evaluated", 0)),
+            accepted_count=int(receipt.get("candidates_accepted", 0)),
+            rejected_count=int(receipt.get("candidates_rejected", 0)),
         )
-        self._states[project_id] = new_state
+        self._states[project_id] = state
         return StandardResponse(
-            request_id=f"req_stop_{project_id}", data=new_state.to_dict()
+            request_id=f"retester-job-{project_id}", data=state.to_dict()
         )

@@ -23,19 +23,22 @@ from __future__ import annotations
 import argparse
 import mimetypes
 from asyncio import to_thread
-from collections.abc import AsyncGenerator, Mapping, Sequence
-from contextlib import asynccontextmanager
+from collections.abc import AsyncGenerator, Callable, Mapping, Sequence
+from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from pathlib import Path
 
 import uvicorn
 from fastapi import FastAPI, Request, Response
 
+from app.core.data.catalog import DataCatalog
 from app.core.host.logging import get_logger, shutdown_logging
 from app.core.host.persistence import HostPersistence
+from app.core.host.resources import ResourceMonitor
 from app.core.host.session import SessionManager
 from app.core.host.settings import SettingsManager
 from app.core.host.transport import CredentialTester, install_transport
 from app.core.host.vault import Vault
+from app.core.jobs.manager import JobManager
 from app.workspace.data_manager.data.partition_files import (
     recover_catalog_publications,
 )
@@ -166,7 +169,7 @@ def install_web_build(application: FastAPI, build_dir: Path) -> None:
 
 async def _shutdown_workspace_jobs(application: FastAPI) -> None:
     """Release lazy workspace workers before host persistence is detached."""
-    for name in ("basket_jobs", "download_jobs", "code_editor_jobs"):
+    for name in ("basket_jobs", "download_jobs", "code_editor_jobs", "job_manager"):
         if (jobs := getattr(application.state, name, None)) is not None:
             await to_thread(jobs.shutdown, wait=True, cancel_futures=True)
             delattr(application.state, name)
@@ -181,6 +184,7 @@ def _register_routers(application: FastAPI) -> None:
     from app.workspace.code_editor import code_editor_router
     from app.workspace.data_manager import create_router
     from app.workspace.grid_control import grid_control_router
+    from app.workspace.home import home_router
     from app.workspace.trading.routes import trading_router
 
     application.include_router(create_router())
@@ -188,17 +192,14 @@ def _register_routers(application: FastAPI) -> None:
     application.include_router(grid_control_router)
     application.include_router(trading_router)
     application.include_router(ai_router)
+    application.include_router(home_router)
 
 
-def create_app(
+def _create_lifespan(
     persistence: HostPersistence | None = None,
-    *,
-    vault: Vault | None = None,
-    connection_testers: Mapping[str, CredentialTester] | None = None,
-    web_build_dir: Path | None = None,
-) -> FastAPI:
-    """Create an independent application with shared host services in app.state."""
-
+    projects_dir: Path | None = None,
+    scratch_root: Path | None = None,
+) -> Callable[[FastAPI], AbstractAsyncContextManager[None]]:
     @asynccontextmanager
     async def lifespan(application: FastAPI) -> AsyncGenerator[None]:
         logger.info("Backend starting")
@@ -212,29 +213,80 @@ def create_app(
             raise
         application.state.persistence = gateway
         application.state.settings = settings
-        application.state.data_logs = Logs()
-        await to_thread(recover_catalog_publications, gateway)
-
-        def scopes_for(username: str) -> tuple[str, ...]:
-            access = settings.get_scope("user_access")
-            return ("*:*",) if username == access["username"] else ()
-
-        application.state.sessions = SessionManager(gateway, scope_resolver=scopes_for)
-        logger.info("Backend startup completed")
         try:
+            application.state.data_logs = Logs()
+            job_manager = JobManager(
+                persistence=gateway,
+                resource_mgr=ResourceMonitor(scratch_root=scratch_root)
+                if scratch_root is not None
+                else None,
+                reconcile_on_startup=True,
+            )
+            application.state.job_manager = job_manager
+            catalog = DataCatalog(gateway)
+            application.state.data_catalog = catalog
+            await to_thread(recover_catalog_publications, gateway)
+
+            def scopes_for(username: str) -> tuple[str, ...]:
+                access = settings.get_scope("user_access")
+                return ("*:*",) if username == access["username"] else ()
+
+            application.state.sessions = SessionManager(
+                gateway, scope_resolver=scopes_for
+            )
+            if not hasattr(application.state, "home_service"):
+                from app.workspace.home import HomeService
+
+                application.state.home_service = HomeService(
+                    persistence=gateway,
+                    job_manager=job_manager,
+                    data_catalog=catalog,
+                    settings_manager=settings,
+                    projects_dir=projects_dir,
+                )
+            logger.info("Backend startup completed")
             yield
         finally:
             logger.info("Backend shutting down")
-            await _shutdown_workspace_jobs(application)
-            if (mt5 := getattr(application.state, "data_mt5", None)) is not None:
-                await mt5.close()
-            del application.state.data_logs
-            del application.state.sessions
-            del application.state.settings
-            del application.state.persistence
-            logger.info("Backend shutdown completed")
+            try:
+                await _shutdown_workspace_jobs(application)
+            finally:
+                try:
+                    if (
+                        mt5 := getattr(application.state, "data_mt5", None)
+                    ) is not None:
+                        await mt5.close()
+                finally:
+                    for name in (
+                        "data_mt5",
+                        "home_service",
+                        "data_catalog",
+                        "data_logs",
+                        "sessions",
+                        "settings",
+                        "persistence",
+                    ):
+                        if hasattr(application.state, name):
+                            delattr(application.state, name)
+                    logger.info("Backend shutdown completed")
 
-    application = FastAPI(title="HaruQuantAI Backend", lifespan=lifespan)
+    return lifespan
+
+
+def create_app(
+    persistence: HostPersistence | None = None,
+    *,
+    vault: Vault | None = None,
+    connection_testers: Mapping[str, CredentialTester] | None = None,
+    web_build_dir: Path | None = None,
+    projects_dir: Path | None = None,
+    scratch_root: Path | None = None,
+) -> FastAPI:
+    """Create an independent application with shared host services in app.state."""
+    application = FastAPI(
+        title="HaruQuantAI Backend",
+        lifespan=_create_lifespan(persistence, projects_dir, scratch_root),
+    )
     from app.core.host.vault import WindowsCredentialVault
     from app.workspace.data_manager.sources.connections import build_provider_testers
 

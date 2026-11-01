@@ -37,6 +37,7 @@ from app.workspace.builder.app_builder import AppBuilderService
 from app.workspace.builder.common import wrap_response
 from app.workspace.builder.settings_blocks import BlocksSelectionSettings
 from app.workspace.builder.task_build import TaskBuildRunner
+from app.workspace.home.service import HomeService
 
 logger = get_logger(__name__)
 
@@ -44,9 +45,14 @@ logger = get_logger(__name__)
 class ServletBuilderDispatcher:
     """HTTP/RPC dispatcher for Builder workspace controller actions."""
 
-    def __init__(self, service: AppBuilderService | None = None) -> None:
+    def __init__(
+        self,
+        service: AppBuilderService | None = None,
+        *,
+        home_service: HomeService | None = None,
+    ) -> None:
         """Initialize dispatcher with AppBuilderService instance."""
-        self._service = service or AppBuilderService()
+        self._service = service or AppBuilderService(home_service)
 
     def dispatch(
         self, action: str, payload: Mapping[str, Any]
@@ -68,22 +74,28 @@ class ServletBuilderDispatcher:
             action,
             list(payload.keys()),
         )
-        project_id = str(payload.get("project_id", "default_project"))
+        project_id = payload.get("project_id")
+        if not isinstance(project_id, str) or not project_id.strip():
+            raise DomainError(code="PROJECT_REQUIRED", message="Select a saved project")
 
         if action == "build/status":
             return self._service.get_state(project_id)
 
         if action == "build/start":
-            return self._service.start(project_id)
+            return self._service.start(
+                project_id,
+                task_id=payload.get("task_id"),
+                expected_revision=payload.get("expected_revision"),
+            )
 
         if action == "build/pause":
-            return self._service.pause(project_id)
+            return self._service.pause(project_id, job_id=payload.get("job_id"))
 
         if action == "build/resume":
-            return self._service.resume(project_id)
+            return self._service.resume(project_id, job_id=payload.get("job_id"))
 
         if action == "build/stop":
-            return self._service.stop(project_id)
+            return self._service.stop(project_id, job_id=payload.get("job_id"))
 
         if action == "indyTester/calibrate":
             blocks_raw = payload.get("blocks")

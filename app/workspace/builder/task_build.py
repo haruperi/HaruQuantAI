@@ -1,11 +1,9 @@
 """Builder execution job runner, indicator calibration, and genetic evolution engine.
 
 Description:
-    Coordinates the candidate generation execution pipeline, orchestrating technical
-    indicator calibration across historical bar slices, random or multi-island genetic
-    programming (GP) candidate generation via GenerationEngine, backtest performance
-    evaluation via BacktestRunner, candidate qualification via SettingsRankingsService,
-    cross-check pipeline verification via AppRetester, and databank storage.
+    Delegates validated native execution snapshots to Core-backed random generation,
+    actual market-bar evaluation and result persistence. Legacy calls without
+    execution inputs fail closed. Genetic/template modes remain unavailable.
 
 Purpose:
     FEAT-BUILDER-TASK-BUILD: Core candidate generation and qualification runner.
@@ -38,15 +36,16 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.core.trading.generation.engine import GenerationEngine, GenerationSpec
+from app.core.jobs.manager import JobContext
+from app.core.lib.errors import DomainError
 from app.workspace.builder.genetic_defaults import GeneticOptionsDefaults
 from app.workspace.builder.settings_blocks import BlocksSelectionSettings
 from app.workspace.builder.settings_parts_to_improve import PartsToImproveSettings
 from app.workspace.builder.settings_rankings import (
     RankingsSettings,
-    SettingsRankingsService,
 )
 from app.workspace.builder.settings_what_to_build import WhatToBuildSettings
+from app.workspace.home.execution import ExecutionSnapshot, ProjectExecutor
 
 logger = get_logger(__name__)
 
@@ -155,6 +154,9 @@ class TaskBuildRunner:
         rankings: RankingsSettings,
         *,
         seed: int = 42,
+        execution: ProjectExecutor | None = None,
+        snapshot: ExecutionSnapshot | None = None,
+        context: JobContext | None = None,
     ) -> TaskBuildSummary:
         """Execute candidate strategy generation, backtesting, and databank storage.
 
@@ -165,91 +167,47 @@ class TaskBuildRunner:
             blocks: Selected building blocks and weights.
             parts_to_improve: Improvement rules for template mutation.
             rankings: Strategy ranking and acceptance filtering conditions.
-            seed: Deterministic random seed for reproducible candidate generation.
+            seed: Legacy seed; execution uses the captured native snapshot.
+            execution: Injected Core-backed execution owner.
+            snapshot: Validated immutable native task inputs.
+            context: Host cooperative lifecycle context.
 
         Returns:
             TaskBuildSummary containing execution metrics.
         """
-        logger.debug(
-            "Starting TaskBuildRunner for project=%s, mode=%s, seed=%d",
-            project_id,
-            what_to_build.build_mode,
-            seed,
-        )
-        logger.debug(
-            "Configured %d blocks and %d improvement rules",
+        logger.info(
+            "FR-builder-execute-gp: native snapshot supersedes legacy form inputs "
+            "(population=%d, blocks=%d, improvements=%d, limit=%d, seed=%d)",
+            genetic_options.population_size,
             len(blocks.selections),
             len(parts_to_improve.rules),
+            rankings.max_records,
+            seed,
         )
-
-        pop_size = max(1, genetic_options.population_size)
-        max_gen = max(1, genetic_options.max_generations)
-        islands = max(1, genetic_options.islands)
-
-        spec = GenerationSpec(
-            symbol="EURUSD",
-            population_size=pop_size,
-            island_count=islands,
-            max_rule_depth=what_to_build.max_entry_conditions,
-            crossover_prob=genetic_options.crossover_probability
-            / _DEFAULT_PERCENT_DIVISOR,
-            mutation_prob=genetic_options.mutation_probability
-            / _DEFAULT_PERCENT_DIVISOR,
-            seed=seed,
+        if execution is None or snapshot is None or context is None:
+            raise DomainError(
+                code="EXECUTION_CONTEXT_REQUIRED",
+                message="Builder requires a validated native execution snapshot",
+            )
+        if snapshot.project_id != project_id or what_to_build.build_mode != "RANDOM":
+            raise DomainError(
+                code="UNSUPPORTED_MODE",
+                message="Only snapshot-backed random generation is available",
+            )
+        logger.info(
+            "FR-builder-execute-gp: evaluating validated snapshot for %s", project_id
         )
-        engine = GenerationEngine(spec=spec)
-        rankings_service = SettingsRankingsService()
-
-        total_candidates = pop_size * max_gen
-        candidates_accepted = 0
-        candidates_rejected = 0
-        best_fitness = 0.0
-        accepted_ids: list[str] = []
-
-        for gen in range(max_gen):
-            for i in range(pop_size):
-                strat_id = f"strat-{project_id}-g{gen}-i{i}"
-                strat = engine.generate_random_strategy(strat_id)
-
-                h = hash((strat.strategy_id, seed, gen, i))
-                profit_factor = round(1.0 + (abs(h % 200) / 100.0), 2)
-                trades_count = 50 + (abs(h % 150))
-                return_dd = round(1.5 + (abs(h % 300) / 100.0), 2)
-                net_profit = round(float(trades_count) * profit_factor * 12.5, 2)
-
-                stats_snapshot = {
-                    "ProfitFactor": profit_factor,
-                    "NumberOfTrades": trades_count,
-                    "trades_count": trades_count,
-                    "number_of_trades": trades_count,
-                    "ReturnDDRatio": return_dd,
-                    "NetProfit": net_profit,
-                }
-
-                passed, fitness, _ = rankings_service.evaluate_candidate(
-                    stats_snapshot, rankings
-                )
-
-                if passed and len(accepted_ids) < rankings.max_records:
-                    candidates_accepted += 1
-                    accepted_ids.append(strat.strategy_id)
-                    best_fitness = max(best_fitness, fitness)
-                else:
-                    candidates_rejected += 1
-
-        logger.debug(
-            "TaskBuild completed: %d evaluated, %d accepted, best_fitness=%f",
-            total_candidates,
-            candidates_accepted,
-            best_fitness,
-        )
-
+        receipt = execution.run(context, snapshot)
+        if receipt["best_fitness"] is None:
+            raise DomainError(
+                code="NO_FINITE_RESULTS", message="All evaluations were rejected"
+            )
         return TaskBuildSummary(
-            build_mode=what_to_build.build_mode,
-            generations_completed=max_gen,
-            candidates_evaluated=total_candidates,
-            candidates_accepted=candidates_accepted,
-            candidates_rejected=candidates_rejected,
-            best_fitness=best_fitness,
-            accepted_strategy_ids=tuple(accepted_ids),
+            build_mode="RANDOM",
+            generations_completed=1,
+            candidates_evaluated=int(receipt["candidates_evaluated"]),
+            candidates_accepted=int(receipt["candidates_accepted"]),
+            candidates_rejected=int(receipt["candidates_rejected"]),
+            best_fitness=float(receipt["best_fitness"]),
+            accepted_strategy_ids=tuple(str(key) for key in receipt["result_ids"]),
         )

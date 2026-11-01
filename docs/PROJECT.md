@@ -2,7 +2,7 @@
 
 **Status:** Active Clean-Room Reimplementation of StrategyQuant X (SQX-145).
 **Baseline Roadmap:** [`docs/dev/full-reimplementation/`](dev/full-reimplementation/).
-**Current Milestone:** Phase 01 (AppCore) verified and audited (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)); Phase 02 (AppHome) foundation operational; Phase 03 (AppDataManager) active.
+**Current Milestone:** Phase 01 (AppCore) verified and audited (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)); Phase 02 (AppHome) implementation work order retired, with supported execution and workflow evidence retained in the [AppHome completion audit](dev/full-reimplementation/research/apphome-completion-audit.md); Phase 03 (AppDataManager) active.
 
 ---
 
@@ -23,7 +23,7 @@ The project executes an evidence-backed clean-room reimplementation of **Strateg
 
 * **[AGENTS.md](../AGENTS.md) (Contributor Constitution):** Governs development workflows, owner approval gates (`APPROVED: EXECUTE`, `ACCEPTED: COMMIT`), coding standards, test coverage baselines, and architectural limits.
 * **[docs/ARCHITECTURE.md](ARCHITECTURE.md):** Defines structural boundaries, tier layering, the 5 Laws of Spatial Composability, persistence isolation, and lifecycle contracts.
-* **[`docs/dev/full-reimplementation/`](dev/full-reimplementation/):** Remaining workspace development plans; completed AppCore work is recorded in the [completion audit](dev/full-reimplementation/research/appcore-completion-audit.md).
+* **[`docs/dev/full-reimplementation/`](dev/full-reimplementation/):** Remaining workspace development plans; retired AppCore and AppHome work orders are recorded in their [AppCore](dev/full-reimplementation/research/appcore-completion-audit.md) and [AppHome](dev/full-reimplementation/research/apphome-completion-audit.md) completion audits.
 * **Donor Reference Authority (`DONOR_REFERENCE_ROOT` = `data\reference-donor`):** Preserves original StrategyQuant X build-145 sources (`internal/libs`, `internal/plugins`, `internal/extend`, `internal/ctemplate`, `internal/web`). Used exclusively as a behavioral reference, formula donor, and fixture source; no proprietary code is compiled or ported directly.
 
 ---
@@ -67,7 +67,7 @@ The clean-room reimplementation is organized into 20 domain phases detailed in [
 | Phase | Phase Document | Domain Name | Scope & Capabilities | Current Status |
 | :---: | :--- | :--- | :--- | :---: |
 | **01** | [Completion audit](dev/full-reimplementation/research/appcore-completion-audit.md) | **AppCore** | Pure quant engine, time series, trading primitives, grid protocol, host lifecycle, persistence WAL, jobs, wizard code transforms. | **Verified & Audited**<br/>(34 WOs, see [audit](dev/full-reimplementation/research/appcore-completion-audit.md)) |
-| **02** | [`02-AppHome.md`](dev/full-reimplementation/02-AppHome.md) | **AppHome** | Central workstation hub, project registry, dashboard configuration, ATM visibility rules, settings, release notes. | **Foundation Complete**<br/>(HOM-M01, H01–H06) |
+| **02** | [Completion audit](dev/full-reimplementation/research/apphome-completion-audit.md) | **AppHome** | Central hub, native revisioned projects/settings/Notes, shared Core execution, stored results/charts, analysis definitions and persisted themes. | **Implementation Work Order Retired**<br/>(Supported capabilities and limitations in audit) |
 | **03** | [`03-AppDataManager.md`](dev/full-reimplementation/03-AppDataManager.md) | **AppDataManager** | Market data catalog, tick/bar storage, instrument specs, sessions, baskets, broker profiles, data quality review, bar transforms. | **Active Phase**<br/>(DM-M01 migrated) |
 | **04** | [`04-AppCodeEditor.md`](dev/full-reimplementation/04-AppCodeEditor.md) | **AppCodeEditor** | Multi-language code editor, compilation hooks, syntax trees, algorithmic snippets, and template integration. | *Planned* |
 | **05** | [`05-AppWizard.md`](dev/full-reimplementation/05-AppWizard.md) | **AppWizard** | AlgoWizard visual rule builder, conditions, indicators, actions, multi-timeframe logic, code generator backends. | *Core Transform Done* |
@@ -90,6 +90,13 @@ The clean-room reimplementation is organized into 20 domain phases detailed in [
 ---
 
 AppCore acceptance was verified on 2026-11-01 with `uv run python -m pytest tests --cov=app --cov-branch -q`: **2,651 passed**, **84.02% combined statement/branch coverage**, exit **0**. This records repository test acceptance; it does not establish complete SQX donor parity or completion of every workspace.
+
+AppHome qualification on 2026-11-01: **2,748 tests passed**, **84.19% combined
+statement/branch coverage**, exit **0**, measured with coverage starting before
+pytest/plugin imports. This supersedes the incomplete 72.99% startup measurement.
+The implementation work order is retired; its [completion audit](dev/full-reimplementation/research/apphome-completion-audit.md)
+retains supported execution, browser evidence and unavailable-provider limitations.
+Other workspace work orders remain independently active.
 
 ## 5. System Invariants & Non-Negotiable Rules
 

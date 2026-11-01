@@ -22,7 +22,8 @@ def test_lifespan_initializes_and_cleans_services(monkeypatch):
     settings.reload.assert_not_called()
     with TestClient(application) as client:
         settings.reload.assert_called_once_with()
-        gateway.read_records.assert_called_once_with("datamgr_datasets", offset=0)
+        gateway.read_records.assert_any_call("host_jobs", limit=1000)
+        gateway.read_records.assert_any_call("datamgr_datasets", offset=0)
         assert application.state.persistence is gateway
         assert application.state.settings is settings
         assert application.state.sessions.persistence is gateway
@@ -143,3 +144,42 @@ def test_lifespan_cancels_and_closes_basket_jobs(monkeypatch):
         application.state.basket_jobs = manager
     manager.shutdown.assert_called_once_with(wait=True, cancel_futures=True)
     assert not hasattr(application.state, "basket_jobs")
+
+
+def test_home_uses_host_capabilities(monkeypatch, tmp_path):
+    """Home shares the loaded settings, catalog and job persistence authority."""
+    from app.core.host.persistence import HostPersistence
+
+    settings = Mock()
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    gateway = HostPersistence(tmp_path / "host.db")
+    application = backend.create_app(gateway)
+    with TestClient(application):
+        home = application.state.home_service
+        assert home._persistence is gateway
+        assert home._settings_manager is settings
+        assert home._data_catalog is application.state.data_catalog
+        assert home._job_manager is application.state.job_manager
+    assert not hasattr(application.state, "home_service")
+    assert not hasattr(application.state, "job_manager")
+
+
+def test_catalog_startup_failure_releases_workers(monkeypatch):
+    """A failure after worker creation must still release the worker pool."""
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=Mock()))
+    jobs = Mock()
+    monkeypatch.setattr(backend, "JobManager", Mock(return_value=jobs))
+    monkeypatch.setattr(
+        backend,
+        "recover_catalog_publications",
+        Mock(side_effect=RuntimeError("catalog unavailable")),
+    )
+    application = backend.create_app(Mock())
+    with (
+        pytest.raises(RuntimeError, match="catalog unavailable"),
+        TestClient(application),
+    ):
+        pytest.fail("Startup must fail before accepting requests")
+    jobs.shutdown.assert_called_once_with(wait=True, cancel_futures=True)
+    for name in ("job_manager", "persistence", "settings", "data_catalog", "data_logs"):
+        assert not hasattr(application.state, name)

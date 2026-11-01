@@ -105,6 +105,7 @@ const STATS_MODALS: Record<Exclude<StatsModalKind, null>, { title: string; colum
 
 export function EnginePanel({
   runStatus,
+  canStart, pending, progress,
   stats,
   lastEvent,
   log,
@@ -117,6 +118,7 @@ export function EnginePanel({
   onNotify,
 }: {
   runStatus: EngineRunStatus;
+  canStart?: boolean; pending?: boolean; progress?: number;
   stats: ProgressStats;
   lastEvent: string;
   log: string[];
@@ -132,8 +134,8 @@ export function EnginePanel({
   const [statsModal, setStatsModal] = useState<StatsModalKind>(null);
 
   const running = runStatus === 'running';
-  const controlsLocked = running;
-  const deferred = (label: string) => onNotify(`"${label}" is deferred — UI prototype`);
+  const controlsLocked = running || runStatus === 'queued' || pending === true;
+  const deferred = (label: string) => onNotify(`"${label}" is deferred â€” UI prototype`);
 
   const detailedLink = (kind: Exclude<StatsModalKind, null>) => (
     <em>
@@ -155,17 +157,17 @@ export function EnginePanel({
     <div className="sqd-engine">
       <div className="sqd-card sqd-control-card">
         <div className="sqd-control-buttons">
-          <button type="button" className="sqd-btn" onClick={onStop} disabled={runStatus === 'idle'} title="Stop">
+          <button type="button" className="sqd-btn" onClick={onStop} disabled={pending || !['queued', 'running', 'paused'].includes(runStatus)} title="Stop">
             <CircleStop size={15} className="sqd-ico-stop" />
             Stop
           </button>
-          <button type="button" className="sqd-btn" onClick={onPause} disabled={runStatus !== 'running'} title="Pause">
+          <button type="button" className="sqd-btn" onClick={onPause} disabled={pending || runStatus !== 'running'} title="Pause">
             <CirclePause size={15} className="sqd-ico-pause" />
             Pause
           </button>
-          <button type="button" className="sqd-btn sqd-btn-start" onClick={onStart} disabled={controlsLocked} title="Start">
+          <button type="button" className="sqd-btn sqd-btn-start" onClick={onStart} disabled={controlsLocked || canStart === false} title={runStatus === 'paused' ? 'Resume' : 'Start'}>
             <CirclePlay size={15} />
-            Start
+            {runStatus === 'paused' ? 'Resume' : 'Start'}
           </button>
         </div>
         <div className="sqd-control-icons">
@@ -200,8 +202,8 @@ export function EnginePanel({
         </div>
       </div>
 
-      <div className="sqd-progress" role="progressbar" aria-label="Build progress">
-        <div className={`sqd-progress-bar${running ? ' sqd-infinite' : ''}`} />
+      <div className="sqd-progress" role="progressbar" aria-label="Build progress" aria-valuemin={0} aria-valuemax={100} aria-valuenow={progress ?? 0}>
+        <div className="sqd-progress-bar" style={{ width: `${progress ?? 0}%` }} />
       </div>
       <div className="sqd-task-desc" title={lastEvent}>
         Task: {lastEvent}
@@ -240,7 +242,7 @@ export function EnginePanel({
             className="sqd-memory-cleanup"
             onClick={e => {
               e.preventDefault();
-              onNotify('Memory cleanup requested — deferred (UI prototype)');
+              onNotify('Memory cleanup requested â€” deferred (UI prototype)');
             }}
           >
             Memory cleanup
@@ -261,7 +263,7 @@ export function EnginePanel({
                   className="sqd-troubleshooting"
                   onClick={e => {
                     e.preventDefault();
-                    onNotify('Help "No strategies generated?" — deferred (UI prototype)');
+                    onNotify('Help "No strategies generated?" â€” deferred (UI prototype)');
                   }}
                 >
                   <Cog size={14} className="sqd-troubleshooting-ico" />

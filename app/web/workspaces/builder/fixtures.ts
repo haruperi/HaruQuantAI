@@ -14,7 +14,7 @@ export const rules: RuleNode[] = [
 // only; no engine, metric, or chart equivalence is claimed.
 // ---------------------------------------------------------------------------
 
-export type EngineRunStatus = 'idle' | 'running' | 'paused';
+export type EngineRunStatus = import('../home/EnginePanel/EngineCtrl').EngineRunStatus;
 export type SampleType = 'full' | 'in' | 'out';
 
 export interface ProgressStats {

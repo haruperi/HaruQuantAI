@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { ExecutionSettingsEditor, useProjectBinding } from '../home/projectController';
 import type { ReactNode } from 'react';
 import type { EngineRunStatus } from './fixtures';
 import { nextTabLabel, prevTabLabel, settingsTabs, visibleSettingsTabs, whatToBuildDefaults } from './settings/settingsFixtures';
@@ -41,6 +42,7 @@ export function FullSettingsView({
   runStatus: EngineRunStatus;
   onClose: () => void;
 }) {
+  const binding = useProjectBinding();
   const [activeId, setActiveId] = useState(settingsTabs[0].id);
   const [buildState, setBuildState] = useState(whatToBuildDefaults);
   const tabs = visibleSettingsTabs(buildState.strategyType);
@@ -100,8 +102,10 @@ export function FullSettingsView({
                 </svg>
                 <span>Setting changes locked, they will be applied next time you start the project.</span>
               </div>
-              <div hidden={activeId !== "what-to-build"} inert={locked}><WhatToBuildTab state={buildState} onChange={setBuildState} /></div>
-              {Object.entries(TAB_CONTENT).map(([id, content]) => <div key={id} hidden={id !== activeId} inert={locked}>{content}</div>)}
+              <div hidden={activeId !== 'what-to-build'} inert={locked}>{binding ? <ExecutionSettingsEditor /> : <WhatToBuildTab state={buildState} onChange={setBuildState} />}</div>
+              {Object.entries(TAB_CONTENT).map(([id, content]) => <div key={id} hidden={id !== activeId} inert={locked}>
+                {!binding || ['data', 'trading-options', 'money-management', 'notes'].includes(id) ? content : <p>This configuration is unavailable for the selected execution mode.</p>}
+              </div>)}
             </div>
             <div className="sqd-settings-nextbtns">
               {prevTabLabel(index, tabs) !== null && (

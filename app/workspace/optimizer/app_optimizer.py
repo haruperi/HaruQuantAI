@@ -22,12 +22,14 @@ CLI Usage:
 
 from __future__ import annotations
 
-from dataclasses import dataclass
-from typing import Any, Literal
+from collections.abc import Mapping
+from dataclasses import dataclass, replace
+from typing import Any
 
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
 from app.core.lib.responses import StandardResponse
+from app.workspace.home.service import HomeService
 from app.workspace.optimizer.common import wrap_response
 from app.workspace.optimizer.fitness_method_w_f_result import (
     FitnessMethodWFResultService,
@@ -46,18 +48,10 @@ from app.workspace.optimizer.settings_optimization import (
     OptimizationSettingsSnapshot,
     SettingsOptimizationService,
 )
-from app.workspace.optimizer.task_optimize import TaskOptimizeRunner
 
 logger = get_logger(__name__)
 
-OptimizerStatus = Literal[
-    "IDLE",
-    "RUNNING",
-    "PAUSED",
-    "COMPLETED",
-    "STOPPED",
-    "FAILED",
-]
+OptimizerStatus = str
 
 
 @dataclass(frozen=True, slots=True)
@@ -70,13 +64,16 @@ class OptimizerWorkspaceState:
     progress_pct: float
     evaluations_completed: int
     evaluations_total: int
-    best_fitness: float
+    best_fitness: float | None
     active_result_tab: str
+
+    job_id: str | None = None
 
     def to_dict(self) -> dict[str, Any]:
         """Convert state to dictionary representation."""
         return {
             "project_id": self.project_id,
+            "job_id": self.job_id,
             "settings": self.settings.to_dict(),
             "status": self.status,
             "progress_pct": self.progress_pct,
@@ -90,10 +87,13 @@ class OptimizerWorkspaceState:
 class AppOptimizerService:
     """Top-level workspace service coordinating optimizer workflows."""
 
-    def __init__(self) -> None:
+    def __init__(self, home_service: HomeService | None = None) -> None:
         """Initialize workspace service with attached sub-services."""
         self._states: dict[str, OptimizerWorkspaceState] = {}
-        self.profile_service = ResultsOptimizationProfileService()
+        self._home_service = home_service
+        self.profile_service = ResultsOptimizationProfileService(
+            home_service.result_store if home_service else None
+        )
         self.sequential_service = ResultsSequentialOptimizationService()
         self.spp_service = ResultsSysParamPermutationService()
         self.wf_service = ResultsWalkForwardService()
@@ -108,6 +108,8 @@ class AppOptimizerService:
         Returns:
             StandardResponse containing OptimizerWorkspaceState.
         """
+        if self._home_service is not None:
+            return self.get_job_state(project_id)
         state = self._states.get(project_id)
         if state is None:
             default_settings = OptimizationSettingsSnapshot()
@@ -118,7 +120,7 @@ class AppOptimizerService:
                 progress_pct=0.0,
                 evaluations_completed=0,
                 evaluations_total=0,
-                best_fitness=0.0,
+                best_fitness=None,
                 active_result_tab="OptimizationProfile",
             )
             self._states[project_id] = state
@@ -160,7 +162,7 @@ class AppOptimizerService:
             progress_pct=0.0,
             evaluations_completed=0,
             evaluations_total=evals_total,
-            best_fitness=0.0,
+            best_fitness=None,
             active_result_tab=tab,
         )
         self._states[project_id] = new_state
@@ -174,142 +176,101 @@ class AppOptimizerService:
             json_payload=new_state.to_dict(),
         )
 
-    def start(self, project_id: str) -> StandardResponse[OptimizerWorkspaceState]:
-        """Start optimization execution for project.
+    def save_native_settings(
+        self,
+        project_id: str,
+        task_id: str,
+        settings: Mapping[str, Any],
+        expected_revision: int,
+    ) -> dict[str, Any]:
+        """Persist native configuration through the shared revision owner."""
+        return self._host().save_project_settings(
+            project_id, task_id, settings, expected_revision
+        )
 
-        Args:
-            project_id: Project identifier.
+    def _host(self) -> HomeService:
+        """Require an injected project/job authority without opening a database."""
+        if self._home_service is None:
+            raise DomainError(
+                code="EXECUTION_CONTEXT_REQUIRED",
+                message="Inject the shared Home project and job service",
+            )
+        return self._home_service
 
-        Returns:
-            StandardResponse containing updated OptimizerWorkspaceState.
-        """
-        state_resp = self.get_state(project_id)
-        current_state = state_resp.data
-        settings = current_state.settings
-
+    def _apply_action(
+        self,
+        project_id: str,
+        action: str,
+        task_id: str | None = None,
+        expected_revision: int | None = None,
+        job_id: str | None = None,
+    ) -> StandardResponse[OptimizerWorkspaceState]:
+        """Delegate admission and transitions to the shared lifecycle owner."""
+        self._host().engine_action(
+            project_id, action, task_id, expected_revision, job_id
+        )
         logger.info(
-            "Starting optimization run for %s (%s)",
+            "FR-optimizer-lifecycle: delegated %s to shared project authority", action
+        )
+        return self.get_job_state(project_id, job_id)
+
+    def start(
+        self,
+        project_id: str,
+        *,
+        task_id: str | None = None,
+        expected_revision: int | None = None,
+    ) -> StandardResponse[OptimizerWorkspaceState]:
+        """Submit the selected saved revision through the shared execution owner."""
+        return self._apply_action(project_id, "start", task_id, expected_revision)
+
+    def pause(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[OptimizerWorkspaceState]:
+        """Pause the explicitly selected real job."""
+        return self._apply_action(project_id, "pause", job_id=job_id)
+
+    def resume(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[OptimizerWorkspaceState]:
+        """Resume the explicitly selected real job."""
+        return self._apply_action(project_id, "resume", job_id=job_id)
+
+    def stop(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[OptimizerWorkspaceState]:
+        """Request cooperative cancellation of the explicitly selected job."""
+        return self._apply_action(project_id, "stop", job_id=job_id)
+
+    def get_job_state(
+        self,
+        project_id: str,
+        job_id: str | None = None,
+    ) -> StandardResponse[OptimizerWorkspaceState]:
+        """Project actual job observations and completed evaluation receipts."""
+        observation = self._host().get_engine_status(project_id, job_id)
+        receipt = observation.get("result") or {}
+        current = self._states.get(project_id) or OptimizerWorkspaceState(
             project_id,
-            settings.optimization_type,
+            OptimizationSettingsSnapshot(),
+            "IDLE",
+            0,
+            0,
+            0,
+            None,
+            "OptimizationProfile",
         )
-
-        # Transition to RUNNING
-        running_state = OptimizerWorkspaceState(
-            project_id=project_id,
-            settings=settings,
-            status="RUNNING",
-            progress_pct=10.0,
-            evaluations_completed=0,
-            evaluations_total=current_state.evaluations_total,
-            best_fitness=0.0,
-            active_result_tab=current_state.active_result_tab,
+        state = replace(
+            current,
+            status=str(observation["status"]),
+            job_id=observation["job_id"],
+            progress_pct=float(observation["progress"]),
+            evaluations_completed=int(receipt.get("candidates_evaluated", 0)),
+            best_fitness=receipt.get("best_fitness"),
         )
-        self._states[project_id] = running_state
-
-        try:
-            summary = TaskOptimizeRunner.execute(project_id, settings)
-            completed_state = OptimizerWorkspaceState(
-                project_id=project_id,
-                settings=settings,
-                status="COMPLETED",
-                progress_pct=100.0,
-                evaluations_completed=summary.evaluations_completed,
-                evaluations_total=summary.evaluations_completed,
-                best_fitness=summary.best_fitness,
-                active_result_tab=current_state.active_result_tab,
-            )
-            self._states[project_id] = completed_state
-            logger.info(
-                "Optimization COMPLETED for %s: %d evals",
-                project_id,
-                summary.evaluations_completed,
-            )
-            return wrap_response(
-                request_id=f"req_{project_id}_start",
-                data=completed_state,
-                json_payload=completed_state.to_dict(),
-            )
-        except DomainError as err:
-            logger.exception("Optimization failed for %s: %s", project_id, err.message)
-            failed_state = OptimizerWorkspaceState(
-                project_id=project_id,
-                settings=settings,
-                status="FAILED",
-                progress_pct=0.0,
-                evaluations_completed=0,
-                evaluations_total=current_state.evaluations_total,
-                best_fitness=0.0,
-                active_result_tab=current_state.active_result_tab,
-            )
-            self._states[project_id] = failed_state
-            raise
-
-    def pause(self, project_id: str) -> StandardResponse[OptimizerWorkspaceState]:
-        """Pause active optimization session."""
-        state = self.get_state(project_id).data
-        if state.status != "RUNNING":
-            raise DomainError(
-                code="OPTIMIZER_CANNOT_PAUSE",
-                message=f"Cannot pause optimizer in status: {state.status}",
-            )
-        paused_state = OptimizerWorkspaceState(
-            project_id=project_id,
-            settings=state.settings,
-            status="PAUSED",
-            progress_pct=state.progress_pct,
-            evaluations_completed=state.evaluations_completed,
-            evaluations_total=state.evaluations_total,
-            best_fitness=state.best_fitness,
-            active_result_tab=state.active_result_tab,
-        )
-        self._states[project_id] = paused_state
+        self._states[project_id] = state
         return wrap_response(
-            request_id=f"req_{project_id}_pause",
-            data=paused_state,
-            json_payload=paused_state.to_dict(),
-        )
-
-    def resume(self, project_id: str) -> StandardResponse[OptimizerWorkspaceState]:
-        """Resume paused optimization session."""
-        state = self.get_state(project_id).data
-        if state.status != "PAUSED":
-            raise DomainError(
-                code="OPTIMIZER_CANNOT_RESUME",
-                message=f"Cannot resume optimizer in status: {state.status}",
-            )
-        resumed_state = OptimizerWorkspaceState(
-            project_id=project_id,
-            settings=state.settings,
-            status="RUNNING",
-            progress_pct=state.progress_pct,
-            evaluations_completed=state.evaluations_completed,
-            evaluations_total=state.evaluations_total,
-            best_fitness=state.best_fitness,
-            active_result_tab=state.active_result_tab,
-        )
-        self._states[project_id] = resumed_state
-        return wrap_response(
-            request_id=f"req_{project_id}_resume",
-            data=resumed_state,
-            json_payload=resumed_state.to_dict(),
-        )
-
-    def stop(self, project_id: str) -> StandardResponse[OptimizerWorkspaceState]:
-        """Stop optimization session."""
-        state = self.get_state(project_id).data
-        stopped_state = OptimizerWorkspaceState(
-            project_id=project_id,
-            settings=state.settings,
-            status="STOPPED",
-            progress_pct=state.progress_pct,
-            evaluations_completed=state.evaluations_completed,
-            evaluations_total=state.evaluations_total,
-            best_fitness=state.best_fitness,
-            active_result_tab=state.active_result_tab,
-        )
-        self._states[project_id] = stopped_state
-        return wrap_response(
-            request_id=f"req_{project_id}_stop",
-            data=stopped_state,
-            json_payload=stopped_state.to_dict(),
+            request_id=f"optimizer-job-{project_id}",
+            data=state,
+            json_payload=state.to_dict(),
         )

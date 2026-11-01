@@ -1,4 +1,5 @@
 import type { SettingsSection } from '../../../common/project/contracts';
+import { ExecutionSettingsEditor, useProjectBinding } from '../projectController';
 import { useSettingsPanel } from './SettingsPanelCtrl';
 
 export interface SettingsPanelProps {
@@ -9,6 +10,7 @@ export interface SettingsPanelProps {
 }
 
 export function SettingsPanel({ sections, locked, selectedId, onSelect }: SettingsPanelProps) {
+  const binding = useProjectBinding();
   const { active, setActiveId } = useSettingsPanel(sections, selectedId, onSelect);
   return <div className="sqd-settings-tabs">
     <div className="sqd-stabs-header" role="tablist" aria-label="Settings tabs">
@@ -20,8 +22,11 @@ export function SettingsPanel({ sections, locked, selectedId, onSelect }: Settin
       <div className="sqd-settings-body-header"><div className="sqd-settings-tab-desc">{active?.help}</div>
         <a className="sqd-btn sqd-btn-help" href={active?.helpUrl} target="_blank" rel="noreferrer">❔ Help</a></div>
       <div className={`sqd-settings-body-inner${locked ? ' disabled-panel' : ''}`}>
-        {locked && <div className="sqd-disabled-placeholder">Setting changes locked while the local preview is running.</div>}
-        {sections.map(s => <div key={s.id} hidden={active?.id !== s.id} inert={locked}>{s.content}</div>)}
+        {locked && <div className="sqd-disabled-placeholder">Setting changes locked while execution is active.</div>}
+        {sections.map(s => <div key={s.id} hidden={active?.id !== s.id} inert={locked}>
+          {!binding || ['data', 'money', 'options', 'notes'].includes(s.id) ? s.content :
+            s.id === 'optimization' ? <ExecutionSettingsEditor /> : <p>This configuration is unavailable for the selected execution mode.</p>}
+        </div>)}
       </div>
     </div></div>
   </div>;

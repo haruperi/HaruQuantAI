@@ -27,10 +27,12 @@ CLI Usage:
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
-from typing import Any, Literal
+from collections.abc import Mapping
+from dataclasses import dataclass, field, replace
+from typing import Any
 
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.core.lib.responses import StandardResponse
 from app.workspace.builder.common import wrap_response
 from app.workspace.builder.genetic_defaults import (
@@ -41,11 +43,11 @@ from app.workspace.builder.settings_blocks import BlocksSelectionSettings
 from app.workspace.builder.settings_parts_to_improve import PartsToImproveSettings
 from app.workspace.builder.settings_rankings import RankingsSettings
 from app.workspace.builder.settings_what_to_build import WhatToBuildSettings
-from app.workspace.builder.task_build import TaskBuildRunner
+from app.workspace.home.service import HomeService
 
 logger = get_logger(__name__)
 
-BuilderStatus = Literal["IDLE", "RUNNING", "PAUSED", "COMPLETED", "STOPPED", "FAILED"]
+BuilderStatus = str
 
 
 @dataclass(frozen=True, slots=True)
@@ -68,10 +70,13 @@ class BuilderWorkspaceState:
     rejected_count: int = 0
     generations_completed: int = 0
 
+    job_id: str | None = None
+
     def to_dict(self) -> dict[str, Any]:
         """Convert state snapshot to dictionary."""
         return {
             "project_id": self.project_id,
+            "job_id": self.job_id,
             "what_to_build": self.what_to_build.to_dict(),
             "genetic_options": {
                 "population_size": self.genetic_options.population_size,
@@ -97,9 +102,10 @@ class BuilderWorkspaceState:
 class AppBuilderService:
     """Service managing project Builder workspaces and execution transitions."""
 
-    def __init__(self) -> None:
+    def __init__(self, home_service: HomeService | None = None) -> None:
         """Initialize service with memory state store."""
         self._states: dict[str, BuilderWorkspaceState] = {}
+        self._home_service = home_service
 
     def get_state(self, project_id: str) -> StandardResponse[BuilderWorkspaceState]:
         """Retrieve or initialize the Builder workspace state for a project.
@@ -110,6 +116,8 @@ class AppBuilderService:
         Returns:
             StandardResponse containing BuilderWorkspaceState.
         """
+        if self._home_service is not None:
+            return self.get_job_state(project_id)
         logger.debug("Retrieving Builder state for project=%s", project_id)
         if project_id not in self._states:
             self._states[project_id] = BuilderWorkspaceState(project_id=project_id)
@@ -166,121 +174,92 @@ class AppBuilderService:
             json_payload=new_state.to_dict(),
         )
 
-    def start(self, project_id: str) -> StandardResponse[BuilderWorkspaceState]:
-        """Start strategy generation run for a project.
+    def save_native_settings(
+        self,
+        project_id: str,
+        task_id: str,
+        settings: Mapping[str, Any],
+        expected_revision: int,
+    ) -> dict[str, Any]:
+        """Persist native configuration through the shared revision owner."""
+        return self._host().save_project_settings(
+            project_id, task_id, settings, expected_revision
+        )
 
-        Args:
-            project_id: Project identifier.
+    def _host(self) -> HomeService:
+        """Require an injected project/job authority without opening a database."""
+        if self._home_service is None:
+            raise DomainError(
+                code="EXECUTION_CONTEXT_REQUIRED",
+                message="Inject the shared Home project and job service",
+            )
+        return self._home_service
 
-        Returns:
-            StandardResponse containing updated BuilderWorkspaceState.
-        """
-        logger.debug("Starting builder for project=%s", project_id)
-        current = self._states.get(
-            project_id, BuilderWorkspaceState(project_id=project_id)
+    def _apply_action(
+        self,
+        project_id: str,
+        action: str,
+        task_id: str | None = None,
+        expected_revision: int | None = None,
+        job_id: str | None = None,
+    ) -> StandardResponse[BuilderWorkspaceState]:
+        """Delegate admission and transitions to the shared lifecycle owner."""
+        self._host().engine_action(
+            project_id, action, task_id, expected_revision, job_id
         )
-        summary = TaskBuildRunner.execute(
-            project_id=project_id,
-            what_to_build=current.what_to_build,
-            genetic_options=current.genetic_options,
-            blocks=current.blocks,
-            parts_to_improve=current.parts_to_improve,
-            rankings=current.rankings,
+        logger.info(
+            "FR-builder-lifecycle: delegated %s to shared project authority", action
         )
-        new_state = BuilderWorkspaceState(
-            project_id=project_id,
-            what_to_build=current.what_to_build,
-            genetic_options=current.genetic_options,
-            blocks=current.blocks,
-            parts_to_improve=current.parts_to_improve,
-            rankings=current.rankings,
-            status="RUNNING",
-            generated_count=summary.candidates_evaluated,
-            accepted_count=summary.candidates_accepted,
-            rejected_count=summary.candidates_rejected,
-            generations_completed=summary.generations_completed,
+        return self.get_job_state(project_id, job_id)
+
+    def start(
+        self,
+        project_id: str,
+        *,
+        task_id: str | None = None,
+        expected_revision: int | None = None,
+    ) -> StandardResponse[BuilderWorkspaceState]:
+        """Submit the selected saved revision through the shared execution owner."""
+        return self._apply_action(project_id, "start", task_id, expected_revision)
+
+    def pause(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[BuilderWorkspaceState]:
+        """Pause the explicitly selected real job."""
+        return self._apply_action(project_id, "pause", job_id=job_id)
+
+    def resume(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[BuilderWorkspaceState]:
+        """Resume the explicitly selected real job."""
+        return self._apply_action(project_id, "resume", job_id=job_id)
+
+    def stop(
+        self, project_id: str, *, job_id: str | None = None
+    ) -> StandardResponse[BuilderWorkspaceState]:
+        """Request cooperative cancellation of the explicitly selected job."""
+        return self._apply_action(project_id, "stop", job_id=job_id)
+
+    def get_job_state(
+        self,
+        project_id: str,
+        job_id: str | None = None,
+    ) -> StandardResponse[BuilderWorkspaceState]:
+        """Project actual job observations and completed evaluation receipts."""
+        observation = self._host().get_engine_status(project_id, job_id)
+        receipt = observation.get("result") or {}
+        current = self._states.get(project_id, BuilderWorkspaceState(project_id))
+        state = replace(
+            current,
+            status=str(observation["status"]),
+            job_id=observation["job_id"],
+            generated_count=int(receipt.get("candidates_evaluated", 0)),
+            accepted_count=int(receipt.get("candidates_accepted", 0)),
+            rejected_count=int(receipt.get("candidates_rejected", 0)),
         )
-        self._states[project_id] = new_state
+        self._states[project_id] = state
         return wrap_response(
-            request_id=f"builder-start-{project_id}",
-            data=new_state,
-            json_payload=new_state.to_dict(),
-        )
-
-    def pause(self, project_id: str) -> StandardResponse[BuilderWorkspaceState]:
-        """Pause active generation run for a project."""
-        logger.debug("Pausing builder for project=%s", project_id)
-        current = self._states.get(
-            project_id, BuilderWorkspaceState(project_id=project_id)
-        )
-        new_state = BuilderWorkspaceState(
-            project_id=project_id,
-            what_to_build=current.what_to_build,
-            genetic_options=current.genetic_options,
-            blocks=current.blocks,
-            parts_to_improve=current.parts_to_improve,
-            rankings=current.rankings,
-            status="PAUSED",
-            generated_count=current.generated_count,
-            accepted_count=current.accepted_count,
-            rejected_count=current.rejected_count,
-            generations_completed=current.generations_completed,
-        )
-        self._states[project_id] = new_state
-        return wrap_response(
-            request_id=f"builder-pause-{project_id}",
-            data=new_state,
-            json_payload=new_state.to_dict(),
-        )
-
-    def resume(self, project_id: str) -> StandardResponse[BuilderWorkspaceState]:
-        """Resume paused generation run for a project."""
-        logger.debug("Resuming builder for project=%s", project_id)
-        current = self._states.get(
-            project_id, BuilderWorkspaceState(project_id=project_id)
-        )
-        new_state = BuilderWorkspaceState(
-            project_id=project_id,
-            what_to_build=current.what_to_build,
-            genetic_options=current.genetic_options,
-            blocks=current.blocks,
-            parts_to_improve=current.parts_to_improve,
-            rankings=current.rankings,
-            status="RUNNING",
-            generated_count=current.generated_count,
-            accepted_count=current.accepted_count,
-            rejected_count=current.rejected_count,
-            generations_completed=current.generations_completed,
-        )
-        self._states[project_id] = new_state
-        return wrap_response(
-            request_id=f"builder-resume-{project_id}",
-            data=new_state,
-            json_payload=new_state.to_dict(),
-        )
-
-    def stop(self, project_id: str) -> StandardResponse[BuilderWorkspaceState]:
-        """Stop strategy generation run for a project."""
-        logger.debug("Stopping builder for project=%s", project_id)
-        current = self._states.get(
-            project_id, BuilderWorkspaceState(project_id=project_id)
-        )
-        new_state = BuilderWorkspaceState(
-            project_id=project_id,
-            what_to_build=current.what_to_build,
-            genetic_options=current.genetic_options,
-            blocks=current.blocks,
-            parts_to_improve=current.parts_to_improve,
-            rankings=current.rankings,
-            status="STOPPED",
-            generated_count=current.generated_count,
-            accepted_count=current.accepted_count,
-            rejected_count=current.rejected_count,
-            generations_completed=current.generations_completed,
-        )
-        self._states[project_id] = new_state
-        return wrap_response(
-            request_id=f"builder-stop-{project_id}",
-            data=new_state,
-            json_payload=new_state.to_dict(),
+            request_id=f"builder-job-{project_id}",
+            data=state,
+            json_payload=state.to_dict(),
         )

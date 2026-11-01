@@ -1,9 +1,11 @@
-import React, { useState } from 'react';
+import React from 'react';
+import { useEngineRun, type EngineRunHandle } from '../home/EnginePanel/EngineCtrl';
 import { ProgressDashboard } from './ProgressDashboard';
 import { type EngineRunStatus } from './fixtures';
 
 export interface TaskBuildProps {
   className?: string;
+  run?: EngineRunHandle;
   strategyNames?: string[];
   runStatus?: EngineRunStatus;
   onRunStatusChange?: (status: EngineRunStatus) => void;
@@ -13,22 +15,17 @@ export interface TaskBuildProps {
 
 export const TaskBuild: React.FC<TaskBuildProps> = ({
   className = '',
-  strategyNames = [],
-  runStatus: controlledRunStatus,
-  onRunStatusChange: controlledOnChange,
+  run: providedRun,
   onOpenFullSettings = () => {},
   onOpenResults = () => {},
 }) => {
-  const [internalStatus, setInternalStatus] = useState<EngineRunStatus>('idle');
-  const runStatus = controlledRunStatus ?? internalStatus;
-  const handleStatusChange = controlledOnChange ?? setInternalStatus;
+  const fallback = useEngineRun(providedRun ? null : undefined);
+  const run = providedRun ?? fallback;
 
   return (
     <div data-testid="task-build-container" className={className}>
       <ProgressDashboard
-        strategyNames={strategyNames}
-        runStatus={runStatus}
-        onRunStatusChange={handleStatusChange}
+        run={run}
         onOpenFullSettings={onOpenFullSettings}
         onOpenResults={onOpenResults}
       />

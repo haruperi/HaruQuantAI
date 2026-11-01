@@ -1,72 +1,46 @@
-"""Unit tests for AppRetesterService."""
+"""Retester service integration with actual saved strategies and shared jobs."""
+
+from __future__ import annotations
+
+from typing import Any
 
 import pytest
 from app.core.lib.errors import DomainError
 from app.workspace.retester.app_retester import AppRetesterService
-from app.workspace.retester.settings_cross_checks import (
-    CrossChecksSettingsSnapshot,
-    GenericCheckConfig,
+from tests.workspace.builder.test_app_builder import (
+    native_environment as native_environment,  # noqa: PLC0414
 )
-from app.workspace.retester.settings_what_to_retest import WhatToRetestSettings
 
 
-class TestAppRetesterService:
-    """Test suite for AppRetesterService."""
+def test_actual_two_strategy_retest(native_environment: Any, caplog: Any) -> None:
+    home, jobs = native_environment
+    config = home.load_project("acceptance-retester")["tasks"]["task"]["settings"][
+        "execution"
+    ]
+    home.save_project_settings(
+        "acceptance-retester",
+        "task",
+        {"execution": {**config, "strategy_result_ids": ["source", "seed-run-0"]}},
+        1,
+    )
+    service = AppRetesterService(home)
+    with caplog.at_level("INFO"):
+        started = service.start(
+            "acceptance-retester", task_id="task", expected_revision=2
+        ).data
+    final = jobs.wait_for_job(started["job_id"], timeout=10)
+    assert final.status == "COMPLETED"
+    state = service.get_state("acceptance-retester").data
+    assert state["processed_count"] == 2
+    assert state["accepted_count"] == 2
+    assert state["status"] == "COMPLETED"
+    assert "FR-retester-lifecycle" in caplog.text
 
-    def test_golden_fixture_retest_two_strategies(self) -> None:
-        """Starting Retester with 2 strategies in Input databank and WhatIf enabled reaches COMPLETED with processed=2."""
-        service = AppRetesterService()
-        project_id = "proj_test_golden"
 
-        # Mock 2 strategies in "Input" databank
-        service.set_mock_databank(project_id, "Input", ["strat_01", "strat_02"])
-
-        # Configure what to retest and cross-checks
-        what = WhatToRetestSettings(source_databank="Input", target_databank="Input")
-        checks = CrossChecksSettingsSnapshot(
-            enabled=True,
-            what_if=GenericCheckConfig(enabled=True),
-        )
-        service.save_settings(project_id, what_to_retest=what, cross_checks=checks)
-
-        # Start retest
-        resp = service.start(project_id)
-        state = resp.data
-
-        assert state["project_id"] == project_id
-        assert state["status"] == "COMPLETED"
-        assert state["processed_count"] == 2
-        assert state["accepted_count"] == 2
-        assert state["rejected_count"] == 0
-        assert state["progress_pct"] == 100.0
-
-    def test_lifecycle_transitions(self) -> None:
-        """Assert state transitions: get_state, pause, resume, stop."""
-        service = AppRetesterService()
-        project_id = "proj_lifecycle"
-
-        # Initial IDLE
-        res = service.get_state(project_id)
-        assert res.data["status"] == "IDLE"
-
-        # Pause
-        res = service.pause(project_id)
-        assert res.data["status"] == "PAUSED"
-
-        # Resume
-        res = service.resume(project_id)
-        assert res.data["status"] == "RUNNING"
-
-        # Stop
-        res = service.stop(project_id)
-        assert res.data["status"] == "STOPPED"
-
-    def test_already_running_guard(self) -> None:
-        """Starting an already running retester raises RETESTER_ALREADY_RUNNING."""
-        service = AppRetesterService()
-        project_id = "proj_guard"
-        service.resume(project_id)  # sets status to RUNNING
-
-        with pytest.raises(DomainError) as exc_info:
-            service.start(project_id)
-        assert exc_info.value.code == "RETESTER_ALREADY_RUNNING"
+def test_unbound_lifecycle_cannot_claim_success() -> None:
+    service = AppRetesterService()
+    assert service.get_state("draft").data["status"] == "IDLE"
+    for action in (service.start, service.pause, service.resume, service.stop):
+        with pytest.raises(DomainError) as caught:
+            action("draft")
+        assert caught.value.code == "EXECUTION_CONTEXT_REQUIRED"

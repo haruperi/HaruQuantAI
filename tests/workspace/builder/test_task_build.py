@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+from typing import Any
+
 from app.workspace.builder.genetic_defaults import GeneticOptionsDefaults
 from app.workspace.builder.settings_blocks import (
     BlocksSelectionSettings,
@@ -11,33 +14,38 @@ from app.workspace.builder.settings_parts_to_improve import PartsToImproveSettin
 from app.workspace.builder.settings_rankings import RankingsSettings
 from app.workspace.builder.settings_what_to_build import WhatToBuildSettings
 from app.workspace.builder.task_build import BarRecord, TaskBuildRunner
+from tests.workspace.home.test_execution_acceptance import context, project
+from tests.workspace.home.test_execution_acceptance import execution as execution  # noqa: PLC0414
 
 
-def test_golden_fixture_deterministic_execution() -> None:
+def test_golden_fixture_deterministic_execution(execution: Any, tmp_path: Path) -> None:
     """Verify golden fixture: pop_size=4, max_gen=2, seed=42 evaluates 8 candidates."""
     genetic_options = GeneticOptionsDefaults(
         population_size=4,
         max_generations=2,
         islands=1,
     )
-    what_to_build = WhatToBuildSettings(build_mode="GENETIC")
+    what_to_build = WhatToBuildSettings(build_mode="RANDOM")
     blocks = BlocksSelectionSettings()
     parts = PartsToImproveSettings()
     rankings = RankingsSettings(target_databank="Results", max_records=100)
 
     summary = TaskBuildRunner.execute(
-        project_id="proj_1",
+        project_id="project",
         what_to_build=what_to_build,
         genetic_options=genetic_options,
         blocks=blocks,
         parts_to_improve=parts,
         rankings=rankings,
         seed=42,
+        execution=execution[0],
+        snapshot=execution[0].prepare(project("RANDOM", candidates=8), "task", 1),
+        context=context(tmp_path, "builder-compat"),
     )
 
     assert summary.candidates_evaluated == 8
-    assert summary.generations_completed == 2
-    assert summary.build_mode == "GENETIC"
+    assert summary.generations_completed == 1
+    assert summary.build_mode == "RANDOM"
     assert summary.candidates_accepted + summary.candidates_rejected == 8
     assert len(summary.accepted_strategy_ids) == summary.candidates_accepted
     assert summary.to_dict()["candidates_evaluated"] == 8
