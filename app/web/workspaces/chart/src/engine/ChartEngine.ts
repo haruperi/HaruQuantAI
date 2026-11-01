@@ -8,6 +8,7 @@ import { marketOpen } from '../feed/sessions';
 import { clamp, priceToY, yToPrice, niceTicks, zoomAt, transformPrice } from './scales';
 import { paintSeries, heikinAshi } from './candles';
 import { tools } from '../tools/catalog';
+import { isTextNote } from '../tools/textNotes';
 import { sourceCandles, positionPoints, defaultPositionPoints } from '../tools/forecasting';
 import { paint, primitiveHit } from '../tools/geometry';
 import type { Projection } from '../tools/types';
@@ -927,7 +928,7 @@ export class ChartEngine {
     s.setUI({
       tool: 'cursor',
       selected: drawing.id,
-      ...(['Text', 'AnchoredNote', 'Sticker'].includes(drawing.tool)
+      ...(isTextNote(drawing.tool) || ['AnchoredNote', 'Sticker'].includes(drawing.tool)
         ? { dialog: 'drawing' as const }
         : {}),
     });
@@ -1444,8 +1445,8 @@ export class ChartEngine {
     ctx.globalAlpha = d.opacity;
     ctx.font = (d.tool === 'Sticker' ? '24' : '12') + 'px Trebuchet MS';
     ctx.setLineDash(d.dash ? [6, 4] : []);
-    paint(ctx, tools[d.tool].build(d, this.projection()));
-    if (d.text && !['Text', 'AnchoredNote', 'Sticker', 'PriceLine'].includes(d.tool)) {
+    paint(ctx, tools[d.tool].build(d, this.projection()), () => this.invalidate(2));
+    if (d.text && !isTextNote(d.tool) && !['AnchoredNote', 'Sticker', 'PriceLine'].includes(d.tool)) {
       const p = this.projection().point(d.points[0]);
       ctx.fillText(d.text, p.x + 5, p.y - 8);
     }
