@@ -338,7 +338,7 @@ describe('codeEditorClient', () => {
   it('passes the indicator category to both preview and creation', async () => {
     const fetchFn = vi
       .fn()
-      .mockImplementation(mockResponse({ file_path: 'app/include/blocks/indicators/research/research_ma.py', content: '' }));
+      .mockImplementation(mockResponse({ file_path: 'app/extend/blocks/indicators/research/research_ma.py', content: '' }));
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
     await client.renderTemplatePreview('BlocksIndicators', 'ResearchMA', 'research');
     expect(fetchFn).toHaveBeenLastCalledWith(

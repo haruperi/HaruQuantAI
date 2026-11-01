@@ -479,7 +479,7 @@ def test_indicator_catalogue_disambiguates_multiple_classes_in_one_file():
     ) as name:
         path = Path(name) / "multiple.py"
         path.write_text(
-            "from app.include.blocks.indicators.trend.sma import SMA\nclass First(SMA): pass\nclass Second(SMA): pass\n",
+            "from app.extend.blocks.indicators.trend.sma import SMA\nclass First(SMA): pass\nclass Second(SMA): pass\n",
             encoding="utf-8",
         )
         records = [

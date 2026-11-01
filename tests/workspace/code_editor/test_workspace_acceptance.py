@@ -12,7 +12,7 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from app.include.blocks.price import BarPrice
+from app.extend.blocks.price import BarPrice
 from app.main import create_app
 from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 from app.workspace.code_editor.command_models import (

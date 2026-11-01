@@ -1,12 +1,12 @@
-"""Unit tests for CandlestickPatterns in app.include.blocks.indicators.price_action.candlestick_patterns."""
+"""Unit tests for CandlestickPatterns in app.extend.blocks.indicators.price_action.candlestick_patterns."""
 
 from __future__ import annotations
 
 import pytest
-from app.include.blocks.indicators.price_action.candlestick_patterns import (
+from app.extend.blocks.indicators.price_action.candlestick_patterns import (
     CandlestickPatterns,
 )
-from app.include.blocks.series import BarData
+from app.extend.blocks.series import BarData
 
 
 def test_doji_tick_size_and_ratio_modes() -> None:

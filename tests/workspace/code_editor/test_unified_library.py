@@ -4,7 +4,7 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 
 import pytest
-from app.include.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.indicators.base import BaseIndicator
 from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR, CodeEditorError
 from app.workspace.code_editor.indicator_tester import IndicatorTester
 from app.workspace.code_editor.registry import registry, unresolved_symbols
@@ -43,7 +43,7 @@ def test_builtin_resolution_uses_current_compiled_buffer():
     path = EXTEND_DIR / "blocks/indicators/trend/sma.py"
     source = (
         "from typing import ClassVar\n"
-        "from app.include.blocks.indicators.base import BaseIndicator\n"
+        "from app.extend.blocks.indicators.base import BaseIndicator\n"
         "class SMA(BaseIndicator):\n"
         "    revision: ClassVar[int] = 42\n"
         "    def calculate(self, bars): return {}\n"
@@ -138,10 +138,10 @@ def test_invalid_indicator_category_is_rejected(category):
 
 
 def test_modular_actions_preserve_the_public_facade():
-    from app.include.blocks import actions
-    from app.include.blocks.actions.annotations import DrawUpArrowAction
-    from app.include.blocks.actions.base import ActionRecord
-    from app.include.blocks.actions.facade import Actions
+    from app.extend.blocks import actions
+    from app.extend.blocks.actions.annotations import DrawUpArrowAction
+    from app.extend.blocks.actions.base import ActionRecord
+    from app.extend.blocks.actions.facade import Actions
 
     assert len(actions.__all__) == 19
     assert all(hasattr(actions, name) for name in actions.__all__)

@@ -12,7 +12,7 @@ import numpy as np
 import pytest
 from app.core.host.resources import ResourceMonitor
 from app.core.jobs.manager import JobManager
-from app.include.blocks.price import BarPrice
+from app.extend.blocks.price import BarPrice
 from app.main import create_app
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._indicator_data import (

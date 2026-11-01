@@ -10,10 +10,10 @@ import pytest
 from app.core.data.contracts import SymbolInfo, TradeResult
 from app.core.enums import TradeRetcode
 from app.core.trading.simulation.client import SimulatorClient
-from app.include.blocks.order.close.close_all_positions import close_all_positions
-from app.include.blocks.order.open.enter_at_limit import enter_at_limit
-from app.include.blocks.order.open.enter_at_market import enter_at_market
-from app.include.blocks.order.types import TradeFilter
+from app.extend.blocks.order.close.close_all_positions import close_all_positions
+from app.extend.blocks.order.open.enter_at_limit import enter_at_limit
+from app.extend.blocks.order.open.enter_at_market import enter_at_market
+from app.extend.blocks.order.types import TradeFilter
 from app.workspace.trading import (
     ExitAfterBars,
     ExitPlan,

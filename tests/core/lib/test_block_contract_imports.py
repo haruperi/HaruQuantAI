@@ -1,11 +1,11 @@
-"""Test identity between legacy bridge paths and canonical core trading block contracts."""
+"""Test identity between extend bridge paths and canonical core trading block contracts."""
 
 from __future__ import annotations
 
 import app.core.trading.blocks.base as new_base
 import app.core.trading.blocks.metadata as new_meta
-import app.include.blocks.base as old_base
-import app.include.blocks.metadata as old_meta
+import app.extend.blocks.base as old_base
+import app.extend.blocks.metadata as old_meta
 
 
 def test_old_and_new_contracts_are_identical() -> None:

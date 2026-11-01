@@ -5,6 +5,7 @@ from pathlib import Path
 from types import ModuleType
 
 import pytest
+from app.extend.blocks.strategy_control.history import ClosedTrade
 from app.extend.what_if import (
     SCENARIOS,
     BaseWhatIf,
@@ -25,7 +26,6 @@ from app.extend.what_if import (
     UseFixedLots,
     WhatIfRecord,
 )
-from app.include.blocks.strategy_control.history import ClosedTrade
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor._template_generators import _gen_what_if
 from app.workspace.code_editor.registry import SnippetRegistry

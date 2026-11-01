@@ -40,7 +40,12 @@ def inputs() -> dict[str, Any]:
 
 def indicator_type(entry: dict[str, Any]) -> type[BaseIndicator]:
     """Import one canonical class without going through a compatibility facade."""
-    module = entry["new"].removesuffix(".py").replace("/", ".")
+    module = (
+        entry["new"]
+        .replace("app/include/blocks", "app/extend/blocks")
+        .removesuffix(".py")
+        .replace("/", ".")
+    )
     cls: type[BaseIndicator] = getattr(importlib.import_module(module), entry["name"])
     return cls
 
@@ -113,7 +118,9 @@ def test_family_schema_configuration_and_editor_execution(
     with pytest.raises(ValidationError):
         cls(unknown_parameter=1)  # type: ignore[call-arg]
     registry = BlockRegistry()
-    descriptor = registry.register_block(cls, entry["new"])
+    descriptor = registry.register_block(
+        cls, entry["new"].replace("app/include/blocks", "app/extend/blocks")
+    )
     with pytest.raises(BlockRegistryError):
         descriptor.instantiate(unknown_parameter=1)
     for name, model_field in cls.model_fields.items():

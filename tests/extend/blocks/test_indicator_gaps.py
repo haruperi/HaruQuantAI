@@ -2,20 +2,20 @@
 
 from __future__ import annotations
 
-import app.include.blocks.indicators.volume.cot as cot_signals
+import app.extend.blocks.indicators.volume.cot as cot_signals
 import numpy as np
 import pytest
-from app.include.blocks.comparisons.changes_down import changes_down
-from app.include.blocks.comparisons.changes_up import changes_up
-from app.include.blocks.comparisons.crosses_above import crosses_above
-from app.include.blocks.comparisons.crosses_below import crosses_below
-from app.include.blocks.comparisons.is_falling import is_falling
-from app.include.blocks.comparisons.is_greater import is_greater
-from app.include.blocks.comparisons.is_greater_count import is_greater_count
-from app.include.blocks.comparisons.is_lower import is_lower
-from app.include.blocks.comparisons.is_lower_count import is_lower_count
-from app.include.blocks.comparisons.is_rising import is_rising
-from app.include.blocks.indicators import (
+from app.extend.blocks.comparisons.changes_down import changes_down
+from app.extend.blocks.comparisons.changes_up import changes_up
+from app.extend.blocks.comparisons.crosses_above import crosses_above
+from app.extend.blocks.comparisons.crosses_below import crosses_below
+from app.extend.blocks.comparisons.is_falling import is_falling
+from app.extend.blocks.comparisons.is_greater import is_greater
+from app.extend.blocks.comparisons.is_greater_count import is_greater_count
+from app.extend.blocks.comparisons.is_lower import is_lower
+from app.extend.blocks.comparisons.is_lower_count import is_lower_count
+from app.extend.blocks.comparisons.is_rising import is_rising
+from app.extend.blocks.indicators import (
     EMA,
     LWMA,
     MACD,
@@ -24,20 +24,20 @@ from app.include.blocks.indicators import (
     TEMA,
     BollingerBands,
 )
-from app.include.blocks.indicators.momentum.cci import CCI
-from app.include.blocks.indicators.momentum.qqe import QQE
-from app.include.blocks.indicators.momentum.stochastic import Stochastic
-from app.include.blocks.indicators.momentum.wave_trend import WaveTrend
-from app.include.blocks.indicators.trend.adx import ADX
-from app.include.blocks.indicators.trend.ichimoku import Ichimoku
-from app.include.blocks.indicators.volatility.bar_range import BarRange
-from app.include.blocks.indicators.volatility.highest_in_range import HighestInRange
-from app.include.blocks.indicators.volatility.keltner_channel import KeltnerChannel
-from app.include.blocks.indicators.volatility.lowest_in_range import LowestInRange
-from app.include.blocks.indicators.volume.cot import COT
-from app.include.blocks.indicators.volume.volume_profile import VolumeProfile
-from app.include.blocks.price import BarPrice
-from app.include.blocks.series import BarData, IndicatorSeries
+from app.extend.blocks.indicators.momentum.cci import CCI
+from app.extend.blocks.indicators.momentum.qqe import QQE
+from app.extend.blocks.indicators.momentum.stochastic import Stochastic
+from app.extend.blocks.indicators.momentum.wave_trend import WaveTrend
+from app.extend.blocks.indicators.trend.adx import ADX
+from app.extend.blocks.indicators.trend.ichimoku import Ichimoku
+from app.extend.blocks.indicators.volatility.bar_range import BarRange
+from app.extend.blocks.indicators.volatility.highest_in_range import HighestInRange
+from app.extend.blocks.indicators.volatility.keltner_channel import KeltnerChannel
+from app.extend.blocks.indicators.volatility.lowest_in_range import LowestInRange
+from app.extend.blocks.indicators.volume.cot import COT
+from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
+from app.extend.blocks.price import BarPrice
+from app.extend.blocks.series import BarData, IndicatorSeries
 
 
 def test_adx_calculate_and_all_conditions() -> None:
@@ -1004,7 +1004,7 @@ def test_volume_profile_custom_hours_and_all_36_conditions() -> None:
 
 def test_williams_pr_and_series_data_only() -> None:
     """Verify WilliamsPR conditions and that IndicatorSeries has no comparison methods."""
-    from app.include.blocks.indicators.momentum.williams_pr import WilliamsPR
+    from app.extend.blocks.indicators.momentum.williams_pr import WilliamsPR
 
     high = np.array([12.0, 13.0, 14.0, 13.5, 15.0])
     low = np.array([10.0, 11.0, 12.0, 11.5, 13.0])

@@ -7,10 +7,10 @@ from unittest.mock import AsyncMock
 
 import app.workspace.trading.exits as exit_runtime
 import pytest
-from app.include.blocks.order.close.close_all_positions import close_all_positions
-from app.include.blocks.order.open.enter_at_limit import enter_at_limit
-from app.include.blocks.order.open.enter_at_market import enter_at_market
-from app.include.blocks.order.types import TradeFilter
+from app.extend.blocks.order.close.close_all_positions import close_all_positions
+from app.extend.blocks.order.open.enter_at_limit import enter_at_limit
+from app.extend.blocks.order.open.enter_at_market import enter_at_market
+from app.extend.blocks.order.types import TradeFilter
 from app.include.contracts import SymbolInfo, TradeResult
 from app.include.enums import TradeRetcode
 from app.workspace.brokers.simulator import SimulatorClient

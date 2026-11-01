@@ -6,23 +6,23 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 
 import pytest
-from app.include.blocks.order.close.close_all_pending_orders import (
+from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,
 )
-from app.include.blocks.order.close.close_all_positions import close_all_positions
-from app.include.blocks.order.close.close_best_position import close_best_position
-from app.include.blocks.order.close.close_pending_order import close_pending_order
-from app.include.blocks.order.close.close_position import close_position
-from app.include.blocks.order.close.close_worst_position import close_worst_position
-from app.include.blocks.order.modify.set_profit_target import set_profit_target
-from app.include.blocks.order.modify.set_stop_loss import set_stop_loss
-from app.include.blocks.order.open.enter_at_limit import enter_at_limit
-from app.include.blocks.order.open.enter_at_market import enter_at_market
-from app.include.blocks.order.open.enter_at_stop import enter_at_stop
-from app.include.blocks.order.open.enter_reverse_at_market import (
+from app.extend.blocks.order.close.close_all_positions import close_all_positions
+from app.extend.blocks.order.close.close_best_position import close_best_position
+from app.extend.blocks.order.close.close_pending_order import close_pending_order
+from app.extend.blocks.order.close.close_position import close_position
+from app.extend.blocks.order.close.close_worst_position import close_worst_position
+from app.extend.blocks.order.modify.set_profit_target import set_profit_target
+from app.extend.blocks.order.modify.set_stop_loss import set_stop_loss
+from app.extend.blocks.order.open.enter_at_limit import enter_at_limit
+from app.extend.blocks.order.open.enter_at_market import enter_at_market
+from app.extend.blocks.order.open.enter_at_stop import enter_at_stop
+from app.extend.blocks.order.open.enter_reverse_at_market import (
     enter_reverse_at_market,
 )
-from app.include.blocks.order.types import TradeFilter
+from app.extend.blocks.order.types import TradeFilter
 from app.include.contracts import BridgeError, SymbolInfo, TradeCheckResult, TradeResult
 from app.include.enums import OrderTime, TradeAction, TradeRetcode
 from app.workspace.brokers.simulator import SimulatorClient

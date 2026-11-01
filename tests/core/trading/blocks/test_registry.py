@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import app.include.blocks.registry as legacy_registry
+import app.extend.blocks.registry as legacy_registry
 import pytest
 from app.core.lib.errors import DomainError
 from app.core.trading.blocks.base import BaseBlock, block

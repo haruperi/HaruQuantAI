@@ -15,64 +15,64 @@ from app.core.data.contracts import (
 from app.core.enums import DealEntry, DealType, MarginMode
 from app.core.trading.connection.base import TradingClient
 from app.core.trading.simulation.client import SimulatorClient
-from app.include.blocks.order.close.close_all_pending_orders import (
+from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,
 )
-from app.include.blocks.order.close.close_all_positions import close_all_positions
-from app.include.blocks.order.close.close_position import close_position
-from app.include.blocks.order.open.enter_at_limit import enter_at_limit
-from app.include.blocks.order.open.enter_at_market import enter_at_market
-from app.include.blocks.order.types import TradeFilter
-from app.include.blocks.strategy_control.account_balance import account_balance
-from app.include.blocks.strategy_control.account_equity import account_equity
-from app.include.blocks.strategy_control.bars_since_order_closed import (
+from app.extend.blocks.order.close.close_all_positions import close_all_positions
+from app.extend.blocks.order.close.close_position import close_position
+from app.extend.blocks.order.open.enter_at_limit import enter_at_limit
+from app.extend.blocks.order.open.enter_at_market import enter_at_market
+from app.extend.blocks.order.types import TradeFilter
+from app.extend.blocks.strategy_control.account_balance import account_balance
+from app.extend.blocks.strategy_control.account_equity import account_equity
+from app.extend.blocks.strategy_control.bars_since_order_closed import (
     bars_since_order_closed,
 )
-from app.include.blocks.strategy_control.bars_since_order_open import (
+from app.extend.blocks.strategy_control.bars_since_order_open import (
     bars_since_order_open,
 )
-from app.include.blocks.strategy_control.closed_pl_in_money import closed_pl_in_money
-from app.include.blocks.strategy_control.closed_pl_in_pips import closed_pl_in_pips
-from app.include.blocks.strategy_control.history import closed_trades
-from app.include.blocks.strategy_control.last_order_was import last_order_was
-from app.include.blocks.strategy_control.last_order_was_not import last_order_was_not
-from app.include.blocks.strategy_control.market_position import market_position
-from app.include.blocks.strategy_control.market_position_is_flat import (
+from app.extend.blocks.strategy_control.closed_pl_in_money import closed_pl_in_money
+from app.extend.blocks.strategy_control.closed_pl_in_pips import closed_pl_in_pips
+from app.extend.blocks.strategy_control.history import closed_trades
+from app.extend.blocks.strategy_control.last_order_was import last_order_was
+from app.extend.blocks.strategy_control.last_order_was_not import last_order_was_not
+from app.extend.blocks.strategy_control.market_position import market_position
+from app.extend.blocks.strategy_control.market_position_is_flat import (
     market_position_is_flat,
 )
-from app.include.blocks.strategy_control.market_position_is_long import (
+from app.extend.blocks.strategy_control.market_position_is_long import (
     market_position_is_long,
 )
-from app.include.blocks.strategy_control.market_position_is_not_long import (
+from app.extend.blocks.strategy_control.market_position_is_not_long import (
     market_position_is_not_long,
 )
-from app.include.blocks.strategy_control.market_position_is_not_short import (
+from app.extend.blocks.strategy_control.market_position_is_not_short import (
     market_position_is_not_short,
 )
-from app.include.blocks.strategy_control.market_position_is_short import (
+from app.extend.blocks.strategy_control.market_position_is_short import (
     market_position_is_short,
 )
-from app.include.blocks.strategy_control.market_position_size import (
+from app.extend.blocks.strategy_control.market_position_size import (
     market_position_size,
 )
-from app.include.blocks.strategy_control.market_positions_count import (
+from app.extend.blocks.strategy_control.market_positions_count import (
     market_positions_count,
 )
-from app.include.blocks.strategy_control.no_trade_recently_closed import (
+from app.extend.blocks.strategy_control.no_trade_recently_closed import (
     no_trade_recently_closed,
 )
-from app.include.blocks.strategy_control.open_pl_in_money import open_pl_in_money
-from app.include.blocks.strategy_control.open_pl_in_pips import open_pl_in_pips
-from app.include.blocks.strategy_control.order_open_price import order_open_price
-from app.include.blocks.strategy_control.order_pt import order_pt
-from app.include.blocks.strategy_control.order_sl import order_sl
-from app.include.blocks.strategy_control.pending_order_doesnt_exist import (
+from app.extend.blocks.strategy_control.open_pl_in_money import open_pl_in_money
+from app.extend.blocks.strategy_control.open_pl_in_pips import open_pl_in_pips
+from app.extend.blocks.strategy_control.order_open_price import order_open_price
+from app.extend.blocks.strategy_control.order_pt import order_pt
+from app.extend.blocks.strategy_control.order_sl import order_sl
+from app.extend.blocks.strategy_control.pending_order_doesnt_exist import (
     pending_order_doesnt_exist,
 )
-from app.include.blocks.strategy_control.pending_order_exists import (
+from app.extend.blocks.strategy_control.pending_order_exists import (
     pending_order_exists,
 )
-from app.include.blocks.strategy_control.trade_recently_closed import (
+from app.extend.blocks.strategy_control.trade_recently_closed import (
     trade_recently_closed,
 )
 from app.workspace.trading import Trading

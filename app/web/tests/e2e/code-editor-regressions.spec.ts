@@ -14,7 +14,7 @@ async function mockEditor(page: Page, source = 'value = 1\n') {
       }),
     );
   });
-  let path = 'app/include/blocks/indicators/custom/example.py';
+  let path = 'app/extend/blocks/indicators/custom/example.py';
   let disk = source;
   let tabs = [{ file_path: path, title: 'example.py', content: disk, is_dirty: false, mode: 'python' }];
   let active: string | null = path;
@@ -84,11 +84,11 @@ async function mockEditor(page: Page, source = 'value = 1\n') {
       const snake = (value: string) => value.replace(/([a-z0-9])([A-Z])/g, '$1_$2').toLowerCase();
       data = {
         content: `class ${body.name}: pass`,
-        file_path: `app/include/blocks/indicators/${snake(body.category)}/${snake(body.name)}.py`,
+        file_path: `app/extend/blocks/indicators/${snake(body.category)}/${snake(body.name)}.py`,
       };
     } else if (endpoint === '/templates/create') {
       creates.push(body);
-      path = `app/include/blocks/indicators/${body.category}/my_indicator.py`;
+      path = `app/extend/blocks/indicators/${body.category}/my_indicator.py`;
       data = {
         status: 'created',
         file_path: path,
@@ -175,13 +175,13 @@ test('indicator creation supports presets, a custom category and the full target
   const mock = await mockEditor(page);
   await page.goto('/codeeditor');
   await page.getByRole('button', { name: 'Create from Template', exact: true }).click();
-  await expect(page.getByText('app/include/blocks/indicators/custom/my_indicator.py', { exact: true })).toBeVisible();
+  await expect(page.getByText('app/extend/blocks/indicators/custom/my_indicator.py', { exact: true })).toBeVisible();
   await page.getByLabel('Category', { exact: true }).selectOption('trend');
-  await expect(page.getByText('app/include/blocks/indicators/trend/my_indicator.py', { exact: true })).toBeVisible();
+  await expect(page.getByText('app/extend/blocks/indicators/trend/my_indicator.py', { exact: true })).toBeVisible();
   await page.getByLabel('Category', { exact: true }).selectOption('__new__');
   await expect(page.getByRole('button', { name: 'Create & Open', exact: true })).toBeDisabled();
   await page.getByLabel('New indicator category').fill('research');
-  await expect(page.getByText('app/include/blocks/indicators/research/my_indicator.py', { exact: true })).toBeVisible();
+  await expect(page.getByText('app/extend/blocks/indicators/research/my_indicator.py', { exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Create & Open', exact: true }).click();
   await expect.poll(() => mock.creates.length).toBe(1);
   expect(mock.creates[0]).toEqual({ template_type: 'BlocksIndicators', name: 'MyIndicator', category: 'research' });
@@ -247,8 +247,8 @@ test('Python brackets and four-space indentation work while typing', async ({ pa
 
 test('each tab retains its own undo history', async ({ page }) => {
   await mockEditor(page);
-  const first = 'app/include/blocks/indicators/custom/example.py';
-  const second = 'app/include/blocks/indicators/custom/other.py';
+  const first = 'app/extend/blocks/indicators/custom/example.py';
+  const second = 'app/extend/blocks/indicators/custom/other.py';
   await page.route('**/code-editor/navigator', (route) =>
     route.fulfill({
       json: {
@@ -299,7 +299,7 @@ test('backend diagnostics appear inline in the editor', async ({ page }) => {
         status: 'success',
         data: {
           job_id: 'inline-job', status: 'COMPLETED', progress: 100, message: 'Compilation completed with diagnostics', cancellation_requested: false,
-          results: [{ success: false, file: 'app/include/blocks/indicators/custom/example.py',
+          results: [{ success: false, file: 'app/extend/blocks/indicators/custom/example.py',
           errors: [{ line: 1, column: 10, severity: 'error', message: 'Unresolved symbol: missing_name' }] }],
         },
       },
@@ -534,8 +534,8 @@ function packageModal(page: Page) {
 }
 
 async function pendingPackage(page: Page, files = [
-  'app/include/blocks/indicators/custom/first.py',
-  'app/include/blocks/indicators/custom/second.py',
+  'app/extend/blocks/indicators/custom/first.py',
+  'app/extend/blocks/indicators/custom/second.py',
 ]) {
   await mockEditor(page);
   await page.addInitScript(() => {
@@ -598,8 +598,8 @@ async function consumePackageResponse(page: Page, route: Route, data: unknown, e
 }
 
 const packagePreview = [
-  { filename: 'app/include/blocks/indicators/custom/existing.py', file_size: 24, exists_locally: true },
-  { filename: 'app/include/blocks/indicators/custom/new.py', file_size: 32, exists_locally: false },
+  { filename: 'app/extend/blocks/indicators/custom/existing.py', file_size: 24, exists_locally: true },
+  { filename: 'app/extend/blocks/indicators/custom/new.py', file_size: 32, exists_locally: false },
 ];
 
 test('package export without open files is disabled and sends no request', async ({ page }) => {
@@ -987,7 +987,7 @@ test('compilation diagnostics restore after reconnect', async ({ page }) => {
   await mockEditor(page, 'broken = missing_name');
   await page.route('**/code-editor/compilations', route => route.fulfill({ json: { status: 'success', data: {
     job_id: 'editor-restored', status: 'COMPLETED', progress: 100, message: 'Restored diagnostics', cancellation_requested: false,
-    results: [{ file: 'app/include/blocks/indicators/custom/example.py', success: false,
+    results: [{ file: 'app/extend/blocks/indicators/custom/example.py', success: false,
       errors: [{ line: 1, column: 10, severity: 'error', message: 'Restored unresolved symbol' }] }],
   } } }));
   await page.goto('/codeeditor');
@@ -1019,7 +1019,7 @@ test('package compilation, compile all and extension reload use distinct scopes'
 
 test('compilation results stay behind a compact status summary and surface failed files', async ({ page }) => {
   await mockEditor(page);
-  const file = 'app/include/blocks/indicators/custom/example.py';
+  const file = 'app/extend/blocks/indicators/custom/example.py';
   await page.route('**/code-editor/compilations', route => route.fulfill({ json: { status: 'success', data: {
     job_id: 'editor-failed-file', status: 'COMPLETED', progress: 100,
     message: 'Compilation completed with diagnostics', cancellation_requested: false,
@@ -1049,7 +1049,7 @@ test('builtin protection makes the buffer read only and ownership filtering reac
     filters.push(new URL(route.request().url()).searchParams.get('ownership') ?? 'all');
     return route.fulfill({ json: { status: 'success', data: {
       id: 'app/include', name: 'snippets', type: 'directory', children: [{
-        id: 'app/include/blocks/indicators/custom/example.py', name: 'example.py', type: 'file', protected: true, ownership: 'builtin',
+        id: 'app/extend/blocks/indicators/custom/example.py', name: 'example.py', type: 'file', protected: true, ownership: 'builtin',
       }],
     } } });
   });
@@ -1073,7 +1073,7 @@ test('code export creation uses the selected supported format', async ({ page })
   page.once('dialog', dialog => dialog.accept('app/include/user/code_templates/pseudocode/new.txt.tpl'));
   await page.getByRole('button', { name: 'Create export template', exact: true }).click();
   await expect.poll(() => requests.length).toBe(1);
-  expect(requests[0]).toEqual({ source_paths: ['app/include/blocks/indicators/custom/example.py'], target_path: 'app/include/user/code_templates/pseudocode/new.txt.tpl', format_id: 'pseudocode' });
+  expect(requests[0]).toEqual({ source_paths: ['app/extend/blocks/indicators/custom/example.py'], target_path: 'app/include/user/code_templates/pseudocode/new.txt.tpl', format_id: 'pseudocode' });
 });
 
 test('late reconnect diagnostics cannot overwrite a newly submitted compilation', async ({ page }) => {
@@ -1119,7 +1119,7 @@ test('corrupted-session recovery fails visibly without writing a replacement ses
 test('template UI includes order subtypes and indicator-derived signal mappings', async ({ page }) => {
   const mock = await mockEditor(page);
   await page.route('**/code-editor/catalogue/indicators', route => route.fulfill({ json: { status: 'success', data: [
-    { identity: 'app/include/blocks/indicators/trend/sma.py', file_path: 'app/include/blocks/indicators/trend/sma.py', name: 'SMA', outputs: ['value'], parameters: { period: 14 }, protected: true },
+    { identity: 'app/extend/blocks/indicators/trend/sma.py', file_path: 'app/extend/blocks/indicators/trend/sma.py', name: 'SMA', outputs: ['value'], parameters: { period: 14 }, protected: true },
   ] } }));
   const previews: Array<{ indicator?: string; order_action_type?: string }> = [];
   await page.route('**/code-editor/templates/render', route => {
@@ -1132,17 +1132,17 @@ test('template UI includes order subtypes and indicator-derived signal mappings'
   await page.getByRole('combobox', { name: 'Order action subtype' }).selectOption('Close');
   await expect.poll(() => previews.some(request => request.order_action_type === 'Close')).toBe(true);
   await page.getByRole('button', { name: /Blocks Signal Trading signals/ }).click();
-  await page.getByRole('combobox', { name: 'Signal indicator' }).selectOption('app/include/blocks/indicators/trend/sma.py');
+  await page.getByRole('combobox', { name: 'Signal indicator' }).selectOption('app/extend/blocks/indicators/trend/sma.py');
   await expect.poll(() => previews.some(request => request.indicator?.endsWith('/sma.py'))).toBe(true);
   await page.getByRole('button', { name: 'Create & Open', exact: true }).click();
   await expect.poll(() => mock.creates.length).toBe(1);
-  expect(mock.creates[0]).toMatchObject({ template_type: 'BlocksSignal', indicator: 'app/include/blocks/indicators/trend/sma.py' });
+  expect(mock.creates[0]).toMatchObject({ template_type: 'BlocksSignal', indicator: 'app/extend/blocks/indicators/trend/sma.py' });
 });
 
 test('restored diagnostics are only attached to the matching source version', async ({ page }) => {
   await mockEditor(page, 'newer_buffer = 1');
   const original = 'broken = missing_name';
-  const path = 'app/include/blocks/indicators/custom/example.py';
+  const path = 'app/extend/blocks/indicators/custom/example.py';
   await page.route('**/code-editor/compilations', route => route.fulfill({ json: { status: 'success', data: {
     job_id: 'editor-versioned', status: 'COMPLETED', progress: 100, message: 'Restored result', cancellation_requested: false,
     source_hashes: { [path]: createHash('sha256').update(original).digest('hex') },

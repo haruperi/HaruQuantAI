@@ -39,16 +39,16 @@ uv run pytest tests/workspace/trading tests/workspace/brokers tests/examples/tes
 
 ## Canonical strategy operations
 
-Strategy operations now live in `app/include/blocks/order` and
-`app/include/blocks/strategy_control`. The old lowercase helper methods and
+Strategy operations now live in `app/extend/blocks/order` and
+`app/extend/blocks/strategy_control`. The old lowercase helper methods and
 workspace exports of `TradeFilter` / `ClosedTrade` have been removed.
 Import each operation from its owning module:
 
 ```python
-from app.include.blocks.order.open.enter_at_market import enter_at_market
-from app.include.blocks.order.close.close_best_position import close_best_position
-from app.include.blocks.order.types import TradeFilter
-from app.include.blocks.strategy_control.market_positions_count import (
+from app.extend.blocks.order.open.enter_at_market import enter_at_market
+from app.extend.blocks.order.close.close_best_position import close_best_position
+from app.extend.blocks.order.types import TradeFilter
+from app.extend.blocks.strategy_control.market_positions_count import (
     market_positions_count,
 )
 
@@ -84,7 +84,7 @@ qualification limits are documented in `docs/dev/trading-block-migration.md`.
 strategy actions. No broker-specific implementation or background task is added.
 
 ```python
-from app.include.blocks.order.types import TradeFilter
+from app.extend.blocks.order.types import TradeFilter
 from app.workspace.trading import (
     ExitAfterBars,
     ExitPlan,
