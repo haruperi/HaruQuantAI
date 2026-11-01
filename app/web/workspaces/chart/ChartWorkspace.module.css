@@ -943,3 +943,73 @@
   font: inherit;
   line-height: 1.5;
 }
+
+/* TradingView-like magnet strength and optional indicator snapping menu. */
+.root :global(.cq-magnet-menu) {
+  width: 205px;
+  padding: 5px;
+  border-radius: 6px;
+  box-shadow: 0 8px 28px #0007;
+}
+.root :global(.cq-magnet-menu .cq-magnet-option) {
+  display: flex;
+  justify-content: flex-start;
+  gap: 10px;
+  width: 100%;
+  min-height: 36px;
+  height: 36px;
+  padding: 6px 9px;
+  font-size: 12px;
+  text-align: left;
+  border-radius: 5px;
+}
+.root :global(.cq-magnet-menu .cq-magnet-option svg) {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+.root :global(.cq-magnet-menu .cq-magnet-option[aria-checked='true']) {
+  background: var(--cq-hover);
+  color: var(--cq-text);
+}
+.root :global(.cq-magnet-switch-row) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 1px solid var(--cq-border);
+  margin-top: 4px;
+  padding: 9px 8px 4px;
+  gap: 8px;
+  color: var(--cq-muted);
+  white-space: nowrap;
+  font-size: 12px;
+}
+.root :global(.cq-magnet-switch-row button[role='switch']) {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 36px;
+  min-width: 36px;
+  height: 20px;
+  min-height: 20px;
+  border-radius: 12px;
+  padding: 3px;
+  background: #43454b;
+}
+.root :global(.cq-magnet-switch-row button[role='switch'][aria-checked='true']) {
+  background: #2962ff;
+}
+.root :global(.cq-magnet-switch-row button[role='switch'][aria-checked='true'] span) {
+  transform: translateX(16px);
+}
+.root :global(.cq-magnet-switch-row button[role='switch'] span) {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  background: white;
+  transition: transform 120ms ease;
+}
+.root :global(.cq-magnet-switch-row button[role='switch']:disabled) {
+  opacity: .45;
+}
