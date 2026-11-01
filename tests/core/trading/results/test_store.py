@@ -184,3 +184,24 @@ def test_transactional_rollback(persistence_gateway: HostPersistence) -> None:
     with pytest.raises(DomainError) as exc_info:
         root_store.get_result("res-001")
     assert exc_info.value.code == "RESULT_NOT_FOUND"
+
+
+def test_legacy_record_without_mae_mfe_loads_cleanly(
+    persistence_gateway: HostPersistence,
+) -> None:
+    """Historical records stored without mae_mfe deserialize safely with empty tuple default."""
+    legacy_payload = {
+        "result_id": "legacy-res-001",
+        "databank_id": "db-legacy",
+        "strategy_id": "strat-old",
+        "strategy_name": "OldStrategy",
+        "metrics": {"net_profit": 500.0, "max_drawdown": 12.5},
+        "trades": [{"ticket": 1, "profit": 500.0}],
+        "equity_curve": [{"time": "2026-01-01T10:00:00Z", "equity": 10500.0}],
+    }
+    loaded = RunResult.from_dict(legacy_payload)
+    assert loaded.result_id == "legacy-res-001"
+    assert loaded.mae_mfe == ()
+    summary = loaded.to_summary()
+    # Check max_drawdown mapped to drawdown in summary
+    assert summary.drawdown == 12.5

@@ -1,4 +1,5 @@
 # AppCore - library work orders
+> **Completion Audit:** See [AppCore completion audit and requirement matrix](research/appcore-completion-audit.md) for verified status, test evidence, defect fixes, and format decisions.
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -688,6 +689,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit if changes are required:* `core: retain the canonical metadata persistence gateway`.
 
 ### `ProjectStore` and `ResultStore` - WO-C11.02 - READY
+> **Supersession Notice (2026-11-01):** The XML-specific .cfx instructions below are superseded by the ratified native JSON `.haru` container format (`manifest.json`, `project.json`, `tasks/*.json`). See the [AppCore completion audit](research/appcore-completion-audit.md) for details. Historical .cfx text is preserved for provenance.
 
 *Feature:* persistence services for `.cfx` project containers and strategy backtest databank results.
 *Evidence IDs:* `PREVIOUS-002`, `OBS-CORE-CFX-001`; donor classes inspected in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`, `ResultsGroup.java`, `results/file/`.
@@ -709,6 +711,7 @@ These orders replace the former summary table. `READY` authorizes only the expli
 *Commit:* `feat(core): implement project store and databank result persistence`.
 
 ### `ProjectEnvelope` - WO-C11.03 - READY (bounded source-backed slice)
+> **Supersession Notice (2026-11-01):** The XML-specific .cfx instructions below are superseded by the ratified native JSON `.haru` container format (`manifest.json`, `project.json`, `tasks/*.json`). See the [AppCore completion audit](research/appcore-completion-audit.md) for details. Historical .cfx text is preserved for provenance.
 
 *Feature:* read/write a project config XML document plus named task XML documents without interpreting the full project/strategy schema. This does not complete WO-C11.02 or authorize result-container support.
 *Evidence:* `OBS-CORE-SOURCE-20261030`; `SQFileManager.createProjectFile`, `loadProjectConfig` and `loadTaskConfigs` in `DONOR_REFERENCE_ROOT/internal/libs/tradinglib/file/SQFileManager.java`.

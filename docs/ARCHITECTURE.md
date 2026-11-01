@@ -131,9 +131,10 @@ CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES -> READY
 ### 4.2 Quantitative Engine Subsystems (`app/core/`)
 
 * **`app/core/data/`:** High-performance time series data structures, columnar bar/tick storage (Arrow/Polars/DuckDB), and resamplers.
-* **`app/core/trading/`:** Core order models (`Market`, `Limit`, `Stop`), position lifecycle, fill simulation, cash/margin accounting, and slippage/commission models.
+* **`app/core/trading/`:** Core order models (`Market`, `Limit`, `Stop`), position lifecycle, fill simulation, cash/margin accounting, slippage/commission models, optimization engines (grid search, Walk-Forward Analysis with WFE metrics), and databank result storage with MAE/MFE tracking.
+* **`app/core/trading/project/`:** Native `.haru` container format (atomic ZIP package enclosing `manifest.json`, `project.json`, and `tasks/*.json`) with strict path traversal defenses. Supersedes historical XML `.cfx` envelope instructions (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)).
 * **`app/core/grid/`:** Distributed grid compute protocol, worker node discovery, message serialization, and task slicing.
-* **`app/core/wizard/`:** Multi-platform strategy AST normalizer and Jinja2 code generator supporting MQL5, MQL4, EasyLanguage, cTrader C#, and Python.
+* **`app/core/wizard/`:** Multi-platform strategy AST normalizer and Jinja2 code generator supporting MQL5, MQL4, EasyLanguage, cTrader C#, and Python with fail-closed validation and Python AST syntax verification.
 
 ---
 

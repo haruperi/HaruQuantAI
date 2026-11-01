@@ -151,3 +151,56 @@ def test_modular_actions_preserve_the_public_facade():
     record = Actions.draw_up_arrow(shift=3)
     assert record.action_type == "draw_up_arrow"
     assert record.params["shift"] == 3
+
+
+def test_validator_accepts_either_base_what_if_and_rejects_unrelated_or_abstract() -> (
+    None
+):
+    import types
+    from collections.abc import Sequence
+
+    from app.extend.what_if.base import BaseWhatIf as ExtBaseWhatIf
+    from app.extend.what_if.base import WhatIfRecord as ExtRecord
+    from app.include.what_if.base import BaseWhatIf as IncBaseWhatIf
+    from app.include.what_if.base import WhatIfRecord as IncRecord
+    from app.workspace.code_editor.registry import SnippetRegistry
+
+    reg = SnippetRegistry()
+
+    class ConcreteIncludeWhatIf(IncBaseWhatIf):
+        def filter_trades(self, trades: Sequence[IncRecord]) -> list[IncRecord]:
+            return list(trades)
+
+    mod_inc = types.ModuleType("custom_inc_mod")
+    mod_inc.ConcreteIncludeWhatIf = ConcreteIncludeWhatIf  # type: ignore[attr-defined]
+    ConcreteIncludeWhatIf.__module__ = "custom_inc_mod"
+    res_inc = reg.register(Path("app/include/what_if/inc.py"), mod_inc)
+    assert "ConcreteIncludeWhatIf" in res_inc
+
+    class ConcreteExtendWhatIf(ExtBaseWhatIf):
+        def filter_trades(self, trades: Sequence[ExtRecord]) -> list[ExtRecord]:
+            return list(trades)
+
+    mod_ext = types.ModuleType("custom_ext_mod")
+    mod_ext.ConcreteExtendWhatIf = ConcreteExtendWhatIf  # type: ignore[attr-defined]
+    ConcreteExtendWhatIf.__module__ = "custom_ext_mod"
+    res_ext = reg.register(Path("app/include/what_if/ext.py"), mod_ext)
+    assert "ConcreteExtendWhatIf" in res_ext
+
+    class UnrelatedClass:
+        pass
+
+    mod_unrelated = types.ModuleType("custom_unrelated_mod")
+    mod_unrelated.UnrelatedClass = UnrelatedClass  # type: ignore[attr-defined]
+    UnrelatedClass.__module__ = "custom_unrelated_mod"
+    with pytest.raises(CodeEditorError, match="must implement BaseWhatIf"):
+        reg.register(Path("app/include/what_if/unrelated.py"), mod_unrelated)
+
+    class AbstractWhatIf(IncBaseWhatIf):
+        pass
+
+    mod_abstract = types.ModuleType("custom_abstract_mod")
+    mod_abstract.AbstractWhatIf = AbstractWhatIf  # type: ignore[attr-defined]
+    AbstractWhatIf.__module__ = "custom_abstract_mod"
+    with pytest.raises(CodeEditorError, match="must implement BaseWhatIf"):
+        reg.register(Path("app/include/what_if/abstract.py"), mod_abstract)

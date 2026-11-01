@@ -41,12 +41,13 @@ from types import ModuleType
 from typing import Protocol, cast
 
 from app.core.lib.errors import JSONValue, copy_json
-from app.extend.what_if.base import BaseWhatIf
+from app.extend.what_if.base import BaseWhatIf as _ExtendBaseWhatIf
 from app.include.blocks.indicators.base import BaseIndicator
 from app.include.blocks.money_management.base import (
     BasePositionSizer as _BasePositionSizer,
 )
 from app.include.metrics.base import BaseMetric as _BaseMetric
+from app.include.what_if.base import BaseWhatIf as _IncludeBaseWhatIf
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.code_editor.results import Diagnostic
 
@@ -98,7 +99,7 @@ class SnippetRegistry:
         if "indicators" in path.parts:
             base = BaseIndicator
         elif "what_if" in path.parts:
-            base = BaseWhatIf
+            base = (_ExtendBaseWhatIf, _IncludeBaseWhatIf)
         elif "metrics" in path.parts:
             base = _BaseMetric
         elif "money_management" in path.parts:

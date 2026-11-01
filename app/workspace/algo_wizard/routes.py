@@ -37,7 +37,10 @@ CLI Usage:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    wizard_router: APIRouter
 
 from fastapi import APIRouter, HTTPException
 
@@ -404,7 +407,17 @@ def create_wizard_router(
     return router
 
 
-wizard_router = create_wizard_router()
+_router_cache: dict[str, APIRouter] = {}
+
+
+def __getattr__(name: str) -> Any:
+    """Lazily instantiate and cache router to avoid import-time side effects."""
+    if name == "wizard_router":
+        if "wizard_router" not in _router_cache:
+            _router_cache["wizard_router"] = create_wizard_router()
+        return _router_cache["wizard_router"]
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
+
 
 __all__ = [
     "create_wizard_router",

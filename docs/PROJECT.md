@@ -2,7 +2,7 @@
 
 **Status:** Active Clean-Room Reimplementation of StrategyQuant X (SQX-145).
 **Baseline Roadmap:** [`docs/dev/full-reimplementation/`](dev/full-reimplementation/00-README.md).
-**Current Milestone:** Phase 01 (AppCore) 100% complete; Phase 02 (AppHome) foundation operational; Phase 03 (AppDataManager) active.
+**Current Milestone:** Phase 01 (AppCore) verified and audited (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)); Phase 02 (AppHome) foundation operational; Phase 03 (AppDataManager) active.
 
 ---
 
@@ -66,7 +66,7 @@ The clean-room reimplementation is organized into 20 domain phases detailed in [
 
 | Phase | Phase Document | Domain Name | Scope & Capabilities | Current Status |
 | :---: | :--- | :--- | :--- | :---: |
-| **01** | [`01-AppCore.md`](dev/full-reimplementation/01-AppCore.md) | **AppCore** | Pure quant engine, time series, trading primitives, grid protocol, host lifecycle, persistence WAL, jobs, wizard code transforms. | **100% Complete**<br/>(34 WOs, 459 tests) |
+| **01** | [`01-AppCore.md`](dev/full-reimplementation/01-AppCore.md) | **AppCore** | Pure quant engine, time series, trading primitives, grid protocol, host lifecycle, persistence WAL, jobs, wizard code transforms. | **Verified & Audited**<br/>(34 WOs, see [audit](dev/full-reimplementation/research/appcore-completion-audit.md)) |
 | **02** | [`02-AppHome.md`](dev/full-reimplementation/02-AppHome.md) | **AppHome** | Central workstation hub, project registry, dashboard configuration, ATM visibility rules, settings, release notes. | **Foundation Complete**<br/>(HOM-M01, H01–H06) |
 | **03** | [`03-AppDataManager.md`](dev/full-reimplementation/03-AppDataManager.md) | **AppDataManager** | Market data catalog, tick/bar storage, instrument specs, sessions, baskets, broker profiles, data quality review, bar transforms. | **Active Phase**<br/>(DM-M01 migrated) |
 | **04** | [`04-AppCodeEditor.md`](dev/full-reimplementation/04-AppCodeEditor.md) | **AppCodeEditor** | Multi-language code editor, compilation hooks, syntax trees, algorithmic snippets, and template integration. | *Planned* |

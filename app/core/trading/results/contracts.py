@@ -97,6 +97,7 @@ class RunResult:
     metrics: dict[str, float | int | str] = field(default_factory=dict)
     trades: tuple[dict[str, JSONValue], ...] = ()
     equity_curve: tuple[dict[str, JSONValue], ...] = ()
+    mae_mfe: tuple[dict[str, JSONValue], ...] = ()
     parameters: dict[str, JSONValue] = field(default_factory=dict)
     strategy_payload: dict[str, JSONValue] = field(default_factory=dict)
     created_at: str = field(default_factory=lambda: datetime.now(UTC).isoformat())
@@ -104,6 +105,9 @@ class RunResult:
 
     def to_summary(self) -> ResultSummary:
         """Derive lightweight summary containing key performance indicators."""
+        drawdown_val = float(
+            self.metrics.get("drawdown", self.metrics.get("max_drawdown", 0.0))
+        )
         return ResultSummary(
             result_id=self.result_id,
             databank_id=self.databank_id,
@@ -111,7 +115,7 @@ class RunResult:
             strategy_name=self.strategy_name,
             net_profit=float(self.metrics.get("net_profit", 0.0)),
             profit_factor=float(self.metrics.get("profit_factor", 0.0)),
-            drawdown=float(self.metrics.get("drawdown", 0.0)),
+            drawdown=drawdown_val,
             sharpe_ratio=float(self.metrics.get("sharpe_ratio", 0.0)),
             trades_count=int(self.metrics.get("trades_count", len(self.trades))),
             win_rate=float(self.metrics.get("win_rate", 0.0)),
@@ -129,6 +133,7 @@ class RunResult:
             "metrics": dict(self.metrics),
             "trades": [copy_json(t) for t in self.trades],
             "equity_curve": [copy_json(e) for e in self.equity_curve],
+            "mae_mfe": [copy_json(m) for m in self.mae_mfe],
             "parameters": copy_json(self.parameters),
             "strategy_payload": copy_json(self.strategy_payload),
             "created_at": self.created_at,
@@ -141,6 +146,7 @@ class RunResult:
         metrics = _parse_metrics(data.get("metrics"))
         trades = _parse_dict_list(data.get("trades"))
         equity = _parse_dict_list(data.get("equity_curve"))
+        mae_mfe = _parse_dict_list(data.get("mae_mfe"))
 
         params_raw = data.get("parameters", {})
         params = copy_json(params_raw) if isinstance(params_raw, dict) else {}
@@ -156,6 +162,7 @@ class RunResult:
             metrics=metrics,
             trades=trades,
             equity_curve=equity,
+            mae_mfe=mae_mfe,
             parameters=params if isinstance(params, dict) else {},
             strategy_payload=payload if isinstance(payload, dict) else {},
             created_at=str(data.get("created_at", "")),

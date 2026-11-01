@@ -414,8 +414,6 @@ _BUILTIN_PRIMITIVES: tuple[HSLBlockCatalogueEntry, ...] = _builtin_hsl_primitive
 
 def _seed_default_indicators_if_empty(registry: BlockRegistry) -> None:
     """Populate the default BlockRegistry from composition_manifest when empty."""
-    if len(registry.snapshot()) > 0:
-        return
     manifest = composition_manifest()
     calculations = manifest.get("calculations", {})
     if not isinstance(calculations, Mapping):

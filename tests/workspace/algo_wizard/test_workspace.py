@@ -486,3 +486,38 @@ def test_wizard_http_routes_end_to_end() -> None:
         ).status_code
         == 200
     )
+
+
+def test_importing_models_does_not_populate_global_registry() -> None:
+    """Importing AlgoWizard models in a fresh subprocess must not seed the global registry."""
+    import subprocess
+    import sys
+
+    code = (
+        "import sys;"
+        "from app.workspace.algo_wizard.models import HSLStrategyDocument;"
+        "from app.core.trading.blocks.registry import block_registry;"
+        "sys.exit(0 if len(block_registry.snapshot()) == 0 else 1)"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    assert result.returncode == 0, f"STDOUT: {result.stdout}\nSTDERR: {result.stderr}"
+
+
+def test_wizard_router_lazy_cached_identity() -> None:
+    """Repeated access to wizard_router preserves object identity across entry points."""
+    from app.workspace.algo_wizard import wizard_router as router_pkg
+    from app.workspace.algo_wizard.routes import wizard_router as router_mod
+    from fastapi import APIRouter
+
+    assert isinstance(router_pkg, APIRouter)
+    assert isinstance(router_mod, APIRouter)
+    assert router_pkg is router_mod
+
+    from app.workspace.algo_wizard import wizard_router as router_pkg2
+
+    assert router_pkg is router_pkg2

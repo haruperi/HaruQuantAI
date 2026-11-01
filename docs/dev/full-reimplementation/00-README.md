@@ -36,6 +36,7 @@ classDiagram
 ## Current readiness — source-backed revision of 2026-10-30
 
 Read the [review result and remaining work](research/2026-10-30-reimplementation-review.md)
+(and the [AppCore completion audit](research/appcore-completion-audit.md) for the verified requirement matrix)
 for the exact scope, released slices and validation.
 
 There are 20 top-level dispatch/phase Markdown files; supporting research lives in `research/`.

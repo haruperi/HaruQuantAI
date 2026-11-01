@@ -7,6 +7,7 @@ from app.core.trading.optimization.engine import (
     ParameterRange,
     WalkForwardResult,
     WalkForwardWindow,
+    WalkForwardWindowResult,
 )
 
 __all__ = [
@@ -16,4 +17,5 @@ __all__ = [
     "ParameterRange",
     "WalkForwardResult",
     "WalkForwardWindow",
+    "WalkForwardWindowResult",
 ]

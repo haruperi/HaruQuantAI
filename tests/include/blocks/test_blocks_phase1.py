@@ -499,7 +499,26 @@ def test_canonical_metric_and_sizer_contracts() -> None:
     assert not hasattr(editor_reg, "BasePositionSizer")
 
 
-def test_global_block_registry_registers_vertical_slice() -> None:
+def test_global_block_registry_registers_vertical_slice(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import sys
+
+    isolated_registry = BlockRegistry()
+    current_module = sys.modules[__name__]
+    monkeypatch.setattr(
+        current_module,
+        "block_registry",
+        isolated_registry,
+    )
+    monkeypatch.setattr(
+        "app.core.trading.blocks.registry.block_registry",
+        isolated_registry,
+    )
+    monkeypatch.setattr(
+        "app.include.blocks.registry.block_registry",
+        isolated_registry,
+    )
     block_registry.register_block(SMA)
     block_registry.register_block(plus)
     block_registry.register_block(is_greater)

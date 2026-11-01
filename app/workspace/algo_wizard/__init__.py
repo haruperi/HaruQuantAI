@@ -2,6 +2,13 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from fastapi import APIRouter
+
+    wizard_router: APIRouter
+
 from app.workspace.algo_wizard.catalogue import WizardCatalogueService
 from app.workspace.algo_wizard.catalogue_models import (
     CatalogueOptionItem,
@@ -63,7 +70,7 @@ from app.workspace.algo_wizard.models import (
     VariableSetActionNode,
     VariableSpec,
 )
-from app.workspace.algo_wizard.routes import create_wizard_router, wizard_router
+from app.workspace.algo_wizard.routes import create_wizard_router
 from app.workspace.algo_wizard.strategies import StrategyDocumentService
 from app.workspace.algo_wizard.strategies_models import (
     AddStrategyRequest,
@@ -287,3 +294,12 @@ __all__ = [
     "upgrade_legacy_wizard_document",
     "wizard_router",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    """Lazily re-export wizard_router to avoid import-time side effects."""
+    if name == "wizard_router":
+        from app.workspace.algo_wizard.routes import wizard_router
+
+        return wizard_router
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

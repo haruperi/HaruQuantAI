@@ -5,7 +5,8 @@ Supports Grid Search and Walk-Forward matrix generation.
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+import math
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from typing import Any
 
@@ -95,7 +96,7 @@ class OptimizationIndexes:
         multiplier = 1
         index = 0
 
-        for i in range(len(self.ranges)):
+        for i in reversed(range(len(self.ranges))):
             name = self._names[i]
             target_val = params.get(name)
             if target_val is None:
@@ -135,12 +136,36 @@ class WalkForwardWindow:
 
 
 @dataclass(frozen=True, slots=True)
+class WalkForwardWindowResult:
+    """Evaluation outcome for a single Walk-Forward window."""
+
+    window: WalkForwardWindow
+    selected_params: dict[str, float]
+    is_score: float
+    oos_score: float
+
+    def to_dict(self) -> dict[str, Any]:
+        """Convert window result to dictionary."""
+        return {
+            "window_index": self.window.index,
+            "selected_params": dict(self.selected_params),
+            "is_score": self.is_score,
+            "oos_score": self.oos_score,
+            "is_start_bar": self.window.is_start_bar,
+            "is_end_bar": self.window.is_end_bar,
+            "oos_start_bar": self.window.oos_start_bar,
+            "oos_end_bar": self.window.oos_end_bar,
+        }
+
+
+@dataclass(frozen=True, slots=True)
 class WalkForwardResult:
     """Aggregated multi-run Walk-Forward optimization outcome."""
 
     windows: tuple[WalkForwardWindow, ...]
     window_results: tuple[dict[str, Any], ...]
     wfe: float  # Walk-Forward Efficiency percentage
+    detailed_windows: tuple[WalkForwardWindowResult, ...] = ()
 
 
 class OptimizationEngine:
@@ -251,6 +276,187 @@ class OptimizationEngine:
         results.sort(key=lambda item: item[1], reverse=True)
         return results
 
+    def _validate_wf_spec(
+        self,
+        bars: Sequence[MarketBar],
+        num_windows: int,
+        is_ratio: float,
+    ) -> None:
+        if num_windows <= 0:
+            msg = f"num_windows must be positive, got {num_windows}"
+            raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+        if not (0.0 < is_ratio < 1.0):
+            msg = f"is_ratio must be between 0.0 and 1.0 exclusive, got {is_ratio}"
+            raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+        if not bars:
+            msg = "Cannot execute walk forward optimization with empty bar sequence"
+            raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+        for i in range(1, len(bars)):
+            if bars[i].time <= bars[i - 1].time:
+                msg = (
+                    f"Bar timestamps must be strictly increasing: "
+                    f"bars[{i}].time ({bars[i].time}) <= "
+                    f"bars[{i - 1}].time ({bars[i - 1].time})"
+                )
+                raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+
+    def _validate_wf_windows(
+        self,
+        windows: tuple[WalkForwardWindow, ...],
+        num_windows: int,
+        total_bars: int,
+    ) -> None:
+        if len(windows) < num_windows:
+            msg = (
+                f"Insufficient bars to generate {num_windows} windows "
+                f"(generated {len(windows)})"
+            )
+            raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+        for w in windows:
+            if w.is_end_bar <= w.is_start_bar or w.oos_end_bar <= w.oos_start_bar:
+                msg = "Walk-forward window contains empty IS or OOS slice"
+                raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+            if w.oos_end_bar > total_bars:
+                msg = "Walk-forward window exceeds total bar sequence bounds"
+                raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+
+    def _evaluate_single_window(
+        self,
+        window: WalkForwardWindow,
+        bars: Sequence[MarketBar],
+        indexes: OptimizationIndexes,
+        evaluate_fn: Callable[[Sequence[MarketBar], Mapping[str, float]], float],
+        *,
+        token: CancellationToken | None = None,
+        on_step: Callable[[], None] | None = None,
+    ) -> WalkForwardWindowResult:
+        is_slice = tuple(bars[window.is_start_bar : window.is_end_bar])
+        oos_slice = tuple(bars[window.oos_start_bar : window.oos_end_bar])
+
+        best_params: dict[str, float] | None = None
+        best_is_score = float("-inf")
+
+        for step in range(indexes.total_permutations):
+            if token is not None:
+                token.check()
+
+            params = indexes.get_params(step)
+            score = evaluate_fn(is_slice, params)
+            if not math.isfinite(score):
+                msg = f"Non-finite IS evaluation score encountered: {score}"
+                raise DomainError(code="INVALID_OPTIMIZATION_SCORE", message=msg)
+
+            if score > best_is_score:
+                best_is_score = score
+                best_params = params
+
+            if on_step is not None:
+                on_step()
+
+        if best_params is None:
+            msg = "Failed to select best parameter set for window"
+            raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+
+        if token is not None:
+            token.check()
+
+        oos_score = evaluate_fn(oos_slice, best_params)
+        if not math.isfinite(oos_score):
+            msg = f"Non-finite OOS evaluation score encountered: {oos_score}"
+            raise DomainError(code="INVALID_OPTIMIZATION_SCORE", message=msg)
+
+        if on_step is not None:
+            on_step()
+
+        return WalkForwardWindowResult(
+            window=window,
+            selected_params=best_params,
+            is_score=best_is_score,
+            oos_score=oos_score,
+        )
+
+    def run_walk_forward(
+        self,
+        bars: Sequence[MarketBar],
+        parameter_ranges: Sequence[ParameterRange],
+        *,
+        num_windows: int,
+        is_ratio: float = 0.7,
+        evaluate_fn: Callable[[Sequence[MarketBar], Mapping[str, float]], float],
+        token: CancellationToken | None = None,
+        progress: Callable[[int, int], None] | None = None,
+    ) -> WalkForwardResult:
+        """Execute rolling Walk-Forward optimization across sequential bar slices.
+
+        For each rolling window:
+        1. Evaluates all parameter candidates on In-Sample (IS) slice.
+        2. Selects candidate with highest IS score (stable ties retain first order).
+        3. Evaluates selected parameters once on Out-of-Sample (OOS) slice.
+        4. Retains typed per-window details and computes aggregate WFE.
+
+        Note:
+            Callbacks must supply comparable, additive optimization scores.
+
+        Args:
+            bars: Chronologically increasing sequence of market bars.
+            parameter_ranges: Parameter dimensions defining candidate search grid.
+            num_windows: Number of rolling walk-forward windows (must be >= 1).
+            is_ratio: Proportion of each window for In-Sample training (0 < ratio < 1).
+            evaluate_fn: Callback accepting bar slice and parameter mapping.
+            token: Optional cancellation token for task interruption.
+            progress: Optional callback reporting (completed, total).
+
+        Returns:
+            WalkForwardResult containing windows, details, and aggregate WFE.
+        """
+        self._validate_wf_spec(bars, num_windows, is_ratio)
+        indexes = self.build_indexes(parameter_ranges)
+        if indexes.total_permutations <= 0:
+            msg = "Parameter ranges produce no candidate permutations"
+            raise DomainError(code="INVALID_WALK_FORWARD_SPEC", message=msg)
+
+        windows = self.generate_wf_windows(
+            total_bars=len(bars),
+            num_windows=num_windows,
+            is_ratio=is_ratio,
+            bars=bars,
+        )
+        self._validate_wf_windows(windows, num_windows, len(bars))
+
+        total_evals = len(windows) * (indexes.total_permutations + 1)
+        completed = [0]
+
+        def _on_step() -> None:
+            completed[0] += 1
+            if progress is not None:
+                progress(completed[0], total_evals)
+
+        detailed_windows = [
+            self._evaluate_single_window(
+                w,
+                bars,
+                indexes,
+                evaluate_fn,
+                token=token,
+                on_step=_on_step,
+            )
+            for w in windows
+        ]
+
+        if token is not None:
+            token.check()
+
+        total_is = sum(item.is_score for item in detailed_windows)
+        total_oos = sum(item.oos_score for item in detailed_windows)
+        aggregate_wfe = self.calculate_wfe(total_is, total_oos)
+
+        return WalkForwardResult(
+            windows=windows,
+            window_results=tuple(item.to_dict() for item in detailed_windows),
+            wfe=aggregate_wfe,
+            detailed_windows=tuple(detailed_windows),
+        )
+
 
 __all__ = [
     "CancellationToken",
@@ -259,4 +465,5 @@ __all__ = [
     "ParameterRange",
     "WalkForwardResult",
     "WalkForwardWindow",
+    "WalkForwardWindowResult",
 ]

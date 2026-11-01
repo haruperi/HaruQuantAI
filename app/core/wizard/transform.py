@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import ast
+import keyword
 import re
 from dataclasses import dataclass
 from typing import Any
@@ -15,6 +17,21 @@ from app.core.trading.strategy.contracts import (
 )
 
 SUPPORTED_PLATFORMS = frozenset({"mql5", "mql4", "easylanguage", "ctrader", "python"})
+_SUPPORTED_COMPARATORS = frozenset({"==", "!=", ">", "<", ">=", "<="})
+_MARKET_FIELDS = frozenset(
+    {
+        "open",
+        "high",
+        "low",
+        "close",
+        "volume",
+        "tick_volume",
+        "open_price",
+        "high_price",
+        "low_price",
+        "close_price",
+    }
+)
 
 _KNOWN_BLOCKS = frozenset(
     {"sma", "ema", "rsi", "atr", "bollinger", "macd", "stochastic", "price"}
@@ -564,48 +581,152 @@ class StrategyTransformer:
             value=val,
         )
 
-    def _map_operand(self, val: str | float, platform: str) -> str:
+    def _map_operand(
+        self,
+        val: str | float,
+        platform: str,
+        rule_name: str,
+        *,
+        side: str,
+        known_symbols: set[str],
+        errors: list[str],
+    ) -> str:
         if isinstance(val, (int, float)):
             return str(val)
-        s = str(val).strip().lower()
-        price_map = {
-            "open": "open_price" if platform == "python" else "open",
-            "high": "high_price" if platform == "python" else "high",
-            "low": "low_price" if platform == "python" else "low",
-            "close": "close_price" if platform == "python" else "close",
-            "volume": "volume",
-            "tick_volume": "volume",
-        }
-        return price_map.get(s, self._normalize_name(s))
+        raw_str = str(val).strip()
+        try:
+            float(raw_str)
+            return raw_str
+        except ValueError:
+            pass
+
+        s = raw_str.lower()
+        if s in _MARKET_FIELDS:
+            price_map = {
+                "open": "open_price" if platform == "python" else "open",
+                "open_price": "open_price" if platform == "python" else "open",
+                "high": "high_price" if platform == "python" else "high",
+                "high_price": "high_price" if platform == "python" else "high",
+                "low": "low_price" if platform == "python" else "low",
+                "low_price": "low_price" if platform == "python" else "low",
+                "close": "close_price" if platform == "python" else "close",
+                "close_price": "close_price" if platform == "python" else "close",
+                "volume": "volume",
+                "tick_volume": "volume",
+            }
+            return price_map.get(s, self._normalize_name(raw_str))
+
+        norm_name = self._normalize_name(raw_str)
+        if raw_str in known_symbols or norm_name in known_symbols:
+            if platform == "python":
+                return f"self.{norm_name}"
+            return norm_name
+
+        if platform == "python":
+            errors.append(
+                f"Unresolved operand reference '{raw_str}' for {side} operand in "
+                f"rule '{rule_name}' (must be a declared parameter, variable, "
+                f"or market field)"
+            )
+        return ""
 
     def _normalize_condition(
-        self, cond: ConditionDefinition, rule_name: str, errors: list[str]
+        self,
+        cond: ConditionDefinition,
+        rule_name: str,
+        errors: list[str],
+        known_symbols: set[str],
     ) -> NormalizedCondition | None:
         """Validate and normalize a single condition definition."""
         if cond.composition_block_id:
-            block_base = cond.composition_block_id.lower().split(".")[0]
-            if block_base not in _KNOWN_BLOCKS:
-                errors.append(
-                    f"Unsupported indicator composition block "
-                    f"'{cond.composition_block_id}' in rule '{rule_name}'"
-                )
-                return None
+            errors.append(
+                f"Unsupported indicator composition block "
+                f"'{cond.composition_block_id}' in rule '{rule_name}' "
+                f"(indicator composition blocks are not supported for code generation)"
+            )
+            return None
 
         comp = cond.comparator.strip()
+        if comp not in _SUPPORTED_COMPARATORS:
+            errors.append(
+                f"Unsupported comparator '{comp}' in rule '{rule_name}'. "
+                f"Supported comparators are: {sorted(_SUPPORTED_COMPARATORS)}"
+            )
+            return None
+
         comp_mql = comp
         comp_cs = comp
         comp_py = comp
         comp_el = _COMPARATOR_MAP_EL.get(comp, comp)
 
-        left_mql = self._map_operand(cond.left, "mql")
-        left_el = self._map_operand(cond.left, "el")
-        left_cs = self._map_operand(cond.left, "cs")
-        left_py = self._map_operand(cond.left, "python")
+        left_mql = self._map_operand(
+            cond.left,
+            "mql",
+            rule_name,
+            side="left",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
+        left_el = self._map_operand(
+            cond.left,
+            "el",
+            rule_name,
+            side="left",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
+        left_cs = self._map_operand(
+            cond.left,
+            "cs",
+            rule_name,
+            side="left",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
+        left_py = self._map_operand(
+            cond.left,
+            "python",
+            rule_name,
+            side="left",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
 
-        right_mql = self._map_operand(cond.right, "mql")
-        right_el = self._map_operand(cond.right, "el")
-        right_cs = self._map_operand(cond.right, "cs")
-        right_py = self._map_operand(cond.right, "python")
+        right_mql = self._map_operand(
+            cond.right,
+            "mql",
+            rule_name,
+            side="right",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
+        right_el = self._map_operand(
+            cond.right,
+            "el",
+            rule_name,
+            side="right",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
+        right_cs = self._map_operand(
+            cond.right,
+            "cs",
+            rule_name,
+            side="right",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
+        right_py = self._map_operand(
+            cond.right,
+            "python",
+            rule_name,
+            side="right",
+            known_symbols=known_symbols,
+            errors=errors,
+        )
+
+        if not left_py or not right_py:
+            return None
 
         return NormalizedCondition(
             expr_mql=f"{left_mql} {comp_mql} {right_mql}",
@@ -614,10 +735,23 @@ class StrategyTransformer:
             expr_py=f"{left_py} {comp_py} {right_py}",
         )
 
-    def _normalize_action(self, action: RuleAction) -> NormalizedAction:
+    def _normalize_action(
+        self, action: RuleAction, rule_name: str, errors: list[str]
+    ) -> NormalizedAction:
         """Normalize execution action parameters."""
         sl_pips = float(action.sl_pips)
         tp_pips = float(action.tp_pips)
+
+        kind_str = (
+            action.kind.value if hasattr(action.kind, "value") else str(action.kind)
+        )
+        if kind_str not in ("enter", "exit"):
+            errors.append(f"Unsupported action kind '{kind_str}' in rule '{rule_name}'")
+        elif kind_str == "enter" and action.direction not in (1, -1):
+            errors.append(
+                f"Invalid direction '{action.direction}' for enter action "
+                f"in rule '{rule_name}' (expected 1 or -1)"
+            )
 
         if action.direction == 1:
             sl_expr_mql5 = (
@@ -650,9 +784,6 @@ class StrategyTransformer:
             sl_expr_mql4 = f"Bid + {sl_pips} * Point" if sl_pips > 0 else "0"
             tp_expr_mql4 = f"Bid - {tp_pips} * Point" if tp_pips > 0 else "0"
 
-        kind_str = (
-            action.kind.value if hasattr(action.kind, "value") else str(action.kind)
-        )
         return NormalizedAction(
             kind=kind_str,
             direction=int(action.direction),
@@ -671,6 +802,19 @@ class StrategyTransformer:
     ) -> tuple[NormalizedStrategy | None, tuple[str, ...]]:
         """Map strategy rules and setup into intermediate representation."""
         errors: list[str] = []
+        known_symbols: set[str] = set()
+
+        for p in document.params:
+            if not p.name.isidentifier() or keyword.iskeyword(p.name):
+                errors.append(f"Invalid or reserved parameter identifier: '{p.name}'")
+            known_symbols.add(p.name)
+            known_symbols.add(self._normalize_name(p.name))
+
+        for v in document.variables:
+            if not v.name.isidentifier() or keyword.iskeyword(v.name):
+                errors.append(f"Invalid or reserved variable identifier: '{v.name}'")
+            known_symbols.add(v.name)
+            known_symbols.add(self._normalize_name(v.name))
 
         params = tuple(
             self._map_param(p.name, p.param_type, p.value) for p in document.params
@@ -685,11 +829,13 @@ class StrategyTransformer:
             r_name = rule.name or rule.rule_id
             norm_conds: list[NormalizedCondition] = []
             for cond in rule.conditions:
-                nc = self._normalize_condition(cond, r_name, errors)
+                nc = self._normalize_condition(cond, r_name, errors, known_symbols)
                 if nc is not None:
                     norm_conds.append(nc)
 
-            norm_acts = tuple(self._normalize_action(act) for act in rule.actions)
+            norm_acts = tuple(
+                self._normalize_action(act, r_name, errors) for act in rule.actions
+            )
             cond_mql = " && ".join(c.expr_mql for c in norm_conds)
             cond_el = " and ".join(c.expr_el for c in norm_conds)
             cond_cs = " && ".join(c.expr_cs for c in norm_conds)
@@ -752,12 +898,6 @@ class StrategyTransformer:
         template = self._templates[plat]
         try:
             rendered = template.render(strategy=norm_strategy)
-            return ExportResult(
-                success=True,
-                source_code=rendered,
-                errors=(),
-                platform=target_platform,
-            )
         except Exception as exc:  # noqa: BLE001
             return ExportResult(
                 success=False,
@@ -765,6 +905,24 @@ class StrategyTransformer:
                 errors=(f"Template rendering failed: {exc}",),
                 platform=target_platform,
             )
+
+        if plat == "python":
+            try:
+                ast.parse(rendered)
+            except SyntaxError as exc:
+                return ExportResult(
+                    success=False,
+                    source_code="",
+                    errors=(f"Generated Python code failed syntax validation: {exc}",),
+                    platform=target_platform,
+                )
+
+        return ExportResult(
+            success=True,
+            source_code=rendered,
+            errors=(),
+            platform=target_platform,
+        )
 
 
 __all__ = ["ExportResult", "NormalizedStrategy", "StrategyTransformer"]

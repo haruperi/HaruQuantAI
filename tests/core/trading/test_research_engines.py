@@ -146,6 +146,65 @@ def test_optimization_indexes_bidirectional_mapping() -> None:
         # Note: mapping is exact for discreet step values
         assert isinstance(params["stop_loss"], float)
         assert isinstance(params["take_profit"], float)
+        assert indexes.get_index(params) == i
+
+
+def test_optimization_indexes_asymmetric_grids() -> None:
+    """OptimizationIndexes correctly round-trips asymmetric 2x3 and 2x3x4 grids."""
+    opt_engine = OptimizationEngine()
+
+    # 2 x 3 grid
+    ranges_2x3 = [
+        ParameterRange(name="p1", start=1.0, end=2.0, step=1.0),  # size 2: [1.0, 2.0]
+        ParameterRange(
+            name="p2", start=10.0, end=30.0, step=10.0
+        ),  # size 3: [10.0, 20.0, 30.0]
+    ]
+    idx_2x3 = opt_engine.build_indexes(ranges_2x3)
+    assert idx_2x3.total_permutations == 6
+    expected_combinations = [
+        {"p1": 1.0, "p2": 10.0},
+        {"p1": 1.0, "p2": 20.0},
+        {"p1": 1.0, "p2": 30.0},
+        {"p1": 2.0, "p2": 10.0},
+        {"p1": 2.0, "p2": 20.0},
+        {"p1": 2.0, "p2": 30.0},
+    ]
+    for i in range(idx_2x3.total_permutations):
+        params = idx_2x3.get_params(i)
+        assert params == expected_combinations[i]
+        assert idx_2x3.get_index(params) == i
+
+    # 2 x 3 x 4 grid
+    ranges_2x3x4 = [
+        ParameterRange(name="a", start=1.0, end=2.0, step=1.0),  # size 2
+        ParameterRange(name="b", start=10.0, end=30.0, step=10.0),  # size 3
+        ParameterRange(name="c", start=100.0, end=400.0, step=100.0),  # size 4
+    ]
+    idx_2x3x4 = opt_engine.build_indexes(ranges_2x3x4)
+    assert idx_2x3x4.total_permutations == 24
+    for i in range(idx_2x3x4.total_permutations):
+        params = idx_2x3x4.get_params(i)
+        assert idx_2x3x4.get_index(params) == i
+
+    # Single dimension
+    ranges_single = [ParameterRange(name="single", start=5.0, end=15.0, step=5.0)]
+    idx_single = opt_engine.build_indexes(ranges_single)
+    assert idx_single.total_permutations == 3
+    for i in range(idx_single.total_permutations):
+        params = idx_single.get_params(i)
+        assert idx_single.get_index(params) == i
+
+    # Singleton dimension
+    ranges_singleton = [
+        ParameterRange(name="fixed", start=1.0, end=1.0, step=1.0),
+        ParameterRange(name="var", start=1.0, end=3.0, step=1.0),
+    ]
+    idx_singleton = opt_engine.build_indexes(ranges_singleton)
+    assert idx_singleton.total_permutations == 3
+    for i in range(idx_singleton.total_permutations):
+        params = idx_singleton.get_params(i)
+        assert idx_singleton.get_index(params) == i
 
 
 def test_walk_forward_matrix_generation() -> None:

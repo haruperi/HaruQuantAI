@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import types
+from typing import Any
+
 from app.core.enums import OrderType
 from app.core.trading.strategy.contracts import (
     ActionKind,
@@ -135,10 +138,10 @@ def test_python_golden_output() -> None:
 
     # Verify generated Python code compiles cleanly without syntax errors
     compiled = compile(code, "<test-python-export>", "exec")
-    assert compiled is not None
+    assert isinstance(compiled, types.CodeType)
 
     # Execute class creation in a fresh namespace
-    ns: dict = {}
+    ns: dict[str, Any] = {}
     exec(compiled, ns)
     assert "TrendFollower01" in ns
     instance = ns["TrendFollower01"]()
@@ -244,3 +247,234 @@ def test_disabled_rules_are_excluded() -> None:
     res = transformer.transform(doc_with_disabled, "python")
     assert res.success is True
     assert "DisabledSpecialRule" not in res.source_code
+
+
+def test_invalid_comparator_fails_closed() -> None:
+    """Strategy export fails closed when rule specifies an unsupported comparator."""
+    transformer = StrategyTransformer()
+    bad_rule = RuleDefinition(
+        rule_id="bad-comp-rule",
+        name="Bad Comparator Rule",
+        trigger=RuleTriggerKind.ON_BAR_CLOSE,
+        conditions=(
+            ConditionDefinition(
+                left="close",
+                comparator="INVALID_COMP",
+                right="open",
+            ),
+        ),
+        actions=(RuleAction(kind=ActionKind.EXIT),),
+    )
+    doc = StrategyDocument(strategy_id="BadCompStrategy", rules=(bad_rule,))
+    res = transformer.transform(doc, "python")
+    assert res.success is False
+    assert res.source_code == ""
+    assert any("comparator" in err.lower() for err in res.errors)
+
+
+def test_undeclared_operand_fails_closed() -> None:
+    """Strategy export fails closed when operand is not declared in parameters, variables, or market fields."""
+    transformer = StrategyTransformer()
+    bad_rule = RuleDefinition(
+        rule_id="bad-operand-rule",
+        name="Bad Operand Rule",
+        trigger=RuleTriggerKind.ON_BAR_CLOSE,
+        conditions=(
+            ConditionDefinition(
+                left="undefined_market_indicator_xyz",
+                comparator=">",
+                right=10.0,
+            ),
+        ),
+        actions=(RuleAction(kind=ActionKind.EXIT),),
+    )
+    doc = StrategyDocument(strategy_id="BadOperandStrategy", rules=(bad_rule,))
+    res = transformer.transform(doc, "python")
+    assert res.success is False
+    assert res.source_code == ""
+    assert any("undefined_market_indicator_xyz" in err for err in res.errors)
+
+
+def test_composition_block_without_indicator_definition_fails_closed() -> None:
+    """Strategy export fails closed when an indicator composition block is specified but not emitted."""
+    transformer = StrategyTransformer()
+    bad_rule = RuleDefinition(
+        rule_id="unrendered-block-rule",
+        name="Unrendered Block Rule",
+        trigger=RuleTriggerKind.ON_BAR_CLOSE,
+        conditions=(
+            ConditionDefinition(
+                left="close",
+                comparator=">",
+                right=10.0,
+                composition_block_id="sma.14",
+            ),
+        ),
+        actions=(RuleAction(kind=ActionKind.EXIT),),
+    )
+    doc = StrategyDocument(strategy_id="UnrenderedBlockStrategy", rules=(bad_rule,))
+    res = transformer.transform(doc, "python")
+    assert res.success is False
+    assert res.source_code == ""
+    assert any("composition block" in err.lower() for err in res.errors)
+
+
+def test_reserved_keyword_identifier_fails_closed() -> None:
+    """Strategy export fails closed when parameter name is a Python reserved keyword."""
+    transformer = StrategyTransformer()
+    doc = StrategyDocument(
+        strategy_id="BadIdentStrategy",
+        rules=(),
+        params=(ParameterDefinition(name="class", param_type="int", value=1),),
+    )
+    res = transformer.transform(doc, "python")
+    assert res.success is False
+    assert res.source_code == ""
+    assert any("reserved" in err.lower() for err in res.errors)
+
+
+def test_unsupported_action_kind_fails_closed() -> None:
+    """Strategy export fails closed when rule specifies an unsupported action kind."""
+    transformer = StrategyTransformer()
+    bad_rule = RuleDefinition(
+        rule_id="bad-action-rule",
+        name="Bad Action Rule",
+        trigger=RuleTriggerKind.ON_BAR_CLOSE,
+        conditions=(ConditionDefinition(left="close", comparator=">", right="open"),),
+        actions=(RuleAction(kind="custom_unsupported_action"),),  # type: ignore[arg-type]
+    )
+    doc = StrategyDocument(strategy_id="BadActionStrategy", rules=(bad_rule,))
+    res = transformer.transform(doc, "python")
+    assert res.success is False
+    assert res.source_code == ""
+    assert any("unsupported action kind" in err.lower() for err in res.errors)
+
+
+class _SimpleBar:
+    """Lightweight market bar mock for strategy evaluate verification."""
+
+    def __init__(
+        self,
+        open_val: float,
+        high_val: float,
+        low_val: float,
+        close_val: float,
+        volume: float = 100.0,
+    ) -> None:
+        self.open = open_val
+        self.high = high_val
+        self.low = low_val
+        self.close = close_val
+        self.volume = volume
+
+
+def test_python_export_with_parameter_operand_executes_and_overrides() -> None:
+    """Exported Python strategy resolves parameter references to instance attributes and evaluates correctly."""
+    transformer = StrategyTransformer()
+    rule = RuleDefinition(
+        rule_id="param-threshold-rule",
+        name="ParamThresholdRule",
+        trigger=RuleTriggerKind.ON_BAR_CLOSE,
+        conditions=(
+            ConditionDefinition(left="close", comparator=">", right="Threshold"),
+        ),
+        actions=(
+            RuleAction(
+                kind=ActionKind.ENTER,
+                direction=1,
+                order_type=OrderType.BUY,
+                volume=1.0,
+            ),
+        ),
+    )
+    doc = StrategyDocument(
+        strategy_id="ParamStrategy",
+        rules=(rule,),
+        params=(
+            ParameterDefinition(name="Threshold", param_type="float", value=1.1010),
+        ),
+    )
+
+    res = transformer.transform(doc, "python")
+    assert res.success is True
+    assert "close_price > self.Threshold" in res.source_code
+
+    compiled = compile(res.source_code, "<test-param-eval>", "exec")
+    ns: dict[str, Any] = {}
+    exec(compiled, ns)
+    strategy_cls = ns["ParamStrategy"]
+
+    # Instance with default parameter Threshold = 1.1010
+    instance = strategy_cls(Threshold=1.1010)
+
+    # Bar with close = 1.1000 -> condition false, no actions
+    bar_low = _SimpleBar(
+        open_val=1.1000, high_val=1.1005, low_val=1.0995, close_val=1.1000
+    )
+    actions = instance.evaluate(bar_low)
+    assert len(actions) == 0
+
+    # Bar with close = 1.1020 -> condition true, enter action triggered
+    bar_high = _SimpleBar(
+        open_val=1.1000, high_val=1.1025, low_val=1.0995, close_val=1.1020
+    )
+    actions = instance.evaluate(bar_high)
+    assert len(actions) == 1
+    assert actions[0]["kind"] == "enter"
+
+    # Instance with overridden parameter Threshold = 1.1030
+    instance_overridden = strategy_cls(Threshold=1.1030)
+    # The same bar (close = 1.1020) should no longer trigger
+    actions_overridden = instance_overridden.evaluate(bar_high)
+    assert len(actions_overridden) == 0
+
+
+def test_python_export_with_state_variable_condition_executes() -> None:
+    """Exported Python strategy resolves state variable references to instance attributes and evaluates correctly."""
+    transformer = StrategyTransformer()
+    rule = RuleDefinition(
+        rule_id="state-var-rule",
+        name="StateVarRule",
+        trigger=RuleTriggerKind.ON_BAR_CLOSE,
+        conditions=(
+            ConditionDefinition(left="consecutive_losses", comparator="<", right=3),
+        ),
+        actions=(
+            RuleAction(
+                kind=ActionKind.ENTER,
+                direction=1,
+                order_type=OrderType.BUY,
+                volume=1.0,
+            ),
+        ),
+    )
+    doc = StrategyDocument(
+        strategy_id="StateVarStrategy",
+        rules=(rule,),
+        variables=(
+            VariableDefinition(
+                name="consecutive_losses", var_type="int", default_value=0
+            ),
+        ),
+    )
+
+    res = transformer.transform(doc, "python")
+    assert res.success is True
+    assert "self.consecutive_losses < 3" in res.source_code
+
+    compiled = compile(res.source_code, "<test-var-eval>", "exec")
+    ns: dict[str, Any] = {}
+    exec(compiled, ns)
+    strategy_cls = ns["StateVarStrategy"]
+
+    instance = strategy_cls()
+    bar = _SimpleBar(open_val=1.1000, high_val=1.1010, low_val=1.0990, close_val=1.1005)
+
+    # Initial state consecutive_losses = 0 < 3 -> action triggered
+    actions = instance.evaluate(bar)
+    assert len(actions) == 1
+
+    # Mutate instance state consecutive_losses = 3 -> condition false, no action
+    instance.consecutive_losses = 3
+    actions = instance.evaluate(bar)
+    assert len(actions) == 0
