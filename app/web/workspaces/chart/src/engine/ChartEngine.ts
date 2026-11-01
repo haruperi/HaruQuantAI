@@ -151,9 +151,9 @@ export class ChartEngine {
     listen('pointercancel', () => this.cancel());
     listen('pointerleave', () => {
       this.clearValues();
+      this.onCrosshairTime?.(null);
       if (!this.down) {
         this.pointer = null;
-        this.onCrosshairTime?.(null);
         this.invalidate(4);
       }
     });
