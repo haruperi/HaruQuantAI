@@ -2,7 +2,7 @@
 
 **Status:** Active Clean-Room Reimplementation of StrategyQuant X (SQX-145).
 **Baseline Roadmap:** [`docs/dev/full-reimplementation/`](dev/full-reimplementation/).
-**Current Milestone:** Phase 01 (AppCore) verified and audited (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)); Phase 02 (AppHome) implementation work order retired, with supported execution and workflow evidence retained in the [AppHome completion audit](dev/full-reimplementation/research/apphome-completion-audit.md); Phase 03 (AppDataManager) active.
+**Current Milestone:** Phase 01 (AppCore) verified and audited (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)); Phase 02 (AppHome) implementation work order retired, with supported execution and workflow evidence retained in the [AppHome completion audit](dev/full-reimplementation/research/apphome-completion-audit.md); Phase 03 (AppDataManager) audit active (see [AppDataManager completion audit](dev/full-reimplementation/research/appdatamanager-completion-audit.md)).
 
 ---
 
@@ -68,7 +68,7 @@ The clean-room reimplementation is organized into 20 domain phases detailed in [
 | :---: | :--- | :--- | :--- | :---: |
 | **01** | [Completion audit](dev/full-reimplementation/research/appcore-completion-audit.md) | **AppCore** | Pure quant engine, time series, trading primitives, grid protocol, host lifecycle, persistence WAL, jobs, wizard code transforms. | **Verified & Audited**<br/>(34 WOs, see [audit](dev/full-reimplementation/research/appcore-completion-audit.md)) |
 | **02** | [Completion audit](dev/full-reimplementation/research/apphome-completion-audit.md) | **AppHome** | Central hub, native revisioned projects/settings/Notes, shared Core execution, stored results/charts, analysis definitions and persisted themes. | **Implementation Work Order Retired**<br/>(Supported capabilities and limitations in audit) |
-| **03** | [`03-AppDataManager.md`](dev/full-reimplementation/03-AppDataManager.md) | **AppDataManager** | Market data catalog, tick/bar storage, instrument specs, sessions, baskets, broker profiles, data quality review, bar transforms. | **Active Phase**<br/>(DM-M01 migrated) |
+| **03** | [`03-AppDataManager.md`](dev/full-reimplementation/03-AppDataManager.md) | **AppDataManager** | Market data catalog, tick/bar storage, instrument specs, sessions, baskets, broker profiles, data quality review, bar transforms. | **Audit Active / Retained**<br/>(See [audit](dev/full-reimplementation/research/appdatamanager-completion-audit.md); Symbols substituted, brokers retained) |
 | **04** | [`04-AppCodeEditor.md`](dev/full-reimplementation/04-AppCodeEditor.md) | **AppCodeEditor** | Multi-language code editor, compilation hooks, syntax trees, algorithmic snippets, and template integration. | *Planned* |
 | **05** | [`05-AppWizard.md`](dev/full-reimplementation/05-AppWizard.md) | **AppWizard** | AlgoWizard visual rule builder, conditions, indicators, actions, multi-timeframe logic, code generator backends. | *Core Transform Done* |
 | **06** | [`06-AppResults.md`](dev/full-reimplementation/06-AppResults.md) | **AppResults** | High-capacity databanks, multi-metric performance evaluation, equity/drawdown charts, trade lists, PDF/HTML exports. | *Planned* |

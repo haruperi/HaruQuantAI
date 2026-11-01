@@ -142,26 +142,23 @@ CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES -> READY
 
 ## 5. Tier 2: Domain Workspaces Architecture (`app/workspace/`)
 
-Domain Workspaces encapsulate business logic, domain models, and REST endpoints under `/api/v2/<domain>/...`:
+Domain Workspaces encapsulate business logic, domain models, and REST endpoints under `/api/v1/<domain>/...`:
 
 ### 5.1 Authoritative Data Manager Workspace (`app/workspace/data_manager/`)
-Re-architected from StrategyQuant X (SQX-145) reference donors into cohesive Python modules:
+Re-architected from StrategyQuant X (SQX-145) reference donors into cohesive feature subpackages assembled via `create_router()`:
 
-| Module | SQX Donor Component | Functional Responsibility |
+| Subpackage | SQX Donor Component | Functional Responsibility |
 | :--- | :--- | :--- |
-| [`home.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/home.py) | `DataManagerHome` | Storage health metrics, total bar count, disk usage, symbol inventory. |
-| [`data.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/data.py) | `DataManagerData` | Bar and tick catalog, ingestion pipeline, historical bar storage and retrieval. |
-| [`instruments.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/instruments.py) | `DataManagerInstruments` | Instrument definitions: tick sizes, point values, contract specifications, margins. |
-| [`sessions.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/sessions.py) | `DataManagerSessions` | Trading session schedules, day-of-week windows, NinjaTrader XML import/export. |
-| [`baskets.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/baskets.py) | `DataManagerBasket` | Synthetic/composite instruments, custom weightings, index creation. |
-| [`broker.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/broker.py) | `DataManagerBroker` | Broker profiles: spread models, commission rates, slippage models, margin rules. |
-| [`connections.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/connections.py) | `DataManagerConnections` | `ProviderManager` coordinating data feeds, download queues, provider registration. |
-| [`custom_data.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/custom_data.py) | `DataManagerCustomData` | COT (Commitment of Traders) reports and macroeconomic data series. |
-| [`log.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/log.py) | `DataManagerLog` | Audit log of data operations, import history, and adjustments. |
-| [`help.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/help.py) | `DataManagerHelp` | Contextual help registry, documentation topics, data guides. |
-| [`actions/review/quality.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/actions/review/quality.py) | `DataManagerActions` (Review) | `DataQualityInspector`: gap detection, bad tick filtering, price spike detection. |
-| [`actions/transform/transforms.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/actions/transform/transforms.py) | `DataManagerActions` (Transform) | `SeriesTransformer`: resampling timeframes (M1 to H1/D1), session alignment. |
-| [`routes.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/routes.py) | Data Manager REST API | REST router exposing endpoints under `/api/v2/data/...`. |
+| [`symbols/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/symbols/) | `DataManagerInstruments` | Master symbol registry, contract specifications, tick sizing, margins, and point values (substitutes `Instruments`). |
+| [`sessions/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/sessions/) | `DataManagerSessions` | Trading session schedules, day-of-week windows, holiday calendars. |
+| [`brokers/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/brokers/) | `DataManagerBroker` / `DataManagerConnections` | Broker configuration, spread models, commission rates, slippage models, credential testing. |
+| [`baskets/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/baskets/) | `DataManagerBasket` | Synthetic/composite instruments, custom weightings, basket batch operations. |
+| [`custom/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/custom/) | `DataManagerCustomData` | Macroeconomic series (COT, FRED), custom indicators, user time series. |
+| [`data/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/data/) | `DataManagerData` / `DataManagerActions` / `DataManagerHome` | Historical bar/tick catalog, partition files, data review (gap/spike inspection), transforms (resampling), and exports. |
+| [`logs/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/logs/) | `DataManagerLog` | Audit log of data operations, import history, and adjustments. |
+| [`help/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/help/) | `DataManagerHelp` | Contextual help registry, documentation topics, data guides. |
+| [`sources/`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/sources/) | `DataSource*` | Data feed orchestration, Dukascopy downloads, and local file import pipelines. |
+| [`__init__.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/__init__.py) | Data Manager Gateway | Router assembly (`create_router()`) mounted at `/api/v1/data` with session authorization and CLI command dispatch. |
 
 ### 5.2 Home Workspace (`app/workspace/home/` & `app/web/workspaces/home/`)
 Coordinates workstation entry, project registry, dashboard configuration (`dashboardPanels.ts`), and advanced money-management ATM visibility rules (`atmVisibility.ts`).
@@ -193,7 +190,7 @@ The user interface is an integrated single-page application built with React 19,
 Extensions provide pluggable capabilities through typed slots:
 
 ### 7.1 Extension Slot Contract: `data.provider`
-Market data provider plugins declare compliance with `slot: "data.provider"` in `plugin.json` and implement `BaseDataProvider` (`app/workspace/data_manager/connections.py`):
+Market data provider plugins declare compliance with `slot: "data.provider"` in `plugin.json` and implement `BrokerClient` (`app/workspace/brokers/base.py`):
 ```python
 class BaseDataProvider(ABC):
     provider_id: str
@@ -215,7 +212,7 @@ class BaseDataProvider(ABC):
     def test_connection(self) -> bool: ...
 ```
 
-### 7.2 Active Dynamic Data Providers (`app/plugins/data_source/`)
+### 7.2 Active Broker and Data Connectors (`app/workspace/brokers/`)
 1. **`dukascopy`:** Historical Forex and CFD tick and minute data.
 2. **`darwinex`:** Institutional tick data with true bid/ask spreads.
 3. **`metatrader`:** MetaTrader 4 / 5 CSV and binary history parser.

@@ -1,4 +1,6 @@
 # AppDataManager — Market Data Engine
+> **COMPLETION AUDIT ACTIVE (2026-11-01):** See [AppDataManager Completion Audit](research/appdatamanager-completion-audit.md). This workspace document is **retained** and not ready for retirement. HaruQuantAI architecturally substituted `Instruments` with `Symbols` (e.g., `Symbols.clone` in `app/workspace/data_manager/symbols/feature.py`), and broker connectors remain consolidated in `app/workspace/brokers/`.
+
 > UI migration completed: [verification and limitations](research/ui-preservation-migration-verification.md). Current sources are under `app/web`; old source columns below are historical migration evidence. Reuse the migrated screens when implementing later features.
 
 > UI migration execution: [preservation plan](research/ui-preservation-migration-plan.md) governs the structural move. Preserve the existing screens, routes, runtime fixtures and behavior; backend/service adaptations below remain separate work. Shared ProjectWorkbench stays under `app/web/common/project`; migrated tests use `app/web/tests/workspace/<owner>`.
@@ -69,6 +71,8 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 *Commit:* refactor(data-manager): migrate data manager and broker workspaces.
 
+> **Migration Reality Note (2026-11-01):** Broker connectors remain in `app/workspace/brokers/` and tests in `tests/workspace/brokers/`; the planned `app/workspace/data_sources/` was not created. Furthermore, `instruments` was architecturally substituted by `symbols` (`app/workspace/data_manager/symbols/`). See [audit](research/appdatamanager-completion-audit.md).
+
 
 ### Phase 3.1: Instrument clone defaults — `DataManagerInstruments`
 
@@ -87,11 +91,12 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 *Exact types:* frozen dataclasses `InstrumentBrokerRef(instrument: str, broker_id: int)`, `CloneBroker(id: int, name: str, postfix: str, mt_use: bool)`, `CloneDefaults(source_name: str, clone_name: str, broker_id: int, choices: tuple[CloneBroker, ...])`. No field has an implicit default. `CloneInstrumentDefaults` contains only static method `build`.
 
-*Functional Requirements & Implementation:*
-- [X] `CloneInstrumentDefaults.build(selected_names: Sequence[str], instruments: Sequence[InstrumentBrokerRef], brokers: Sequence[CloneBroker]) -> CloneDefaults` -> if selected_names is empty, raise `DomainError(code="INSTRUMENT_SELECTION_REQUIRED", message="You have to select some instrument.", details={})` before any other operation.
-- [X] `CloneInstrumentDefaults.build(...)` -> use selected_names[0], without trimming or case conversion. Start the clone base as this full name. Find exact-name instrument records; strip a broker postfix only when there is exactly one matching instrument and exactly one broker with that instrument's broker_id, the postfix is nonempty, and the name ends with it. Remove exactly one suffix occurrence.
-- [X] `CloneInstrumentDefaults.build(...)` -> return clone_name as the resulting base followed by literal `Clone`; return broker_id=-1. choices begins with `CloneBroker(-1,"SQ default","",True)`, followed by input brokers whose mt_use is True in input order. Do not deduplicate/sort or filter the broker used for suffix removal by mt_use.
-- [X] `CloneInstrumentDefaults.build(...)` -> allocate new output tuples; do not mutate any supplied sequence or dataclass. DomainError code and typed fields are target helper decisions; the selection text and naming behavior are observed donor behavior.
+*Functional Requirements & Implementation (Reconciled 2026-11-01: Substituted by Symbols):*
+> *Note:* Standalone `CloneInstrumentDefaults` was not created. Instrument functionality was substituted into `Symbols` (`app/workspace/data_manager/symbols/`), where default clone naming and parameter handling are unified in `Symbols.clone`. Checkboxes corrected to reflect actual codebase state:
+- [ ] `CloneInstrumentDefaults.build(selected_names: Sequence[str], instruments: Sequence[InstrumentBrokerRef], brokers: Sequence[CloneBroker]) -> CloneDefaults` -> if selected_names is empty, raise `DomainError(code="INSTRUMENT_SELECTION_REQUIRED", message="You have to select some instrument.", details={})` before any other operation.
+- [ ] `CloneInstrumentDefaults.build(...)` -> use selected_names[0], without trimming or case conversion. Start the clone base as this full name. Find exact-name instrument records; strip a broker postfix only when there is exactly one matching instrument and exactly one broker with that instrument's broker_id, the postfix is nonempty, and the name ends with it. Remove exactly one suffix occurrence.
+- [ ] `CloneInstrumentDefaults.build(...)` -> return clone_name as the resulting base followed by literal `Clone`; return broker_id=-1. choices begins with `CloneBroker(-1,"SQ default","",True)`, followed by input brokers whose mt_use is True in input order. Do not deduplicate/sort or filter the broker used for suffix removal by mt_use.
+- [ ] `CloneInstrumentDefaults.build(...)` -> allocate new output tuples; do not mutate any supplied sequence or dataclass. DomainError code and typed fields are target helper decisions; the selection text and naming behavior are observed donor behavior.
 
 *Exact tests:*
 
@@ -107,6 +112,8 @@ All target names/signatures/error codes below are normative Python/React adaptat
 *Verification:* `uv run python -m pytest tests/workspace/data_manager/test_instrument_clone_defaults.py -q` must exit 0 with all six named tests collected. No network, database, clock or random seed is used. Commit only the two listed files after this result.
 
 ### Phase 3.2: Clone command orchestration — `DataManagerInstruments`
+
+> **Architectural Substitution Note (2026-11-01):** `InstrumentCloneService` was not created as an independent coordinator. In HaruQuantAI, `Instruments` was substituted by `Symbols` (`app/workspace/data_manager/symbols/`). Symbol cloning is fulfilled by `Symbols.clone` in `app/workspace/data_manager/symbols/feature.py:396`, which trims whitespace and validates source record existence against `datamgr_symbols` before adding the cloned symbol.
 
 *Feature:* clone an existing instrument through a supplied storage/naming adapter.
 **Task ID:** `WO-DM-INSTRUMENT-CLONE-COMMAND`. **Readiness:** READY-AFTER-CORE-CONTRACTS for this coordinator only; production repository/HTTP integration is BLOCKED by `I-DataManagerInstruments`. **Evidence:** `OBS145-INSTRUMENT-CLONE-001`.
@@ -134,6 +141,8 @@ All target names/signatures/error codes below are normative Python/React adaptat
 
 
 ## Phase 03.9: Full workspace feature orders — evidence-gated contracts
+
+> **Audit Reconciliation Note (2026-11-01):** All 31 contribution orders below carry `Readiness: READY` headings but retain explicit contractual clauses stating that exact public operations, request/response models, and persistence effects remain unestablished (`Function/signature authorization: none`). Active implementations exist across Data Manager feature packages (`symbols`, `sessions`, `brokers`, `baskets`, `custom`, `data`, `logs`, `help`, `sources`) and `app/workspace/brokers/`. See [AppDataManager Completion Audit](research/appdatamanager-completion-audit.md) for full status reconciliation.
 
 ### `AppDataManager`
 
