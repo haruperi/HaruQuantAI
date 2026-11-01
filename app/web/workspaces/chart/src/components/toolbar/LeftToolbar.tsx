@@ -36,6 +36,7 @@ import {
   Image as ImageIcon,
   Share2,
   Lightbulb,
+  Smile,
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
 import {
@@ -46,7 +47,7 @@ import {
   forecastingSections,
   shapeSections,
 } from '../../tools/catalog';
-import { keyFor, type ToolId, type CursorMode } from '../../types';
+import { keyFor, type ToolId, type CursorMode, type DrawingGroup } from '../../types';
 import { textNoteSections } from '../../tools/textNotes';
 import { indicators } from '../../indicators/catalog';
 import { ToolButton } from '../Tooltip';
@@ -65,9 +66,11 @@ const groups = [
   { name: 'Forecasting', icon: ArrowUpRight },
   { name: 'Shapes', icon: Shapes },
   { name: 'Annotate', icon: Type },
-];
+] satisfies { name: DrawingGroup; icon: typeof Type }[];
 const annotationIcons: Partial<Record<ToolId, typeof Type>> = {
   Text: Type,
+  AnchoredNote: StickyNote,
+  Sticker: Smile,
   Note: StickyNote,
   PriceNote: BadgeDollarSign,
   Pin: MapPin,
@@ -251,6 +254,16 @@ function ShapeToolIcon({ id }: { id: ToolId }) {
     </svg>
   );
 }
+
+/** Shared renderer keeps a group's collapsed icon identical to its menu icon. */
+function GroupToolIcon({ name, id }: { name: DrawingGroup; id: ToolId }) {
+  if (name === 'Trend') return <LineToolIcon id={id} />;
+  if (name === 'Fibonacci') return <FibonacciToolIcon id={id} />;
+  if (name === 'Patterns') return <PatternToolIcon id={id} />;
+  if (name === 'Forecasting') return <ForecastingToolIcon id={id} />;
+  if (name === 'Shapes') return <ShapeToolIcon id={id} />;
+  return <AnnotationToolIcon id={id} />;
+}
 export function LeftToolbar() {
   const { store, engine } = useChart(),
     s = useStore(store),
@@ -379,6 +392,8 @@ export function LeftToolbar() {
         >
           <ToolButton
             label={name + ' tools'}
+            data-last-tool={s.lastGroupTools[name] ?? undefined}
+            aria-description={s.lastGroupTools[name] ? 'Last selected: ' + tools[s.lastGroupTools[name]].label : undefined}
             className={s.ui.tool !== 'cursor' && tools[s.ui.tool].group === name ? 'cq-active' : ''}
             onPointerDown={() => {
               longPressed.current = false;
@@ -394,7 +409,9 @@ export function LeftToolbar() {
               if (!longPressed.current) setOpen(open === name ? null : name);
             }}
           >
-            <Icon />
+            {s.lastGroupTools[name]
+              ? <GroupToolIcon name={name} id={s.lastGroupTools[name]} />
+              : <Icon />}
             <ChevronRight
               className="cq-caret"
               size={10}
@@ -441,19 +458,14 @@ export function LeftToolbar() {
                   {section.ids.map((id) => (
                     <div
                       key={id}
-                      className={'cq-tool-option' + (s.ui.tool === id ? ' cq-selected-tool' : '')}
+                      className={'cq-tool-option' + (s.lastGroupTools[name] === id ? ' cq-selected-tool' : '')}
                     >
                       <button
                         role="menuitem"
-                        aria-current={s.ui.tool === id ? 'true' : undefined}
+                        aria-current={s.lastGroupTools[name] === id ? 'true' : undefined}
                         onClick={() => choose(id)}
                       >
-                        {name === 'Trend' && <LineToolIcon id={id} />}
-                        {name === 'Fibonacci' && <FibonacciToolIcon id={id} />}
-                        {name === 'Patterns' && <PatternToolIcon id={id} />}
-                        {name === 'Forecasting' && <ForecastingToolIcon id={id} />}
-                        {name === 'Shapes' && <ShapeToolIcon id={id} />}
-                        {name === 'Annotate' && <AnnotationToolIcon id={id} />}
+                        <GroupToolIcon name={name} id={id} />
                         <span>{tools[id].label}</span>
                         {name !== 'Annotate' && <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>}
                       </button>
