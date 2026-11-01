@@ -861,3 +861,8 @@
 .root :global(.cq-line-menu .cq-tool-option > button:first-child span) {
   white-space: normal;
 }
+
+.root :global(.cq-line-menu[aria-label='Patterns tools']) {
+  width: 350px;
+  max-height: calc(100vh - 225px);
+}

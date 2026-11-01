@@ -61,6 +61,25 @@ test('every drawing tool creates an editable persisted object with undo and redo
       ],
     },
     {
+      group: 'Patterns',
+      names: [
+        ['XABCD pattern', 5],
+        ['Cypher pattern', 5],
+        ['Head and shoulders', 7],
+        ['ABCD pattern', 4],
+        ['Triangle pattern', 4],
+        ['Three drives pattern', 7],
+        ['Elliott impulse wave (1·2·3·4·5)', 6],
+        ['Elliott correction wave (A·B·C)', 4],
+        ['Elliott triangle wave (A·B·C·D·E)', 6],
+        ['Elliott double combo wave (W·X·Y)', 4],
+        ['Elliott triple combo wave (W·X·Y·X·Z)', 6],
+        ['Cyclic lines', 2],
+        ['Time cycles', 2],
+        ['Sine line', 2],
+      ],
+    },
+    {
       group: 'Shapes',
       names: [
         ['Rectangle', 2],
@@ -102,9 +121,9 @@ test('every drawing tool creates an editable persisted object with undo and redo
         await page.mouse.up();
       } else {
         await page.mouse.click(x, y);
-        if (anchors === 3 || anchors === 0) {
-          await page.mouse.click(x + 110, y + 75);
-          await page.mouse.click(x + 160, y - 25);
+        if (anchors >= 3 || anchors === 0) {
+          for (let i = 1; i < (anchors || 3); i++)
+            await page.mouse.click(x + i * 38, y + (i % 2 ? 75 : -25));
         }
         if (anchors === 0) await page.keyboard.press('Enter');
       }
@@ -184,7 +203,7 @@ test('drawing menu hover closes on leave and permits menu selection', async ({ p
   if (await connection.isVisible())
     await connection.getByRole('button', { name: 'Close', exact: true }).click();
 
-  for (const group of ['Trend', 'Fibonacci', 'Shapes', 'Annotate']) {
+  for (const group of ['Trend', 'Fibonacci', 'Patterns', 'Shapes', 'Annotate']) {
     const trigger = page.getByRole('button', { name: group + ' tools', exact: true });
     const caret = trigger.locator('.cq-caret');
     const menu = page.getByRole('menu', { name: group + ' tools', exact: true });
@@ -428,4 +447,78 @@ test('Fibonacci parity menu, curve editing, favorites, locks and reload', async 
   await page.keyboard.press('Alt+f');
   await expect(page.locator('.cq-hint')).toContainText('FibRetracement');
   await page.keyboard.press('Escape');
+});
+
+test('Patterns parity menu, incomplete cancellation and Elliott anchor editing', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(60000);
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const trigger = page.getByRole('button', { name: 'Patterns tools', exact: true });
+  const menu = page.getByRole('menu', { name: 'Patterns tools', exact: true });
+  await trigger.click();
+  await expect(menu.locator('.cq-line-heading')).toHaveText([
+    'Chart Patterns',
+    'Elliott Waves',
+    'Cycles',
+  ]);
+  await expect(menu.getByRole('menuitem')).toHaveCount(14);
+  const favorite = menu.getByRole('button', { name: 'Favorite XABCD pattern', exact: true });
+  await favorite.click();
+  await menu.getByRole('menuitem', { name: 'XABCD pattern', exact: true }).click();
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  const x = box.x + 400,
+    y = box.y + 240;
+  await page.mouse.click(x, y);
+  await page.mouse.click(x + 40, y - 70);
+  await page.keyboard.press('Enter');
+  await expect(host).toHaveAttribute('data-drawings', '0');
+  await page.keyboard.press('Escape');
+  await trigger.click();
+  await menu
+    .getByRole('menuitem', { name: 'Elliott impulse wave (1·2·3·4·5)', exact: true })
+    .click();
+  await trigger.click();
+  await expect(
+    menu.getByRole('menuitem', { name: 'Elliott impulse wave (1·2·3·4·5)', exact: true }),
+  ).toHaveAttribute('aria-current', 'true');
+  await menu
+    .getByRole('menuitem', { name: 'Elliott impulse wave (1·2·3·4·5)', exact: true })
+    .click();
+  for (let i = 0; i < 6; i++) {
+    await page.mouse.click(x + i * 40, y + (i % 2 ? -70 : 0));
+    await expect(host).toHaveAttribute('data-drawings', i === 5 ? '1' : '0');
+  }
+  const read = () =>
+    page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+      return (state.drawings[state.chart.symbol + ':' + state.chart.interval]?.[0]?.points ??
+        []) as { time: number; price: number }[];
+    });
+  await expect.poll(read).toHaveLength(6);
+  const before = await read();
+  await page.mouse.move(x + 200, y - 70);
+  await page.mouse.down();
+  await page.mouse.move(x + 230, y - 100, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(async () => (await read())[5].price).not.toBe(before[5].price);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(read).toEqual(before);
+  await page.getByRole('button', { name: 'Lock all drawings', exact: true }).click();
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 20, y + 20, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(read).toEqual(before);
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await trigger.click();
+  await expect(favorite).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: testInfo.outputPath('patterns-menu.png') });
+  await menu.getByRole('menuitem', { name: 'Sine line', exact: true }).scrollIntoViewIfNeeded();
+  await expect(menu.getByRole('menuitem', { name: 'Sine line', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Zoom in', exact: true }).hover();
+  await expect(menu).toBeHidden();
 });

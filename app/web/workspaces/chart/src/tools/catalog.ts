@@ -1,4 +1,20 @@
 import {
+  XABCDPattern,
+  CypherPattern,
+  HeadShoulders,
+  ABCDPattern,
+  TrianglePattern,
+  ThreeDrives,
+} from './chartPatterns';
+import {
+  ElliottImpulse,
+  ElliottCorrection,
+  ElliottTriangle,
+  ElliottDoubleCombo,
+  ElliottTripleCombo,
+} from './elliottWaves';
+import { CyclicLines, TimeCycles, SineLine } from './cycles';
+import {
   FibChannel,
   FibSpeedFan,
   TrendFibTime,
@@ -81,7 +97,46 @@ export const fibonacciSections: { title: string; ids: ToolId[] }[] = [
   },
   { title: 'Gann', ids: ['GannBox', 'GannSquareFixed', 'GannSquare', 'GannFan'] },
 ];
+export const patternSections: { title: string; ids: ToolId[] }[] = [
+  {
+    title: 'Chart Patterns',
+    ids: [
+      'XABCDPattern',
+      'CypherPattern',
+      'HeadShoulders',
+      'ABCDPattern',
+      'TrianglePattern',
+      'ThreeDrives',
+    ],
+  },
+  {
+    title: 'Elliott Waves',
+    ids: [
+      'ElliottImpulse',
+      'ElliottCorrection',
+      'ElliottTriangle',
+      'ElliottDoubleCombo',
+      'ElliottTripleCombo',
+    ],
+  },
+  { title: 'Cycles', ids: ['CyclicLines', 'TimeCycles', 'SineLine'] },
+];
 export const tools: Record<ToolId, Tool> = {
+  XABCDPattern,
+  CypherPattern,
+  HeadShoulders,
+  ABCDPattern,
+  TrianglePattern,
+  ThreeDrives,
+  ElliottImpulse,
+  ElliottCorrection,
+  ElliottTriangle,
+  ElliottDoubleCombo,
+  ElliottTripleCombo,
+  CyclicLines,
+  TimeCycles,
+  SineLine,
+
   FibChannel,
   FibSpeedFan,
   TrendFibTime,

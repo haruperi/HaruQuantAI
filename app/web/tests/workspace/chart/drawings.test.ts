@@ -1,5 +1,5 @@
 import { it, expect } from 'vitest';
-import { tools } from '../../../workspaces/chart/src/tools/catalog';
+import { tools, patternSections } from '../../../workspaces/chart/src/tools/catalog';
 import { primitiveHit } from '../../../workspaces/chart/src/tools/geometry';
 import { toolIds, type Drawing } from '../../../workspaces/chart/src/types';
 it('every requested tool produces finite geometry from market anchors', () => {
@@ -257,6 +257,119 @@ it('all Fibonacci and Gann tools stay finite with coincident and reversed anchor
         { time: 10, price: 20 },
         { time: 20, price: 10 },
       ],
+    ]) {
+      const shapes = tools[id].build(drawing(id, points), projection);
+      expect(shapes.length).toBeGreaterThan(0);
+      expect(JSON.stringify(shapes)).not.toMatch(/null|NaN/);
+    }
+  }
+});
+
+const patternDrawing = (tool: Drawing['tool']): Drawing =>
+  drawing(
+    tool,
+    Array.from({ length: tools[tool].anchors }, (_, i) => ({
+      time: 100 + i * 40,
+      price: i % 2 ? 50 : 20,
+    })),
+  );
+it('pattern tools expose the required pivot counts and ordered labels', () => {
+  const sequences: [Drawing['tool'], string[]][] = [
+    ['XABCDPattern', ['X', 'A', 'B', 'C', 'D']],
+    ['CypherPattern', ['X', 'A', 'B', 'C', 'D']],
+    ['ABCDPattern', ['A', 'B', 'C', 'D']],
+    ['TrianglePattern', ['A', 'B', 'C', 'D']],
+    ['ElliottImpulse', ['0', '1', '2', '3', '4', '5']],
+    ['ElliottCorrection', ['0', 'A', 'B', 'C']],
+    ['ElliottTriangle', ['0', 'A', 'B', 'C', 'D', 'E']],
+    ['ElliottDoubleCombo', ['0', 'W', 'X', 'Y']],
+    ['ElliottTripleCombo', ['0', 'W', 'X', 'Y', 'X', 'Z']],
+  ];
+  for (const [id, names] of sequences) {
+    expect(tools[id].anchors).toBe(names.length);
+    const text = tools[id]
+      .build(patternDrawing(id), projection)
+      .filter((shape) => shape.kind === 'text')
+      .map((shape) => shape.text);
+    expect(text.slice(0, names.length)).toEqual(names);
+  }
+  expect(tools.HeadShoulders.anchors).toBe(7);
+  expect(tools.ThreeDrives.anchors).toBe(7);
+});
+it('harmonic ratios are price-based and zero denominators do not invent measurements', () => {
+  const d = drawing('XABCDPattern', [
+    { time: 0, price: 10 },
+    { time: 20, price: 30 },
+    { time: 40, price: 20 },
+  ]);
+  expect(
+    tools.XABCDPattern.build(d, projection)
+      .filter((shape) => shape.kind === 'text')
+      .at(-1)?.text,
+  ).toBe('0.500');
+  d.points[1].price = 10;
+  expect(
+    tools.XABCDPattern.build(d, projection)
+      .filter((shape) => shape.kind === 'text')
+      .at(-1)?.text,
+  ).toBe('—');
+  expect(
+    tools.CypherPattern.build(patternDrawing('CypherPattern'), projection).length,
+  ).toBeGreaterThan(tools.XABCDPattern.build(patternDrawing('XABCDPattern'), projection).length);
+});
+it('triangle boundaries connect alternating highs and lows and neckline joins the two neck pivots', () => {
+  const triangle = tools.TrianglePattern.build(
+    patternDrawing('TrianglePattern'),
+    projection,
+  ).filter((shape) => shape.kind === 'path');
+  expect(triangle[1].points).toEqual([
+    { x: 100, y: 20 },
+    { x: 180, y: 20 },
+  ]);
+  expect(triangle[2].points).toEqual([
+    { x: 140, y: 50 },
+    { x: 220, y: 50 },
+  ]);
+  const head = tools.HeadShoulders.build(patternDrawing('HeadShoulders'), projection).filter(
+    (shape) => shape.kind === 'path',
+  );
+  expect(head.at(-1)?.points).toEqual([
+    { x: 180, y: 20 },
+    { x: 260, y: 20 },
+  ]);
+});
+it('cycle period and sine amplitude follow their anchors with bounded work', () => {
+  const d = drawing('CyclicLines', [
+    { time: 100, price: 20 },
+    { time: 200, price: 60 },
+  ]);
+  const cyclic = tools.CyclicLines.build(d, projection).filter((shape) => shape.kind === 'path');
+  expect(cyclic[1].points[0].x - cyclic[0].points[0].x).toBe(100);
+  expect(cyclic.length).toBeLessThanOrEqual(256);
+  const arcs = tools.TimeCycles.build({ ...d, tool: 'TimeCycles' }, projection).filter(
+    (shape) => shape.kind === 'path',
+  );
+  expect(arcs[0].points).toHaveLength(33);
+  const sine = tools.SineLine.build({ ...d, tool: 'SineLine' }, projection)[0];
+  if (sine.kind !== 'path') throw new Error('Expected sine path');
+  expect(sine.points.length).toBeLessThanOrEqual(4097);
+  const crest = sine.points.reduce((best, point) =>
+    Math.abs(point.x - 200) < Math.abs(best.x - 200) ? point : best,
+  );
+  expect(crest.y).toBeCloseTo(60, 0);
+  expect(primitiveHit(sine, crest)).toBe(true);
+  expect(primitiveHit(sine, { x: 5000, y: 5000 })).toBe(false);
+});
+it('all pattern tools support partial, coincident and reversed previews without invalid geometry', () => {
+  for (const id of patternSections.flatMap((section) => section.ids)) {
+    for (const points of [
+      [],
+      [{ time: 10, price: 20 }],
+      [
+        { time: 10, price: 20 },
+        { time: 10, price: 20 },
+      ],
+      [...patternDrawing(id).points].reverse(),
     ]) {
       const shapes = tools[id].build(drawing(id, points), projection);
       expect(shapes.length).toBeGreaterThan(0);

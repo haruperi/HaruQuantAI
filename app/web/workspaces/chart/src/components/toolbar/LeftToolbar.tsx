@@ -10,6 +10,7 @@ import {
   TrendingUp,
   Hash,
   Shapes,
+  Network,
   Type,
   Ruler,
   Magnet,
@@ -25,7 +26,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
-import { tools, lineSections, fibonacciSections } from '../../tools/catalog';
+import { tools, lineSections, fibonacciSections, patternSections } from '../../tools/catalog';
 import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
 import { ToolButton } from '../Tooltip';
 const cursors = [
@@ -39,6 +40,7 @@ const cursors = [
 const groups = [
   { name: 'Trend', icon: TrendingUp },
   { name: 'Fibonacci', icon: Hash },
+  { name: 'Patterns', icon: Network },
   { name: 'Shapes', icon: Shapes },
   { name: 'Annotate', icon: Type },
 ];
@@ -114,6 +116,34 @@ function FibonacciToolIcon({ id }: { id: ToolId }) {
         <path d="M3 20L21 4M3 15L16 3M8 22L21 11" />
       ) : (
         <path d="M3 4h18M3 9h18M3 15h18M3 21h18M3 21L21 4" />
+      )}
+    </svg>
+  );
+}
+function PatternToolIcon({ id }: { id: ToolId }) {
+  const glyphs: Partial<Record<ToolId, string>> = {
+    XABCDPattern: 'M2 19L6 6L11 16L16 3L22 12M2 19L11 16L22 12M6 6L16 3',
+    CypherPattern: 'M2 19L7 8L12 16L17 3L22 12M2 19L17 3M2 19L22 12',
+    HeadShoulders: 'M1 20L4 9L7 17L12 2L16 17L20 9L23 20M7 17h9',
+    ABCDPattern: 'M3 19L7 3L17 20L21 5M3 19L17 20M7 3L21 5',
+    TrianglePattern: 'M2 3L4 21L16 8L20 16M2 3L16 8M4 21L20 16',
+    ThreeDrives: 'M1 20L4 8L7 18L11 5L14 15L18 2L22 12',
+    CyclicLines: 'M4 2v20M9 2v20M14 2v20M20 2v20',
+    TimeCycles: 'M2 14a5 5 0 0 1 10 0 5 5 0 0 1 10 0',
+    SineLine: 'M2 12c4-14 6-14 10 0s6 14 10 0',
+  };
+  const wave = id.startsWith('Elliott');
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <path d={glyphs[id] ?? 'M2 20L6 11L10 17L15 8L18 14L22 4'} />
+      {wave && (
+        <text x="3" y="6" fill="currentColor" stroke="none" fontSize="6">
+          {id === 'ElliottImpulse'
+            ? '1   5'
+            : id === 'ElliottDoubleCombo' || id === 'ElliottTripleCombo'
+              ? 'W   Y'
+              : 'A   C'}
+        </text>
       )}
     </svg>
   );
@@ -274,7 +304,8 @@ export function LeftToolbar() {
           {open === name && (
             <div
               className={
-                'cq-flyout' + (['Trend', 'Fibonacci'].includes(name) ? ' cq-line-menu' : '')
+                'cq-flyout' +
+                (['Trend', 'Fibonacci', 'Patterns'].includes(name) ? ' cq-line-menu' : '')
               }
               role="menu"
               aria-label={name + ' tools'}
@@ -285,11 +316,17 @@ export function LeftToolbar() {
                 ? lineSections
                 : name === 'Fibonacci'
                   ? fibonacciSections
-                  : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
+                  : name === 'Patterns'
+                    ? patternSections
+                    : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
               ).map((section) => (
                 <div
                   key={section.title}
-                  className={['Trend', 'Fibonacci'].includes(name) ? 'cq-line-section' : undefined}
+                  className={
+                    ['Trend', 'Fibonacci', 'Patterns'].includes(name)
+                      ? 'cq-line-section'
+                      : undefined
+                  }
                 >
                   {section.title && <div className="cq-line-heading">{section.title}</div>}
                   {section.ids.map((id) => (
@@ -304,6 +341,7 @@ export function LeftToolbar() {
                       >
                         {name === 'Trend' && <LineToolIcon id={id} />}
                         {name === 'Fibonacci' && <FibonacciToolIcon id={id} />}
+                        {name === 'Patterns' && <PatternToolIcon id={id} />}
                         <span>{tools[id].label}</span>
                         <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>
                       </button>

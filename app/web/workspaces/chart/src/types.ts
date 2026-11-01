@@ -41,6 +41,21 @@ export interface XY {
   y: number;
 }
 export const toolIds = [
+  'XABCDPattern',
+  'CypherPattern',
+  'HeadShoulders',
+  'ABCDPattern',
+  'TrianglePattern',
+  'ThreeDrives',
+  'ElliottImpulse',
+  'ElliottCorrection',
+  'ElliottTriangle',
+  'ElliottDoubleCombo',
+  'ElliottTripleCombo',
+  'CyclicLines',
+  'TimeCycles',
+  'SineLine',
+
   'InfoLine',
   'ExtendedLine',
   'TrendAngle',
