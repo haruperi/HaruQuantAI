@@ -1,5 +1,5 @@
 import type { ChartStore } from './chartStore';
-import { intervals, chartStyles, toolIds, indicatorIds, type Persisted } from '../types';
+import { drawingGroups, intervals, chartStyles, toolIds, indicatorIds, type Persisted, type ToolId } from '../types';
 import { symbols } from '../feed/symbols';
 import { tools } from '../tools/catalog';
 export const storageKey = 'haruquantai.chart.v1';
@@ -154,6 +154,17 @@ export function decode(raw: string): Persisted {
     s.recents.some((x: unknown) => !symbols.some((t) => t.id === x))
   )
     throw new Error('Invalid chart preferences.');
+  // Older v1 documents omit this field. Validate rather than trusting arbitrary
+  // stored group names or a tool registered under a different group.
+  if (s.lastGroupTools !== undefined) {
+    if (!object(s.lastGroupTools)) throw new Error('Invalid last drawing tools.');
+    for (const [group, id] of Object.entries(s.lastGroupTools)) {
+      if (!drawingGroups.some((name) => name === group) ||
+          !toolIds.some((tool) => tool === id) ||
+          tools[id as ToolId].group !== group)
+        throw new Error('Invalid last drawing tools.');
+    }
+  }
   const validated = s as unknown as Persisted;
   return {
     chart: {
@@ -167,6 +178,7 @@ export function decode(raw: string): Persisted {
     alerts: validated.alerts,
     favorites: validated.favorites,
     recents: validated.recents,
+    lastGroupTools: validated.lastGroupTools ?? {},
   };
 }
 export function persisted(store: ChartStore): Persisted {
@@ -178,6 +190,7 @@ export function persisted(store: ChartStore): Persisted {
     alerts: s.alerts,
     favorites: s.favorites,
     recents: s.recents,
+    lastGroupTools: s.lastGroupTools,
   };
 }
 export function connectPersistence(store: ChartStore, storage: Storage): () => void {
