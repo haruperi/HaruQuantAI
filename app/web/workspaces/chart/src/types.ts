@@ -139,6 +139,9 @@ export const toolIds = [
   'Measure',
 ] as const;
 export type ToolId = (typeof toolIds)[number];
+export const drawingGroups = ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes', 'Annotate'] as const;
+export type DrawingGroup = (typeof drawingGroups)[number];
+export type LastGroupTools = Partial<Record<DrawingGroup, ToolId>>;
 export interface Drawing {
   positionSizing?: { accountSize: number; riskPercent: number };
   sourceBars?: Bar[];
@@ -235,6 +238,7 @@ export interface Persisted extends DocumentState {
   alerts: Alert[];
   favorites: ToolId[];
   recents: string[];
+  lastGroupTools: LastGroupTools;
 }
 export type Dialog =
   'symbol' | 'indicators' | 'alert' | 'order' | 'settings' | 'drawing' | 'help' | 'delete' | null;
