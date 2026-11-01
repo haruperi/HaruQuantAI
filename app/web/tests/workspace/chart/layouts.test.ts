@@ -1,5 +1,5 @@
 import { expect, it } from 'vitest';
-import { defaultLayout, getLayout, layouts, layoutStorageKey, readLayout } from '../../../workspaces/chart/src/layout/layouts';
+import { defaultLayout, getLayout, getLayoutSizes, layoutSplitters, layouts, resizeTracks, layoutStorageKey, readLayout } from '../../../workspaces/chart/src/layout/layouts';
 
 it('defines rectangular non-overlapping 1–8-chart layouts with exact chart indices', () => {
   expect(layouts.length).toBeGreaterThan(30);
@@ -40,8 +40,29 @@ it('reads sync settings and active pane safely, with backward-compatible default
   expect(from({ id: '4', active: 2, sync: { symbol: true, crosshair: false } })).toEqual({
     id: '4', active: 2,
     sync: { symbol: true, interval: false, crosshair: false, time: false, dateRange: false },
+    sizes: {},
   });
   expect(from({ id: '2h', active: 6, sync: { interval: 'wrong' } }).active).toBe(0);
   expect(from({ id: '__invalid__', active: 0 })).toEqual(defaultLayout);
   expect(readLayout({ getItem: () => '{' })).toEqual(defaultLayout);
+});
+
+it('finds grid boundaries and keeps drag resizing bounded and normalized', () => {
+  const cells = getLayout('4').cells;
+  const splits = layoutSplitters(cells);
+  expect(splits.some(split => split.axis === 'columns' && split.edge === 1)).toBe(true);
+  expect(splits.some(split => split.axis === 'rows' && split.edge === 1)).toBe(true);
+  const original = getLayoutSizes('4');
+  const changed = resizeTracks(original, 'columns', 1, 18);
+  expect(changed.columns[0]).toBeCloseTo(68);
+  expect(changed.columns[1]).toBeCloseTo(32);
+  expect(changed.columns.reduce((a, b) => a + b, 0)).toBeCloseTo(100);
+  const clamped = resizeTracks(original, 'rows', 1, -999);
+  expect(clamped.rows[0]).toBeGreaterThanOrEqual(8);
+  expect(clamped.rows[1]).toBeLessThanOrEqual(92);
+  const restored = readLayout({ getItem: () => JSON.stringify({
+    id: '4', active: 1, sync: defaultLayout.sync, sizes: { '4': changed },
+  }) });
+  expect(restored.sizes['4'].columns).toEqual(changed.columns);
+  expect(getLayoutSizes('4', restored.sizes['4'])).toEqual(changed);
 });
