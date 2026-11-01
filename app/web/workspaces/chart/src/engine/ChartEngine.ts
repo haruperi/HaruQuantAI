@@ -41,6 +41,10 @@ interface Pane {
 }
 export class ChartEngine {
   readonly canvases: HTMLCanvasElement[] = [];
+  /** Optional multicart hooks; callbacks are emitted only for direct user interaction. */
+  onCrosshairTime?: (time: number | null) => void;
+  onViewport?: (range: readonly [number, number]) => void;
+  private linkedCrosshairTime: number | null = null;
   readonly quotes = new Map<string, Quote>();
   bars: Bar[] = [];
   visible: Bar[] = [];
@@ -149,6 +153,7 @@ export class ChartEngine {
       this.clearValues();
       if (!this.down) {
         this.pointer = null;
+        this.onCrosshairTime?.(null);
         this.invalidate(4);
       }
     });
@@ -443,17 +448,20 @@ export class ChartEngine {
   scrollLast() {
     this.offset += this.plotWidth - 80 - this.x(this.visible.length - 1);
     this.invalidate(7);
+    this.publishViewport();
   }
   zoom(factor: number, x = this.plotWidth / 2) {
     const z = zoomAt(x, this.spacing, this.offset, factor);
     this.spacing = z.spacing;
     this.offset = z.offset;
     this.invalidate(7);
+    this.publishViewport();
   }
   setWindow(fraction: number) {
     const index = Math.round((this.visible.length - 1) * clamp(fraction, 0, 1));
     this.offset += this.plotWidth / 2 - this.x(index);
     this.invalidate(7);
+    this.publishViewport();
   }
   addPriceLine(y: number) {
     const drawing = this.makeDrawing([
@@ -571,6 +579,38 @@ export class ChartEngine {
     const a = this.visible[low]?.time ?? (this.visible[0]?.time ?? 0) + low * this.barMs(),
       b = this.visible[low + 1]?.time ?? a + this.barMs();
     return { time: a + (b - a) * fraction, price };
+  }
+  private timeAtX(x: number): number {
+    const index = this.indexAt(x), low = Math.floor(index);
+    const a = this.visible[low]?.time ?? (this.visible[0]?.time ?? 0) + low * this.barMs();
+    const b = this.visible[low + 1]?.time ?? a + this.barMs();
+    return a + (b - a) * (index - low);
+  }
+  getVisibleTimeRange(): readonly [number, number] | null {
+    return this.visible.length && this.plotWidth > 0
+      ? [this.timeAtX(0), this.timeAtX(this.plotWidth)] : null;
+  }
+  setVisibleTimeRange(range: readonly [number, number]): void {
+    if (!this.visible.length || !(range[1] > range[0]) || !this.plotWidth) return;
+    const start = this.store.getState().chart.gaps
+      ? this.indexTime(range[0])
+      : (range[0] - this.visible[0].time) / this.barMs();
+    const end = this.store.getState().chart.gaps
+      ? this.indexTime(range[1])
+      : (range[1] - this.visible[0].time) / this.barMs();
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
+    this.spacing = clamp(this.plotWidth / (end - start), 0.2, 50);
+    this.offset = -start * this.spacing;
+    this.invalidate(7);
+  }
+  setLinkedCrosshairTime(time: number | null): void {
+    if (this.linkedCrosshairTime === time) return;
+    this.linkedCrosshairTime = time;
+    this.invalidate(4);
+  }
+  private publishViewport(): void {
+    const range = this.getVisibleTimeRange();
+    if (range) this.onViewport?.(range);
   }
   private projection(): Projection {
     return {
@@ -732,6 +772,8 @@ export class ChartEngine {
   private pointerMove(e: PointerEvent) {
     const p = this.local(e);
     this.pointer = p;
+    this.onCrosshairTime?.(p.x >= 0 && p.x < this.plotWidth && p.y >= 0 && p.y < this.mainHeight && this.visible.length
+      ? this.timeAtX(p.x) : null);
     if (this.touches.has(e.pointerId)) this.touches.set(e.pointerId, p);
     if (this.touches.size === 2) {
       const [a, b] = [...this.touches.values()],
@@ -775,6 +817,7 @@ export class ChartEngine {
         this.offset = next.offset;
       } else this.offset = this.initialOffset + dx;
       this.invalidate(7);
+      this.publishViewport();
     }
     if (this.gesture === 'price') {
       const span = this.initialRange[1] - this.initialRange[0],
@@ -1216,6 +1259,19 @@ export class ChartEngine {
       ctx.restore();
     }
     const ctx = this.context(2);
+    if (this.linkedCrosshairTime !== null && bars.length) {
+      const crosshairX = this.projection().point({ time: this.linkedCrosshairTime, price: this.min }).x;
+      if (crosshairX >= 0 && crosshairX < this.plotWidth) {
+        ctx.save();
+        ctx.strokeStyle = muted;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(crosshairX, 0);
+        ctx.lineTo(crosshairX, this.plotHeight);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
     const last = bars.at(-1);
     if (!last) return;
     ctx.save();
