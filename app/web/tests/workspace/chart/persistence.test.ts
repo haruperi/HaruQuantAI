@@ -1,3 +1,4 @@
+import { tools, lineSections } from '../../../workspaces/chart/src/tools/catalog';
 import { it, expect } from 'vitest';
 import { createChartStore } from '../../../workspaces/chart/src/store/chartStore';
 import {
@@ -35,4 +36,29 @@ it('preserves unknown data instead of overwriting it', () => {
   stop();
   expect(map.get(storageKey)).toBe('{"version":99}');
   expect(s.getState().ui.saved).toBe('Storage needs attention');
+});
+
+it('round-trips every line menu tool with all anchors and favorites', () => {
+  const store = createChartStore();
+  const ids = lineSections.flatMap((section) => section.ids);
+  const state = persisted(store);
+  state.drawings['XAUUSD:3m'] = ids.map((tool) => ({
+    id: tool,
+    tool,
+    points: Array.from({ length: tools[tool].anchors }, (_, i) => ({
+      time: 1000 + i * 60000,
+      price: 100 + i,
+    })),
+    color: '#2962ff',
+    width: 2,
+    dash: false,
+    opacity: 1,
+    text: 'round trip',
+    locked: false,
+    hidden: false,
+    extendLeft: true,
+    extendRight: true,
+  }));
+  state.favorites = ids;
+  expect(decode(JSON.stringify({ version: 1, state }))).toEqual(state);
 });

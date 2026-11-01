@@ -25,7 +25,7 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
-import { tools } from '../../tools/catalog';
+import { tools, lineSections } from '../../tools/catalog';
 import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
 import { ToolButton } from '../Tooltip';
 const cursors = [
@@ -42,6 +42,50 @@ const groups = [
   { name: 'Shapes', icon: Shapes },
   { name: 'Annotate', icon: Type },
 ];
+function LineToolIcon({ id }: { id: ToolId }) {
+  const horizontal = ['HorizontalLine', 'HorizontalRay', 'PriceLine'].includes(id);
+  const vertical = id === 'VerticalLine';
+  const cross = id === 'CrossLine';
+  const channel = [
+    'ParallelChannel',
+    'RegressionTrend',
+    'FlatTopBottom',
+    'DisjointChannel',
+  ].includes(id);
+  const fork = id.includes('Pitchfork');
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      {cross ? (
+        <path d="M2 12h20M12 2v20" />
+      ) : vertical ? (
+        <path d="M12 2v20" />
+      ) : horizontal ? (
+        <path d="M2 12h20" />
+      ) : (
+        <path d="M3 20L21 3" />
+      )}
+      {channel && (
+        <>
+          <path d={id === 'FlatTopBottom' ? 'M3 4h18' : 'M3 14L16 2'} />
+          <path d="M8 22L21 10" />
+        </>
+      )}
+      {fork && (
+        <>
+          <path d="M3 12L14 2M10 22L22 10M3 12l7 10" />
+        </>
+      )}
+      {id === 'InfoLine' && <rect x="12" y="15" width="9" height="6" rx="1" />}
+      {id === 'TrendAngle' && <path d="M3 20h18M10 20a7 7 0 0 0-2-5" />}
+      {!cross && (
+        <>
+          <circle cx={vertical ? 12 : 4} cy={horizontal ? 12 : 19} r="1.5" />
+          <circle cx={vertical ? 12 : 20} cy={horizontal ? 12 : 4} r="1.5" />
+        </>
+      )}
+    </svg>
+  );
+}
 export function LeftToolbar() {
   const { store, engine } = useChart(),
     s = useStore(store),
@@ -70,19 +114,35 @@ export function LeftToolbar() {
   const selected = (s.drawings[keyFor(s.chart)] ?? []).find((d) => d.id === s.ui.selected);
   return (
     <aside className="cq-toolbar" aria-label="Drawing tools">
-      <div className="cq-tool-group" onPointerEnter={cancelClose} onPointerLeave={scheduleClose}>
+      <div
+        className="cq-tool-group"
+        onPointerEnter={() => {
+          if (open === 'cursor') cancelClose();
+        }}
+        onPointerLeave={scheduleClose}
+      >
         <ToolButton
           label="Cursor mode"
           shortcut="P"
           aria-haspopup="menu"
           aria-expanded={open === 'cursor'}
-          onClick={() => setOpen(open === 'cursor' ? null : 'cursor')}
+          onClick={() => {
+            cancelClose();
+            setOpen(open === 'cursor' ? null : 'cursor');
+          }}
         >
           {(() => {
             const Icon = cursors.find((cursor) => cursor.id === s.ui.cursor)!.icon;
             return <Icon />;
           })()}
-          <ChevronRight className="cq-caret" size={10} onPointerEnter={() => setOpen('cursor')} />
+          <ChevronRight
+            className="cq-caret"
+            size={10}
+            onPointerEnter={() => {
+              cancelClose();
+              setOpen('cursor');
+            }}
+          />
         </ToolButton>
         {open === 'cursor' && (
           <div
@@ -147,7 +207,9 @@ export function LeftToolbar() {
         <div
           className="cq-tool-group"
           key={name}
-          onPointerEnter={cancelClose}
+          onPointerEnter={() => {
+            if (open === name) cancelClose();
+          }}
           onPointerLeave={scheduleClose}
         >
           <ToolButton
@@ -163,43 +225,69 @@ export function LeftToolbar() {
             onPointerUp={() => clearTimeout(longPress.current)}
             onPointerCancel={() => clearTimeout(longPress.current)}
             onClick={() => {
+              cancelClose();
               if (!longPressed.current) setOpen(open === name ? null : name);
             }}
           >
             <Icon />
-            <ChevronRight className="cq-caret" size={10} onPointerEnter={() => setOpen(name)} />
+            <ChevronRight
+              className="cq-caret"
+              size={10}
+              onPointerEnter={() => {
+                cancelClose();
+                setOpen(name);
+              }}
+            />
           </ToolButton>
           {open === name && (
             <div
-              className="cq-flyout"
+              className={'cq-flyout' + (name === 'Trend' ? ' cq-line-menu' : '')}
               role="menu"
               aria-label={name + ' tools'}
               onPointerEnter={cancelClose}
               onPointerLeave={scheduleClose}
             >
-              {toolIds
-                .filter((id) => tools[id].group === name)
-                .map((id) => (
-                  <div key={id} className="cq-tool-option">
-                    <button role="menuitem" onClick={() => choose(id)}>
-                      <span>{tools[id].label}</span>
-                      <kbd>{tools[id].shortcut}</kbd>
-                    </button>
-                    <button
-                      aria-label={'Favorite ' + tools[id].label}
-                      className={s.favorites.includes(id) ? 'cq-starred' : ''}
-                      onClick={() =>
-                        store.setState({
-                          favorites: s.favorites.includes(id)
-                            ? s.favorites.filter((x) => x !== id)
-                            : [...s.favorites, id],
-                        })
-                      }
+              {(name === 'Trend'
+                ? lineSections
+                : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
+              ).map((section) => (
+                <div
+                  key={section.title}
+                  className={name === 'Trend' ? 'cq-line-section' : undefined}
+                >
+                  {section.title && <div className="cq-line-heading">{section.title}</div>}
+                  {section.ids.map((id) => (
+                    <div
+                      key={id}
+                      className={'cq-tool-option' + (s.ui.tool === id ? ' cq-selected-tool' : '')}
                     >
-                      <Star size={13} />
-                    </button>
-                  </div>
-                ))}
+                      <button
+                        role="menuitem"
+                        aria-current={s.ui.tool === id ? 'true' : undefined}
+                        onClick={() => choose(id)}
+                      >
+                        {name === 'Trend' && <LineToolIcon id={id} />}
+                        <span>{tools[id].label}</span>
+                        <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>
+                      </button>
+                      <button
+                        aria-label={'Favorite ' + tools[id].label}
+                        aria-pressed={s.favorites.includes(id)}
+                        className={s.favorites.includes(id) ? 'cq-starred' : ''}
+                        onClick={() =>
+                          store.setState({
+                            favorites: s.favorites.includes(id)
+                              ? s.favorites.filter((x) => x !== id)
+                              : [...s.favorites, id],
+                          })
+                        }
+                      >
+                        <Star size={13} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ))}
             </div>
           )}
         </div>

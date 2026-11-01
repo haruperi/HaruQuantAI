@@ -1,9 +1,10 @@
-import type { Drawing, Point, XY } from '../types';
+import type { Bar, Drawing, Point, XY } from '../types';
 export type Primitive =
   | { kind: 'path'; points: XY[]; closed?: boolean; fill?: boolean }
   | { kind: 'ellipse'; center: XY; rx: number; ry: number }
   | { kind: 'text'; at: XY; text: string };
 export interface Projection {
+  bars?: readonly Bar[];
   point: (p: Point) => XY;
   width: number;
   height: number;

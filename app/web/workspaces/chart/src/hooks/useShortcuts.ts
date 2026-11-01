@@ -5,6 +5,8 @@ import { fullscreen } from '../engine/export';
 export const shortcuts = [
   ['Alt+T', 'Trend line'],
   ['Alt+H', 'Horizontal line'],
+  ['Alt+J', 'Horizontal ray'],
+  ['Alt+C', 'Crossline'],
   ['Alt+V', 'Vertical line'],
   ['Alt+F', 'Fib retracement'],
   ['Alt+R', 'Ray'],
@@ -48,6 +50,8 @@ export function useShortcuts() {
           v: 'VerticalLine',
           f: 'FibRetracement',
           r: 'Ray',
+          j: 'HorizontalRay',
+          c: 'CrossLine',
         };
         if (tool[key]) {
           e.preventDefault();

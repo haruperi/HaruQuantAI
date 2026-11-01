@@ -1,8 +1,15 @@
 import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  const connection = page.getByRole('dialog', { name: 'Connect to HaruQuantAI host' });
+  await page.addLocatorHandler(connection, async () => {
+    await connection.getByRole('button', { name: 'Close', exact: true }).click();
+  });
+});
 test('every drawing tool creates an editable persisted object with undo and redo', async ({
   page,
 }) => {
-  test.setTimeout(120000);
+  test.setTimeout(180000);
   await page.goto('/chart');
   const host = page.getByTestId('chart-canvas-host');
   await expect(host).toHaveAttribute('data-loading', 'false');
@@ -19,6 +26,18 @@ test('every drawing tool creates an editable persisted object with undo and redo
         ['Horizontal ray', 1],
         ['Price line', 1],
         ['Arrow', 2],
+        ['Info line', 2],
+        ['Extended line', 2],
+        ['Trend angle', 2],
+        ['Crossline', 1],
+        ['Parallel channel', 3],
+        ['Regression trend', 2],
+        ['Flat top/bottom', 3],
+        ['Disjoint channel', 3],
+        ['Pitchfork', 3],
+        ['Schiff pitchfork', 3],
+        ['Modified Schiff pitchfork', 3],
+        ['Inside pitchfork', 3],
       ],
     },
     {
@@ -27,7 +46,6 @@ test('every drawing tool creates an editable persisted object with undo and redo
         ['Fib retracement', 2],
         ['Fib extension', 3],
         ['Fib timezone', 2],
-        ['Pitchfork', 3],
         ['Gann fan', 2],
       ],
     },
@@ -256,4 +274,80 @@ test('cursor menu modes, effects, tooltip and eraser undo', async ({ page }, tes
   await page.screenshot({ path: testInfo.outputPath('cursor-menu.png') });
   await page.getByRole('button', { name: 'Zoom in', exact: true }).hover();
   await expect(menu).toBeHidden();
+});
+
+test('line parity menu sections, favorites, shortcuts and channel editing', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(60000);
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const trigger = page.getByRole('button', { name: 'Trend tools', exact: true });
+  const menu = page.getByRole('menu', { name: 'Trend tools', exact: true });
+  await trigger.click();
+  await expect(menu.locator('.cq-line-heading')).toHaveText([
+    'Lines',
+    'Channels',
+    'Pitchforks',
+    'Additional tools',
+  ]);
+  await expect(menu.getByRole('menuitem')).toHaveCount(20);
+  const favorite = menu.getByRole('button', { name: 'Favorite Parallel channel', exact: true });
+  await favorite.click();
+  await expect(favorite).toHaveAttribute('aria-pressed', 'true');
+  await menu.getByRole('menuitem', { name: 'Parallel channel', exact: true }).click();
+  await trigger.click();
+  await expect(
+    menu.getByRole('menuitem', { name: 'Parallel channel', exact: true }),
+  ).toHaveAttribute('aria-current', 'true');
+  await menu.getByRole('menuitem', { name: 'Parallel channel', exact: true }).click();
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  const a = { x: box.x + 350, y: box.y + 230 };
+  await page.mouse.click(a.x, a.y);
+  await page.mouse.click(a.x + 150, a.y - 60);
+  await page.mouse.click(a.x + 70, a.y + 90);
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  const read = () =>
+    page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+      return (state.drawings[state.chart.symbol + ':' + state.chart.interval]?.[0]?.points ??
+        []) as {
+        time: number;
+        price: number;
+      }[];
+    });
+  await expect.poll(read).toHaveLength(3);
+  const before = await read();
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(a.x - 30, a.y + 30, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(async () => (await read())[0].price).not.toBe(before[0].price);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(read).toEqual(before);
+  await page.getByRole('button', { name: 'Lock all drawings', exact: true }).click();
+  await page.mouse.move(a.x, a.y);
+  await page.mouse.down();
+  await page.mouse.move(a.x - 30, a.y + 30, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(read).toEqual(before);
+  await page.getByRole('button', { name: 'Lock all drawings', exact: true }).click();
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await trigger.click();
+  await expect(favorite).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: testInfo.outputPath('line-tools-menu.png') });
+  await menu
+    .getByRole('menuitem', { name: 'Inside pitchfork', exact: true })
+    .scrollIntoViewIfNeeded();
+  await expect(menu.getByRole('menuitem', { name: 'Inside pitchfork', exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Zoom in', exact: true }).hover();
+  await expect(menu).toBeHidden();
+  await page.keyboard.press('Alt+j');
+  await expect(page.locator('.cq-hint')).toContainText('HorizontalRay');
+  await page.keyboard.press('Escape');
+  await page.keyboard.press('Alt+c');
+  await expect(page.locator('.cq-hint')).toContainText('CrossLine');
+  await page.keyboard.press('Escape');
 });

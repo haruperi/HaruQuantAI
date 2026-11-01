@@ -555,6 +555,7 @@ export class ChartEngine {
   }
   private projection(): Projection {
     return {
+      bars: this.visible,
       point: (p) => ({
         x: this.store.getState().chart.gaps
           ? this.indexTime(p.time) * this.spacing + this.offset

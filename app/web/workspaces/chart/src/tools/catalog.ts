@@ -1,3 +1,6 @@
+import { InfoLine, ExtendedLine, TrendAngle, CrossLine } from './lineVariants';
+import { ParallelChannel, RegressionTrend, FlatTopBottom, DisjointChannel } from './channels';
+import { SchiffPitchfork, ModifiedSchiffPitchfork, InsidePitchfork } from './pitchforkVariants';
 import { TrendLine } from './TrendLine';
 import { Segment } from './Segment';
 import { Ray } from './Ray';
@@ -23,7 +26,43 @@ import { Brush } from './Brush';
 import { Measure } from './Measure';
 import type { ToolId } from '../types';
 import type { Tool } from './types';
+export const lineSections: { title: string; ids: ToolId[] }[] = [
+  {
+    title: 'Lines',
+    ids: [
+      'TrendLine',
+      'Ray',
+      'InfoLine',
+      'ExtendedLine',
+      'TrendAngle',
+      'HorizontalLine',
+      'HorizontalRay',
+      'VerticalLine',
+      'CrossLine',
+    ],
+  },
+  {
+    title: 'Channels',
+    ids: ['ParallelChannel', 'RegressionTrend', 'FlatTopBottom', 'DisjointChannel'],
+  },
+  {
+    title: 'Pitchforks',
+    ids: ['Pitchfork', 'SchiffPitchfork', 'ModifiedSchiffPitchfork', 'InsidePitchfork'],
+  },
+  { title: 'Additional tools', ids: ['Segment', 'PriceLine', 'Arrow'] },
+];
 export const tools: Record<ToolId, Tool> = {
+  InfoLine,
+  ExtendedLine,
+  TrendAngle,
+  CrossLine,
+  ParallelChannel,
+  RegressionTrend,
+  FlatTopBottom,
+  DisjointChannel,
+  SchiffPitchfork,
+  ModifiedSchiffPitchfork,
+  InsidePitchfork,
   TrendLine,
   Segment,
   Ray,

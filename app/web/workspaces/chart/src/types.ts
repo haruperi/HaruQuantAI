@@ -41,6 +41,17 @@ export interface XY {
   y: number;
 }
 export const toolIds = [
+  'InfoLine',
+  'ExtendedLine',
+  'TrendAngle',
+  'CrossLine',
+  'ParallelChannel',
+  'RegressionTrend',
+  'FlatTopBottom',
+  'DisjointChannel',
+  'SchiffPitchfork',
+  'ModifiedSchiffPitchfork',
+  'InsidePitchfork',
   'TrendLine',
   'Ray',
   'Segment',

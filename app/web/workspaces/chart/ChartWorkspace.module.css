@@ -806,3 +806,50 @@
 .root :global(.cq-cursor-toggle) button[aria-checked='true'] span {
   margin-left: auto;
 }
+
+.root :global(.cq-line-menu) {
+  width: 285px;
+  max-height: calc(100vh - 165px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+.root :global(.cq-line-section) + :global(.cq-line-section) {
+  border-top: 1px solid var(--cq-border);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+.root :global(.cq-line-heading) {
+  color: var(--cq-muted);
+  text-transform: uppercase;
+  font-size: 10px;
+  padding: 7px 10px;
+}
+.root :global(.cq-line-menu .cq-tool-option) {
+  border-radius: 5px;
+}
+.root :global(.cq-line-menu .cq-tool-option > button:first-child) {
+  justify-content: flex-start;
+  gap: 8px;
+  height: 40px;
+  text-align: left;
+}
+.root :global(.cq-line-menu kbd) {
+  margin-left: auto;
+  color: var(--cq-muted);
+}
+.root :global(.cq-line-menu .cq-tool-option > button:last-child) {
+  opacity: 0;
+  flex-shrink: 0;
+}
+.root :global(.cq-line-menu .cq-tool-option:hover > button:last-child),
+.root :global(.cq-line-menu .cq-tool-option:focus-within > button:last-child),
+.root :global(.cq-line-menu .cq-tool-option > button.cq-starred) {
+  opacity: 1;
+}
+.root :global(.cq-line-menu .cq-selected-tool) {
+  background: var(--cq-text);
+  color: var(--cq-bg);
+}
+.root :global(.cq-line-menu .cq-selected-tool > button:hover) {
+  background: transparent;
+}
