@@ -609,6 +609,8 @@ export class ChartEngine {
     this.invalidate(4);
   }
   private publishViewport(): void {
+    // Loading resets the window before mounted panes can restore their saved range.
+    if (this.loading) return;
     const range = this.getVisibleTimeRange();
     if (range) this.onViewport?.(range);
   }
