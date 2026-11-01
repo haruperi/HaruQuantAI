@@ -74,7 +74,7 @@ export function useShortcuts() {
       else if (key === 'l') s.settings({ scale: s.chart.scale === 'log' ? 'linear' : 'log' });
       else if (key === 'a') s.settings({ auto: !s.chart.auto });
       else if (key === 'p')
-        s.setUI({ cursor: s.ui.cursor === 'crosshair' ? 'arrow' : 'crosshair' });
+        s.setUI({ cursor: s.ui.cursor === 'crosshair' ? 'arrow' : 'crosshair', tool: 'cursor' });
       else if (key === '/') {
         e.preventDefault();
         s.setUI({ dialog: 'symbol' });

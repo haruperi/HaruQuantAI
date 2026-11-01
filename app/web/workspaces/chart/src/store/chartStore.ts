@@ -60,6 +60,8 @@ export function createChartStore() {
       ui: {
         tool: 'cursor',
         cursor: 'crosshair',
+        cursorFavorites: [],
+        valuesOnLongPress: true,
         dialog: null,
         panel: null,
         selected: null,

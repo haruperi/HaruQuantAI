@@ -2,6 +2,9 @@ import { useEffect, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import {
   MousePointer2,
+  CirclePlay,
+  WandSparkles,
+  Eraser,
   Crosshair,
   Dot,
   TrendingUp,
@@ -23,8 +26,16 @@ import {
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
 import { tools } from '../../tools/catalog';
-import { keyFor, toolIds, type ToolId } from '../../types';
+import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
 import { ToolButton } from '../Tooltip';
+const cursors = [
+  { id: 'crosshair', label: 'Cross', icon: Crosshair },
+  { id: 'dot', label: 'Dot', icon: Dot },
+  { id: 'arrow', label: 'Arrow', icon: MousePointer2 },
+  { id: 'demonstration', label: 'Demonstration', icon: CirclePlay },
+  { id: 'magic', label: 'Magic', icon: WandSparkles },
+  { id: 'eraser', label: 'Eraser', icon: Eraser },
+] satisfies { id: CursorMode; label: string; icon: typeof Crosshair }[];
 const groups = [
   { name: 'Trend', icon: TrendingUp },
   { name: 'Fibonacci', icon: Hash },
@@ -59,25 +70,78 @@ export function LeftToolbar() {
   const selected = (s.drawings[keyFor(s.chart)] ?? []).find((d) => d.id === s.ui.selected);
   return (
     <aside className="cq-toolbar" aria-label="Drawing tools">
-      <ToolButton
-        label="Cursor mode"
-        shortcut="P"
-        onClick={() =>
-          s.setUI({
-            cursor:
-              s.ui.cursor === 'crosshair' ? 'dot' : s.ui.cursor === 'dot' ? 'arrow' : 'crosshair',
-            tool: 'cursor',
-          })
-        }
-      >
-        {s.ui.cursor === 'crosshair' ? (
-          <Crosshair />
-        ) : s.ui.cursor === 'dot' ? (
-          <Dot />
-        ) : (
-          <MousePointer2 />
+      <div className="cq-tool-group" onPointerEnter={cancelClose} onPointerLeave={scheduleClose}>
+        <ToolButton
+          label="Cursor mode"
+          shortcut="P"
+          aria-haspopup="menu"
+          aria-expanded={open === 'cursor'}
+          onClick={() => setOpen(open === 'cursor' ? null : 'cursor')}
+        >
+          {(() => {
+            const Icon = cursors.find((cursor) => cursor.id === s.ui.cursor)!.icon;
+            return <Icon />;
+          })()}
+          <ChevronRight className="cq-caret" size={10} onPointerEnter={() => setOpen('cursor')} />
+        </ToolButton>
+        {open === 'cursor' && (
+          <div
+            className="cq-flyout cq-cursor-menu"
+            role="menu"
+            aria-label="Cursor modes"
+            onPointerEnter={cancelClose}
+            onPointerLeave={scheduleClose}
+          >
+            {cursors.map(({ id, label, icon: Icon }) => (
+              <div
+                className={
+                  'cq-tool-option cq-cursor-option' +
+                  (id === 'eraser' ? ' cq-cursor-separator' : '')
+                }
+                key={id}
+              >
+                <button
+                  role="menuitemradio"
+                  aria-checked={s.ui.cursor === id}
+                  onClick={() => {
+                    cancelClose();
+                    s.setUI({ cursor: id, tool: 'cursor' });
+                    setOpen(null);
+                  }}
+                >
+                  <Icon />
+                  <span>{label}</span>
+                </button>
+                <button
+                  aria-label={'Favorite cursor ' + label}
+                  aria-pressed={s.ui.cursorFavorites.includes(id)}
+                  className={s.ui.cursorFavorites.includes(id) ? 'cq-starred' : ''}
+                  onClick={() =>
+                    s.setUI({
+                      cursorFavorites: s.ui.cursorFavorites.includes(id)
+                        ? s.ui.cursorFavorites.filter((mode) => mode !== id)
+                        : [...s.ui.cursorFavorites, id],
+                    })
+                  }
+                >
+                  <Star size={13} />
+                </button>
+              </div>
+            ))}
+            <div className="cq-cursor-separator cq-cursor-toggle">
+              <span id="cq-values-label">Values tooltip on long press</span>
+              <button
+                role="switch"
+                aria-labelledby="cq-values-label"
+                aria-checked={s.ui.valuesOnLongPress}
+                onClick={() => s.setUI({ valuesOnLongPress: !s.ui.valuesOnLongPress })}
+              >
+                <span />
+              </button>
+            </div>
+          </div>
         )}
-      </ToolButton>
+      </div>
       <hr />
       {groups.map(({ name, icon: Icon }) => (
         <div

@@ -148,7 +148,6 @@ test('drawing body move, endpoint resize, style, lock and delete are undoable', 
   await expect.poll(async () => (await read()).text).toBe('Support study');
 });
 
-
 test('drawing menu hover closes on leave and permits menu selection', async ({ page }) => {
   await page.goto('/chart');
   const host = page.getByTestId('chart-canvas-host');
@@ -175,4 +174,86 @@ test('drawing menu hover closes on leave and permits menu selection', async ({ p
     await menu.getByRole('menuitem').first().click();
     await expect(menu).toBeHidden();
   }
+});
+
+test('cursor menu modes, effects, tooltip and eraser undo', async ({ page }, testInfo) => {
+  test.setTimeout(60000);
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const connection = page.getByRole('dialog', { name: 'Connect to HaruQuantAI host' });
+  if (await connection.isVisible())
+    await connection.getByRole('button', { name: 'Close', exact: true }).click();
+  const cursor = page.getByRole('button', { name: 'Cursor mode', exact: true });
+  const menu = page.getByRole('menu', { name: 'Cursor modes', exact: true });
+  const select = async (name: string) => {
+    await cursor.click();
+    await menu.getByRole('menuitemradio', { name, exact: true }).click();
+    await expect(menu).toBeHidden();
+  };
+  for (const [name, mode] of [
+    ['Cross', 'crosshair'],
+    ['Dot', 'dot'],
+    ['Arrow', 'arrow'],
+  ]) {
+    await select(name);
+    await expect(host).toHaveAttribute('data-cursor', mode);
+  }
+  await cursor.click();
+  await menu.getByRole('button', { name: 'Favorite cursor Arrow', exact: true }).click();
+  await expect(
+    menu.getByRole('button', { name: 'Favorite cursor Arrow', exact: true }),
+  ).toHaveAttribute('aria-pressed', 'true');
+  await menu.getByRole('menuitemradio', { name: 'Cross', exact: true }).click();
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  const x = box.x + 350,
+    y = box.y + 240;
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await expect(host).toHaveAttribute('data-values-tooltip', 'true');
+  await page.mouse.up();
+  await expect(host).toHaveAttribute('data-values-tooltip', 'false');
+  await cursor.click();
+  await menu.getByRole('switch', { name: 'Values tooltip on long press' }).click();
+  await menu.getByRole('menuitemradio', { name: 'Cross', exact: true }).click();
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.waitForTimeout(600);
+  await expect(host).toHaveAttribute('data-values-tooltip', 'false');
+  await page.mouse.up();
+
+  for (const name of ['Demonstration', 'Magic']) {
+    await select(name);
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 100, y + 60, { steps: 10 });
+    await page.mouse.up();
+    await expect
+      .poll(async () => Number(await host.getAttribute('data-cursor-effects')))
+      .toBeGreaterThan(0);
+    await expect(host).toHaveAttribute('data-drawings', '0');
+    await expect(host).toHaveAttribute('data-cursor-effects', '0');
+  }
+  await page.getByRole('button', { name: 'Trend tools', exact: true }).click();
+  await page.getByRole('menuitem', { name: /^Trend line/ }).click();
+  await page.mouse.move(x, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 120, y + 80, { steps: 5 });
+  await page.mouse.up();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await select('Eraser');
+  await page.getByRole('button', { name: 'Lock all drawings', exact: true }).click();
+  await page.mouse.click(x + 60, y + 40);
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await page.getByRole('button', { name: 'Lock all drawings', exact: true }).click();
+  await page.mouse.click(x + 60, y + 40);
+  await expect(host).toHaveAttribute('data-drawings', '0');
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await cursor.click();
+  await page.getByRole('button', { name: 'Cursor mode', exact: true }).hover();
+  await expect(menu).toBeVisible();
+  await page.screenshot({ path: testInfo.outputPath('cursor-menu.png') });
+  await page.getByRole('button', { name: 'Zoom in', exact: true }).hover();
+  await expect(menu).toBeHidden();
 });

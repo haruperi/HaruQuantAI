@@ -69,6 +69,21 @@ export class ChartEngine {
   private scalePane: Pane | null = null;
   private pointer: XY | null = null;
   private down: XY | null = null;
+  private valueTimer?: ReturnType<typeof setTimeout>;
+  private longPressValues = false;
+  private effects: { point: XY; time: number; kind: 'demonstration' | 'magic'; start: boolean }[] =
+    [];
+  private effectGesture = false;
+  private clearValues() {
+    clearTimeout(this.valueTimer);
+    this.longPressValues = false;
+    this.host.dataset.valuesTooltip = 'false';
+  }
+  private addEffect(point: XY, kind: 'demonstration' | 'magic', start = false) {
+    this.effects.push({ point, kind, start, time: performance.now() });
+    this.effects = this.effects.slice(-512);
+    this.invalidate(4);
+  }
   private initialOffset = 0;
   private initialRange: [number, number] = [0, 1];
   private gesture: 'pan' | 'price' | 'time' | 'draw' | 'move' | 'resize' | 'pane' | null = null;
@@ -127,6 +142,7 @@ export class ChartEngine {
     listen('pointerup', (e) => this.pointerUp(e));
     listen('pointercancel', () => this.cancel());
     listen('pointerleave', () => {
+      this.clearValues();
       if (!this.down) {
         this.pointer = null;
         this.invalidate(4);
@@ -189,6 +205,17 @@ export class ChartEngine {
           this.liveViewport = null;
         } else this.scrollLast();
         this.haVersion = -1;
+      }
+      if (
+        s.ui.cursor !== previous.ui.cursor ||
+        s.ui.tool !== previous.ui.tool ||
+        s.ui.valuesOnLongPress !== previous.ui.valuesOnLongPress
+      ) {
+        this.clearValues();
+        this.effectGesture = false;
+        this.effects = [];
+        input.style.cursor =
+          s.ui.cursor === 'arrow' ? 'default' : s.ui.cursor === 'eraser' ? 'cell' : 'crosshair';
       }
       if (s.ui.tool !== previous.ui.tool) {
         this.points = [];
@@ -432,6 +459,9 @@ export class ChartEngine {
     s.setUI({ replayIndex: index, playing: index === this.bars.length - 1 ? false : s.ui.playing });
   }
   cancel() {
+    this.clearValues();
+    this.effectGesture = false;
+    this.effects = [];
     this.points = [];
     this.preview = null;
     this.down = null;
@@ -556,6 +586,7 @@ export class ChartEngine {
   private pointerDown(e: PointerEvent) {
     if (e.button !== 0) return;
     const p = this.local(e);
+    this.clearValues();
     this.touches.set(e.pointerId, p);
     this.canvases[2].setPointerCapture(e.pointerId);
     if (this.touches.size === 2) {
@@ -605,6 +636,31 @@ export class ChartEngine {
       this.gesture = 'time';
       return;
     }
+    if (s.ui.tool === 'cursor' && p.y < this.mainHeight) {
+      if (s.ui.cursor === 'eraser') {
+        const hit = this.hit(p);
+        if (hit && !hit.locked && !s.ui.lock && !s.ui.hide) {
+          s.setDrawings(this.drawings().filter((drawing) => drawing.id !== hit.id));
+          s.setUI({ selected: null });
+        }
+        this.down = null;
+        return;
+      }
+      if (s.ui.cursor === 'magic' || s.ui.cursor === 'demonstration' || e.altKey) {
+        this.effectGesture = true;
+        this.gesture = null;
+        this.addEffect(p, s.ui.cursor === 'magic' ? 'magic' : 'demonstration', true);
+        return;
+      }
+      if (s.ui.valuesOnLongPress && this.touches.size === 1) {
+        this.pointer = p;
+        this.valueTimer = setTimeout(() => {
+          this.longPressValues = true;
+          this.host.dataset.valuesTooltip = 'true';
+          this.invalidate(4);
+        }, 500);
+      }
+    }
     if (s.ui.tool !== 'cursor') {
       this.gesture = 'draw';
       const point = this.point(p);
@@ -647,6 +703,18 @@ export class ChartEngine {
       return;
     }
     const s = this.store.getState();
+    if (
+      s.ui.tool === 'cursor' &&
+      s.ui.cursor === 'magic' &&
+      !this.down &&
+      p.x < this.plotWidth &&
+      p.y < this.mainHeight
+    )
+      this.addEffect(p, 'magic', true);
+    if (this.effectGesture && this.down) {
+      this.addEffect(p, s.ui.cursor === 'magic' ? 'magic' : 'demonstration');
+      return;
+    }
     if (!this.down) {
       if (this.points.length && s.ui.tool !== 'cursor')
         this.preview = this.makeDrawing([...this.points, this.point(p)]);
@@ -656,6 +724,7 @@ export class ChartEngine {
     const dx = p.x - this.down.x,
       dy = p.y - this.down.y;
     this.moving ||= Math.hypot(dx, dy) > 3;
+    if (this.moving) this.clearValues();
     if (this.gesture === 'pan' || this.gesture === 'time') {
       if (e.shiftKey && this.gesture === 'time') {
         const next = zoomAt(
@@ -716,6 +785,8 @@ export class ChartEngine {
     }
   }
   private pointerUp(e: PointerEvent) {
+    this.clearValues();
+    this.effectGesture = false;
     this.touches.delete(e.pointerId);
     if (this.touches.size) {
       this.pinch = 0;
@@ -1150,7 +1221,7 @@ export class ChartEngine {
         px = c.magnet ? this.projection().point(point) : this.pointer,
         index = clamp(Math.round(this.indexAt(px.x)), 0, bars.length - 1);
       hover = bars[index] ?? last;
-      if (s.ui.cursor !== 'arrow') {
+      if (s.ui.cursor === 'crosshair' || s.ui.cursor === 'dot') {
         ctx.strokeStyle = muted;
         ctx.setLineDash([4, 4]);
         if (s.ui.cursor === 'crosshair') {
@@ -1178,25 +1249,70 @@ export class ChartEngine {
           this.plotHeight + 16,
         );
       }
-      if (c.tooltip) {
+      if (c.tooltip || this.longPressValues) {
         ctx.fillStyle = dark ? '#1e222d' : '#f1f3f6';
         ctx.fillRect(
-          clamp(px.x + 15, 0, this.plotWidth - 190),
+          clamp(px.x + 15, 0, this.plotWidth - 320),
           clamp(px.y + 15, 0, this.mainHeight - 45),
-          185,
+          315,
           35,
         );
         ctx.fillStyle = fg;
         ctx.fillText(
           'O ' +
             formatPrice(hover.open, c.precision) +
-            '  C ' +
+            ' H ' +
+            formatPrice(hover.high, c.precision) +
+            ' L ' +
+            formatPrice(hover.low, c.precision) +
+            ' C ' +
             formatPrice(hover.close, c.precision),
-          clamp(px.x + 23, 8, this.plotWidth - 182),
+          clamp(px.x + 23, 8, this.plotWidth - 312),
           clamp(px.y + 35, 20, this.mainHeight - 25),
         );
       }
     }
+    const effectNow = performance.now();
+    this.effects = this.effects.filter((effect) => effectNow - effect.time < 1600);
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(0, 0, this.plotWidth, this.mainHeight);
+    ctx.clip();
+    this.effects.forEach((effect, i) => {
+      const age = (effectNow - effect.time) / 1600;
+      ctx.globalAlpha = 1 - age;
+      ctx.strokeStyle = effect.kind === 'magic' ? '#ffd166' : '#f23645';
+      ctx.fillStyle = ctx.strokeStyle;
+      ctx.lineWidth = 5;
+      ctx.lineCap = 'round';
+      const previous = this.effects[i - 1];
+      ctx.beginPath();
+      if (
+        effect.kind === 'demonstration' &&
+        previous &&
+        !effect.start &&
+        previous.kind === effect.kind
+      ) {
+        ctx.moveTo(previous.point.x, previous.point.y);
+        ctx.lineTo(effect.point.x, effect.point.y);
+        ctx.stroke();
+      } else if (effect.kind === 'magic') {
+        const radius = 6 * (1 - age) + 2;
+        ctx.lineWidth = 2;
+        ctx.moveTo(effect.point.x - radius, effect.point.y);
+        ctx.lineTo(effect.point.x + radius, effect.point.y);
+        ctx.moveTo(effect.point.x, effect.point.y - radius);
+        ctx.lineTo(effect.point.x, effect.point.y + radius);
+        ctx.stroke();
+      } else {
+        ctx.arc(effect.point.x, effect.point.y, 3, 0, Math.PI * 2);
+        ctx.fill();
+      }
+    });
+    ctx.restore();
+    this.host.dataset.cursor = s.ui.cursor;
+    this.host.dataset.cursorEffects = String(this.effects.length);
+    if (this.effects.length) this.invalidate(4);
     const index = bars.indexOf(hover);
     this.onReadout?.({
       bar: hover,
@@ -1275,6 +1391,8 @@ export class ChartEngine {
     ctx.restore();
   }
   destroy() {
+    this.clearValues();
+    this.effects = [];
     this.disposed = true;
     this.abort?.abort();
     this.stopFeed?.();

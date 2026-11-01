@@ -166,9 +166,12 @@ export interface Menu {
   y: number;
   target: 'chart' | 'price' | 'time' | 'drawing';
 }
+export type CursorMode = 'crosshair' | 'dot' | 'arrow' | 'demonstration' | 'magic' | 'eraser';
 export interface UIState {
   tool: ToolId | 'cursor';
-  cursor: 'crosshair' | 'dot' | 'arrow';
+  cursor: CursorMode;
+  cursorFavorites: CursorMode[];
+  valuesOnLongPress: boolean;
   dialog: Dialog;
   panel: 'alerts' | 'positions' | 'favorites' | null;
   selected: string | null;

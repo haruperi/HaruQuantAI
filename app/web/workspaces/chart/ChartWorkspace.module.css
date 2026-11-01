@@ -743,3 +743,66 @@
     margin-top: 0;
   }
 }
+
+.root :global(.cq-cursor-menu) {
+  width: 260px;
+}
+.root :global(.cq-cursor-option) {
+  border-radius: 5px;
+}
+.root :global(.cq-cursor-option) button[role='menuitemradio'] {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  height: 40px;
+  text-align: left;
+  justify-content: flex-start;
+}
+.root :global(.cq-cursor-option):has([aria-checked='true']) {
+  background: var(--cq-text);
+  color: var(--cq-bg, #131722);
+}
+.root :global(.cq-cursor-option) button[aria-checked='true'] {
+  color: inherit;
+}
+.root :global(.cq-cursor-option) > button:last-child {
+  opacity: 0;
+}
+.root :global(.cq-cursor-option):hover > button:last-child,
+.root :global(.cq-cursor-option):focus-within > button:last-child,
+.root :global(.cq-cursor-option > button.cq-starred) {
+  opacity: 1;
+}
+.root :global(.cq-cursor-separator) {
+  border-top: 1px solid var(--cq-border);
+  margin-top: 8px;
+  padding-top: 8px;
+}
+.root :global(.cq-cursor-toggle) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-bottom: 4px;
+}
+.root :global(.cq-cursor-toggle) button {
+  width: 36px;
+  height: 20px;
+  min-height: 20px;
+  border-radius: 12px;
+  background: #555;
+  padding: 3px;
+}
+.root :global(.cq-cursor-toggle) button[aria-checked='true'] {
+  background: #ddd;
+}
+.root :global(.cq-cursor-toggle) button span {
+  display: block;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: #171717;
+}
+.root :global(.cq-cursor-toggle) button[aria-checked='true'] span {
+  margin-left: auto;
+}
