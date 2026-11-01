@@ -24,6 +24,18 @@ import {
   HelpCircle,
   Minus,
   ArrowUpRight,
+  StickyNote,
+  BadgeDollarSign,
+  MapPin,
+  Table2,
+  MessageSquare,
+  MessageCircle,
+  Tag,
+  Signpost,
+  Flag,
+  Image as ImageIcon,
+  Share2,
+  Lightbulb,
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
 import {
@@ -34,7 +46,8 @@ import {
   forecastingSections,
   shapeSections,
 } from '../../tools/catalog';
-import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
+import { keyFor, type ToolId, type CursorMode } from '../../types';
+import { textNoteSections } from '../../tools/textNotes';
 import { ToolButton } from '../Tooltip';
 const cursors = [
   { id: 'crosshair', label: 'Cross', icon: Crosshair },
@@ -52,6 +65,25 @@ const groups = [
   { name: 'Shapes', icon: Shapes },
   { name: 'Annotate', icon: Type },
 ];
+const annotationIcons: Partial<Record<ToolId, typeof Type>> = {
+  Text: Type,
+  Note: StickyNote,
+  PriceNote: BadgeDollarSign,
+  Pin: MapPin,
+  Table: Table2,
+  Callout: MessageSquare,
+  Comment: MessageCircle,
+  PriceLabel: Tag,
+  Signpost,
+  FlagMark: Flag,
+  Image: ImageIcon,
+  Post: Share2,
+  Idea: Lightbulb,
+};
+function AnnotationToolIcon({ id }: { id: ToolId }) {
+  const Icon = annotationIcons[id] ?? Type;
+  return <Icon aria-hidden="true" />;
+}
 function LineToolIcon({ id }: { id: ToolId }) {
   const horizontal = ['HorizontalLine', 'HorizontalRay', 'PriceLine'].includes(id);
   const vertical = id === 'VerticalLine';
@@ -360,8 +392,8 @@ export function LeftToolbar() {
             <div
               className={
                 'cq-flyout' +
-                (['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes'].includes(name)
-                  ? ' cq-line-menu'
+                (['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes', 'Annotate'].includes(name)
+                  ? ' cq-line-menu' + (name === 'Annotate' ? ' cq-text-menu' : '')
                   : '')
               }
               role="menu"
@@ -379,7 +411,7 @@ export function LeftToolbar() {
                       ? forecastingSections
                       : name === 'Shapes'
                         ? shapeSections
-                        : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
+                        : textNoteSections
               ).map((section) => (
                 <div
                   key={section.title}
@@ -405,8 +437,9 @@ export function LeftToolbar() {
                         {name === 'Patterns' && <PatternToolIcon id={id} />}
                         {name === 'Forecasting' && <ForecastingToolIcon id={id} />}
                         {name === 'Shapes' && <ShapeToolIcon id={id} />}
+                        {name === 'Annotate' && <AnnotationToolIcon id={id} />}
                         <span>{tools[id].label}</span>
-                        <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>
+                        {name !== 'Annotate' && <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>}
                       </button>
                       <button
                         aria-label={'Favorite ' + tools[id].label}
