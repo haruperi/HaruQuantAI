@@ -121,8 +121,18 @@ test('every drawing tool creates an editable persisted object with undo and redo
       group: 'Annotate',
       names: [
         ['Text', 1],
-        ['Anchored note', 1],
-        ['Emoji / sticker', 1],
+        ['Note', 1],
+        ['Price note', 1],
+        ['Pin', 1],
+        ['Table', 1],
+        ['Callout', 1],
+        ['Comment', 1],
+        ['Price label', 1],
+        ['Signpost', 1],
+        ['Flag mark', 1],
+        ['Image', 1],
+        ['Post', 1],
+        ['Idea', 1],
       ],
     },
   ];
@@ -170,6 +180,34 @@ test('every drawing tool creates an editable persisted object with undo and redo
   await page.getByRole('button', { name: 'Delete all drawings', exact: true }).click();
   await page.getByRole('button', { name: 'Delete drawings', exact: true }).click();
   await expect(host).toHaveAttribute('data-drawings', '0');
+});
+
+test('text tools match the reference sections and save an editable annotation', async ({ page }) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  await page.getByRole('button', { name: 'Annotate tools', exact: true }).click();
+  const menu = page.getByRole('menu', { name: 'Annotate tools', exact: true });
+  await expect(menu.locator('.cq-line-heading')).toHaveText(['Text and Notes', 'Content']);
+  await expect(menu.getByRole('menuitem')).toHaveText([
+    'Text', 'Note', 'Price note', 'Pin', 'Table', 'Callout', 'Comment', 'Price label',
+    'Signpost', 'Flag mark', 'Image', 'Post', 'Idea',
+  ]);
+  await menu.getByRole('menuitem', { name: 'Table', exact: true }).click();
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  await page.mouse.click(box.x + 330, box.y + 220);
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await page.getByRole('textbox', { name: 'Drawing text' }).fill('Side | Entry\nLong | 1.0842');
+  await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  await expect(page.getByText('Saved locally', { exact: true })).toBeVisible();
+  const actual = await page.evaluate(() => {
+    const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+    return state.drawings[state.chart.symbol + ':' + state.chart.interval][0];
+  });
+  expect(actual.tool).toBe('Table');
+  expect(actual.text).toBe('Side | Entry\nLong | 1.0842');
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
 });
 
 test('drawing body move, endpoint resize, style, lock and delete are undoable', async ({
