@@ -48,6 +48,7 @@ from typing import Any, Literal
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
+from app.include import format_timestamp
 from app.include.contracts import (
     MarketBar,
     MarketTick,
@@ -70,8 +71,6 @@ from app.workspace.brokers.metatrader import create_mt5_client
 from app.workspace.brokers.simulator import SimulatorClient
 from app.workspace.data_manager.data.history import get_historical_bars, get_ticks
 from app.workspace.trading import Trading
-
-from app.include import format_timestamp
 
 BROKER: Literal["simulator", "mt5", "ctrader"] = os.getenv("BROKER", "mt5")  # type: ignore[assignment]
 ALLOW_LIVE_TRADING = True

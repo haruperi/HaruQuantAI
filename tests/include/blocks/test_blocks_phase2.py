@@ -299,10 +299,9 @@ def test_clean_migration_obsolete_implementations_removed() -> None:
 def test_clean_migration_direct_consumer_imports() -> None:
     """Verify all consumers import directly from canonical blocks package."""
     # 1. app.include package root exposes canonical blocks
+    import app.include as root_inc
     from app.include.blocks.comparisons.is_greater import is_greater
     from app.include.blocks.functions.plus import plus
-
-    import app.include as root_inc
 
     assert root_inc.is_greater is is_greater
     assert root_inc.plus is plus
