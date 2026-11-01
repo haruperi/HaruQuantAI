@@ -48,6 +48,7 @@ import {
 } from '../../tools/catalog';
 import { keyFor, type ToolId, type CursorMode } from '../../types';
 import { textNoteSections } from '../../tools/textNotes';
+import { indicators } from '../../indicators/catalog';
 import { ToolButton } from '../Tooltip';
 const cursors = [
   { id: 'crosshair', label: 'Cross', icon: Crosshair },
@@ -478,15 +479,78 @@ export function LeftToolbar() {
         <ZoomOut />
       </ToolButton>
       <hr />
-      <ToolButton
-        label="Magnet"
-        shortcut="M"
-        aria-pressed={s.chart.magnet}
-        className={s.chart.magnet ? 'cq-active' : ''}
-        onClick={() => s.settings({ magnet: !s.chart.magnet })}
+      <div
+        className="cq-tool-group"
+        onPointerEnter={() => {
+          if (open === 'magnet') cancelClose();
+        }}
+        onPointerLeave={scheduleClose}
       >
-        <Magnet />
-      </ToolButton>
+        <ToolButton
+          label="Magnet"
+          shortcut="M"
+          aria-haspopup="menu"
+          aria-expanded={open === 'magnet'}
+          aria-pressed={s.chart.magnet}
+          className={s.chart.magnet ? 'cq-active' : ''}
+          onClick={() => {
+            cancelClose();
+            s.settings({ magnet: !s.chart.magnet });
+          }}
+        >
+          <Magnet />
+          <ChevronRight
+            className="cq-caret"
+            size={10}
+            onPointerEnter={() => {
+              cancelClose();
+              setOpen('magnet');
+            }}
+          />
+        </ToolButton>
+        {open === 'magnet' && (
+          <div
+            className="cq-flyout cq-magnet-menu"
+            role="menu"
+            aria-label="Magnet modes"
+            onPointerEnter={cancelClose}
+            onPointerLeave={scheduleClose}
+          >
+            {(['weak', 'strong'] as const).map((strength) => (
+              <button
+                key={strength}
+                role="menuitemradio"
+                aria-checked={s.chart.magnet && s.chart.magnetStrength === strength}
+                className="cq-magnet-option"
+                onClick={() => {
+                  cancelClose();
+                  s.settings({ magnet: true, magnetStrength: strength });
+                  setOpen(null);
+                }}
+              >
+                <Magnet aria-hidden="true" />
+                <span>{strength === 'weak' ? 'Weak magnet' : 'Strong magnet'}</span>
+              </button>
+            ))}
+            <div className="cq-magnet-switch-row">
+              <span id="cq-snap-indicators-label">Snap to indicators</span>
+              <button
+                type="button"
+                role="switch"
+                aria-labelledby="cq-snap-indicators-label"
+                aria-checked={s.chart.snapToIndicators}
+                disabled={!s.indicators.some(indicator => !indicators[indicator.kind].pane)}
+                title={!s.indicators.some(indicator => !indicators[indicator.kind].pane)
+                  ? 'Add a price-overlay indicator to enable snapping'
+                  : 'Include price-overlay indicator points when magnet is enabled'}
+                onClick={() => s.settings({ snapToIndicators: !s.chart.snapToIndicators })}
+              >
+                <span />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
       <ToolButton
         label="Lock all drawings"
         aria-pressed={s.ui.lock}
