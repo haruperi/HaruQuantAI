@@ -28,9 +28,11 @@ test('styles, symbol search, local theme, indicators, settings and reload', asyn
   await expect(page.getByRole('button', { name: 'Remove RSI', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Remove RSI', exact: true }).click();
   await page.getByRole('button', { name: 'Chart settings', exact: true }).click();
-  await page.getByLabel('Chart theme', { exact: true }).selectOption('light');
-  await page.getByLabel('History minimap', { exact: true }).check();
-  await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  const chartDialog = page.getByRole('dialog', { name: 'Chart settings' });
+  await chartDialog.getByRole('button', { name: 'Canvas', exact: true }).click();
+  await chartDialog.getByLabel('Chart theme', { exact: true }).selectOption('light');
+  await chartDialog.getByLabel('History minimap', { exact: true }).check();
+  await chartDialog.getByRole('button', { name: 'Ok', exact: true }).click();
   await expect(page.locator('[data-chart-theme]')).toHaveAttribute('data-chart-theme', 'light');
   await page.screenshot({
     path: path.resolve('../../.agents/logs/2026-09-25T180609_chart-platform/chart-light.png'),
