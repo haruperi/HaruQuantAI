@@ -1,3 +1,10 @@
+import { defaultPositionPoints } from '../../../workspaces/chart/src/tools/forecasting';
+import { anchoredVWAP, volumeBins } from '../../../workspaces/chart/src/tools/volumeTools';
+import {
+  sourceCandles,
+  positionMetrics,
+  positionPoints,
+} from '../../../workspaces/chart/src/tools/forecasting';
 import { it, expect } from 'vitest';
 import { tools, patternSections } from '../../../workspaces/chart/src/tools/catalog';
 import { primitiveHit } from '../../../workspaces/chart/src/tools/geometry';
@@ -376,4 +383,183 @@ it('all pattern tools support partial, coincident and reversed previews without 
       expect(JSON.stringify(shapes)).not.toMatch(/null|NaN/);
     }
   }
+});
+
+const forecastBars = [10, 20, 30].map((close, i) => ({
+  time: i * 10,
+  open: close,
+  high: close + 2,
+  low: close - 2,
+  close,
+  volume: (i + 1) * 10,
+}));
+it('long and short drawings calculate risk/reward and flag invalid levels', () => {
+  const long = drawing('LongPosition', [
+    { time: 0, price: 100 },
+    { time: 10, price: 90 },
+    { time: 20, price: 120 },
+  ]);
+  const shapes = tools.LongPosition.build(long, projection);
+  expect(
+    shapes.some(
+      (shape) => shape.kind === 'badge' && shape.text.includes('Risk/reward ratio: 2.00'),
+    ),
+  ).toBe(true);
+  expect(shapes.filter((shape) => shape.fillOpacity === 0.28).map((shape) => shape.color)).toEqual([
+    '#f23645',
+    '#089981',
+  ]);
+  const short = {
+    ...long,
+    tool: 'ShortPosition' as const,
+    points: [
+      { time: 0, price: 100 },
+      { time: 10, price: 110 },
+      { time: 20, price: 80 },
+    ],
+  };
+  expect(
+    tools.ShortPosition.build(short, projection).some(
+      (shape) => shape.kind === 'badge' && shape.text.includes('Risk/reward ratio: 2.00'),
+    ),
+  ).toBe(true);
+  expect(
+    tools.LongPosition.build(short, projection).some(
+      (shape) => shape.kind === 'text' && shape.text.includes('opposite sides'),
+    ),
+  ).toBe(true);
+});
+it('VWAP weights typical prices by volume and excludes zero-volume bars', () => {
+  const result = anchoredVWAP(forecastBars);
+  expect(result[0].price).toBe(10);
+  expect(result[1].price).toBeCloseTo(50 / 3);
+  expect(result[2].price).toBeCloseTo(70 / 3);
+  expect(anchoredVWAP(forecastBars.map((bar) => ({ ...bar, volume: 0 })))).toEqual([]);
+});
+it('volume bins conserve volume including flat candles and profiles disclose the estimate', () => {
+  const bins = volumeBins(
+    [...forecastBars, { ...forecastBars[0], high: 10, low: 10, volume: 25 }],
+    32,
+  );
+  expect(bins.reduce((sum, bin) => sum + bin.volume, 0)).toBeCloseTo(85);
+  expect(bins).toHaveLength(32);
+  const d = drawing('FixedVolumeProfile', [
+    { time: 0, price: 10 },
+    { time: 20, price: 30 },
+  ]);
+  expect(
+    tools.FixedVolumeProfile.build(d, { ...projection, bars: forecastBars }).some(
+      (shape) => shape.kind === 'text' && shape.text.includes('OHLC estimate'),
+    ),
+  ).toBe(true);
+  const anchored = tools.AnchoredVWAP.build(drawing('AnchoredVWAP', [{ time: 10, price: 20 }]), {
+    ...projection,
+    bars: forecastBars,
+  });
+  if (anchored[0].kind !== 'path') throw new Error('Expected VWAP path');
+  expect(anchored[0].points[0]).toEqual({ x: 10, y: 20 });
+});
+it('bars pattern uses stable saved candles and translates them to its destination', () => {
+  const d = {
+    ...drawing('BarsPattern', [
+      { time: 0, price: 10 },
+      { time: 20, price: 30 },
+      { time: 50, price: 100 },
+    ]),
+    sourceBars: forecastBars,
+  };
+  expect(sourceCandles(d, { ...projection, bars: [] })).toBe(forecastBars);
+  const shapes = tools.BarsPattern.build(d, { ...projection, bars: [] });
+  if (shapes[0].kind !== 'path') throw new Error('Expected candle wick');
+  expect(shapes[0].points).toEqual([
+    { x: 50, y: 102 },
+    { x: 50, y: 98 },
+  ]);
+  const ghost = { ...d, tool: 'GhostFeed' as const };
+  expect(tools.GhostFeed.build(ghost, projection)).toEqual(
+    tools.GhostFeed.build(ghost, projection),
+  );
+  expect(tools.GhostFeed.build(ghost, projection).length).toBe(33);
+});
+it('range tools report signed price change, bars and elapsed time', () => {
+  const d = drawing('DatePriceRange', [
+    { time: 0, price: 100 },
+    { time: 120000, price: 110 },
+  ]);
+  const shapes = tools.DatePriceRange.build(d, { ...projection, barMs: 60000 });
+  const text = shapes
+    .filter((shape) => shape.kind === 'text')
+    .map((shape) => shape.text)
+    .join('');
+  expect(text).toContain('10.00 (10.00%)');
+  expect(text).toContain('2 bars | 2.0 min');
+});
+it('forecasting tools render safe messages for absent data and bounded partial previews', () => {
+  for (const id of [
+    'AnchoredVWAP',
+    'FixedVolumeProfile',
+    'AnchoredVolumeProfile',
+    'BarsPattern',
+    'GhostFeed',
+    'Sector',
+    'PriceRange',
+    'DateRange',
+    'DatePriceRange',
+  ] as const) {
+    for (const points of [
+      [],
+      [{ time: 0, price: 10 }],
+      [
+        { time: 10, price: 10 },
+        { time: 10, price: 10 },
+      ],
+    ]) {
+      const shapes = tools[id].build(drawing(id, points), projection);
+      expect(shapes.length).toBeGreaterThan(0);
+      expect(JSON.stringify(shapes)).not.toMatch(/null|NaN/);
+    }
+  }
+});
+
+it('position sizing and reference badges use independent width and explicit projected amounts', () => {
+  const d = {
+    ...drawing('LongPosition', [
+      { time: 0, price: 100 },
+      { time: 10, price: 90 },
+      { time: 20, price: 120 },
+    ]),
+    positionSizing: { accountSize: 1000, riskPercent: 25 },
+  };
+  expect(positionMetrics(d)).toMatchObject({
+    quantity: 25,
+    riskAmount: 250,
+    rewardAmount: 500,
+    ratio: 2,
+  });
+  expect(positionPoints(d)).toEqual([
+    { time: 0, price: 100 },
+    { time: 0, price: 90 },
+    { time: 0, price: 120 },
+    { time: 20, price: 100 },
+  ]);
+  const shapes = tools.LongPosition.build(d, projection);
+  const badges = shapes.filter((shape) => shape.kind === 'badge');
+  expect(badges[0].text).toContain('Amount: 1500.00');
+  expect(badges[1].text).toContain('Amount: 750.00');
+  expect(badges[2].text).toContain('Projected P&L: 500.00, Qty: 25.00');
+  expect(JSON.stringify(shapes)).not.toContain('Closed');
+  expect(shapes.some((shape) => shape.dash?.length === 2)).toBe(true);
+  expect(shapes.filter((shape) => shape.fillOpacity === 0.28)).toHaveLength(2);
+});
+
+it('one-click position defaults mirror a one-percent stop and equal target', () => {
+  expect(defaultPositionPoints({ time: 1000, price: 100 }, false, 10)).toEqual([
+    { time: 1000, price: 100 },
+    { time: 1000, price: 99 },
+    { time: 1000, price: 101 },
+    { time: 1080, price: 100 },
+  ]);
+  expect(
+    defaultPositionPoints({ time: 1000, price: 100 }, true, 10).map((point) => point.price),
+  ).toEqual([100, 101, 99, 100]);
 });

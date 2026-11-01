@@ -3,6 +3,7 @@ import {
   lineSections,
   fibonacciSections,
   patternSections,
+  forecastingSections,
 } from '../../../workspaces/chart/src/tools/catalog';
 import { it, expect } from 'vitest';
 import { createChartStore } from '../../../workspaces/chart/src/store/chartStore';
@@ -45,9 +46,12 @@ it('preserves unknown data instead of overwriting it', () => {
 
 it('round-trips every sectioned drawing menu tool with all anchors and favorites', () => {
   const store = createChartStore();
-  const ids = [...lineSections, ...fibonacciSections, ...patternSections].flatMap(
-    (section) => section.ids,
-  );
+  const ids = [
+    ...lineSections,
+    ...fibonacciSections,
+    ...patternSections,
+    ...forecastingSections,
+  ].flatMap((section) => section.ids);
   const state = persisted(store);
   state.drawings['XAUUSD:3m'] = ids.map((tool) => ({
     id: tool,
@@ -68,4 +72,75 @@ it('round-trips every sectioned drawing menu tool with all anchors and favorites
   }));
   state.favorites = ids;
   expect(decode(JSON.stringify({ version: 1, state }))).toEqual(state);
+});
+
+it('snapshot decoding preserves candles and rejects malformed, unordered and oversized snapshots', () => {
+  const state = persisted(createChartStore());
+  const bar = { time: 1000, open: 10, high: 12, low: 8, close: 11, volume: 20 };
+  const item = {
+    id: 'snapshot',
+    tool: 'BarsPattern' as const,
+    points: [
+      { time: 1000, price: 10 },
+      { time: 2000, price: 12 },
+      { time: 3000, price: 20 },
+    ],
+    sourceBars: [bar],
+    color: '#2962ff',
+    width: 2,
+    dash: false,
+    opacity: 1,
+    text: '',
+    locked: false,
+    hidden: false,
+    extendLeft: false,
+    extendRight: false,
+  };
+  state.drawings['XAUUSD:3m'] = [item];
+  expect(decode(JSON.stringify({ version: 1, state }))).toEqual(state);
+  for (const sourceBars of [
+    [{ ...bar, volume: -1 }],
+    [{ ...bar, low: 11 }],
+    [bar, bar],
+    Array.from({ length: 513 }, (_, i) => ({ ...bar, time: i })),
+  ]) {
+    state.drawings['XAUUSD:3m'] = [{ ...item, sourceBars }];
+    expect(() => decode(JSON.stringify({ version: 1, state }))).toThrow(/snapshot/);
+  }
+  state.drawings['XAUUSD:3m'] = [{ ...item, tool: 'TrendLine' }];
+  expect(() => decode(JSON.stringify({ version: 1, state }))).toThrow(/snapshot/);
+});
+
+it('position sizing remains optional and rejects invalid account and risk settings', () => {
+  const state = persisted(createChartStore());
+  const item = {
+    id: 'position',
+    tool: 'LongPosition' as const,
+    points: [
+      { time: 0, price: 100 },
+      { time: 0, price: 90 },
+      { time: 0, price: 120 },
+      { time: 1000, price: 100 },
+    ],
+    positionSizing: { accountSize: 1000, riskPercent: 1 },
+    color: '#2962ff',
+    width: 2,
+    dash: false,
+    opacity: 1,
+    text: '',
+    locked: false,
+    hidden: false,
+    extendLeft: false,
+    extendRight: false,
+  };
+  state.drawings['XAUUSD:3m'] = [item];
+  expect(decode(JSON.stringify({ version: 1, state }))).toEqual(state);
+  for (const positionSizing of [
+    { accountSize: 0, riskPercent: 1 },
+    { accountSize: 1000, riskPercent: 101 },
+    { accountSize: 1e13, riskPercent: 1 },
+  ]) {
+    state.drawings['XAUUSD:3m'] = [{ ...item, positionSizing }];
+    expect(() => decode(JSON.stringify({ version: 1, state }))).toThrow(/position sizing/);
+  }
 });

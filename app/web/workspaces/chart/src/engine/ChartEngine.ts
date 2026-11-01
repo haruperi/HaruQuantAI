@@ -7,6 +7,7 @@ import { marketOpen } from '../feed/sessions';
 import { clamp, priceToY, yToPrice, niceTicks, zoomAt, transformPrice } from './scales';
 import { paintSeries, heikinAshi } from './candles';
 import { tools } from '../tools/catalog';
+import { sourceCandles, positionPoints, defaultPositionPoints } from '../tools/forecasting';
 import { paint, primitiveHit } from '../tools/geometry';
 import type { Projection } from '../tools/types';
 import { indicators } from '../indicators/catalog';
@@ -665,6 +666,16 @@ export class ChartEngine {
     if (s.ui.tool !== 'cursor') {
       this.gesture = 'draw';
       const point = this.point(p);
+      if (s.ui.tool === 'LongPosition' || s.ui.tool === 'ShortPosition') {
+        this.points = defaultPositionPoints(
+          point,
+          s.ui.tool === 'ShortPosition',
+          this.barMs(),
+          this.point({ x: p.x + 180, y: p.y }).time,
+        );
+        this.preview = this.makeDrawing(this.points);
+        return;
+      }
       if (s.ui.tool === 'Brush') this.points = [point];
       else this.points.push(point);
       this.preview = this.makeDrawing(this.points);
@@ -674,7 +685,10 @@ export class ChartEngine {
     const selected = this.drawings().find((d) => d.id === s.ui.selected);
     this.handle =
       selected && !selected.locked && !selected.hidden && !s.ui.lock && !s.ui.hide
-        ? selected.points.findIndex((a) => {
+        ? (selected.tool === 'LongPosition' || selected.tool === 'ShortPosition'
+            ? positionPoints(selected)
+            : selected.points
+          ).findIndex((a) => {
             const b = this.projection().point(a);
             return Math.hypot(b.x - p.x, b.y - p.y) < 9;
           })
@@ -763,7 +777,14 @@ export class ChartEngine {
       this.invalidate(7);
     }
     if (this.gesture === 'draw' && s.ui.tool !== 'cursor') {
-      if (s.ui.tool === 'Brush') {
+      if (s.ui.tool === 'LongPosition' || s.ui.tool === 'ShortPosition') {
+        if (this.moving)
+          this.points[3] = {
+            time: Math.max(this.points[0].time + this.barMs(), this.point(p).time),
+            price: this.points[0].price,
+          };
+        this.preview = this.makeDrawing(this.points);
+      } else if (s.ui.tool === 'Brush') {
         this.points.push(this.point(p));
         this.preview = this.makeDrawing(this.points);
       } else this.preview = this.makeDrawing([...this.points, this.point(p)]);
@@ -782,6 +803,25 @@ export class ChartEngine {
             : { time: v.time + b.time - a.time, price: v.price + b.price - a.price },
         ),
       };
+      if (
+        this.gesture === 'resize' &&
+        (this.original.tool === 'LongPosition' || this.original.tool === 'ShortPosition')
+      ) {
+        const points = positionPoints(this.original);
+        if (this.handle === 3)
+          points[3] = {
+            time: Math.max(points[0].time + this.barMs(), b.time),
+            price: points[0].price,
+          };
+        else if (this.handle === 0) {
+          points[0] = b;
+          points[1].time = b.time;
+          points[2].time = b.time;
+          points[3].price = b.price;
+          points[3].time = Math.max(points[3].time, b.time + this.barMs());
+        } else points[this.handle] = { time: points[0].time, price: b.price };
+        this.preview = { ...this.original, points };
+      }
       this.invalidate(6);
     }
   }
@@ -850,7 +890,17 @@ export class ChartEngine {
       tool = tools[this.preview.tool];
     if (tool.anchors && this.points.length < tool.anchors) return;
     if (!tool.anchors && this.points.length < (this.preview.tool === 'Polygon' ? 3 : 2)) return;
-    const drawing = { ...this.preview, points: this.points.map((p) => ({ ...p })) };
+    const drawing: Drawing = { ...this.preview, points: this.points.map((p) => ({ ...p })) };
+    if (drawing.tool === 'BarsPattern' || drawing.tool === 'GhostFeed')
+      drawing.sourceBars = sourceCandles(drawing, this.projection()).map((bar) => ({ ...bar }));
+    if (drawing.tool === 'LongPosition' || drawing.tool === 'ShortPosition') {
+      drawing.points = positionPoints(drawing);
+      drawing.points[3].time = Math.max(
+        drawing.points[3].time,
+        drawing.points[0].time + this.barMs(),
+      );
+      drawing.positionSizing = { accountSize: 1000, riskPercent: 1 };
+    }
     s.setDrawings([...this.drawings(), drawing]);
     this.points = [];
     this.preview = null;
@@ -1381,10 +1431,15 @@ export class ChartEngine {
     }
     ctx.setLineDash([]);
     if (selected && !d.locked)
-      for (const anchor of d.points) {
+      for (const anchor of d.tool === 'LongPosition' || d.tool === 'ShortPosition'
+        ? positionPoints(d)
+        : d.points) {
         const p = this.projection().point(anchor);
         ctx.beginPath();
-        ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+        if (d.tool === 'LongPosition' || d.tool === 'ShortPosition') {
+          ctx.rect(p.x - 5, p.y - 5, 10, 10);
+          ctx.strokeStyle = '#2962ff';
+        } else ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
         ctx.fillStyle = '#fff';
         ctx.fill();
         ctx.stroke();

@@ -1,4 +1,14 @@
 import {
+  LongPosition,
+  ShortPosition,
+  PositionForecast,
+  BarsPattern,
+  GhostFeed,
+  Sector,
+} from './forecasting';
+import { AnchoredVWAP, FixedVolumeProfile, AnchoredVolumeProfile } from './volumeTools';
+import { PriceRange, DateRange, DatePriceRange } from './rangeTools';
+import {
   XABCDPattern,
   CypherPattern,
   HeadShoulders,
@@ -121,7 +131,35 @@ export const patternSections: { title: string; ids: ToolId[] }[] = [
   },
   { title: 'Cycles', ids: ['CyclicLines', 'TimeCycles', 'SineLine'] },
 ];
+export const forecastingSections: { title: string; ids: ToolId[] }[] = [
+  {
+    title: 'Forecasting',
+    ids: [
+      'LongPosition',
+      'ShortPosition',
+      'PositionForecast',
+      'BarsPattern',
+      'GhostFeed',
+      'Sector',
+    ],
+  },
+  { title: 'Volume-based', ids: ['AnchoredVWAP', 'FixedVolumeProfile', 'AnchoredVolumeProfile'] },
+  { title: 'Measurers', ids: ['PriceRange', 'DateRange', 'DatePriceRange'] },
+];
 export const tools: Record<ToolId, Tool> = {
+  LongPosition,
+  ShortPosition,
+  PositionForecast,
+  BarsPattern,
+  GhostFeed,
+  Sector,
+  AnchoredVWAP,
+  FixedVolumeProfile,
+  AnchoredVolumeProfile,
+  PriceRange,
+  DateRange,
+  DatePriceRange,
+
   XABCDPattern,
   CypherPattern,
   HeadShoulders,

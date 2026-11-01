@@ -41,6 +41,19 @@ export interface XY {
   y: number;
 }
 export const toolIds = [
+  'LongPosition',
+  'ShortPosition',
+  'PositionForecast',
+  'BarsPattern',
+  'GhostFeed',
+  'Sector',
+  'AnchoredVWAP',
+  'FixedVolumeProfile',
+  'AnchoredVolumeProfile',
+  'PriceRange',
+  'DateRange',
+  'DatePriceRange',
+
   'XABCDPattern',
   'CypherPattern',
   'HeadShoulders',
@@ -104,6 +117,8 @@ export const toolIds = [
 ] as const;
 export type ToolId = (typeof toolIds)[number];
 export interface Drawing {
+  positionSizing?: { accountSize: number; riskPercent: number };
+  sourceBars?: Bar[];
   id: string;
   tool: ToolId;
   points: Point[];

@@ -1,8 +1,10 @@
 import type { Bar, Drawing, Point, XY } from '../types';
-export type Primitive =
+export type Primitive = (
   | { kind: 'path'; points: XY[]; closed?: boolean; fill?: boolean }
   | { kind: 'ellipse'; center: XY; rx: number; ry: number }
-  | { kind: 'text'; at: XY; text: string };
+  | { kind: 'text'; at: XY; text: string }
+  | { kind: 'badge'; at: XY; text: string; background: string }
+) & { color?: string; fillOpacity?: number; dash?: number[] };
 export interface Projection {
   bars?: readonly Bar[];
   point: (p: Point) => XY;

@@ -80,6 +80,42 @@ export function decode(raw: string): Persisted {
         d.opacity > 1
       )
         throw new Error('Invalid drawing.');
+      if (d.positionSizing !== undefined) {
+        const sizing = d.positionSizing;
+        if (
+          !['LongPosition', 'ShortPosition'].includes(String(d.tool)) ||
+          !object(sizing) ||
+          !finite(sizing.accountSize) ||
+          sizing.accountSize <= 0 ||
+          sizing.accountSize > 1e12 ||
+          !finite(sizing.riskPercent) ||
+          sizing.riskPercent <= 0 ||
+          sizing.riskPercent > 100
+        )
+          throw new Error('Invalid position sizing settings.');
+      }
+      if (d.sourceBars !== undefined) {
+        if (
+          !['BarsPattern', 'GhostFeed'].includes(String(d.tool)) ||
+          !Array.isArray(d.sourceBars) ||
+          d.sourceBars.length > 512
+        )
+          throw new Error('Invalid drawing candle snapshot.');
+        let previousTime = -Infinity;
+        for (const bar of d.sourceBars) {
+          if (
+            !object(bar) ||
+            !['time', 'open', 'high', 'low', 'close', 'volume'].every((key) => finite(bar[key])) ||
+            Number(bar.time) <= previousTime ||
+            Number(bar.volume) < 0 ||
+            Number(bar.low) <= 0 ||
+            Number(bar.low) > Math.min(Number(bar.open), Number(bar.close)) ||
+            Number(bar.high) < Math.max(Number(bar.open), Number(bar.close))
+          )
+            throw new Error('Invalid drawing candle snapshot bar.');
+          previousTime = Number(bar.time);
+        }
+      }
       const tool = tools[d.tool as keyof typeof tools];
       if (d.points.length < (tool.anchors || (d.tool === 'Polygon' ? 3 : 2)))
         throw new Error('Incomplete drawing anchors.');

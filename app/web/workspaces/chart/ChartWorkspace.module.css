@@ -866,3 +866,8 @@
   width: 350px;
   max-height: calc(100vh - 225px);
 }
+
+.root :global(.cq-line-menu[aria-label='Forecasting tools']) {
+  width: 320px;
+  max-height: calc(100vh - 265px);
+}

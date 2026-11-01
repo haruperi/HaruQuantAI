@@ -80,6 +80,23 @@ test('every drawing tool creates an editable persisted object with undo and redo
       ],
     },
     {
+      group: 'Forecasting',
+      names: [
+        ['Long position', 1],
+        ['Short position', 1],
+        ['Position forecast', 2],
+        ['Bars pattern', 3],
+        ['Ghost feed', 2],
+        ['Sector', 3],
+        ['Anchored VWAP', 1],
+        ['Fixed range volume profile', 2],
+        ['Anchored volume profile', 1],
+        ['Price range', 2],
+        ['Date range', 2],
+        ['Date and price range', 2],
+      ],
+    },
+    {
       group: 'Shapes',
       names: [
         ['Rectangle', 2],
@@ -203,7 +220,7 @@ test('drawing menu hover closes on leave and permits menu selection', async ({ p
   if (await connection.isVisible())
     await connection.getByRole('button', { name: 'Close', exact: true }).click();
 
-  for (const group of ['Trend', 'Fibonacci', 'Patterns', 'Shapes', 'Annotate']) {
+  for (const group of ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes', 'Annotate']) {
     const trigger = page.getByRole('button', { name: group + ' tools', exact: true });
     const caret = trigger.locator('.cq-caret');
     const menu = page.getByRole('menu', { name: group + ' tools', exact: true });
@@ -521,4 +538,154 @@ test('Patterns parity menu, incomplete cancellation and Elliott anchor editing',
   await expect(menu.getByRole('menuitem', { name: 'Sine line', exact: true })).toBeVisible();
   await page.getByRole('button', { name: 'Zoom in', exact: true }).hover();
   await expect(menu).toBeHidden();
+});
+
+test('Forecasting menu, candle snapshots, editing, locking and reload', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(60000);
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const trigger = page.getByRole('button', { name: 'Forecasting tools', exact: true });
+  const menu = page.getByRole('menu', { name: 'Forecasting tools', exact: true });
+  await trigger.click();
+  await expect(menu.locator('.cq-line-heading')).toHaveText([
+    'Forecasting',
+    'Volume-based',
+    'Measurers',
+  ]);
+  await expect(menu.getByRole('menuitem')).toHaveCount(12);
+  const favorite = menu.getByRole('button', { name: 'Favorite Bars pattern', exact: true });
+  await favorite.click();
+  await menu.getByRole('menuitem', { name: 'Bars pattern', exact: true }).click();
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  const x = box.x + 350,
+    y = box.y + 230;
+  await page.mouse.click(x, y);
+  await page.mouse.click(x + 120, y - 60);
+  await page.mouse.click(x + 240, y);
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  const read = () =>
+    page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+      return state.drawings[state.chart.symbol + ':' + state.chart.interval]?.[0] as
+        | {
+            points: { time: number; price: number }[];
+            sourceBars: { time: number; close: number }[];
+          }
+        | undefined;
+    });
+  await expect.poll(async () => (await read())?.sourceBars?.length ?? 0).toBeGreaterThan(0);
+  const before = (await read())!;
+  await page.mouse.move(x + 240, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 260, y + 30, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(async () => (await read())?.points[2].price).not.toBe(before.points[2].price);
+  expect((await read())?.sourceBars).toEqual(before.sourceBars);
+  await page.getByRole('button', { name: 'Undo', exact: true }).click();
+  await expect.poll(read).toEqual(before);
+  await page.getByRole('button', { name: 'Lock all drawings', exact: true }).click();
+  await page.mouse.move(x + 240, y);
+  await page.mouse.down();
+  await page.mouse.move(x + 260, y + 30, { steps: 5 });
+  await page.mouse.up();
+  await expect.poll(read).toEqual(before);
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await expect.poll(read).toEqual(before);
+  await trigger.click();
+  await expect(favorite).toHaveAttribute('aria-pressed', 'true');
+  await page.screenshot({ path: testInfo.outputPath('forecasting-menu.png') });
+  await menu
+    .getByRole('menuitem', { name: 'Date and price range', exact: true })
+    .scrollIntoViewIfNeeded();
+  await expect(
+    menu.getByRole('menuitem', { name: 'Date and price range', exact: true }),
+  ).toBeVisible();
+  await page.getByRole('button', { name: 'Zoom in', exact: true }).hover();
+  await expect(menu).toBeHidden();
+});
+
+test('position reference appearance, sizing settings and independent width handles', async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(60000);
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  const read = () =>
+    page.evaluate(() => {
+      const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+      return (state.drawings[state.chart.symbol + ':' + state.chart.interval] ?? []) as {
+        points: { time: number; price: number }[];
+        positionSizing: { accountSize: number; riskPercent: number };
+      }[];
+    });
+  for (const [index, name] of ['Long position', 'Short position'].entries()) {
+    await page.getByRole('button', { name: 'Forecasting tools', exact: true }).click();
+    await page.getByRole('menuitem', { name, exact: true }).click();
+    const x = box.x + 400 + index * 420,
+      y = box.y + 280;
+    await page.mouse.move(x, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 220, y, { steps: 5 });
+    await page.mouse.up();
+    await expect.poll(async () => (await read())[index]?.points.length).toBe(4);
+    const before = (await read())[index];
+    await page.mouse.move(x + 220, y);
+    await page.mouse.down();
+    await page.mouse.move(x + 270, y, { steps: 5 });
+    await page.mouse.up();
+    await expect
+      .poll(async () => (await read())[index].points[3].time)
+      .not.toBe(before.points[3].time);
+    expect((await read())[index].points.slice(0, 3)).toEqual(before.points.slice(0, 3));
+    await page.getByRole('button', { name: 'Undo', exact: true }).click();
+    await expect.poll(async () => (await read())[index]).toEqual(before);
+    // Open settings from the drawing context menu.
+    await page.mouse.click(x, y, { button: 'right' });
+    await page.getByRole('menuitem', { name: 'Drawing settings', exact: true }).click();
+    await page.getByLabel('Position account size', { exact: true }).fill('1000');
+    await page.getByLabel('Position risk percent', { exact: true }).fill('25');
+    await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+    await expect.poll(async () => (await read())[index].positionSizing.riskPercent).toBe(25);
+    await page.screenshot({
+      path: testInfo.outputPath(index ? 'short-position.png' : 'long-position.png'),
+    });
+  }
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '2');
+  await expect
+    .poll(async () => (await read()).map((d) => d.positionSizing.riskPercent))
+    .toEqual([25, 25]);
+});
+
+test('one click places complete long and short positions with editable defaults', async ({
+  page,
+}) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  for (const [i, name] of ['Long position', 'Short position'].entries()) {
+    await page.getByRole('button', { name: 'Forecasting tools', exact: true }).click();
+    await page.getByRole('menuitem', { name, exact: true }).click();
+    await expect(page.locator('.cq-hint')).toContainText('Click to place');
+    await page.mouse.click(box.x + 400 + i * 300, box.y + 250);
+    await expect(host).toHaveAttribute('data-drawings', String(i + 1));
+  }
+  // Persistence is debounced; completion itself is checked above and reload below.
+  await expect
+    .poll(async () =>
+      page.evaluate(() => {
+        const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+        return state.drawings[state.chart.symbol + ':' + state.chart.interval]?.length ?? 0;
+      }),
+    )
+    .toBe(2);
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '2');
 });

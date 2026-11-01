@@ -31,6 +31,8 @@ export function segmentDistance(p: XY, a: XY, b: XY): number {
   return Math.hypot(p.x - a.x - t * dx, p.y - a.y - t * dy);
 }
 export function primitiveHit(shape: Primitive, p: XY): boolean {
+  if (shape.kind === 'badge')
+    return Math.abs(p.x - shape.at.x) < 100 && Math.abs(p.y - shape.at.y) < 18;
   if (shape.kind === 'text')
     return (
       p.x >= shape.at.x - 4 &&
@@ -59,9 +61,35 @@ export function primitiveHit(shape: Primitive, p: XY): boolean {
 }
 export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[]): void {
   for (const shape of shapes) {
+    ctx.save();
+    if (shape.color) {
+      ctx.strokeStyle = shape.color;
+      ctx.fillStyle = shape.color;
+    }
+    if (shape.dash) ctx.setLineDash(shape.dash);
     ctx.beginPath();
+    if (shape.kind === 'badge') {
+      const lines = shape.text.split('\n');
+      const width = Math.max(...lines.map((text) => ctx.measureText(text).width)) + 12;
+      const height = lines.length * 15 + 8;
+      const x = shape.at.x - width / 2,
+        y = shape.at.y - height / 2;
+      ctx.setLineDash([]);
+      ctx.fillStyle = shape.background;
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 1;
+      ctx.roundRect(x, y, width, height, 4);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.textAlign = 'center';
+      lines.forEach((text, i) => ctx.fillText(text, shape.at.x, y + 16 + i * 15));
+      ctx.restore();
+      continue;
+    }
     if (shape.kind === 'text') {
       ctx.fillText(shape.text, shape.at.x, shape.at.y);
+      ctx.restore();
       continue;
     }
     if (shape.kind === 'ellipse')
@@ -80,10 +108,11 @@ export function paint(ctx: CanvasRenderingContext2D, shapes: Primitive[]): void 
     }
     if (shape.kind === 'ellipse' || shape.fill) {
       ctx.save();
-      ctx.globalAlpha *= 0.12;
+      ctx.globalAlpha *= shape.fillOpacity ?? 0.12;
       ctx.fill();
       ctx.restore();
     }
     ctx.stroke();
+    ctx.restore();
   }
 }

@@ -62,6 +62,51 @@ export function DrawingSettings() {
             </select>
           </label>
         </div>
+        {(drawing.tool === 'LongPosition' || drawing.tool === 'ShortPosition') && (
+          <div className="cq-fields">
+            <label>
+              Account size
+              <input
+                aria-label="Position account size"
+                type="number"
+                min="0.01"
+                max="1000000000000"
+                value={drawing.positionSizing?.accountSize ?? 1000}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (Number.isFinite(value) && value > 0 && value <= 1e12)
+                    update({
+                      positionSizing: {
+                        accountSize: value,
+                        riskPercent: drawing.positionSizing?.riskPercent ?? 1,
+                      },
+                    });
+                }}
+              />
+            </label>
+            <label>
+              Risk (%)
+              <input
+                aria-label="Position risk percent"
+                type="number"
+                min="0.01"
+                max="100"
+                step="0.1"
+                value={drawing.positionSizing?.riskPercent ?? 1}
+                onChange={(e) => {
+                  const value = Number(e.target.value);
+                  if (Number.isFinite(value) && value > 0 && value <= 100)
+                    update({
+                      positionSizing: {
+                        accountSize: drawing.positionSizing?.accountSize ?? 1000,
+                        riskPercent: value,
+                      },
+                    });
+                }}
+              />
+            </label>
+          </div>
+        )}
         <label>
           Text label
           <input

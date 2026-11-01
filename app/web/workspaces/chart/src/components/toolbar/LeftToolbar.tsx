@@ -26,7 +26,13 @@ import {
   ArrowUpRight,
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
-import { tools, lineSections, fibonacciSections, patternSections } from '../../tools/catalog';
+import {
+  tools,
+  lineSections,
+  fibonacciSections,
+  patternSections,
+  forecastingSections,
+} from '../../tools/catalog';
 import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
 import { ToolButton } from '../Tooltip';
 const cursors = [
@@ -41,6 +47,7 @@ const groups = [
   { name: 'Trend', icon: TrendingUp },
   { name: 'Fibonacci', icon: Hash },
   { name: 'Patterns', icon: Network },
+  { name: 'Forecasting', icon: ArrowUpRight },
   { name: 'Shapes', icon: Shapes },
   { name: 'Annotate', icon: Type },
 ];
@@ -145,6 +152,27 @@ function PatternToolIcon({ id }: { id: ToolId }) {
               : 'A   C'}
         </text>
       )}
+    </svg>
+  );
+}
+function ForecastingToolIcon({ id }: { id: ToolId }) {
+  const glyphs: Partial<Record<ToolId, string>> = {
+    LongPosition: 'M2 5h20M2 12h20M2 19h20M7 3v18M4 8l3-3 3 3',
+    ShortPosition: 'M2 5h20M2 12h20M2 19h20M7 3v18M4 16l3 3 3-3',
+    PositionForecast: 'M2 20L21 3M13 3h8v8M3 10v10h10',
+    BarsPattern: 'M4 2v20M2 6h4v8H2M11 2v20M9 8h4v9H9M19 2v20M17 5h4v7h-4',
+    GhostFeed: 'M2 19l5-7 5 4 5-10 5 3M7 7v10M17 2v10',
+    Sector: 'M3 21V3a18 18 0 0 1 18 18H3M3 21L16 8',
+    AnchoredVWAP: 'M2 18l5-6 5 2 5-9 5 3M4 4v16M1 12h6',
+    FixedVolumeProfile: 'M3 3v18M3 5h10v3H3M3 10h17v3H3M3 15h13v3H3M21 3v18',
+    AnchoredVolumeProfile: 'M21 3v18M21 5H11v3h10M21 10H4v3h17M21 15H8v3h13',
+    PriceRange: 'M12 2v20M5 3h14M5 21h14M9 6l3-3 3 3M9 18l3 3 3-3',
+    DateRange: 'M2 12h20M3 5v14M21 5v14M6 9l-3 3 3 3M18 9l3 3-3 3',
+    DatePriceRange: 'M3 3h18v18H3zM12 6v12M6 12h12',
+  };
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" aria-hidden="true">
+      <path d={glyphs[id]} />
     </svg>
   );
 }
@@ -305,7 +333,9 @@ export function LeftToolbar() {
             <div
               className={
                 'cq-flyout' +
-                (['Trend', 'Fibonacci', 'Patterns'].includes(name) ? ' cq-line-menu' : '')
+                (['Trend', 'Fibonacci', 'Patterns', 'Forecasting'].includes(name)
+                  ? ' cq-line-menu'
+                  : '')
               }
               role="menu"
               aria-label={name + ' tools'}
@@ -318,12 +348,14 @@ export function LeftToolbar() {
                   ? fibonacciSections
                   : name === 'Patterns'
                     ? patternSections
-                    : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
+                    : name === 'Forecasting'
+                      ? forecastingSections
+                      : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
               ).map((section) => (
                 <div
                   key={section.title}
                   className={
-                    ['Trend', 'Fibonacci', 'Patterns'].includes(name)
+                    ['Trend', 'Fibonacci', 'Patterns', 'Forecasting'].includes(name)
                       ? 'cq-line-section'
                       : undefined
                   }
@@ -342,6 +374,7 @@ export function LeftToolbar() {
                         {name === 'Trend' && <LineToolIcon id={id} />}
                         {name === 'Fibonacci' && <FibonacciToolIcon id={id} />}
                         {name === 'Patterns' && <PatternToolIcon id={id} />}
+                        {name === 'Forecasting' && <ForecastingToolIcon id={id} />}
                         <span>{tools[id].label}</span>
                         <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>
                       </button>

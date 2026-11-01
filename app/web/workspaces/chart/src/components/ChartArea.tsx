@@ -134,9 +134,11 @@ export function ChartArea() {
       {s.ui.tool !== 'cursor' && (
         <div className="cq-hint">
           {s.ui.tool} ·{' '}
-          {s.ui.tool === 'Polygon'
-            ? 'Click vertices, Enter to finish'
-            : 'Place anchors on the chart'}{' '}
+          {s.ui.tool === 'LongPosition' || s.ui.tool === 'ShortPosition'
+            ? 'Click to place; drag to set width'
+            : s.ui.tool === 'Polygon'
+              ? 'Click vertices, Enter to finish'
+              : 'Place anchors on the chart'}{' '}
           · Esc to cancel
         </div>
       )}
