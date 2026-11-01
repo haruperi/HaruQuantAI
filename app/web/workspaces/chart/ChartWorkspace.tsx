@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useStore } from 'zustand';
 import { createChartStore } from './src/store/chartStore';
-import { connectPersistence } from './src/store/persistence';
-import { ChartContext } from './src/hooks/useChartEngine';
+import { connectPersistence, persisted, storageKey } from './src/store/persistence';
+import { ChartContext, type ChartServices } from './src/hooks/useChartEngine';
 import { useShortcuts } from './src/hooks/useShortcuts';
 import type { ChartEngine } from './src/engine/ChartEngine';
+import { defaultLayout, getLayout, getLayoutSizes, layoutSplitters, resizeTracks, layoutStorageKey, readLayout, type LayoutState, type LayoutSizes, type SyncSetting } from './src/layout/layouts';
 import { TopBar } from './src/components/topbar/TopBar';
 import { LeftToolbar } from './src/components/toolbar/LeftToolbar';
 import { BottomBar } from './src/components/bottombar/BottomBar';
@@ -25,39 +26,275 @@ import { Minimap } from './src/components/panels/Minimap';
 import { Toasts } from './src/components/panels/Toasts';
 import { ContextMenu } from './src/components/ContextMenu';
 import styles from './ChartWorkspace.module.css';
+
 function Shortcuts() {
   useShortcuts();
   return null;
 }
+function ChartPane({ services, index, active, onSelect }: {
+  services: ChartServices;
+  index: number;
+  active: boolean;
+  onSelect: (index: number) => void;
+}) {
+  const theme = useStore(services.store, state => state.chart.theme);
+  return (
+    <div role="group" aria-label={'Chart ' + (index + 1)}
+      className={'cq-chart-cell' + (active ? ' cq-chart-cell-active' : '')}
+      data-chart-theme={theme}
+      data-testid="chart-pane" data-pane-index={index}
+      style={{ gridArea: 'c' + index }}
+      onPointerDown={() => onSelect(index)}
+      onFocusCapture={() => onSelect(index)}>
+      <ChartContext.Provider value={services}>
+        <ChartArea />
+      </ChartContext.Provider>
+    </div>
+  );
+}
+const paneStorageKey = (index: number) => index === 0 ? storageKey : storageKey + '.pane.' + index;
+
+/** Keeps all eight chart instances alive in memory while unused panes are hidden.
+ * Each store owns independent indicators, drawings, settings and undo history.
+ * Only enabled synchronization dimensions are copied between stores.
+ */
 export function ChartWorkspace() {
-  const store = useMemo(createChartStore, []),
-    engine = useRef<ChartEngine | null>(null),
-    root = useRef<HTMLDivElement>(null),
-    s = useStore(store),
-    services = useMemo(() => ({ store, engine, root }), [store]);
+  const stores = useMemo(() => Array.from({ length: 8 }, () => createChartStore()), []);
+  const engines = useMemo(() =>
+    Array.from({ length: 8 }, () => ({ current: null as ChartEngine | null })), []);
+  const root = useRef<HTMLDivElement>(null);
+  const resizeDrag = useRef<{ layoutId: string; axis: 'columns' | 'rows'; edge: number;
+    start: number; length: number; sizes: LayoutSizes } | null>(null);
+  const viewRanges = useRef<(readonly [number, number] | null)[]>(Array(8).fill(null));
+  const [layout, setLayout] = useState<LayoutState>(() =>
+    typeof window === 'undefined' ? { ...defaultLayout, sync: { ...defaultLayout.sync }, sizes: {} }
+      : readLayout(window.localStorage));
+  const currentLayout = useRef(layout);
+  currentLayout.current = layout;
+  const active = Math.min(layout.active, getLayout(layout.id).count - 1);
+  const selectedStore = stores[active];
+  const s = useStore(selectedStore);
+
+  const paneServices = useMemo<ChartServices[]>(() => stores.map((store, index) => ({
+    store,
+    engine: engines[index],
+    root,
+    onCrosshairTime: (time: number | null) => {
+      const config = currentLayout.current;
+      if (!config.sync.crosshair || config.active !== index) return;
+      engines.forEach((target, i) => {
+        if (i !== index) target.current?.setLinkedCrosshairTime(time);
+      });
+    },
+    onViewport: (range: readonly [number, number]) => {
+      viewRanges.current[index] = range;
+      const config = currentLayout.current;
+      if (!config.sync.time || config.active !== index) return;
+      engines.forEach((target, i) => {
+        if (i !== index) {
+          target.current?.setVisibleTimeRange(range);
+          viewRanges.current[i] = range;
+        }
+      });
+    },
+    onReady: (chartEngine: ChartEngine) => {
+      const config = currentLayout.current;
+      const synchronizedRange = config.sync.time && config.active !== index
+        ? engines[config.active].current?.getVisibleTimeRange() : null;
+      const range = synchronizedRange ?? viewRanges.current[index];
+      if (range) chartEngine.setVisibleTimeRange(range);
+      viewRanges.current[index] = chartEngine.getVisibleTimeRange();
+    },
+    onDispose: (range: readonly [number, number] | null) => {
+      if (range) viewRanges.current[index] = range;
+    },
+  })), [stores, engines]);
+  const services = paneServices[active];
+
+  // Hydrate first, then subscribe. The original single-chart storage key is untouched.
+  useEffect(() => {
+    let stops: (() => void)[] = [];
+    try {
+      const storage = localStorage;
+      stops.push(connectPersistence(stores[0], storage, paneStorageKey(0)));
+      for (let i = 1; i < stores.length; i++) {
+        const key = paneStorageKey(i);
+        if (!storage.getItem(key)) {
+          const base = structuredClone(persisted(stores[0]));
+          stores[i].setState({ ...base, chart: { ...base.chart, title: 'Chart ' + (i + 1) } });
+        }
+        stops.push(connectPersistence(stores[i], storage, key));
+      }
+    } catch {
+      stores[0].getState().setUI({ saved: 'Browser storage unavailable' });
+    }
+    let propagating = false;
+    const unsubscribes = stores.map((source, sourceIndex) => source.subscribe((state, previous) => {
+      if (propagating) return;
+      const sync = currentLayout.current.sync;
+      const changes: Partial<typeof state.chart> = {};
+      if (sync.symbol && state.chart.symbol !== previous.chart.symbol)
+        changes.symbol = state.chart.symbol;
+      if (sync.interval && state.chart.interval !== previous.chart.interval)
+        changes.interval = state.chart.interval;
+      if (sync.dateRange && state.chart.range !== previous.chart.range)
+        changes.range = state.chart.range;
+      if (!Object.keys(changes).length) return;
+      propagating = true;
+      try {
+        stores.forEach((target, index) => {
+          if (index === sourceIndex) return;
+          const other = target.getState();
+          if (Object.entries(changes).some(([key, value]) =>
+            other.chart[key as keyof typeof other.chart] !== value))
+            target.setState({ chart: { ...other.chart, ...changes } });
+        });
+      } finally {
+        propagating = false;
+      }
+    }));
+    return () => {
+      unsubscribes.forEach(unsubscribe => unsubscribe());
+      stops.forEach(stop => stop());
+    };
+  }, [stores]);
+
+  // Chart engines are resized by ResizeObserver; restore the visible time window
+  // after CSS grid cells acquire their new dimensions.
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => {
+      engines.forEach((engine, index) => {
+        const range = viewRanges.current[index];
+        if (range) engine.current?.setVisibleTimeRange(range);
+      });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [layout.id, engines]);
+
   useEffect(() => {
     try {
-      return connectPersistence(store, localStorage);
+      localStorage.setItem(layoutStorageKey, JSON.stringify(layout));
     } catch {
-      store.getState().setUI({ saved: 'Browser storage unavailable' });
+      // The workspace remains usable without browser storage.
     }
-  }, [store]);
+  }, [layout]);
+
+  const updateLayout = (id: string) => {
+    const count = getLayout(id).count;
+    setLayout(previous => ({
+      ...previous, id,
+      active: Math.min(previous.active, count - 1),
+    }));
+  };
+  const selectPane = (index: number) => {
+    if (index === currentLayout.current.active) return;
+    engines.forEach(engine => engine.current?.setLinkedCrosshairTime(null));
+    setLayout(previous => ({ ...previous, active: index }));
+  };
+  const updateSync = (setting: SyncSetting, enabled: boolean) => {
+    const chosen = selectedStore.getState().chart;
+    if (enabled && (setting === 'symbol' || setting === 'interval' || setting === 'dateRange')) {
+      const key = setting === 'dateRange' ? 'range' : setting;
+      stores.forEach((store, index) => {
+        if (index === active) return;
+        const chart = store.getState().chart;
+        if (chart[key] !== chosen[key])
+          store.setState({ chart: { ...chart, [key]: chosen[key] } });
+      });
+    }
+    if (enabled && setting === 'time') {
+      const range = engines[active].current?.getVisibleTimeRange();
+      if (range) engines.forEach((target, i) => {
+        if (i !== active) target.current?.setVisibleTimeRange(range);
+      });
+    }
+    if (!enabled && setting === 'crosshair')
+      engines.forEach(engine => engine.current?.setLinkedCrosshairTime(null));
+    setLayout(previous => ({
+      ...previous, sync: { ...previous.sync, [setting]: enabled },
+    }));
+  };
+
+  const definition = getLayout(layout.id);
+  const cells = definition.cells;
+  const sizes = getLayoutSizes(layout.id, layout.sizes[layout.id]);
+  const splits = layoutSplitters(cells);
+  const position = (values: number[], end: number) =>
+    values.slice(0, end).reduce((sum, value) => sum + value, 0);
+  const boardStyle = {
+    gridTemplateColumns: sizes.columns.map(n => n + 'fr').join(' '),
+    gridTemplateRows: sizes.rows.map(n => n + 'fr').join(' '),
+    gridTemplateAreas: cells.map(row => '"' + row.map(i => 'c' + i).join(' ') + '"').join(' '),
+  };
   return (
     <ChartContext.Provider value={services}>
-      <div
-        ref={root}
-        className={styles.root}
-        data-chart-theme={s.chart.theme}
-        tabIndex={0}
-        aria-label="Chart workspace"
-        onPointerDown={(e) => {
-          if (e.target instanceof HTMLCanvasElement) root.current?.focus({ preventScroll: true });
-        }}
-      >
+      <div ref={root} className={styles.root} data-chart-theme={s.chart.theme}
+        tabIndex={0} aria-label="Chart workspace"
+        onPointerDown={event => {
+          if (event.target instanceof HTMLCanvasElement)
+            root.current?.focus({ preventScroll: true });
+        }}>
         <Shortcuts />
-        <TopBar />
+        <TopBar layout={layout} onLayoutChange={updateLayout} onSyncChange={updateSync} />
         <LeftToolbar />
-        <ChartArea />
+        <div className="cq-chart-board" style={boardStyle} data-layout={layout.id}>
+          {Array.from({ length: definition.count }, (_, index) => (
+            <ChartPane key={index} index={index} active={active === index}
+              services={paneServices[index]} onSelect={selectPane} />
+          ))}
+          {splits.map(split => {
+            const vertical = split.axis === 'columns';
+            const positions = vertical ? sizes.rows : sizes.columns;
+            const edgeSizes = vertical ? sizes.columns : sizes.rows;
+            const start = position(positions, split.start);
+            const extent = position(positions, split.end) - start;
+            const divider = position(edgeSizes, split.edge);
+            return (
+              <div key={split.key} role="separator"
+                aria-label={'Resize charts ' + split.key}
+                aria-orientation={vertical ? 'vertical' : 'horizontal'}
+                title="Drag to resize charts · Double-click to reset"
+                className={'cq-chart-splitter ' + (vertical ? 'cq-chart-splitter-vertical' : 'cq-chart-splitter-horizontal')}
+                style={vertical
+                  ? { left: divider + '%', top: start + '%', height: extent + '%' }
+                  : { top: divider + '%', left: start + '%', width: extent + '%' }}
+                onPointerDown={event => {
+                  if (event.button !== 0) return;
+                  event.preventDefault();
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  const rect = event.currentTarget.parentElement?.getBoundingClientRect();
+                  resizeDrag.current = {
+                    layoutId: layout.id, axis: split.axis, edge: split.edge,
+                    start: vertical ? event.clientX : event.clientY,
+                    length: (vertical ? rect?.width : rect?.height) || 1,
+                    sizes,
+                  };
+                }}
+                onPointerMove={event => {
+                  const drag = resizeDrag.current;
+                  if (!drag || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
+                  const delta = ((drag.axis === 'columns' ? event.clientX : event.clientY) - drag.start)
+                    / drag.length * 100;
+                  const resized = resizeTracks(drag.sizes, drag.axis, drag.edge, delta);
+                  setLayout(previous => ({
+                    ...previous, sizes: { ...previous.sizes, [drag.layoutId]: resized },
+                  }));
+                }}
+                onPointerUp={event => {
+                  resizeDrag.current = null;
+                  if (event.currentTarget.hasPointerCapture(event.pointerId))
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                }}
+                onPointerCancel={() => { resizeDrag.current = null; }}
+                onDoubleClick={() => setLayout(previous => {
+                  const sizes = { ...previous.sizes };
+                  delete sizes[layout.id];
+                  return { ...previous, sizes };
+                })}
+              />
+            );
+          })}
+        </div>
         <BottomBar />
         {s.ui.panel === 'alerts' && <AlertsPanel />}
         {s.ui.panel === 'positions' && <PositionsPanel />}

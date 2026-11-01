@@ -2,7 +2,9 @@ import { useEffect, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import { useChart } from '../hooks/useChartEngine';
 import { ToolButton } from './Tooltip';
-export function Modal({ title, children }: { title: string; children: ReactNode }) {
+export function Modal({
+  title, children, footer, className,
+}: { title: string; children: ReactNode; footer?: ReactNode; className?: string }) {
   const { store } = useChart(),
     ref = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -21,7 +23,7 @@ export function Modal({ title, children }: { title: string; children: ReactNode 
       }}
     >
       <div
-        className="cq-modal"
+        className={'cq-modal' + (className ? ' ' + className : '')}
         role="dialog"
         aria-modal="true"
         aria-label={title}
@@ -60,6 +62,7 @@ export function Modal({ title, children }: { title: string; children: ReactNode 
           </ToolButton>
         </header>
         {children}
+        {footer}
       </div>
     </div>
   );

@@ -121,8 +121,18 @@ test('every drawing tool creates an editable persisted object with undo and redo
       group: 'Annotate',
       names: [
         ['Text', 1],
-        ['Anchored note', 1],
-        ['Emoji / sticker', 1],
+        ['Note', 1],
+        ['Price note', 1],
+        ['Pin', 1],
+        ['Table', 1],
+        ['Callout', 1],
+        ['Comment', 1],
+        ['Price label', 1],
+        ['Signpost', 1],
+        ['Flag mark', 1],
+        ['Image', 1],
+        ['Post', 1],
+        ['Idea', 1],
       ],
     },
   ];
@@ -170,6 +180,34 @@ test('every drawing tool creates an editable persisted object with undo and redo
   await page.getByRole('button', { name: 'Delete all drawings', exact: true }).click();
   await page.getByRole('button', { name: 'Delete drawings', exact: true }).click();
   await expect(host).toHaveAttribute('data-drawings', '0');
+});
+
+test('text tools match the reference sections and save an editable annotation', async ({ page }) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+  await page.getByRole('button', { name: 'Annotate tools', exact: true }).click();
+  const menu = page.getByRole('menu', { name: 'Annotate tools', exact: true });
+  await expect(menu.locator('.cq-line-heading')).toHaveText(['Text and Notes', 'Content']);
+  await expect(menu.getByRole('menuitem')).toHaveText([
+    'Text', 'Note', 'Price note', 'Pin', 'Table', 'Callout', 'Comment', 'Price label',
+    'Signpost', 'Flag mark', 'Image', 'Post', 'Idea',
+  ]);
+  await menu.getByRole('menuitem', { name: 'Table', exact: true }).click();
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  await page.mouse.click(box.x + 330, box.y + 220);
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  await page.getByRole('textbox', { name: 'Drawing text' }).fill('Side | Entry\nLong | 1.0842');
+  await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  await expect(page.getByText('Saved locally', { exact: true })).toBeVisible();
+  const actual = await page.evaluate(() => {
+    const state = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state;
+    return state.drawings[state.chart.symbol + ':' + state.chart.interval][0];
+  });
+  expect(actual.tool).toBe('Table');
+  expect(actual.text).toBe('Side | Entry\nLong | 1.0842');
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
 });
 
 test('drawing body move, endpoint resize, style, lock and delete are undoable', async ({
@@ -248,6 +286,101 @@ test('drawing menu hover closes on leave and permits menu selection', async ({ p
     await menu.getByRole('menuitem').first().click();
     await expect(menu).toBeHidden();
   }
+});
+
+test('magnet menu supports weak, strong and indicator snapping with persistence', async ({ page }) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+
+  const trigger = page.getByRole('button', { name: 'Magnet', exact: true });
+  const caret = trigger.locator('.cq-caret');
+  const menu = page.getByRole('menu', { name: 'Magnet modes', exact: true });
+  await caret.hover();
+  await expect(menu).toBeVisible();
+  await expect(menu.getByRole('menuitemradio')).toHaveText(['Weak magnet', 'Strong magnet']);
+  await expect(menu.getByRole('switch', { name: 'Snap to indicators' })).toBeDisabled();
+
+  await menu.getByRole('menuitemradio', { name: 'Weak magnet' }).click();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await caret.hover();
+  await expect(menu.getByRole('menuitemradio', { name: 'Weak magnet' })).toHaveAttribute('aria-checked', 'true');
+  await menu.getByRole('menuitemradio', { name: 'Strong magnet' }).click();
+
+  await page.getByRole('button', { name: 'Indicators', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: 'Indicators' });
+  await dialog.getByRole('button', { name: /SMA/ }).click();
+  await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+
+  await caret.hover();
+  const toggle = menu.getByRole('switch', { name: 'Snap to indicators' });
+  await expect(toggle).toBeEnabled();
+  await toggle.click();
+  await expect(toggle).toHaveAttribute('aria-checked', 'true');
+  await expect(menu.getByRole('menuitemradio', { name: 'Strong magnet' })).toHaveAttribute('aria-checked', 'true');
+
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'false');
+  await trigger.click();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await expect(page.getByText('Saved locally', { exact: true })).toBeVisible();
+  await expect.poll(async () => page.evaluate(() => {
+    const chart = JSON.parse(localStorage.getItem('haruquantai.chart.v1')!).state.chart;
+    return { magnet: chart.magnet, magnetStrength: chart.magnetStrength, snapToIndicators: chart.snapToIndicators };
+  })).toEqual({ magnet: true, magnetStrength: 'strong', snapToIndicators: true });
+
+  await page.reload();
+  await expect(trigger).toHaveAttribute('aria-pressed', 'true');
+  await caret.hover();
+  await expect(menu.getByRole('menuitemradio', { name: 'Strong magnet' })).toHaveAttribute('aria-checked', 'true');
+  await expect(menu.getByRole('switch', { name: 'Snap to indicators' })).toHaveAttribute('aria-checked', 'true');
+});
+
+test('drawing group icons follow the last selected tool across placement and reload', async ({ page }) => {
+  await page.goto('/chart');
+  const host = page.getByTestId('chart-canvas-host');
+  await expect(host).toHaveAttribute('data-loading', 'false');
+
+  const selections = [
+    { group: 'Trend', label: 'Parallel channel', id: 'ParallelChannel' },
+    { group: 'Fibonacci', label: 'Fib spiral', id: 'FibSpiral' },
+    { group: 'Patterns', label: 'Head and shoulders', id: 'HeadShoulders' },
+    { group: 'Forecasting', label: 'Long position', id: 'LongPosition' },
+    { group: 'Shapes', label: 'Rectangle', id: 'Rectangle' },
+    { group: 'Annotate', label: 'Price note', id: 'PriceNote' },
+  ];
+
+  for (const { group, label, id } of selections) {
+    const trigger = page.getByRole('button', { name: group + ' tools', exact: true });
+    const menu = page.getByRole('menu', { name: group + ' tools', exact: true });
+    await trigger.click();
+    await menu.getByRole('menuitem').filter({ has: page.getByText(label, { exact: true }) }).click();
+    await expect(trigger).toHaveAttribute('data-last-tool', id);
+    await trigger.click();
+    const selected = menu.getByRole('menuitem').filter({ has: page.getByText(label, { exact: true }) });
+    await expect(selected).toHaveAttribute('aria-current', 'true');
+    expect(await trigger.locator('svg').first().innerHTML()).toBe(await selected.locator('svg').first().innerHTML());
+    await selected.click();
+  }
+
+  const box = (await page.getByTestId('chart-input').boundingBox())!;
+  await page.mouse.click(box.x + 350, box.y + 220);
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  const dialog = page.getByRole('dialog');
+  if (await dialog.isVisible())
+    await page.getByRole('button', { name: 'Close dialog', exact: true }).click();
+  await expect(page.getByRole('button', { name: 'Annotate tools', exact: true })).toHaveAttribute('data-last-tool', 'PriceNote');
+
+  await expect.poll(async () => page.evaluate(() => {
+    const raw = localStorage.getItem('haruquantai.chart.v1');
+    return raw ? JSON.parse(raw).state.lastGroupTools : null;
+  })).toEqual(Object.fromEntries(selections.map(({ group, id }) => [group, id])));
+
+  await page.reload();
+  await expect(host).toHaveAttribute('data-drawings', '1');
+  for (const { group, id } of selections)
+    await expect(page.getByRole('button', { name: group + ' tools', exact: true }))
+      .toHaveAttribute('data-last-tool', id);
 });
 
 test('cursor menu modes, effects, tooltip and eraser undo', async ({ page }, testInfo) => {

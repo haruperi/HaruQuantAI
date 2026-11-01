@@ -25,6 +25,83 @@ it('round-trips the chart document and rejects malformed/future versions', () =>
     ),
   ).toThrow();
 });
+it('persists magnet options and upgrades older chart documents without losing drawings', () => {
+  const state = persisted(createChartStore());
+  state.chart.magnet = true;
+  state.chart.magnetStrength = 'strong';
+  state.chart.snapToIndicators = true;
+  expect(decode(JSON.stringify({ version: 1, state }))).toEqual(state);
+
+  const legacy = structuredClone(state);
+  delete (legacy.chart as Partial<typeof legacy.chart>).magnetStrength;
+  delete (legacy.chart as Partial<typeof legacy.chart>).snapToIndicators;
+  const decoded = decode(JSON.stringify({ version: 1, state: legacy }));
+  expect(decoded.chart).toMatchObject({ magnet: true, magnetStrength: 'weak', snapToIndicators: false });
+
+  const invalid = structuredClone(state);
+  (invalid.chart as unknown as Record<string, unknown>).magnetStrength = 'extra';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid magnet strength.');
+  (invalid.chart as unknown as Record<string, unknown>).magnetStrength = 'weak';
+  (invalid.chart as unknown as Record<string, unknown>).snapToIndicators = 'yes';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid indicator snapping setting.');
+});
+
+it('remembers the last chosen tool per group through cursor reset and saved-chart reload', () => {
+  const store = createChartStore();
+  store.getState().setUI({ tool: 'ParallelChannel' });
+  store.getState().setUI({ tool: 'FibSpiral' });
+  store.getState().setUI({ tool: 'PriceNote' });
+  expect(store.getState().lastGroupTools).toEqual({
+    Trend: 'ParallelChannel', Fibonacci: 'FibSpiral', Annotate: 'PriceNote',
+  });
+  store.getState().setUI({ tool: 'cursor' });
+  expect(store.getState().lastGroupTools.Trend).toBe('ParallelChannel');
+  store.getState().setUI({ tool: 'HorizontalRay' });
+  expect(store.getState().lastGroupTools).toEqual({
+    Trend: 'HorizontalRay', Fibonacci: 'FibSpiral', Annotate: 'PriceNote',
+  });
+  const state = persisted(store);
+  expect(decode(JSON.stringify({ version: 1, state })).lastGroupTools).toEqual(state.lastGroupTools);
+
+  const older = structuredClone(state) as unknown as Record<string, unknown>;
+  delete older.lastGroupTools;
+  expect(decode(JSON.stringify({ version: 1, state: older })).lastGroupTools).toEqual({});
+  for (const lastGroupTools of [
+    [],
+    { Unknown: 'ParallelChannel' },
+    { Trend: 'PriceNote' },
+    { Shapes: 'NotARealTool' },
+  ]) {
+    expect(() => decode(JSON.stringify({ version: 1, state: { ...state, lastGroupTools } })))
+      .toThrow('Invalid last drawing tools.');
+  }
+});
+
+it('round-trips appearance options and restores defaults for pre-settings charts', () => {
+  const state = persisted(createChartStore());
+  state.chart.candleUpColor = '#123456';
+  state.chart.gridColor = '#112233';
+  state.chart.showGrid = false;
+  state.chart.showBuySellButtons = false;
+  state.chart.showAlertLines = false;
+  expect(decode(JSON.stringify({ version: 1, state })).chart).toEqual(state.chart);
+  const older = structuredClone(state);
+  for (const key of ['candleUpColor', 'gridColor', 'showGrid', 'showBuySellButtons', 'showAlertLines'])
+    delete (older.chart as unknown as Record<string, unknown>)[key];
+  const decoded = decode(JSON.stringify({ version: 1, state: older }));
+  expect(decoded.chart.candleUpColor).toBe('#089981');
+  expect(decoded.chart.gridColor).toBe('#2a2e39');
+  expect(decoded.chart.showGrid).toBe(true);
+  expect(decoded.chart.showBuySellButtons).toBe(true);
+  expect(decoded.chart.showAlertLines).toBe(true);
+  const invalid = structuredClone(state);
+  invalid.chart.candleUpColor = 'rgb(255, 0, 0)';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid chart appearance color.');
+  invalid.chart.candleUpColor = '#123456';
+  (invalid.chart as unknown as Record<string, unknown>).showGrid = 'yes';
+  expect(() => decode(JSON.stringify({ version: 1, state: invalid }))).toThrow('Invalid chart appearance toggle.');
+});
+
 it('preserves unknown data instead of overwriting it', () => {
   const map = new Map([[storageKey, '{"version":99}']]);
   const storage = {

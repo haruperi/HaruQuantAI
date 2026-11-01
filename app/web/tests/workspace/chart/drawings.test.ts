@@ -1,4 +1,5 @@
 import { defaultCurvePoints } from '../../../workspaces/chart/src/tools/shapeTools';
+import { textNoteSections, isTextNote } from '../../../workspaces/chart/src/tools/textNotes';
 import { defaultPositionPoints } from '../../../workspaces/chart/src/tools/forecasting';
 import { anchoredVWAP, volumeBins } from '../../../workspaces/chart/src/tools/volumeTools';
 import {
@@ -39,6 +40,34 @@ it('every requested tool produces finite geometry from market anchors', () => {
     expect(shapes.length).toBeGreaterThan(0);
     expect(JSON.stringify(shapes)).not.toMatch(/null|NaN/);
   }
+});
+it('Text and Notes has the exact section order and every entry is a drawing tool', () => {
+  const sections = [
+    { title: 'Text and Notes', ids: ['Text', 'Note', 'PriceNote', 'Pin', 'Table', 'Callout', 'Comment', 'PriceLabel', 'Signpost', 'FlagMark'] },
+    { title: 'Content', ids: ['Image', 'Post', 'Idea'] },
+  ];
+  expect(textNoteSections).toEqual(sections);
+  for (const section of sections) for (const id of section.ids) {
+    expect(toolIds).toContain(id);
+    expect(isTextNote(id as Drawing['tool'])).toBe(true);
+    expect(tools[id as Drawing['tool']].anchors).toBe(1);
+  }
+});
+it('table cells, price annotations, multiline text and image bounds have finite geometry', () => {
+  const make = (tool: Drawing['tool'], text: string): Drawing => ({
+    id: 'annotation', tool, text, color: '#2962ff', width: 2, dash: false, opacity: 1,
+    points: [{ time: 10, price: 42.5 }], locked: false, hidden: false,
+    extendLeft: false, extendRight: false,
+  });
+  const projection = { point: (p: { time: number; price: number }) => ({ x: p.time, y: p.price }), width: 600, height: 400, barMs: 1 };
+  const table = tools.Table.build(make('Table', 'Side | Price\nBuy | 42.50'), projection);
+  expect(table.filter(s => s.kind === 'text').map(s => s.kind === 'text' ? s.text : '')).toEqual(['Side', 'Price', 'Buy', '42.50']);
+  const price = tools.PriceNote.build(make('PriceNote', 'Support'), projection);
+  expect(price.some(s => s.kind === 'text' && s.text.includes('42.50000'))).toBe(true);
+  const img = tools.Image.build(make('Image', 'https://example.com/chart.png'), projection);
+  expect(img[0].kind).toBe('image');
+  expect(primitiveHit(img[0], { x: 15, y: 0 })).toBe(true);
+  expect(primitiveHit(img[0], { x: 500, y: 0 })).toBe(false);
 });
 it('hit tests segment edges and text without selecting remote points', () => {
   const line = {

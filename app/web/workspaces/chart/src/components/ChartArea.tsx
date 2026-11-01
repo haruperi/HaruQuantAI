@@ -9,7 +9,7 @@ import { formatPrice } from '../utils/format';
 import { pnl } from '../store/positions';
 import { ToolButton } from './Tooltip';
 export function ChartArea() {
-  const { store, engine, root } = useChart(),
+  const { store, engine, root, onCrosshairTime, onViewport, onReady, onDispose } = useChart(),
     s = useStore(store),
     host = useRef<HTMLDivElement>(null),
     legend = useRef<HTMLDivElement>(null),
@@ -21,7 +21,12 @@ export function ChartArea() {
     if (!host.current) return;
     const instance = new ChartEngine(host.current, store, new MockFeed());
     engine.current = instance;
-    instance.onLoading = setLoading;
+    instance.onCrosshairTime = onCrosshairTime;
+    instance.onViewport = onViewport;
+    instance.onLoading = (loading) => {
+      setLoading(loading);
+      if (!loading) onReady?.(instance);
+    };
     instance.onReadout = (r) => {
       const c = store.getState().chart;
       const f = (v: number) => formatPrice(v, c.precision);
@@ -61,16 +66,17 @@ export function ChartArea() {
       });
     };
     return () => {
+      onDispose?.(instance.getVisibleTimeRange());
       instance.destroy();
       engine.current = null;
     };
-  }, [store, engine, root]);
+  }, [store, engine, root, onCrosshairTime, onViewport, onReady, onDispose]);
   const symbol = symbolInfo(s.chart.symbol);
   return (
     <div className="cq-chart" aria-label="Chart" role="region">
       <div className="cq-canvas-host" ref={host} data-testid="chart-canvas-host" />
       <div className="cq-legend" ref={legend}>
-        <h1>
+        {s.chart.showSymbolTitle && <h1>
           <span className="cq-symbol-logo">{symbol.icon}</span>
           {symbol.name}
           <span className="cq-legend-muted">
@@ -78,11 +84,11 @@ export function ChartArea() {
             · {s.chart.interval} · {symbol.exchange}
           </span>
           <span className="cq-live-dot" />
-        </h1>
-        <div className="cq-ohlc" ref={ohlc}>
+        </h1>}
+        <div className="cq-ohlc" ref={ohlc} style={{ display: s.chart.showOhlc ? undefined : 'none' }}>
           Loading OHLC…
         </div>
-        <div className="cq-quotes">
+        {s.chart.showBuySellButtons && <div className="cq-quotes">
           <button className="cq-sell" onClick={() => s.setUI({ dialog: 'order', side: 'sell' })}>
             <span ref={sell}>—</span>
             <small>SELL</small>
@@ -92,8 +98,8 @@ export function ChartArea() {
             <span ref={buy}>—</span>
             <small>BUY</small>
           </button>
-        </div>
-        {s.indicators.map((i) => (
+        </div>}
+        {s.chart.showIndicatorLegend && s.indicators.map((i) => (
           <div
             className="cq-indicator-legend"
             key={i.id}

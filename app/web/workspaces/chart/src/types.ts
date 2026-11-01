@@ -122,11 +122,26 @@ export const toolIds = [
   'Circle',
   'Text',
   'AnchoredNote',
+  'Note',
+  'PriceNote',
+  'Pin',
+  'Table',
+  'Callout',
+  'Comment',
+  'PriceLabel',
+  'Signpost',
+  'FlagMark',
+  'Image',
+  'Post',
+  'Idea',
   'Sticker',
   'Brush',
   'Measure',
 ] as const;
 export type ToolId = (typeof toolIds)[number];
+export const drawingGroups = ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes', 'Annotate'] as const;
+export type DrawingGroup = (typeof drawingGroups)[number];
+export type LastGroupTools = Partial<Record<DrawingGroup, ToolId>>;
 export interface Drawing {
   positionSizing?: { accountSize: number; riskPercent: number };
   sourceBars?: Bar[];
@@ -202,6 +217,8 @@ export interface Settings {
   precision: number;
   countdown: boolean;
   magnet: boolean;
+  magnetStrength: 'weak' | 'strong';
+  snapToIndicators: boolean;
   volume: boolean;
   previousClose: boolean;
   tooltip: boolean;
@@ -211,6 +228,29 @@ export interface Settings {
   title: string;
   range: string;
   paneHeight: number;
+  // Appearance and visibility preferences used by the chart-settings dialog.
+  colorBarsByPreviousClose: boolean;
+  candleBody: boolean;
+  candleBorders: boolean;
+  candleWicks: boolean;
+  candleUpColor: string;
+  candleDownColor: string;
+  candleBorderUpColor: string;
+  candleBorderDownColor: string;
+  candleWickUpColor: string;
+  candleWickDownColor: string;
+  backgroundColor: string;
+  gridColor: string;
+  textColor: string;
+  showGrid: boolean;
+  showSymbolTitle: boolean;
+  showOhlc: boolean;
+  showIndicatorLegend: boolean;
+  showBuySellButtons: boolean;
+  showLastPriceLine: boolean;
+  showPriceScaleLabels: boolean;
+  showAlertLines: boolean;
+  showPositions: boolean;
 }
 export interface DocumentState {
   chart: Settings;
@@ -221,6 +261,7 @@ export interface Persisted extends DocumentState {
   alerts: Alert[];
   favorites: ToolId[];
   recents: string[];
+  lastGroupTools: LastGroupTools;
 }
 export type Dialog =
   'symbol' | 'indicators' | 'alert' | 'order' | 'settings' | 'drawing' | 'help' | 'delete' | null;

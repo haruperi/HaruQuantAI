@@ -8,6 +8,8 @@ import { marketOpen } from '../feed/sessions';
 import { clamp, priceToY, yToPrice, niceTicks, zoomAt, transformPrice } from './scales';
 import { paintSeries, heikinAshi } from './candles';
 import { tools } from '../tools/catalog';
+import { resolveMagnetSnap } from './magnet';
+import { isTextNote } from '../tools/textNotes';
 import { sourceCandles, positionPoints, defaultPositionPoints } from '../tools/forecasting';
 import { paint, primitiveHit } from '../tools/geometry';
 import type { Projection } from '../tools/types';
@@ -39,6 +41,10 @@ interface Pane {
 }
 export class ChartEngine {
   readonly canvases: HTMLCanvasElement[] = [];
+  /** Optional multicart hooks; callbacks are emitted only for direct user interaction. */
+  onCrosshairTime?: (time: number | null) => void;
+  onViewport?: (range: readonly [number, number]) => void;
+  private linkedCrosshairTime: number | null = null;
   readonly quotes = new Map<string, Quote>();
   bars: Bar[] = [];
   visible: Bar[] = [];
@@ -145,6 +151,7 @@ export class ChartEngine {
     listen('pointercancel', () => this.cancel());
     listen('pointerleave', () => {
       this.clearValues();
+      this.onCrosshairTime?.(null);
       if (!this.down) {
         this.pointer = null;
         this.invalidate(4);
@@ -441,17 +448,20 @@ export class ChartEngine {
   scrollLast() {
     this.offset += this.plotWidth - 80 - this.x(this.visible.length - 1);
     this.invalidate(7);
+    this.publishViewport();
   }
   zoom(factor: number, x = this.plotWidth / 2) {
     const z = zoomAt(x, this.spacing, this.offset, factor);
     this.spacing = z.spacing;
     this.offset = z.offset;
     this.invalidate(7);
+    this.publishViewport();
   }
   setWindow(fraction: number) {
     const index = Math.round((this.visible.length - 1) * clamp(fraction, 0, 1));
     this.offset += this.plotWidth / 2 - this.x(index);
     this.invalidate(7);
+    this.publishViewport();
   }
   addPriceLine(y: number) {
     const drawing = this.makeDrawing([
@@ -545,21 +555,66 @@ export class ChartEngine {
     );
   }
   private point(p: XY): Point {
-    const i = this.indexAt(p.x),
-      near = Math.round(i),
-      bar = this.visible[clamp(near, 0, this.visible.length - 1)],
-      c = this.store.getState().chart;
-    let price = this.price(p.y);
-    if (c.magnet && bar)
-      price = [bar.open, bar.high, bar.low, bar.close].reduce((a, b) =>
-        Math.abs(this.y(a) - p.y) < Math.abs(this.y(b) - p.y) ? a : b,
-      );
-    const index = c.magnet ? near : i,
-      low = Math.floor(index),
-      fraction = index - low;
+    const i = this.indexAt(p.x);
+    const state = this.store.getState(), c = state.chart;
+    const price = this.price(p.y);
+    const overlays = c.snapToIndicators
+      ? this.indicatorCache.flatMap((series, index) =>
+          state.indicators[index] && !indicators[state.indicators[index].kind].pane ? series : [])
+      : [];
+    const snapped = c.magnet
+      ? resolveMagnetSnap({
+          cursor: p,
+          fractionalIndex: i,
+          bars: this.visible,
+          strength: c.magnetStrength,
+          snapToIndicators: c.snapToIndicators,
+          priceOverlaySeries: overlays,
+          xAtIndex: (index) => this.x(index),
+          yAtPrice: (value) => this.y(value),
+        })
+      : null;
+    if (snapped) return { time: this.visible[snapped.index].time, price: snapped.price };
+    const low = Math.floor(i), fraction = i - low;
     const a = this.visible[low]?.time ?? (this.visible[0]?.time ?? 0) + low * this.barMs(),
       b = this.visible[low + 1]?.time ?? a + this.barMs();
     return { time: a + (b - a) * fraction, price };
+  }
+  private timeAtX(x: number): number {
+    const index = this.indexAt(x), low = Math.floor(index);
+    const a = this.visible[low]?.time ?? (this.visible[0]?.time ?? 0) + low * this.barMs();
+    const b = this.visible[low + 1]?.time ?? a + this.barMs();
+    return a + (b - a) * (index - low);
+  }
+  getVisibleTimeRange(): readonly [number, number] | null {
+    return this.visible.length && this.plotWidth > 0
+      ? [this.timeAtX(0), this.timeAtX(this.plotWidth)] : null;
+  }
+  setVisibleTimeRange(range: readonly [number, number]): void {
+    if (!this.visible.length || !(range[1] > range[0]) || !this.plotWidth) return;
+    const start = this.store.getState().chart.gaps
+      ? this.indexTime(range[0])
+      : (range[0] - this.visible[0].time) / this.barMs();
+    const end = this.store.getState().chart.gaps
+      ? this.indexTime(range[1])
+      : (range[1] - this.visible[0].time) / this.barMs();
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return;
+    this.spacing = clamp(this.plotWidth / (end - start), 0.2, 50);
+    this.offset = -start * this.spacing;
+    this.host.dataset.syncedTimeWindow = range.map(Math.round).join(':');
+    this.invalidate(7);
+  }
+  setLinkedCrosshairTime(time: number | null): void {
+    if (this.linkedCrosshairTime === time) return;
+    this.linkedCrosshairTime = time;
+    this.host.dataset.linkedCrosshairTime = time === null ? '' : String(Math.round(time));
+    this.invalidate(4);
+  }
+  private publishViewport(): void {
+    // Loading resets the window before mounted panes can restore their saved range.
+    if (this.loading) return;
+    const range = this.getVisibleTimeRange();
+    if (range) this.onViewport?.(range);
   }
   private projection(): Projection {
     return {
@@ -721,6 +776,8 @@ export class ChartEngine {
   private pointerMove(e: PointerEvent) {
     const p = this.local(e);
     this.pointer = p;
+    this.onCrosshairTime?.(p.x >= 0 && p.x < this.plotWidth && p.y >= 0 && p.y < this.mainHeight && this.visible.length
+      ? this.timeAtX(p.x) : null);
     if (this.touches.has(e.pointerId)) this.touches.set(e.pointerId, p);
     if (this.touches.size === 2) {
       const [a, b] = [...this.touches.values()],
@@ -764,6 +821,7 @@ export class ChartEngine {
         this.offset = next.offset;
       } else this.offset = this.initialOffset + dx;
       this.invalidate(7);
+      this.publishViewport();
     }
     if (this.gesture === 'price') {
       const span = this.initialRange[1] - this.initialRange[0],
@@ -927,7 +985,7 @@ export class ChartEngine {
     s.setUI({
       tool: 'cursor',
       selected: drawing.id,
-      ...(['Text', 'AnchoredNote', 'Sticker'].includes(drawing.tool)
+      ...(isTextNote(drawing.tool) || ['AnchoredNote', 'Sticker'].includes(drawing.tool)
         ? { dialog: 'drawing' as const }
         : {}),
     });
@@ -949,10 +1007,10 @@ export class ChartEngine {
       c = s.chart,
       bars = this.visible;
     const dark = c.theme === 'dark',
-      bg = dark ? '#131722' : '#ffffff',
+      bg = c.backgroundColor,
       fg = dark ? '#d1d4dc' : '#131722',
-      muted = '#787b86',
-      grid = dark ? 'rgba(42,46,57,0.6)' : '#e6e8ed';
+      muted = c.textColor,
+      grid = c.showGrid ? c.gridColor : 'transparent';
     const start = clamp(Math.floor(this.indexAt(0)) - 1, 0, Math.max(0, bars.length - 1)),
       end = clamp(Math.ceil(this.indexAt(this.plotWidth)) + 1, 0, Math.max(0, bars.length - 1));
     const paneConfigs = s.indicators.filter((i) => indicators[i.kind].pane);
@@ -997,14 +1055,15 @@ export class ChartEngine {
         ctx.lineTo(this.plotWidth, y);
         ctx.stroke();
         const value = transformPrice(tick, c.scale, this.anchor());
-        ctx.fillText(
-          c.scale === 'log'
-            ? formatPrice(tick, c.precision)
-            : formatPrice(value, c.scale === 'percent' ? 2 : c.precision) +
-                (c.scale === 'percent' ? '%' : ''),
-          this.plotWidth + 6,
-          y + 4,
-        );
+        if (c.showPriceScaleLabels)
+          ctx.fillText(
+            c.scale === 'log'
+              ? formatPrice(tick, c.precision)
+              : formatPrice(value, c.scale === 'percent' ? 2 : c.precision) +
+                  (c.scale === 'percent' ? '%' : ''),
+            this.plotWidth + 6,
+            y + 4,
+          );
       }
       const step = Math.max(1, Math.ceil(85 / this.spacing));
       for (let i = Math.ceil(start / step) * step; i <= end; i += step) {
@@ -1061,6 +1120,7 @@ export class ChartEngine {
         this.spacing,
         c.style,
         this.mainHeight,
+        c,
       );
       const ik = String(this.barsVersion) + ':' + bars.length + JSON.stringify(s.indicators);
       if (this.indicatorKey !== ik) {
@@ -1140,9 +1200,9 @@ export class ChartEngine {
         const config = s.indicators.find((i) => i.id === pane.configId);
         ctx.fillStyle = muted;
         ctx.fillText(config?.kind ?? 'Volume', 12, pane.top + 16);
-        for (const tick of niceTicks(pane.min, pane.max, 3)) {
-          ctx.fillText(formatPrice(tick, 1), this.plotWidth + 5, y(tick) + 4);
-        }
+        if (c.showPriceScaleLabels)
+          for (const tick of niceTicks(pane.min, pane.max, 3))
+            ctx.fillText(formatPrice(tick, 1), this.plotWidth + 5, y(tick) + 4);
         ctx.save();
         ctx.beginPath();
         ctx.rect(0, pane.top, this.plotWidth, pane.height);
@@ -1151,7 +1211,7 @@ export class ChartEngine {
           ctx.globalAlpha = config?.opacity ?? 0.5;
           for (let i = start; i <= end; i++) {
             ctx.fillStyle =
-              config?.color ?? (bars[i].close >= bars[i].open ? '#089981' : '#f23645');
+              config?.color ?? (bars[i].close >= bars[i].open ? c.candleUpColor : c.candleDownColor);
             ctx.fillRect(
               this.x(i) - this.spacing * 0.35,
               y(bars[i].volume),
@@ -1203,6 +1263,19 @@ export class ChartEngine {
       ctx.restore();
     }
     const ctx = this.context(2);
+    if (this.linkedCrosshairTime !== null && bars.length) {
+      const crosshairX = this.projection().point({ time: this.linkedCrosshairTime, price: this.min }).x;
+      if (crosshairX >= 0 && crosshairX < this.plotWidth) {
+        ctx.save();
+        ctx.strokeStyle = muted;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath();
+        ctx.moveTo(crosshairX, 0);
+        ctx.lineTo(crosshairX, this.plotHeight);
+        ctx.stroke();
+        ctx.restore();
+      }
+    }
     const last = bars.at(-1);
     if (!last) return;
     ctx.save();
@@ -1221,16 +1294,19 @@ export class ChartEngine {
       ctx.lineTo(this.plotWidth, y);
       ctx.stroke();
       ctx.setLineDash([]);
-      ctx.fillStyle = color;
-      ctx.fillRect(this.plotWidth, y - 10, 64, 20);
-      ctx.fillStyle = '#fff';
-      ctx.fillText(text, this.plotWidth + 4, y + 4);
+      if (c.showPriceScaleLabels) {
+        ctx.fillStyle = color;
+        ctx.fillRect(this.plotWidth, y - 10, 64, 20);
+        ctx.fillStyle = '#fff';
+        ctx.fillText(text, this.plotWidth + 4, y + 4);
+      }
     };
     const quote = this.quotes.get(c.symbol);
     const direction = quote ? quote.price >= quote.previous : last.close >= last.open;
-    const liveColor = direction ? '#089981' : '#f23645';
-    chip(last.close, formatPrice(last.close, c.precision), liveColor);
-    if (!s.ui.replay && this.now() - this.tickAt < 180) {
+    const liveColor = direction ? c.candleUpColor : c.candleDownColor;
+    if (c.showLastPriceLine)
+      chip(last.close, formatPrice(last.close, c.precision), liveColor);
+    if (c.showLastPriceLine && c.showPriceScaleLabels && !s.ui.replay && this.now() - this.tickAt < 180) {
       ctx.save();
       ctx.globalAlpha = 0.18 * (1 - (this.now() - this.tickAt) / 180);
       ctx.fillStyle = '#ffffff';
@@ -1255,7 +1331,7 @@ export class ChartEngine {
         Math.floor((remaining / 1000) % 60)
           .toString()
           .padStart(2, '0');
-    if (c.countdown && !s.ui.replay) {
+    if (c.countdown && c.showLastPriceLine && c.showPriceScaleLabels && !s.ui.replay) {
       ctx.fillStyle = muted;
       ctx.fillText(
         marketOpen(c.symbol, this.now()) ? countdown : 'Closed',
@@ -1271,10 +1347,10 @@ export class ChartEngine {
       );
     this.positionChips = [];
     for (const a of s.alerts)
-      if (a.symbol === c.symbol && a.active)
+      if (c.showAlertLines && a.symbol === c.symbol && a.active)
         chip(a.value, '♧ ' + formatPrice(a.value, c.precision), '#ff9800');
     for (const p of s.positions)
-      if (p.symbol === c.symbol && (p.status === 'open' || p.status === 'pending')) {
+      if (c.showPositions && p.symbol === c.symbol && (p.status === 'open' || p.status === 'pending')) {
         const color = p.side === 'buy' ? '#2962ff' : '#f23645';
         chip(
           p.entry,
@@ -1444,8 +1520,8 @@ export class ChartEngine {
     ctx.globalAlpha = d.opacity;
     ctx.font = (d.tool === 'Sticker' ? '24' : '12') + 'px Trebuchet MS';
     ctx.setLineDash(d.dash ? [6, 4] : []);
-    paint(ctx, tools[d.tool].build(d, this.projection()));
-    if (d.text && !['Text', 'AnchoredNote', 'Sticker', 'PriceLine'].includes(d.tool)) {
+    paint(ctx, tools[d.tool].build(d, this.projection()), () => this.invalidate(2));
+    if (d.text && !isTextNote(d.tool) && !['AnchoredNote', 'Sticker', 'PriceLine'].includes(d.tool)) {
       const p = this.projection().point(d.points[0]);
       ctx.fillText(d.text, p.x + 5, p.y - 8);
     }

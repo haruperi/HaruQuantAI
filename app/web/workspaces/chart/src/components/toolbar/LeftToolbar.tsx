@@ -24,6 +24,19 @@ import {
   HelpCircle,
   Minus,
   ArrowUpRight,
+  StickyNote,
+  BadgeDollarSign,
+  MapPin,
+  Table2,
+  MessageSquare,
+  MessageCircle,
+  Tag,
+  Signpost,
+  Flag,
+  Image as ImageIcon,
+  Share2,
+  Lightbulb,
+  Smile,
 } from 'lucide-react';
 import { useChart } from '../../hooks/useChartEngine';
 import {
@@ -34,7 +47,9 @@ import {
   forecastingSections,
   shapeSections,
 } from '../../tools/catalog';
-import { keyFor, toolIds, type ToolId, type CursorMode } from '../../types';
+import { keyFor, type ToolId, type CursorMode, type DrawingGroup } from '../../types';
+import { textNoteSections } from '../../tools/textNotes';
+import { indicators } from '../../indicators/catalog';
 import { ToolButton } from '../Tooltip';
 const cursors = [
   { id: 'crosshair', label: 'Cross', icon: Crosshair },
@@ -51,7 +66,43 @@ const groups = [
   { name: 'Forecasting', icon: ArrowUpRight },
   { name: 'Shapes', icon: Shapes },
   { name: 'Annotate', icon: Type },
-];
+] satisfies { name: DrawingGroup; icon: typeof Type }[];
+const annotationIcons: Partial<Record<ToolId, typeof Type>> = {
+  Text: Type,
+  AnchoredNote: StickyNote,
+  Sticker: Smile,
+  Note: StickyNote,
+  PriceNote: BadgeDollarSign,
+  Pin: MapPin,
+  Table: Table2,
+  Callout: MessageSquare,
+  Comment: MessageCircle,
+  PriceLabel: Tag,
+  Signpost,
+  FlagMark: Flag,
+  Image: ImageIcon,
+  Post: Share2,
+  Idea: Lightbulb,
+};
+function AnnotationToolIcon({ id }: { id: ToolId }) {
+  const Icon = annotationIcons[id] ?? Type;
+  return <Icon aria-hidden="true" />;
+}
+function MagnetStrengthIcon({ strength }: { strength: 'weak' | 'strong' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M5 13V8a7 7 0 0 1 14 0v5h-5V8a2 2 0 0 0-4 0v5z" />
+      <path d="M5 10h5M14 10h5" />
+      <circle cx="12" cy="18" r="1" fill="currentColor" stroke="none" />
+      {strength === 'strong' && (
+        <>
+          <circle cx="7" cy="20.5" r="1" fill="currentColor" stroke="none" />
+          <circle cx="17" cy="20.5" r="1" fill="currentColor" stroke="none" />
+        </>
+      )}
+    </svg>
+  );
+}
 function LineToolIcon({ id }: { id: ToolId }) {
   const horizontal = ['HorizontalLine', 'HorizontalRay', 'PriceLine'].includes(id);
   const vertical = id === 'VerticalLine';
@@ -203,6 +254,16 @@ function ShapeToolIcon({ id }: { id: ToolId }) {
     </svg>
   );
 }
+
+/** Shared renderer keeps a group's collapsed icon identical to its menu icon. */
+function GroupToolIcon({ name, id }: { name: DrawingGroup; id: ToolId }) {
+  if (name === 'Trend') return <LineToolIcon id={id} />;
+  if (name === 'Fibonacci') return <FibonacciToolIcon id={id} />;
+  if (name === 'Patterns') return <PatternToolIcon id={id} />;
+  if (name === 'Forecasting') return <ForecastingToolIcon id={id} />;
+  if (name === 'Shapes') return <ShapeToolIcon id={id} />;
+  return <AnnotationToolIcon id={id} />;
+}
 export function LeftToolbar() {
   const { store, engine } = useChart(),
     s = useStore(store),
@@ -331,6 +392,8 @@ export function LeftToolbar() {
         >
           <ToolButton
             label={name + ' tools'}
+            data-last-tool={s.lastGroupTools[name] ?? undefined}
+            aria-description={s.lastGroupTools[name] ? 'Last selected: ' + tools[s.lastGroupTools[name]].label : undefined}
             className={s.ui.tool !== 'cursor' && tools[s.ui.tool].group === name ? 'cq-active' : ''}
             onPointerDown={() => {
               longPressed.current = false;
@@ -346,7 +409,9 @@ export function LeftToolbar() {
               if (!longPressed.current) setOpen(open === name ? null : name);
             }}
           >
-            <Icon />
+            {s.lastGroupTools[name]
+              ? <GroupToolIcon name={name} id={s.lastGroupTools[name]} />
+              : <Icon />}
             <ChevronRight
               className="cq-caret"
               size={10}
@@ -360,8 +425,8 @@ export function LeftToolbar() {
             <div
               className={
                 'cq-flyout' +
-                (['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes'].includes(name)
-                  ? ' cq-line-menu'
+                (['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes', 'Annotate'].includes(name)
+                  ? ' cq-line-menu' + (name === 'Annotate' ? ' cq-text-menu' : '')
                   : '')
               }
               role="menu"
@@ -379,12 +444,12 @@ export function LeftToolbar() {
                       ? forecastingSections
                       : name === 'Shapes'
                         ? shapeSections
-                        : [{ title: '', ids: toolIds.filter((id) => tools[id].group === name) }]
+                        : textNoteSections
               ).map((section) => (
                 <div
                   key={section.title}
                   className={
-                    ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes'].includes(name)
+                    ['Trend', 'Fibonacci', 'Patterns', 'Forecasting', 'Shapes', 'Annotate'].includes(name)
                       ? 'cq-line-section'
                       : undefined
                   }
@@ -393,20 +458,16 @@ export function LeftToolbar() {
                   {section.ids.map((id) => (
                     <div
                       key={id}
-                      className={'cq-tool-option' + (s.ui.tool === id ? ' cq-selected-tool' : '')}
+                      className={'cq-tool-option' + (s.lastGroupTools[name] === id ? ' cq-selected-tool' : '')}
                     >
                       <button
                         role="menuitem"
-                        aria-current={s.ui.tool === id ? 'true' : undefined}
+                        aria-current={s.lastGroupTools[name] === id ? 'true' : undefined}
                         onClick={() => choose(id)}
                       >
-                        {name === 'Trend' && <LineToolIcon id={id} />}
-                        {name === 'Fibonacci' && <FibonacciToolIcon id={id} />}
-                        {name === 'Patterns' && <PatternToolIcon id={id} />}
-                        {name === 'Forecasting' && <ForecastingToolIcon id={id} />}
-                        {name === 'Shapes' && <ShapeToolIcon id={id} />}
+                        <GroupToolIcon name={name} id={id} />
                         <span>{tools[id].label}</span>
-                        <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>
+                        {name !== 'Annotate' && <kbd>{id === 'HorizontalRay' ? 'Alt+J' : tools[id].shortcut}</kbd>}
                       </button>
                       <button
                         aria-label={'Favorite ' + tools[id].label}
@@ -445,15 +506,78 @@ export function LeftToolbar() {
         <ZoomOut />
       </ToolButton>
       <hr />
-      <ToolButton
-        label="Magnet"
-        shortcut="M"
-        aria-pressed={s.chart.magnet}
-        className={s.chart.magnet ? 'cq-active' : ''}
-        onClick={() => s.settings({ magnet: !s.chart.magnet })}
+      <div
+        className="cq-tool-group"
+        onPointerEnter={() => {
+          if (open === 'magnet') cancelClose();
+        }}
+        onPointerLeave={scheduleClose}
       >
-        <Magnet />
-      </ToolButton>
+        <ToolButton
+          label="Magnet"
+          shortcut="M"
+          aria-haspopup="menu"
+          aria-expanded={open === 'magnet'}
+          aria-pressed={s.chart.magnet}
+          className={s.chart.magnet ? 'cq-active' : ''}
+          onClick={() => {
+            cancelClose();
+            s.settings({ magnet: !s.chart.magnet });
+          }}
+        >
+          <Magnet />
+          <ChevronRight
+            className="cq-caret"
+            size={10}
+            onPointerEnter={() => {
+              cancelClose();
+              setOpen('magnet');
+            }}
+          />
+        </ToolButton>
+        {open === 'magnet' && (
+          <div
+            className="cq-flyout cq-magnet-menu"
+            role="menu"
+            aria-label="Magnet modes"
+            onPointerEnter={cancelClose}
+            onPointerLeave={scheduleClose}
+          >
+            {(['weak', 'strong'] as const).map((strength) => (
+              <button
+                key={strength}
+                role="menuitemradio"
+                aria-checked={s.chart.magnet && s.chart.magnetStrength === strength}
+                className="cq-magnet-option"
+                onClick={() => {
+                  cancelClose();
+                  s.settings({ magnet: true, magnetStrength: strength });
+                  setOpen(null);
+                }}
+              >
+                <MagnetStrengthIcon strength={strength} />
+                <span>{strength === 'weak' ? 'Weak magnet' : 'Strong magnet'}</span>
+              </button>
+            ))}
+            <div className="cq-magnet-switch-row">
+              <span id="cq-snap-indicators-label">Snap to indicators</span>
+              <button
+                type="button"
+                role="switch"
+                aria-labelledby="cq-snap-indicators-label"
+                aria-checked={s.chart.snapToIndicators}
+                disabled={!s.indicators.some(indicator => !indicators[indicator.kind].pane)}
+                title={!s.indicators.some(indicator => !indicators[indicator.kind].pane)
+                  ? 'Add a price-overlay indicator to enable snapping'
+                  : 'Include price-overlay indicator points when magnet is enabled'}
+                onClick={() => s.settings({ snapToIndicators: !s.chart.snapToIndicators })}
+              >
+                <span />
+              </button>
+            </div>
+          </div>
+        )}
+      </div>
       <ToolButton
         label="Lock all drawings"
         aria-pressed={s.ui.lock}

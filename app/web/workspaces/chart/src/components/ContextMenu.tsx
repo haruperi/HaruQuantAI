@@ -2,7 +2,7 @@ import { useStore } from 'zustand';
 import { useChart } from '../hooks/useChartEngine';
 import { keyFor } from '../types';
 export function ContextMenu() {
-  const { store, engine } = useChart(),
+  const { store, engine, root } = useChart(),
     s = useStore(store),
     menu = s.ui.menu;
   if (!menu) return null;
@@ -75,16 +75,18 @@ export function ContextMenu() {
               { label: 'Chart settings', run: () => s.setUI({ dialog: 'settings' }) },
               { label: 'Object list', run: () => s.setUI({ panel: 'favorites' }) },
             ];
+  const activePane = root.current?.querySelector<HTMLElement>('.cq-chart-cell-active');
+  const workspaceBounds = root.current?.getBoundingClientRect();
+  const paneBounds = activePane?.getBoundingClientRect();
+  const paneLeft = paneBounds && workspaceBounds ? paneBounds.left - workspaceBounds.left : 48;
+  const paneTop = paneBounds && workspaceBounds ? paneBounds.top - workspaceBounds.top : 40;
   return (
     <div
       className="cq-context"
       role="menu"
       style={{
-        left: Math.min(menu.x, Math.max(0, (engine.current?.width ?? 400) - 200)) + 48,
-        top: Math.min(
-          menu.y + 40,
-          Math.max(40, (engine.current?.height ?? 500) - rows.length * 32),
-        ),
+        left: paneLeft + Math.min(menu.x, Math.max(0, (engine.current?.width ?? 400) - 200)),
+        top: paneTop + Math.min(menu.y, Math.max(0, (engine.current?.height ?? 500) - rows.length * 32)),
       }}
       onKeyDown={(e) => {
         if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {

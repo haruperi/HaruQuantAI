@@ -70,6 +70,7 @@ import { Polygon } from './Polygon';
 import { Circle } from './Circle';
 import { Text } from './Text';
 import { AnchoredNote } from './AnchoredNote';
+import { Note, PriceNote, Pin, Table, Callout, Comment, PriceLabel, Signpost, FlagMark, Image, Post, Idea } from './textNotes';
 import { Sticker } from './Sticker';
 import { Brush } from './Brush';
 import { Measure } from './Measure';
@@ -260,6 +261,18 @@ export const tools: Record<ToolId, Tool> = {
   Circle,
   Text,
   AnchoredNote,
+  Note,
+  PriceNote,
+  Pin,
+  Table,
+  Callout,
+  Comment,
+  PriceLabel,
+  Signpost,
+  FlagMark,
+  Image,
+  Post,
+  Idea,
   Sticker,
   Brush,
   Measure,

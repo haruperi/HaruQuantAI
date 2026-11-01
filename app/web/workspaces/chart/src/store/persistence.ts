@@ -1,5 +1,5 @@
-import type { ChartStore } from './chartStore';
-import { intervals, chartStyles, toolIds, indicatorIds, type Persisted } from '../types';
+import { defaults, type ChartStore } from './chartStore';
+import { drawingGroups, intervals, chartStyles, toolIds, indicatorIds, type Persisted, type ToolId } from '../types';
 import { symbols } from '../feed/symbols';
 import { tools } from '../tools/catalog';
 export const storageKey = 'haruquantai.chart.v1';
@@ -34,6 +34,28 @@ export function decode(raw: string): Persisted {
     c.paneHeight > 300
   )
     throw new Error('Invalid chart settings.');
+  const appearanceToggles = [
+    'colorBarsByPreviousClose', 'candleBody', 'candleBorders', 'candleWicks',
+    'showGrid', 'showSymbolTitle', 'showOhlc', 'showIndicatorLegend',
+    'showBuySellButtons', 'showLastPriceLine', 'showPriceScaleLabels',
+    'showAlertLines', 'showPositions',
+  ] as const;
+  for (const key of appearanceToggles)
+    if (c[key] !== undefined && typeof c[key] !== 'boolean')
+      throw new Error('Invalid chart appearance toggle.');
+  const appearanceColors = [
+    'candleUpColor', 'candleDownColor', 'candleBorderUpColor', 'candleBorderDownColor',
+    'candleWickUpColor', 'candleWickDownColor', 'backgroundColor', 'gridColor', 'textColor',
+  ] as const;
+  for (const key of appearanceColors) {
+    const value = c[key];
+    if (value !== undefined && (!text(value) || !/^#[0-9a-fA-F]{6}$/.test(value)))
+      throw new Error('Invalid chart appearance color.');
+  }
+  if (c.magnetStrength !== undefined && !['weak', 'strong'].includes(String(c.magnetStrength)))
+    throw new Error('Invalid magnet strength.');
+  if (c.snapToIndicators !== undefined && typeof c.snapToIndicators !== 'boolean')
+    throw new Error('Invalid indicator snapping setting.');
   for (const k of [
     'reverse',
     'auto',
@@ -150,14 +172,36 @@ export function decode(raw: string): Persisted {
     s.recents.some((x: unknown) => !symbols.some((t) => t.id === x))
   )
     throw new Error('Invalid chart preferences.');
+  // Older v1 documents omit this field. Validate rather than trusting arbitrary
+  // stored group names or a tool registered under a different group.
+  if (s.lastGroupTools !== undefined) {
+    if (!object(s.lastGroupTools)) throw new Error('Invalid last drawing tools.');
+    for (const [group, id] of Object.entries(s.lastGroupTools)) {
+      if (!drawingGroups.some((name) => name === group) ||
+          !toolIds.some((tool) => tool === id) ||
+          tools[id as ToolId].group !== group)
+        throw new Error('Invalid last drawing tools.');
+    }
+  }
   const validated = s as unknown as Persisted;
   return {
-    chart: validated.chart,
+    chart: {
+      ...defaults,
+      // Old light-theme charts had no custom canvas colors; use their previous palette.
+      ...(c.theme === 'light'
+        ? { backgroundColor: '#ffffff', gridColor: '#e6e8ed', textColor: '#787b86' }
+        : {}),
+      ...validated.chart,
+      // Preserve existing v1 chart documents saved before magnet options existed.
+      magnetStrength: c.magnetStrength === 'strong' ? 'strong' : 'weak',
+      snapToIndicators: c.snapToIndicators === true,
+    },
     drawings: validated.drawings,
     indicators: validated.indicators,
     alerts: validated.alerts,
     favorites: validated.favorites,
     recents: validated.recents,
+    lastGroupTools: validated.lastGroupTools ?? {},
   };
 }
 export function persisted(store: ChartStore): Persisted {
@@ -169,12 +213,13 @@ export function persisted(store: ChartStore): Persisted {
     alerts: s.alerts,
     favorites: s.favorites,
     recents: s.recents,
+    lastGroupTools: s.lastGroupTools,
   };
 }
-export function connectPersistence(store: ChartStore, storage: Storage): () => void {
+export function connectPersistence(store: ChartStore, storage: Storage, key = storageKey): () => void {
   let writable = true;
   try {
-    const raw = storage.getItem(storageKey);
+    const raw = storage.getItem(key);
     if (raw) store.setState(decode(raw));
   } catch (error) {
     writable = false;
@@ -189,7 +234,7 @@ export function connectPersistence(store: ChartStore, storage: Storage): () => v
   const save = () => {
     if (!writable) return;
     try {
-      storage.setItem(storageKey, JSON.stringify({ version: 1, state: persisted(store) }));
+      storage.setItem(key, JSON.stringify({ version: 1, state: persisted(store) }));
       store.getState().setUI({ saved: 'Saved locally' });
     } catch {
       store.getState().setUI({ saved: 'Not saved — storage unavailable' });

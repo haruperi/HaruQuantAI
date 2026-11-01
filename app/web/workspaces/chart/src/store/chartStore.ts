@@ -9,7 +9,8 @@ import type {
   Settings,
   UIState,
 } from '../types';
-import { keyFor } from '../types';
+import { drawingGroups, keyFor } from '../types';
+import { tools } from '../tools/catalog';
 import { withChartHistory, type History } from './history';
 export const defaults: Settings = {
   symbol: 'XAUUSD',
@@ -23,6 +24,8 @@ export const defaults: Settings = {
   precision: 2,
   countdown: true,
   magnet: false,
+  magnetStrength: 'weak',
+  snapToIndicators: false,
   volume: true,
   previousClose: false,
   tooltip: false,
@@ -32,6 +35,28 @@ export const defaults: Settings = {
   title: 'Gold workspace',
   range: '1D',
   paneHeight: 100,
+  colorBarsByPreviousClose: false,
+  candleBody: true,
+  candleBorders: true,
+  candleWicks: true,
+  candleUpColor: '#089981',
+  candleDownColor: '#f23645',
+  candleBorderUpColor: '#089981',
+  candleBorderDownColor: '#f23645',
+  candleWickUpColor: '#089981',
+  candleWickDownColor: '#f23645',
+  backgroundColor: '#131722',
+  gridColor: '#2a2e39',
+  textColor: '#787b86',
+  showGrid: true,
+  showSymbolTitle: true,
+  showOhlc: true,
+  showIndicatorLegend: true,
+  showBuySellButtons: true,
+  showLastPriceLine: true,
+  showPriceScaleLabels: true,
+  showAlertLines: true,
+  showPositions: true,
 };
 export interface ChartState extends Persisted {
   ui: UIState;
@@ -57,6 +82,7 @@ export function createChartStore() {
       positions: [],
       favorites: ['TrendLine', 'HorizontalLine', 'FibRetracement'],
       recents: ['XAUUSD'],
+      lastGroupTools: {},
       ui: {
         tool: 'cursor',
         cursor: 'crosshair',
@@ -78,7 +104,19 @@ export function createChartStore() {
         speed: 1,
       },
       settings: (change) => get().edit({ chart: { ...get().chart, ...change } }),
-      setUI: (change) => set((s) => ({ ui: { ...s.ui, ...change } })),
+      setUI: (change) =>
+        set((s) => {
+          const next = change.tool;
+          const group = next && next !== 'cursor' ? tools[next].group : null;
+          return {
+            ui: { ...s.ui, ...change },
+            // Remember tool choices centrally: toolbar, favorites, and shortcuts all
+            // use setUI, while the engine's switch back to cursor must not erase them.
+            ...(group && drawingGroups.some((name) => name === group)
+              ? { lastGroupTools: { ...s.lastGroupTools, [group]: next } }
+              : {}),
+          };
+        }),
       setDrawings: (drawings) =>
         get().edit({ drawings: { ...get().drawings, [keyFor(get().chart)]: drawings } }),
       setIndicators: (indicators) => get().edit({ indicators }),
