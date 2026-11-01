@@ -4,6 +4,7 @@ export type Primitive = (
   | { kind: 'ellipse'; center: XY; rx: number; ry: number }
   | { kind: 'text'; at: XY; text: string }
   | { kind: 'badge'; at: XY; text: string; background: string }
+  | { kind: 'image'; at: XY; url: string; width: number; height: number }
 ) & {
   color?: string;
   fillOpacity?: number;
