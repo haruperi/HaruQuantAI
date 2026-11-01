@@ -214,6 +214,8 @@ export interface Settings {
   precision: number;
   countdown: boolean;
   magnet: boolean;
+  magnetStrength: 'weak' | 'strong';
+  snapToIndicators: boolean;
   volume: boolean;
   previousClose: boolean;
   tooltip: boolean;
