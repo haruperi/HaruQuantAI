@@ -255,7 +255,7 @@ export function SettingsDialog() {
               <Checkbox label="Price scale labels" checked={draft.showPriceScaleLabels} onChange={toggle('showPriceScaleLabels')} />
               <div className="cq-setting-heading">LINES</div>
               <Checkbox label="Last price line" checked={draft.showLastPriceLine} onChange={toggle('showLastPriceLine')} />
-              <Checkbox label="Previous day close" checked={draft.previousClose} onChange={toggle('previousClose')} />
+              <Checkbox label="Previous bar close" checked={draft.previousClose} onChange={toggle('previousClose')} />
             </>
           )}
           {section === 'canvas' && (
