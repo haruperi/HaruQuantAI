@@ -70,7 +70,7 @@ export function ChartArea() {
     <div className="cq-chart" aria-label="Chart" role="region">
       <div className="cq-canvas-host" ref={host} data-testid="chart-canvas-host" />
       <div className="cq-legend" ref={legend}>
-        <h1>
+        {s.chart.showSymbolTitle && <h1>
           <span className="cq-symbol-logo">{symbol.icon}</span>
           {symbol.name}
           <span className="cq-legend-muted">
@@ -78,11 +78,11 @@ export function ChartArea() {
             · {s.chart.interval} · {symbol.exchange}
           </span>
           <span className="cq-live-dot" />
-        </h1>
-        <div className="cq-ohlc" ref={ohlc}>
+        </h1>}
+        <div className="cq-ohlc" ref={ohlc} style={{ display: s.chart.showOhlc ? undefined : 'none' }}>
           Loading OHLC…
         </div>
-        <div className="cq-quotes">
+        {s.chart.showBuySellButtons && <div className="cq-quotes">
           <button className="cq-sell" onClick={() => s.setUI({ dialog: 'order', side: 'sell' })}>
             <span ref={sell}>—</span>
             <small>SELL</small>
@@ -92,8 +92,8 @@ export function ChartArea() {
             <span ref={buy}>—</span>
             <small>BUY</small>
           </button>
-        </div>
-        {s.indicators.map((i) => (
+        </div>}
+        {s.chart.showIndicatorLegend && s.indicators.map((i) => (
           <div
             className="cq-indicator-legend"
             key={i.id}
