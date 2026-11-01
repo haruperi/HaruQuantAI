@@ -216,10 +216,10 @@ export function persisted(store: ChartStore): Persisted {
     lastGroupTools: s.lastGroupTools,
   };
 }
-export function connectPersistence(store: ChartStore, storage: Storage): () => void {
+export function connectPersistence(store: ChartStore, storage: Storage, key = storageKey): () => void {
   let writable = true;
   try {
-    const raw = storage.getItem(storageKey);
+    const raw = storage.getItem(key);
     if (raw) store.setState(decode(raw));
   } catch (error) {
     writable = false;
@@ -234,7 +234,7 @@ export function connectPersistence(store: ChartStore, storage: Storage): () => v
   const save = () => {
     if (!writable) return;
     try {
-      storage.setItem(storageKey, JSON.stringify({ version: 1, state: persisted(store) }));
+      storage.setItem(key, JSON.stringify({ version: 1, state: persisted(store) }));
       store.getState().setUI({ saved: 'Saved locally' });
     } catch {
       store.getState().setUI({ saved: 'Not saved — storage unavailable' });
