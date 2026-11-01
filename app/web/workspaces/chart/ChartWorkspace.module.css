@@ -1479,3 +1479,24 @@
 .root :global(.cq-chart-splitter:focus-visible) {
   outline: 2px solid #2962ff;
 }
+
+
+/* Each chart maintains its own appearance even when another pane is active. */
+.root :global(.cq-chart-cell[data-chart-theme='dark']) {
+  --cq-bg: #131722;
+  --cq-panel: #1e222d;
+  --cq-border: #2a2e39;
+  --cq-text: #d1d4dc;
+  --cq-muted: #787b86;
+  --cq-hover: #2a2e39;
+  color: var(--cq-text);
+}
+.root :global(.cq-chart-cell[data-chart-theme='light']) {
+  --cq-bg: #fff;
+  --cq-panel: #f5f6fa;
+  --cq-border: #e0e3eb;
+  --cq-text: #131722;
+  --cq-muted: #787b86;
+  --cq-hover: #e9edf5;
+  color: var(--cq-text);
+}
