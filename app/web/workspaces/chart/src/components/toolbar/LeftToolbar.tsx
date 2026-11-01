@@ -85,6 +85,21 @@ function AnnotationToolIcon({ id }: { id: ToolId }) {
   const Icon = annotationIcons[id] ?? Type;
   return <Icon aria-hidden="true" />;
 }
+function MagnetStrengthIcon({ strength }: { strength: 'weak' | 'strong' }) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" aria-hidden="true">
+      <path d="M5 13V8a7 7 0 0 1 14 0v5h-5V8a2 2 0 0 0-4 0v5z" />
+      <path d="M5 10h5M14 10h5" />
+      <circle cx="12" cy="18" r="1" fill="currentColor" stroke="none" />
+      {strength === 'strong' && (
+        <>
+          <circle cx="7" cy="20.5" r="1" fill="currentColor" stroke="none" />
+          <circle cx="17" cy="20.5" r="1" fill="currentColor" stroke="none" />
+        </>
+      )}
+    </svg>
+  );
+}
 function LineToolIcon({ id }: { id: ToolId }) {
   const horizontal = ['HorizontalLine', 'HorizontalRay', 'PriceLine'].includes(id);
   const vertical = id === 'VerticalLine';
@@ -528,7 +543,7 @@ export function LeftToolbar() {
                   setOpen(null);
                 }}
               >
-                <Magnet aria-hidden="true" />
+                <MagnetStrengthIcon strength={strength} />
                 <span>{strength === 'weak' ? 'Weak magnet' : 'Strong magnet'}</span>
               </button>
             ))}
