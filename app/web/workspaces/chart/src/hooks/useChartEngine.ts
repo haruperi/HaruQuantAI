@@ -5,6 +5,8 @@ export interface ChartServices {
   store: ChartStore;
   engine: MutableRefObject<ChartEngine | null>;
   root: RefObject<HTMLDivElement | null>;
+  onCrosshairTime?: (time: number | null) => void;
+  onViewport?: (range: readonly [number, number]) => void;
 }
 export const ChartContext = createContext<ChartServices | null>(null);
 export function useChart() {
