@@ -26,7 +26,7 @@ Status definitions:
 
 | Work Order | Capability / Feature | Implementation Files | Test Evidence | Status | Remaining Obligations & Notes |
 | :--- | :--- | :--- | :--- | :--- | :--- |
-| **COR-M01** | Core foundation migration sketch | `docs/dev/full-reimplementation/01-AppCore.md:125` | N/A (Historical plan) | `superseded` | Historical migration sketch superseded by concrete work orders WO-C00 through WO-C20 per `01-AppCore.md:122`. |
+| **COR-M01** | Core foundation migration sketch | [Current architecture](../../../ARCHITECTURE.md) | N/A (Historical plan) | `superseded` | Retired migration sketch; concrete Core ownership and implementation evidence are recorded in this matrix. |
 | **WO-C00** | CoreTestBootstrap | `app/web/package.json`, `app/web/vite.config.ts`, `app/web/shell/bootstrap.tsx` | `app/web/tests/bootstrap.test.tsx` | `verified` | Core test infrastructure and frontend isolation bootstrap. |
 | **WO-C01** | DomainError | `app/core/lib/errors.py` | `tests/core/lib/test_errors.py` | `verified` | Standardized domain exception hierarchy, error codes, detail dictionaries, and JSON detachment. |
 | **WO-C02** | StandardResponse | `app/core/lib/responses.py` | `tests/core/lib/test_responses.py`, `tests/core/host/test_responses.py` | `verified` | Standardized generic response envelope, HTTP status mapping, and backward-compatible builders. |
@@ -55,7 +55,7 @@ Status definitions:
 | **WO-C13.02** | DatabankJobs | `app/core/jobs/databank.py` | `tests/core/jobs/test_databank.py` | `verified` | Transactional add, move, delete operations across databanks. |
 | **WO-C14** | HostTransport | `app/core/host/transport.py`, `app/core/host/events.py`, `app/core/host/session.py` | `tests/core/host/test_transport.py`, `tests/core/host/test_events.py`, `tests/core/host/test_session.py` | `verified` | FastAPI ASGI application, session validation, and WebSocket event transport. |
 | **WO-C15** | WizardTransformBoundary | `app/core/wizard/transform.py` | `tests/core/wizard/test_transform.py` | `verified` | Multi-platform code generator with fail-closed validation, Python AST parsing, and instance operand resolution. |
-| **WO-C16** | SQAppLibAttribution | `docs/dev/full-reimplementation/01-AppCore.md:100-117` | Decompilation SHA-256 and AES-256-GCM verification | `verified` | Verified container bundle of SQTradingLib and plugins. |
+| **WO-C16** | SQAppLibAttribution | [Retained library inventory](SQLib-SQAppLib-class-inventory.md) | Historical source-review attribution, not runtime acceptance | `verified` | Carrier attribution identifies SQTradingLib and plugins; this does not establish full donor behavior parity. |
 | **WO-C17.01** | ApplicationEntrypoints | `app/main.py`, `app/cli.py` | `tests/host/test_main.py`, `tests/host/test_cli.py` | `verified` | FastAPI service lifecycle and headless CLI runner. |
 | **WO-C17.02** | WebBuildServing | `app/main.py` | `tests/host/test_web_build.py` | `verified` | Static web distribution asset serving and SPA routing fallback implemented in `app/main.py:193`. |
 | **WO-C18** | CodeEditorOwnership | Routed to `app/workspace/code_editor/` | `tests/workspace/code_editor/` | `routed` | Concrete code editor tabs, snippet tools, and compilation routed to AppCodeEditor (Phase 04). |
@@ -113,9 +113,8 @@ Status definitions:
 
 ---
 
-## 4. Documentation Migration and Deprecation Guidelines
+## 4. Development Plan Retirement
 
-Both `00-README.md` and `01-AppCore.md` are retained in place. Before archiving or deleting `00-README.md` or `01-AppCore.md`, the following dependencies must be preserved elsewhere:
-1. **Preserve Provenance:** Historical notes describing decrypted carrier analysis (`SQAppLib.jar.enc`, `SQLib.jar.enc`) and static dependency graphs serve as permanent reference provenance and must not be deleted.
-2. **Preserve Shared Instructions and Evidence:** Baseline reimplementation guidance, architecture rationale, and migration instructions must be fully migrated before deprecating either file.
-3. **Update Cross-References:** Any incoming links from workspace specifications to `WO-C11.02` and `WO-C11.03` must link to this audit document and reference `.haru` as the accepted format.
+On 2026-11-01 the owner authorized retiring the completed dispatch and AppCore development plans (`00-README.md` and `01-AppCore.md`) after verified implementation. Their historical instructions and embedded evidence are not archived as part of this cleanup.
+
+[PROJECT.md](../../../PROJECT.md) retains scope and acceptance evidence; [ARCHITECTURE.md](../../../ARCHITECTURE.md) retains current Core contracts and boundaries. This matrix retains work-order identifiers referenced by remaining workspace plans. Those identifiers describe prerequisite capabilities; they do not require recreating the retired plans or authorize unrelated implementation.

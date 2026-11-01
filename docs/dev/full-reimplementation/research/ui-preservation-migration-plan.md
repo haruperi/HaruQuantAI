@@ -8,7 +8,7 @@ The user requires the existing browser UI to retain its appearance, interactions
 
 - [Exact migration manifest](ui-preservation-migration-manifest.csv): one row for every tracked file in `ui/` and `app/web/`, including source hashes, proposed destinations, actions and execution phase.
 - [Complete target file tree](ui-preservation-target-tree.txt): preserved existing files and existing target helpers after consolidation. This is separate from the future feature inventory in the workspace plans.
-- Existing architecture: [Core](../01-AppCore.md), [Home](../02-AppHome.md), and workspace documents 03–20 supply ownership and later feature contracts.
+- Existing architecture: [Core architecture](../../../ARCHITECTURE.md), [Home](../02-AppHome.md), and workspace documents 03–20 supply ownership and later feature contracts.
 
 This plan defines the structural migration scope requested by the user. It does not release blocked backend work orders or claim donor functionality. Before moving application code, UI-M00 records the decisions below in the affected dispatch/workspace documents, so later executors do not follow conflicting instructions. The Core C00 restriction against importing the old UI applied to that isolated bootstrap order; do not retroactively describe C00 as a completed application migration.
 

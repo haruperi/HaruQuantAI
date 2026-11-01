@@ -1,7 +1,7 @@
 # HaruQuantAI Spatial Architecture & System Design
 
 **Status:** Ratified 4-Tier Spatial Architecture (AppCore, Workspaces, Web Shell, Extensions).
-**Baseline Roadmap:** [`docs/dev/full-reimplementation/`](dev/full-reimplementation/00-README.md).
+**Baseline Roadmap:** [`docs/dev/full-reimplementation/`](dev/full-reimplementation/).
 **Authorities:** [docs/PROJECT.md](PROJECT.md) governs scope and delivery milestones; [AGENTS.md](../AGENTS.md) governs constitutional rules and contributor gates.
 
 ---
@@ -125,16 +125,18 @@ CONFIGURING -> PATHS -> LOGGING -> PERSISTENCE -> SERVICES -> ROUTES -> READY
 * **Lifecycle States:** Governs `QUEUED`, `RUNNING`, `PAUSED`, `COMPLETED`, `FAILED`, `CANCELLED`, and `INTERRUPTED`. Orphan running tasks from previous crashes are automatically reconciled to `INTERRUPTED` on startup.
 
 #### 4.1.5 Transports, Responses & Event Bus (`transport.py`, `app/core/lib/`)
-* **Uniform Envelopes:** Standard API responses use `StandardResponse[T]` (`status`, `message`, `data`, `error`, `metadata`). Errors use typed `DomainError` hierarchies.
+* **Response Contracts:** `app/core/lib/responses.py` retains two supported interfaces: keyword-only `StandardResponse[T](request_id=..., data=..., revision=...)` instances with `to_dict()`/`to_json()`, and the existing `success`/`failure` builders using `ResponseMetadata` and `StandardError`. Preserve the wire shape selected by each endpoint; conversions must be explicit. Payloads must already be JSON-compatible; dataclasses require explicit serialization. `DomainError` and `JSONValue`/`copy_json` are canonical in `app/core/lib/errors.py`.
 * **Event Streaming:** In-memory asynchronous pub/sub event distribution (`EventBus`) with Server-Sent Events (`/api/v1/events`) and WebSocket gateways.
 
 ### 4.2 Quantitative Engine Subsystems (`app/core/`)
 
 * **`app/core/data/`:** High-performance time series data structures, columnar bar/tick storage (Arrow/Polars/DuckDB), and resamplers.
 * **`app/core/trading/`:** Core order models (`Market`, `Limit`, `Stop`), position lifecycle, fill simulation, cash/margin accounting, slippage/commission models, optimization engines (grid search, Walk-Forward Analysis with WFE metrics), and databank result storage with MAE/MFE tracking.
+* **Result Persistence Boundary:** Execution `app/core/trading/backtest/contracts.py:RunResult` and storage `app/core/trading/results/contracts.py:RunResult` are distinct contracts. Use `from_backtest_result` in `app/core/trading/results/adapters.py` before passing execution results to `ResultStore` or databank jobs. The adapter retains trades, equity and MAE/MFE, maps `max_drawdown` into the stored `drawdown` summary metric, and rejects non-finite payloads. Older stored records without MAE/MFE load with an empty default.
+* **Walk-Forward Execution:** `OptimizationEngine.run_walk_forward` searches each half-open IS window, selects the highest-scoring candidate with stable first-grid-order ties, and evaluates that candidate once on the OOS window. Callbacks receive the relevant bar slice and must supply comparable, additive scores. Aggregate WFE is `100 * sum(OOS scores) / sum(IS scores)`, or zero for a non-positive IS denominator. Invalid windows and non-finite scores fail explicitly; cancellation is cooperative and evaluator failures propagate.
 * **`app/core/trading/project/`:** Native `.haru` container format (atomic ZIP package enclosing `manifest.json`, `project.json`, and `tasks/*.json`) with strict path traversal defenses. Supersedes historical XML `.cfx` envelope instructions (see [AppCore completion audit](dev/full-reimplementation/research/appcore-completion-audit.md)).
 * **`app/core/grid/`:** Distributed grid compute protocol, worker node discovery, message serialization, and task slicing.
-* **`app/core/wizard/`:** Multi-platform strategy AST normalizer and Jinja2 code generator supporting MQL5, MQL4, EasyLanguage, cTrader C#, and Python with fail-closed validation and Python AST syntax verification.
+* **`app/core/wizard/`:** Multi-platform strategy AST normalizer and Jinja2 code generator supporting MQL5, MQL4, EasyLanguage, cTrader C#, and Python with fail-closed validation and Python AST syntax verification. Declared parameters and state variables use instance attributes in generated Python. Unsupported comparators, unresolved operands and indicator compositions without code emitters return export errors. Python syntax parsing and synthetic execution tests do not establish external-platform compilation; MQL, cTrader and EasyLanguage compiler validation remains unverified.
 
 ---
 
