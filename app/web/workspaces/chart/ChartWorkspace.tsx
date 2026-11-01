@@ -5,7 +5,7 @@ import { connectPersistence, persisted, storageKey } from './src/store/persisten
 import { ChartContext, type ChartServices } from './src/hooks/useChartEngine';
 import { useShortcuts } from './src/hooks/useShortcuts';
 import type { ChartEngine } from './src/engine/ChartEngine';
-import { getLayout, layoutStorageKey, readLayout, type LayoutState, type SyncSetting } from './src/layout/layouts';
+import { defaultLayout, getLayout, getLayoutSizes, layoutSplitters, resizeTracks, layoutStorageKey, readLayout, type LayoutState, type LayoutSizes, type SyncSetting } from './src/layout/layouts';
 import { TopBar } from './src/components/topbar/TopBar';
 import { LeftToolbar } from './src/components/toolbar/LeftToolbar';
 import { BottomBar } from './src/components/bottombar/BottomBar';
@@ -42,10 +42,11 @@ export function ChartWorkspace() {
   const engines = useMemo(() =>
     Array.from({ length: 8 }, () => ({ current: null as ChartEngine | null })), []);
   const root = useRef<HTMLDivElement>(null);
+  const resizeDrag = useRef<{ layoutId: string; axis: 'columns' | 'rows'; edge: number;
+    start: number; length: number; sizes: LayoutSizes } | null>(null);
   const viewRanges = useRef<(readonly [number, number] | null)[]>(Array(8).fill(null));
   const [layout, setLayout] = useState<LayoutState>(() =>
-    typeof window === 'undefined' ? { id: 's', active: 0,
-      sync: { symbol: false, interval: false, crosshair: true, time: false, dateRange: false } }
+    typeof window === 'undefined' ? { ...defaultLayout, sync: { ...defaultLayout.sync }, sizes: {} }
       : readLayout(window.localStorage));
   const currentLayout = useRef(layout);
   currentLayout.current = layout;
@@ -195,9 +196,13 @@ export function ChartWorkspace() {
 
   const definition = getLayout(layout.id);
   const cells = definition.cells;
+  const sizes = getLayoutSizes(layout.id, layout.sizes[layout.id]);
+  const splits = layoutSplitters(cells);
+  const position = (values: number[], end: number) =>
+    values.slice(0, end).reduce((sum, value) => sum + value, 0);
   const boardStyle = {
-    gridTemplateColumns: 'repeat(' + cells[0].length + ', minmax(0, 1fr))',
-    gridTemplateRows: 'repeat(' + cells.length + ', minmax(0, 1fr))',
+    gridTemplateColumns: sizes.columns.map(n => n + 'fr').join(' '),
+    gridTemplateRows: sizes.rows.map(n => n + 'fr').join(' '),
     gridTemplateAreas: cells.map(row => '"' + row.map(i => 'c' + i).join(' ') + '"').join(' '),
   };
   return (
@@ -224,6 +229,58 @@ export function ChartWorkspace() {
               </ChartContext.Provider>
             </div>
           ))}
+          {splits.map(split => {
+            const vertical = split.axis === 'columns';
+            const positions = vertical ? sizes.rows : sizes.columns;
+            const edgeSizes = vertical ? sizes.columns : sizes.rows;
+            const start = position(positions, split.start);
+            const extent = position(positions, split.end) - start;
+            const divider = position(edgeSizes, split.edge);
+            return (
+              <div key={split.key} role="separator"
+                aria-label={'Resize charts ' + split.key}
+                aria-orientation={vertical ? 'vertical' : 'horizontal'}
+                title="Drag to resize charts · Double-click to reset"
+                className={'cq-chart-splitter ' + (vertical ? 'cq-chart-splitter-vertical' : 'cq-chart-splitter-horizontal')}
+                style={vertical
+                  ? { left: divider + '%', top: start + '%', height: extent + '%' }
+                  : { top: divider + '%', left: start + '%', width: extent + '%' }}
+                onPointerDown={event => {
+                  if (event.button !== 0) return;
+                  event.preventDefault();
+                  event.currentTarget.setPointerCapture(event.pointerId);
+                  const rect = event.currentTarget.parentElement?.getBoundingClientRect();
+                  resizeDrag.current = {
+                    layoutId: layout.id, axis: split.axis, edge: split.edge,
+                    start: vertical ? event.clientX : event.clientY,
+                    length: (vertical ? rect?.width : rect?.height) || 1,
+                    sizes,
+                  };
+                }}
+                onPointerMove={event => {
+                  const drag = resizeDrag.current;
+                  if (!drag || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
+                  const delta = ((drag.axis === 'columns' ? event.clientX : event.clientY) - drag.start)
+                    / drag.length * 100;
+                  const resized = resizeTracks(drag.sizes, drag.axis, drag.edge, delta);
+                  setLayout(previous => ({
+                    ...previous, sizes: { ...previous.sizes, [drag.layoutId]: resized },
+                  }));
+                }}
+                onPointerUp={event => {
+                  resizeDrag.current = null;
+                  if (event.currentTarget.hasPointerCapture(event.pointerId))
+                    event.currentTarget.releasePointerCapture(event.pointerId);
+                }}
+                onPointerCancel={() => { resizeDrag.current = null; }}
+                onDoubleClick={() => setLayout(previous => {
+                  const sizes = { ...previous.sizes };
+                  delete sizes[layout.id];
+                  return { ...previous, sizes };
+                })}
+              />
+            );
+          })}
         </div>
         <BottomBar />
         {s.ui.panel === 'alerts' && <AlertsPanel />}
