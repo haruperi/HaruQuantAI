@@ -47,9 +47,11 @@ export function decode(raw: string): Persisted {
     'candleUpColor', 'candleDownColor', 'candleBorderUpColor', 'candleBorderDownColor',
     'candleWickUpColor', 'candleWickDownColor', 'backgroundColor', 'gridColor', 'textColor',
   ] as const;
-  for (const key of appearanceColors)
-    if (c[key] !== undefined && (!text(c[key]) || !/^#[0-9a-fA-F]{6}$/.test(c[key])))
+  for (const key of appearanceColors) {
+    const value = c[key];
+    if (value !== undefined && (!text(value) || !/^#[0-9a-fA-F]{6}$/.test(value)))
       throw new Error('Invalid chart appearance color.');
+  }
   if (c.magnetStrength !== undefined && !['weak', 'strong'].includes(String(c.magnetStrength)))
     throw new Error('Invalid magnet strength.');
   if (c.snapToIndicators !== undefined && typeof c.snapToIndicators !== 'boolean')
