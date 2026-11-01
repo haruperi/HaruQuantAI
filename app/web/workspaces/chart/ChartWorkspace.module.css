@@ -1013,3 +1013,274 @@
 .root :global(.cq-magnet-switch-row button[role='switch']:disabled) {
   opacity: .45;
 }
+
+
+/* TradingView-style chart properties: seven-section sidebar, scrollable body, transactional footer. */
+.root :global(.cq-modal.cq-settings-modal) {
+  width: min(900px, 96%);
+  height: min(720px, 92%);
+  max-height: 92%;
+  background: var(--cq-panel);
+  overflow: visible;
+  border-radius: 10px;
+}
+.root :global(.cq-settings-modal > header) {
+  flex: none;
+  position: relative;
+  background: var(--cq-panel);
+  padding: 19px 24px;
+  border-radius: 10px 10px 0 0;
+}
+.root :global(.cq-settings-modal > header h2) {
+  font-size: 20px;
+}
+.root :global(.cq-settings-layout) {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+}
+.root :global(.cq-settings-sidebar) {
+  border-right: 1px solid var(--cq-border);
+  padding: 8px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.root :global(.cq-settings-sidebar button) {
+  display: flex;
+  justify-content: flex-start;
+  gap: 14px;
+  width: 100%;
+  min-height: 47px;
+  padding: 10px 13px;
+  font-size: 14px;
+  border-radius: 9px;
+  text-align: left;
+}
+.root :global(.cq-settings-sidebar button svg) {
+  flex-shrink: 0;
+}
+.root :global(.cq-settings-sidebar .cq-settings-selected) {
+  background: var(--cq-hover);
+  font-weight: 650;
+  color: var(--cq-text);
+}
+.root :global(.cq-settings-main) {
+  padding: 17px 29px 34px;
+  overflow-y: auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  font-size: 14px;
+}
+.root :global(.cq-setting-heading) {
+  color: var(--cq-muted);
+  font-size: 11px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  margin: 10px 0 2px;
+}
+.root :global(.cq-setting-heading:not(:first-child)) {
+  margin-top: 20px;
+}
+.root :global(.cq-setting-check) {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: 11px;
+  line-height: 23px;
+  min-height: 25px;
+  cursor: pointer;
+}
+.root :global(.cq-setting-check input[type="checkbox"]) {
+  width: 18px;
+  height: 18px;
+  flex: none;
+  margin: 3px 0 0;
+  accent-color: #2962ff;
+  cursor: pointer;
+}
+.root :global(.cq-setting-check > span) {
+  min-width: 0;
+}
+.root :global(.cq-setting-check small) {
+  display: block;
+  color: var(--cq-muted);
+  line-height: 1.5;
+  font-size: 11px;
+  margin-top: 3px;
+}
+.root :global(.cq-setting-disabled) {
+  opacity: .48;
+  cursor: not-allowed;
+}
+.root :global(.cq-setting-color-row) {
+  display: flex;
+  align-items: center;
+  min-height: 46px;
+  gap: 12px;
+}
+.root :global(.cq-setting-color-row > .cq-setting-check) {
+  flex: 0 0 150px;
+}
+.root :global(.cq-setting-colors) {
+  display: flex;
+  gap: 11px;
+}
+.root :global(.cq-setting-colors input[type="color"]),
+.root :global(.cq-setting-color-field input[type="color"]) {
+  width: 46px;
+  height: 41px;
+  padding: 5px;
+  border-radius: 9px;
+  border: 1px solid var(--cq-border);
+  background: var(--cq-bg);
+  cursor: pointer;
+}
+.root :global(.cq-setting-colors input[type="color"]:disabled),
+.root :global(.cq-setting-color-field input[type="color"]:disabled) {
+  opacity: .35;
+  cursor: not-allowed;
+}
+.root :global(.cq-setting-inline) {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+.root :global(.cq-setting-inline .cq-setting-check) {
+  flex: 0 0 150px;
+}
+.root :global(.cq-settings-main select) {
+  height: 39px;
+  min-width: 0;
+  max-width: 245px;
+  border-radius: 8px;
+  border: 1px solid var(--cq-border);
+  padding: 6px 11px;
+  background: var(--cq-bg);
+  color: var(--cq-text);
+}
+.root :global(.cq-settings-main select:disabled) {
+  opacity: .45;
+}
+.root :global(.cq-setting-field),
+.root :global(.cq-setting-color-field) {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 470px;
+  gap: 15px;
+}
+.root :global(.cq-setting-color-field input) {
+  flex-shrink: 0;
+}
+.root :global(.cq-settings-note) {
+  font-size: 12px;
+  line-height: 1.65;
+  margin: 0;
+  color: var(--cq-muted);
+  max-width: 440px;
+}
+.root :global(.cq-settings-footer) {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  border-top: 1px solid var(--cq-border);
+  padding: 15px 25px;
+  position: relative;
+  background: var(--cq-panel);
+  border-radius: 0 0 10px 10px;
+}
+.root :global(.cq-settings-footer-buttons) {
+  display: flex;
+  gap: 12px;
+}
+.root :global(.cq-settings-footer-buttons button),
+.root :global(.cq-settings-template summary) {
+  min-height: 37px;
+  padding: 8px 15px;
+  border: 1px solid var(--cq-border);
+  border-radius: 8px;
+  font-size: 14px;
+}
+.root :global(.cq-settings-footer-buttons .cq-settings-ok) {
+  background: #2962ff;
+  border-color: #2962ff;
+  color: white;
+}
+.root :global(.cq-settings-footer-buttons .cq-settings-ok:hover) {
+  background: #1b4ed4;
+}
+.root :global(.cq-settings-template) {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  min-width: 0;
+}
+.root :global(.cq-settings-template > small) {
+  color: #f23645;
+  font-size: 11px;
+  max-width: 240px;
+}
+.root :global(.cq-settings-template details) {
+  position: relative;
+}
+.root :global(.cq-settings-template summary) {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  cursor: pointer;
+  list-style: none;
+  user-select: none;
+}
+.root :global(.cq-settings-template summary::-webkit-details-marker) {
+  display: none;
+}
+.root :global(.cq-settings-template-popover) {
+  position: absolute;
+  bottom: calc(100% + 9px);
+  left: 0;
+  width: 218px;
+  max-height: 245px;
+  overflow: auto;
+  padding: 6px;
+  border: 1px solid var(--cq-border);
+  border-radius: 8px;
+  background: var(--cq-panel);
+  box-shadow: 0 10px 35px #0006;
+  z-index: 8;
+}
+.root :global(.cq-settings-template-popover button) {
+  justify-content: flex-start;
+  width: 100%;
+  min-height: 34px;
+  white-space: normal;
+  text-align: left;
+}
+.root :global(.cq-settings-template-entry) {
+  display: flex;
+  align-items: center;
+}
+.root :global(.cq-settings-template-entry button:last-child) {
+  width: 29px;
+  flex-shrink: 0;
+  padding: 5px;
+}
+.root :global(.cq-settings-template-divider) {
+  border-top: 1px solid var(--cq-border);
+  margin: 5px 0;
+}
+@media (max-width: 690px) {
+  .root :global(.cq-settings-layout) { grid-template-columns: 175px minmax(0, 1fr); }
+  .root :global(.cq-settings-sidebar button) { font-size: 12px; gap: 8px; padding: 7px; }
+  .root :global(.cq-settings-main) { padding: 12px; font-size: 12px; }
+  .root :global(.cq-setting-color-row > .cq-setting-check),
+  .root :global(.cq-setting-inline .cq-setting-check) { flex-basis: 95px; }
+  .root :global(.cq-settings-footer) { padding: 10px; }
+}
