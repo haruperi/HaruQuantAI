@@ -22,12 +22,13 @@ def test_canonical_storage_module_identity() -> None:
     assert new_storage.price_columns is not None
     assert new_storage.catalog_paths is not None
 
-    # TICK_SCHEMA: DateTime: timestamp[us, UTC], Bid: int64, Ask: int64, Flags: uint16
+    # TICK_SCHEMA: DateTime: timestamp[us, UTC], Bid: int64, Ask: int64, Flags: uint16, Volume: uint64
     assert [(field.name, field.type) for field in new_storage.TICK_SCHEMA] == [
         ("DateTime", pa.timestamp("us", tz="UTC")),
         ("Bid", pa.int64()),
         ("Ask", pa.int64()),
         ("Flags", pa.uint16()),
+        ("Volume", pa.uint64()),
     ]
 
     # M1_SCHEMA: DateTime, Open, High, Low, Close, Volume with timestamp[us, UTC], four int64 prices and uint64 volume
