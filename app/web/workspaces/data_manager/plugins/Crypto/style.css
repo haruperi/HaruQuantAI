@@ -23,3 +23,21 @@
 .crypto-flow{color-scheme:dark}.crypto-flow fieldset{border:1px solid var(--line2);padding:12px}.crypto-flow legend{padding:0 6px;font-weight:600}
 :root[data-theme=light] .crypto-flow{color-scheme:light}
 @media(max-width:760px){.crypto-wide .modal{height:calc(100vh - 24px)}.crypto-details,.crypto-date-row,.crypto-redownload{grid-template-columns:1fr}.crypto-details label{grid-template-columns:1fr}.crypto-consent{max-width:46vw}.crypto-flow .modal>footer{height:auto;min-height:48px;padding:8px;flex-wrap:wrap}}
+
+.host-symbol-add .modal { max-width:calc(100vw - 24px); max-height:calc(100dvh - 24px); }
+.host-symbol-add .modal-content { display:flex; flex-direction:column; gap:14px; overflow:auto; padding:16px; }
+.host-symbol-add .modal>header,.host-symbol-add .modal>footer { flex-shrink:0; }
+.host-symbol-add .modal>footer { height:auto; flex-wrap:wrap; padding:12px 16px; gap:10px; }
+.host-symbol-add fieldset { min-width:0; }
+.host-symbol-add .host-symbol-postfix { display:flex; flex-direction:column; gap:6px; }
+.host-symbol-add small { color:var(--muted); }
+.host-symbol-add select { background:var(--bg); color:var(--text); border:1px solid var(--line); padding:6px; max-width:100%; }
+.host-symbol-add summary { cursor:pointer; color:var(--muted); }
+.host-symbol-add details label { display:flex; flex-direction:column; gap:6px; margin:10px 0; }
+.host-symbol-add .crypto-grid { flex:none; height:clamp(160px,30vh,300px); min-height:160px; }
+.host-symbol-add .crypto-consent { flex-basis:100%; max-width:100%; }
+@media(max-width:650px) { .host-symbol-add .modal-content { padding:10px; } .host-symbol-add .yahoo-add-fieldset textarea { min-height:160px; } }
+
+.host-symbol-add .crypto-grid th { background:var(--panel3); color:var(--text); }
+.host-symbol-add .crypto-grid td { background:var(--bg); color:var(--text); }
+.host-symbol-add .crypto-grid tr.selected td { background:color-mix(in srgb,var(--accent) 16%,var(--bg)); }

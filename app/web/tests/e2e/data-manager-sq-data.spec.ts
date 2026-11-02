@@ -1,9 +1,13 @@
 import { expect, test, type Page } from '@playwright/test';
 import { selectLightSkin } from './shellTestUtils';
 
-test.describe('Backend equity search popup', () => {
+for (const provider of ['Equity', 'Futures'] as const) {
+const source = provider === 'Equity' ? 'sq_equity' : 'sq_futures';
+const ticker = provider === 'Equity' ? 'AAP' : '@ES';
+const query = provider === 'Equity' ? 'AAP; MSFT' : '@ES; @NQ';
+test.describe(`Backend ${provider.toLowerCase()} search popup`, () => {
   async function launch(page: Page) {
-    const state = { catalogue: ['AAPL', 'AAP', 'MSFT', 'AMZN'] as unknown, fail: false, writes: [] as { path: string; body: unknown }[] };
+    const state = { catalogue: (provider === 'Equity' ? ['AAPL', 'AAP', 'MSFT', 'AMZN'] : ['@ES', '@ESM', '@NQ', '@GC']) as unknown, fail: false, writes: [] as { path: string; body: unknown }[] };
     await page.addInitScript(() => {
       const original = window.fetch.bind(window);
       window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => String(input).includes('/api/v1/events?')
@@ -24,14 +28,14 @@ test.describe('Backend equity search popup', () => {
       };
       else if (path.includes('/workspace/tabs/')) data = { active_tab: path.split('/').at(-1), selection: null, preview: { state: 'unavailable', reason: 'Select a dataset.', rows: [], limit: 500 } };
       else if (path.endsWith('/capabilities')) data = { timeframes: ['D1'], default_timeframe: 'D1' };
-      else if (path.endsWith('/sources/sq_equity/catalog')) {
+      else if (path.endsWith(`/sources/${source}/catalog`)) {
         if (state.fail) {
-          await route.fulfill({ status: 503, json: { status: 'error', error: { code: 'UNAVAILABLE', message: 'Equity catalogue unavailable' } } }); return;
+          await route.fulfill({ status: 503, json: { status: 'error', error: { code: 'UNAVAILABLE', message: `${provider} catalogue unavailable` } } }); return;
         }
         data = state.catalogue;
-      } else if (path.endsWith('/sources/sq_equity/add')) {
+      } else if (path.endsWith(`/sources/${source}/add`)) {
         const body = route.request().postDataJSON() as { definitions: { symbol: string; underlying: string; timeframe: string }[] };
-        data = { records: body.definitions.map(row => ({ ...row, id: `saved:${row.symbol}`, source: 'sq_equity' })) };
+        data = { records: body.definitions.map(row => ({ ...row, id: `saved:${row.symbol}`, source })) };
       }
       await route.fulfill({ json: { status: 'success', data } });
     });
@@ -40,29 +44,33 @@ test.describe('Backend equity search popup', () => {
     await login.getByLabel('Host password').fill('fixture-password');
     await login.getByRole('button', { name: 'Connect', exact: true }).click();
     await expect(login).toHaveCount(0);
-    await page.getByRole('button', { name: 'Equity data', exact: true }).click();
-    await page.getByRole('menuitem', { name: 'Find and add equity data', exact: true }).click();
-    await expect(page.getByRole('dialog', { name: 'Add SQ Equity Data', exact: true })).toBeVisible();
+    await page.getByRole('button', { name: `${provider} data`, exact: true }).click();
+    await page.getByRole('menuitem', { name: `Find and add ${provider.toLowerCase()} data`, exact: true }).click();
+    await expect(page.getByRole('dialog', { name: `Add SQ ${provider} Data`, exact: true })).toBeVisible();
     state.writes.length = 0;
     return state;
   }
 
   test('reference layout, themes, narrow footer and keyboard closing', async ({ page }) => {
     await launch(page);
-    const dialog = page.getByRole('dialog', { name: 'Add SQ Equity Data', exact: true });
+    const dialog = page.getByRole('dialog', { name: `Add SQ ${provider} Data`, exact: true });
     await expect(dialog.getByRole('heading', { name: 'Find data by' })).toBeVisible();
     await expect(dialog.getByRole('combobox', { name: 'Exchange' })).toBeDisabled();
     await expect(dialog.getByRole('combobox', { name: 'Exchange' })).toHaveValue('Any');
     await expect(dialog.getByRole('checkbox', { name: 'Search in ticker', exact: true })).toBeChecked();
     await expect(dialog.getByRole('checkbox', { name: 'Search in name', exact: true })).toBeDisabled();
     await expect(dialog.getByRole('checkbox', { name: 'Exact match' })).not.toBeChecked();
+    if (provider === 'Futures') {
+      await expect(dialog.getByRole('checkbox', { name: 'Only continuous futures' })).toBeDisabled();
+      expect(await dialog.locator('textarea').evaluate(element => element.getBoundingClientRect().height)).toBe(200);
+    }
     await expect(dialog.getByText('End of Day data supported; subscription status unavailable', { exact: false })).toBeVisible();
     await expect(dialog.getByRole('button', { name: 'Add symbols', exact: true })).toHaveCount(0);
-    await dialog.getByRole('textbox', { name: 'Search text' }).pressSequentially('AAPL');
-    await expect(dialog.getByRole('textbox', { name: 'Search text' })).toHaveValue('AAPL');
-    await page.screenshot({ path: 'test-results/equity-search-dark.png' });
+    await dialog.getByRole('textbox', { name: 'Search text' }).pressSequentially(ticker);
+    await expect(dialog.getByRole('textbox', { name: 'Search text' })).toHaveValue(ticker);
+    await page.screenshot({ path: `test-results/${provider.toLowerCase()}-search-dark.png` });
     await page.evaluate(() => { document.documentElement.dataset.theme = 'light'; });
-    await page.screenshot({ path: 'test-results/equity-search-light.png' });
+    await page.screenshot({ path: `test-results/${provider.toLowerCase()}-search-light.png` });
     await page.setViewportSize({ width: 520, height: 700 });
     await expect(dialog.getByRole('button', { name: 'Close', exact: true }).last()).toBeInViewport();
     expect(await dialog.evaluate(element => element.scrollWidth <= element.clientWidth)).toBe(true);
@@ -72,51 +80,51 @@ test.describe('Backend equity search popup', () => {
     await dialog.getByRole('button', { name: 'Close', exact: true }).last().focus();
     await page.keyboard.press('Tab');
     await expect(dialog.getByRole('button', { name: 'Close', exact: true }).first()).toBeFocused();
-    await page.screenshot({ path: 'test-results/equity-search-narrow.png' });
+    await page.screenshot({ path: `test-results/${provider.toLowerCase()}-search-narrow.png` });
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Equity data', exact: true })).toBeFocused();
+    await expect(page.getByRole('button', { name: `${provider} data`, exact: true })).toBeFocused();
   });
 
   test('catalogue matching, consent and backend registration', async ({ page }) => {
     const state = await launch(page);
-    const dialog = page.getByRole('dialog', { name: 'Add SQ Equity Data', exact: true });
-    await dialog.getByRole('textbox', { name: 'Search text' }).fill('AAP; MSFT');
+    const dialog = page.getByRole('dialog', { name: `Add SQ ${provider} Data`, exact: true });
+    await dialog.getByRole('textbox', { name: 'Search text' }).fill(query);
     await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
     await expect(dialog.getByRole('status')).toHaveText('Found: 3, selected: 0');
     expect(state.writes).toEqual([]);
     await dialog.getByRole('button', { name: '‹ Search again' }).click();
-    await expect(dialog.getByRole('textbox', { name: 'Search text' })).toHaveValue('AAP; MSFT');
+    await expect(dialog.getByRole('textbox', { name: 'Search text' })).toHaveValue(query);
     await dialog.getByRole('checkbox', { name: 'Exact match' }).check();
     await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
     await expect(dialog.getByRole('status')).toHaveText('Found: 2, selected: 0');
-    await dialog.getByRole('checkbox', { name: 'Select ticker AAP', exact: true }).check();
+    await dialog.getByRole('checkbox', { name: `Select ticker ${ticker}`, exact: true }).check();
     await expect(dialog.getByRole('button', { name: 'Continue' })).toBeDisabled();
     await dialog.getByRole('button', { name: 'HaruQuantAI Data Usage Conditions', exact: true }).click();
     await expect(page.getByRole('dialog', { name: 'HaruQuantAI Data Usage Conditions', exact: true })).toBeVisible();
     await page.keyboard.press('Escape');
-    await expect(dialog.getByRole('checkbox', { name: 'Select ticker AAP', exact: true })).toBeChecked();
+    await expect(dialog.getByRole('checkbox', { name: `Select ticker ${ticker}`, exact: true })).toBeChecked();
     await dialog.getByRole('checkbox', { name: 'I confirm that I agree to' }).check();
     await dialog.getByRole('button', { name: 'Continue' }).click();
-    const configure = page.getByRole('dialog', { name: 'Add SQ Equity data', exact: true });
-    await expect(configure.getByRole('textbox', { name: 'Provider symbols' })).toHaveValue('AAP');
+    const configure = page.getByRole('dialog', { name: `Add SQ ${provider} data`, exact: true });
+    await expect(configure.getByRole('textbox', { name: 'Provider symbols' })).toHaveValue(ticker);
     await configure.getByRole('button', { name: 'Add symbols', exact: true }).click();
     await expect(configure).toHaveCount(0);
-    const writes = state.writes.filter(write => write.path.endsWith('/sources/sq_equity/add'));
+    const writes = state.writes.filter(write => write.path.endsWith(`/sources/${source}/add`));
     expect(writes).toHaveLength(1);
-    expect(writes[0].body).toMatchObject({ definitions: [{ symbol: 'AAP_sq_equity', underlying: 'AAP', timeframe: 'D1' }] });
+    expect(writes[0].body).toMatchObject({ definitions: [{ symbol: `${ticker}_${source}`, underlying: ticker, timeframe: 'D1' }] });
     expect(state.writes.some(write => write.path.includes('download-jobs'))).toBe(false);
   });
 
   test('failed and malformed catalogues can retry without mock results', async ({ page }) => {
     const state = await launch(page);
-    const dialog = page.getByRole('dialog', { name: 'Add SQ Equity Data', exact: true });
+    const dialog = page.getByRole('dialog', { name: `Add SQ ${provider} Data`, exact: true });
     state.fail = true;
     await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
-    await expect(dialog.getByRole('alert')).toContainText('Equity catalogue unavailable');
+    await expect(dialog.getByRole('alert')).toContainText(`${provider} catalogue unavailable`);
     state.fail = false; state.catalogue = [{ ticker: 'AAPL' }];
     await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
-    await expect(dialog.getByRole('alert')).toContainText('invalid equity catalogue');
+    await expect(dialog.getByRole('alert')).toContainText(`invalid ${provider.toLowerCase()} catalogue`);
     state.catalogue = ['AAPL'];
     await dialog.getByRole('textbox', { name: 'Search text' }).fill('UNKNOWN');
     await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
@@ -125,31 +133,32 @@ test.describe('Backend equity search popup', () => {
     expect(state.writes).toEqual([]);
   });
 
-  test('lookup times out, closes safely and leaves Futures on its existing flow', async ({ page }) => {
+  test('lookup times out, closes safely and reopens Futures search', async ({ page }) => {
     await launch(page);
-    await page.evaluate(() => {
+    await page.evaluate(source => {
       const original = window.fetch.bind(window);
-      window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => String(input).includes('/sources/sq_equity/catalog')
+      window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => String(input).includes(`/sources/${source}/catalog`)
         ? new Promise<Response>((_resolve, reject) => init?.signal?.addEventListener('abort', () => reject(new DOMException('Cancelled', 'AbortError')), { once: true }))
         : original(input, init)) as typeof fetch;
-    });
+    }, source);
     await page.clock.install();
-    const dialog = page.getByRole('dialog', { name: 'Add SQ Equity Data', exact: true });
+    const dialog = page.getByRole('dialog', { name: `Add SQ ${provider} Data`, exact: true });
     await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
     await expect(dialog.getByRole('button', { name: 'Looking up…' })).toBeDisabled();
     await page.clock.runFor(15001);
-    await expect(dialog.getByRole('alert')).toContainText('Equity lookup timed out');
+    await expect(dialog.getByRole('alert')).toContainText(`${provider} lookup timed out`);
     await dialog.getByRole('button', { name: 'Lookup', exact: true }).click();
     await page.keyboard.press('Escape');
     await expect(dialog).toHaveCount(0);
     await page.clock.resume();
     await page.getByRole('button', { name: 'Futures data', exact: true }).click();
     await page.getByRole('menuitem', { name: 'Find and add futures data', exact: true }).click();
-    const futures = page.getByRole('dialog', { name: 'Add SQ Futures data', exact: true });
-    await expect(futures.getByRole('textbox', { name: 'Provider symbols' })).toBeVisible();
-    await expect(futures.getByRole('button', { name: 'Add and download', exact: true })).toBeVisible();
+    const futures = page.getByRole('dialog', { name: 'Add SQ Futures Data', exact: true });
+    await expect(futures.getByRole('heading', { name: 'Find data by' })).toBeVisible();
+    await expect(futures.getByRole('checkbox', { name: 'Only continuous futures' })).toBeDisabled();
   });
 });
+}
 /** Settings are intentionally not persisted by the current host. */
 async function setFeatureProfileFixture(page: Page, profile: 'Full' | 'Starter'): Promise<void> {
   await page.evaluate(async nextProfile => {

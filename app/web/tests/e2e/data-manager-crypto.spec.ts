@@ -70,3 +70,106 @@ test('supports shared pause/reload/resume, light narrow layout, focus and storag
   await selectLightSkin(page); await page.setViewportSize({width:620,height:700}); dialog=await openAdd(page,'Bitfinex'); await expect(dialog.getByRole('button',{name:'Save'})).toBeInViewport(); await page.screenshot({path:info.outputPath('crypto-light-narrow.png')}); await dialog.getByRole('button',{name:'Save'}).focus(); await page.keyboard.press('Tab'); await expect(dialog.getByRole('button',{name:'Close'}).first()).toBeFocused();
   await dialog.getByRole('textbox',{name:'Filter items'}).fill('BTCUSD'); await dialog.getByRole('checkbox',{name:'Select symbol BTCUSD'}).check(); await dialog.getByRole('checkbox',{name:/I confirm/}).check(); await page.evaluate(()=>{Storage.prototype.setItem=()=>{throw new Error('quota');};}); await dialog.getByRole('button',{name:'Save'}).click(); await expect(dialog.getByRole('alert')).toContainText('Unable to save'); await page.keyboard.press('Escape'); await expect(page.getByRole('button',{name:'Crypto',exact:true})).toBeFocused();
 });
+
+test.describe('Backend crypto donor popup', () => {
+  async function start(page: Page, failCatalogue = false, exchange = 'Binance spot', title = 'Add Binance symbol(s)') {
+    const state = { catalogue: ['BTCUSDT', 'ETHUSDT', 'BNBUSDT'] as unknown, failCatalogue, failSave: false, failRefresh: false, saveGate: null as Promise<void> | null, writes: [] as { definitions: { symbol: string; underlying: string; timeframe: string; broker?: string }[] }[] };
+    await page.addInitScript(() => {
+      const original = window.fetch.bind(window);
+      window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => String(input).includes('/api/v1/events?')
+        ? Promise.resolve(new Response(new ReadableStream<Uint8Array>({ start() {} }), { headers: { 'Content-Type': 'text/event-stream' } }))
+        : original(input, init)) as typeof fetch;
+    });
+    await page.route('**/api/v1/**', async route => {
+      const url = new URL(route.request().url()), endpoint = url.pathname;
+      let data: unknown = [];
+      if (endpoint.endsWith('/auth/login')) data = { token: 'isolated-binance-session' };
+      else if (endpoint.endsWith('/settings')) data = { revision: 1, values: {} };
+      else if (endpoint.endsWith('/status')) data = { cpu_count: 4 };
+      else if (endpoint === '/api/v1/home') data = { recent_projects: [] };
+      else if (endpoint.endsWith('/data/workspace')) data = {
+        tabs: ['data', 'symbols', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: id, core: index < 5 })),
+        active_tab: 'data', layout: { core_group: 'catalogs', chart_position: 'right' },
+      };
+      else if (endpoint.includes('/workspace/tabs/')) data = { active_tab: endpoint.split('/').at(-1), selection: null, preview: { state: 'unavailable', reason: 'Select a dataset.', rows: [], limit: 500 } };
+      else if (endpoint.endsWith('/capabilities')) data = { timeframes: ['M1'], default_timeframe: 'M1' };
+      else if (endpoint.endsWith('/data/brokers')) data = [{ id: '1', name: 'Research broker', description: '', timezone: 'Europe/London', postfix: '_R', stockpicker_use: false, mt_use: true, is_system: false, stocks: [], customized_stocks: 0, customized_symbols: 0, total_symbols: 0, total_sessions: 0, spread_model: { model: 'inherit' }, commission_model: { model: 'inherit' } }];
+      else if (endpoint.endsWith('/catalog')) {
+        if (state.failCatalogue) { await route.fulfill({ status: 503, json: { status: 'error', error: { code: 'UNAVAILABLE', message: 'Binance catalogue unavailable' } } }); return; }
+        data = state.catalogue;
+      } else if (endpoint.endsWith('/add')) {
+        const body = route.request().postDataJSON(); state.writes.push(body);
+        await state.saveGate;
+        if (state.failSave) { await route.fulfill({ status: 409, json: { status: 'error', error: { code: 'CONFLICT', message: 'Binance datasets were not saved' } } }); return; }
+        data = { records: body.definitions.map((row: { symbol: string; timeframe: string }) => ({ ...row, id: `saved:${row.symbol}`, source: 'binance' })) };
+      } else if (endpoint.endsWith('/home/datasets') && state.failRefresh && state.writes.length) {
+        await route.fulfill({ status: 503, json: { status: 'error', error: { code: 'UNAVAILABLE', message: 'Dataset catalogue unavailable' } } }); return;
+      }
+      await route.fulfill({ json: { status: 'success', data } });
+    });
+    await page.goto('/datamanager');
+    const login = page.getByRole('dialog', { name: 'Connect to HaruQuantAI host' });
+    await login.getByLabel('Host password').fill('fixture-password');
+    await login.getByRole('button', { name: 'Connect', exact: true }).click();
+    await expect(login).toHaveCount(0);
+    await page.getByRole('button', { name: 'Crypto', exact: true }).click();
+    await page.getByRole('menuitem', { name: 'Add crypto symbol', exact: true }).click();
+    await page.getByRole('menuitem', { name: exchange, exact: true }).click();
+    await expect(page.getByRole('dialog', { name: title, exact: true })).toBeVisible();
+    return state;
+  }
+
+  test('host registration and refresh retry preserve the draft', async ({ page }) => {
+    const state = await start(page);
+    const modal = page.getByRole('dialog', { name: 'Add Binance symbol(s)', exact: true });
+    await modal.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(modal.getByRole('alert')).toContainText('at least one');
+    await modal.getByRole('textbox', { name: 'Filter items' }).fill('BTC');
+    await modal.getByRole('checkbox', { name: 'Select symbol BTCUSDT' }).check();
+    await modal.getByRole('checkbox', { name: /I confirm/ }).check();
+    await modal.getByRole('textbox', { name: 'Data postfix' }).fill('_TEST');
+    state.failSave = true;
+    await modal.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(modal.getByRole('alert')).toContainText('not saved');
+    state.failSave = false; state.failRefresh = true;
+    await modal.getByRole('button', { name: 'Save', exact: true }).click();
+    await expect(modal.getByRole('alert')).toContainText('Retry refresh');
+    expect(state.writes).toHaveLength(2);
+    expect(state.writes[1].definitions[0].symbol).toBe('BTCUSDT_TEST');
+    state.failRefresh = false;
+    await modal.getByRole('button', { name: 'Retry refresh', exact: true }).click();
+    await expect(modal).toHaveCount(0);
+    expect(state.writes).toHaveLength(2);
+  });
+  test('responsive donor layout', async ({ page }, info) => {
+    await start(page);
+    const modal = page.getByRole('dialog', { name: 'Add Binance symbol(s)', exact: true });
+    await expect(modal.getByText('Choose from available data', { exact: true })).toBeVisible();
+    await page.screenshot({ path: info.outputPath('crypto-dark.png') });
+    await page.evaluate(() => document.documentElement.setAttribute('data-theme', 'light'));
+    await page.screenshot({ path: info.outputPath('crypto-light.png') });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await expect(modal.getByRole('button', { name: 'Save', exact: true })).toBeInViewport();
+    await page.screenshot({ path: info.outputPath('crypto-narrow.png') });
+  });
+  for (const [exchange, title] of [['Binance Coin-M', 'Add Binance Coin-M symbol(s)'], ['Binance USDT-M', 'Add Binance USDT-M symbol(s)'], ['Bitfinex', 'Add Bitfinex symbol(s)'], ['Coinbase Pro', 'Add Coinbase Pro symbol(s)'], ['Poloniex', 'Add Poloniex symbol(s)']]) {
+    test('host exchange catalogue: ' + exchange, async ({ page }) => {
+      await start(page, false, exchange, title);
+      const modal = page.getByRole('dialog', { name: title, exact: true });
+      await expect(modal.getByRole('checkbox', { name: 'Select symbol BTCUSDT' })).toBeVisible();
+      await expect(modal.getByRole('combobox', { name: 'Timeframe', exact: true })).toHaveValue('M1');
+    });
+  }
+  test('failed and malformed catalogues can be retried', async ({ page }) => {
+    const state = await start(page, true);
+    const modal = page.getByRole('dialog', { name: 'Add Binance symbol(s)', exact: true });
+    await expect(modal.getByRole('alert')).toContainText('unavailable');
+    state.failCatalogue = false; state.catalogue = { invalid: true };
+    await modal.getByRole('button', { name: 'Retry catalogue' }).click();
+    await expect(modal.getByRole('alert')).toContainText('invalid symbol catalogue');
+    state.catalogue = ['BTCUSDT'];
+    await modal.getByRole('button', { name: 'Retry catalogue' }).click();
+    await expect(modal.getByRole('checkbox', { name: 'Select symbol BTCUSDT' })).toBeVisible();
+  });
+
+});

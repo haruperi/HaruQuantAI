@@ -1,2 +1,16 @@
 /* Futures shares the existing SQData presentation capability. */
 @import '../Equity/styles.css';
+
+.sq-futures-search-flow .modal.sq-equity-search-modal>.modal-content { padding:16px; }
+.sq-futures-search-flow .sq-equity-search-panel { padding:16px 12px; }
+.sq-futures-search-row { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; align-items:center; }
+.sq-futures-search-row .sq-equity-field { grid-template-columns:105px minmax(0,1fr); gap:12px; }
+.sq-futures-search-flow .sq-equity-field { grid-template-columns:105px minmax(0,1fr); gap:12px; }
+.sq-futures-search-flow .sq-equity-options,.sq-futures-search-flow .sq-equity-search-actions { margin-left:117px; }
+.sq-futures-search-flow .sq-equity-search-text textarea { height:200px; }
+.sq-futures-search-flow .sq-equity-availability { margin-top:12px; }
+@media(max-width:650px) {
+  .sq-futures-search-row { grid-template-columns:minmax(0,1fr); }
+  .sq-futures-search-flow .sq-equity-field { grid-template-columns:minmax(0,1fr); }
+  .sq-futures-search-flow .sq-equity-options,.sq-futures-search-flow .sq-equity-search-actions { margin-left:0; }
+}
