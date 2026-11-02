@@ -7392,7 +7392,7 @@
       "class_name": "ATRRiskBasedSizing",
       "sha256": "9448a75bd89fadc3e9f06c0724b228464d41de8c14c3e188f36dd4fff4918a04",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::ATRRiskBasedSizing"
+      "python_target": "app/extend/money_management/sizers.py::ATRRiskBasedSizing"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/CryptoFixedAmount.java",
@@ -7402,7 +7402,7 @@
       "class_name": "CryptoFixedAmount",
       "sha256": "4a3635aab0a144c8d20fbda1c5dbf558189ae07ae362c482f53b01e95159eb93",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::CryptoFixedAmount"
+      "python_target": "app/extend/money_management/sizers.py::CryptoFixedAmount"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/CryptoFixedBalancePct.java",
@@ -7412,7 +7412,7 @@
       "class_name": "CryptoFixedBalancePct",
       "sha256": "5ac672d2b4473712272472532817d635215694cd5010b94b0f3f3c0c5854b08b",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::CryptoFixedBalancePct"
+      "python_target": "app/extend/money_management/sizers.py::CryptoFixedBalancePct"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/CryptoSizeByPrice.java",
@@ -7422,7 +7422,7 @@
       "class_name": "CryptoSizeByPrice",
       "sha256": "7ac58666f24d2a4baac9eb9c8288ba99b075da4c8cd899ad4da85fc996f50ccc",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::CryptoSizeByPrice"
+      "python_target": "app/extend/money_management/sizers.py::CryptoSizeByPrice"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/FixedAmount.java",
@@ -7432,7 +7432,7 @@
       "class_name": "FixedAmount",
       "sha256": "e9f14a3aea066c8cef3b2dfbb948a7fca423ad3aaa7a0c6ca9b565c91a7d1871",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::FixedAmount"
+      "python_target": "app/extend/money_management/sizers.py::FixedAmount"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/FixedSize.java",
@@ -7442,7 +7442,7 @@
       "class_name": "FixedSize",
       "sha256": "57b97c6dd423103e977c2f04c12d424b404539aabe0c8d1b035314abf28f915d",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::FixedSize"
+      "python_target": "app/extend/money_management/sizers.py::FixedSize"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/PickerFixedAmount.java",
@@ -7452,7 +7452,7 @@
       "class_name": "PickerFixedAmount",
       "sha256": "13b28ef4edae783add4b6d3408ed08a5e66e0441142bf5423c00cc94f439950c",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::PickerFixedAmount"
+      "python_target": "app/extend/money_management/sizers.py::PickerFixedAmount"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/PickerRiskFixedPctOfAccount.java",
@@ -7462,7 +7462,7 @@
       "class_name": "PickerRiskFixedPctOfAccount",
       "sha256": "f8e623b35aca2e7c4628951b52f5509cc3f291c7d39f8e8bef6fd0d2a6d51b7c",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::PickerRiskFixedPctOfAccount"
+      "python_target": "app/extend/money_management/sizers.py::PickerRiskFixedPctOfAccount"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/RiskFixedBalancePct.java",
@@ -7472,7 +7472,7 @@
       "class_name": "RiskFixedBalancePct",
       "sha256": "38a774926b8c3b75746ac9a8df3a80eda8825c9d3ef74d00477702ca74c32e77",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::RiskFixedBalancePct"
+      "python_target": "app/extend/money_management/sizers.py::RiskFixedBalancePct"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/RiskFixedPctOfAccount.java",
@@ -7482,7 +7482,7 @@
       "class_name": "RiskFixedPctOfAccount",
       "sha256": "9b8e37c62ed314f862ae18e1c5564f5a295d99df2c341f464d0f30e1bd9229c7",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::RiskFixedPctOfAccount"
+      "python_target": "app/extend/money_management/sizers.py::RiskFixedPctOfAccount"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/SimpleMartingaleMM.java",
@@ -7492,7 +7492,7 @@
       "class_name": "SimpleMartingaleMM",
       "sha256": "85dd822481eac37aca3f075e7cf2e6965a9a5c35ad598dc0fb16abe5a46b159c",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::SimpleMartingaleMM"
+      "python_target": "app/extend/money_management/sizers.py::SimpleMartingaleMM"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/MoneyManagement/StocksSizeByPrice.java",
@@ -7502,7 +7502,7 @@
       "class_name": "StocksSizeByPrice",
       "sha256": "5e173bd0bc6fd7f33d3f34bbd5405bc711205703ac31b316b2c6b0c2043e592a",
       "classification": "implemented_money_management",
-      "python_target": "app/include/blocks/money_management/sizers.py::StocksSizeByPrice"
+      "python_target": "app/extend/money_management/sizers.py::StocksSizeByPrice"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/RiskManagement/AllowAllTrades.java",

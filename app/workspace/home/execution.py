@@ -48,7 +48,7 @@ from app.core.trading.statistics.contracts import SampleSplit
 from app.core.trading.statistics.service import StatisticsService
 from app.core.trading.strategy.contracts import ActionKind, StrategyDocument
 from app.core.trading.strategy.runtime import StrategyRuntime
-from app.extend.blocks.money_management.sizers import FixedSize
+from app.extend.money_management.sizers import FixedSize
 from app.workspace.home.contracts import ExecutionSettings
 
 logger = get_logger(__name__)

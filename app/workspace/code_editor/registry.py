@@ -43,7 +43,7 @@ from typing import Protocol, cast
 from app.core.lib.errors import JSONValue, copy_json
 from app.core.trading.statistics.base import BaseMetric as _BaseMetric
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.money_management.base import (
+from app.extend.money_management.base import (
     BasePositionSizer as _BasePositionSizer,
 )
 from app.extend.what_if.base import BaseWhatIf as _ExtendBaseWhatIf
@@ -101,7 +101,7 @@ class SnippetRegistry:
             base = _ExtendBaseWhatIf
         elif "metrics" in path.parts:
             base = _BaseMetric
-        elif "blocks" in path.parts and "money_management" in path.parts:
+        elif "money_management" in path.parts:
             base = _BasePositionSizer
 
         internal_block_files = {
@@ -110,6 +110,7 @@ class SnippetRegistry:
             "registry.py",
             "series.py",
             "ma.py",
+            "sizing.py",
         }
         if path.name in internal_block_files or path.name.startswith("__"):
             classes = {}

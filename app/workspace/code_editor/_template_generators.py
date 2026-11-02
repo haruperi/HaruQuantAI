@@ -215,7 +215,7 @@ Calculates trade order size (lots/contracts) based on risk parameters.
 """
 
 from dataclasses import dataclass
-from app.extend.blocks.money_management.base import BasePositionSizer
+from app.extend.money_management.base import BasePositionSizer
 
 
 @dataclass

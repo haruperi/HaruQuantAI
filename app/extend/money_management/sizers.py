@@ -7,13 +7,13 @@ Description:
     CryptoFixedBalancePct, CryptoSizeByPrice, PickerFixedAmount,
     PickerRiskFixedPctOfAccount, and SimpleMartingaleMM.
 Purpose:
-    FEAT-CODE-EDITOR-EXTENSION-COHORTS: Complete the 12-class MoneyManagement
-    extension cohort under app/extend/blocks/money_management.
+    FEAT-MONEY-MANAGEMENT: Complete the 12-class MoneyManagement
+    extension cohort under app/extend/money_management.
 Key Capabilities:
     - FR-mm-sizer-compute: Calculate lot/share/crypto position sizes with donor
       rounding, fallback LotsIfNoMM, maximum lot caps, and martingale state.
 Python API Usage:
-    from app.extend.blocks.money_management.sizers import RiskFixedPctOfAccount
+    from app.extend.money_management.sizers import RiskFixedPctOfAccount
 CLI Usage:
     uv run pytest tests/workspace/code_editor/test_extension_cohorts.py
 """
@@ -24,7 +24,7 @@ import logging
 import math
 from typing import override
 
-from app.extend.blocks.money_management.base import BasePositionSizer
+from app.extend.money_management.base import BasePositionSizer
 
 logger = logging.getLogger(__name__)
 

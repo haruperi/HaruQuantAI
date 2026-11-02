@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 
 from app.extend.blocks.bar_time._common import DateTime
-from app.extend.blocks.money_management import (
+from app.extend.money_management import (
     ATRRiskBasedSizing,
     BasePositionSizer,
     CryptoFixedAmount,
@@ -96,6 +96,10 @@ def test_builtin_manifest_and_editor_compilation_of_new_cohorts():
     editor = CodeEditor()
     mm_res = editor.compile_file("app/extend/what_if/by_days.py")
     assert mm_res["success"] is True
+    sizers_res = editor.compile_file("app/extend/money_management/sizers.py")
+    assert sizers_res["success"] is True
+    sizing_res = editor.compile_file("app/extend/money_management/sizing.py")
+    assert sizing_res["success"] is True
 
 
 def test_all_12_money_management_sizers():

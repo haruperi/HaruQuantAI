@@ -125,7 +125,7 @@ are not discovered implicitly. Configurable/stateful blocks use the class form;
 indicators always use the agreed single-class form.
 
 Move BaseMetric to its reporting-extension owner (app/include/metrics/) and BasePositionSizer to the
-block-library owner (app/include/blocks/money_management/). Update all importers directly across the
+block-library owner (app/extend/money_management/). Update all importers directly across the
 board with no compatibility aliases or shims. Do not turn reporting or MCP extensions into strategy blocks
 merely to reuse a registry.
 

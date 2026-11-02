@@ -31,8 +31,8 @@ from app.extend.blocks.comparisons.is_greater import is_greater
 from app.extend.blocks.functions.plus import plus
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.indicators.trend.sma import SMA
-from app.extend.blocks.money_management.base import BasePositionSizer
 from app.extend.blocks.price import BarPrice
+from app.extend.money_management.base import BasePositionSizer
 from pydantic import Field, ValidationError
 
 
