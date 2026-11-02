@@ -1,4 +1,18 @@
-"""Convert provider market records to standard bar and tick DataFrames."""
+"""Historical market data conversions.
+
+Description:
+    preserve native recorded tick volumes through frame conversion.
+    Use bounded host-owned workflows and explicit missing values.
+Purpose:
+    FEAT-DATAFRAME-CONVERSIONS: recorded historical data fidelity.
+Key Capabilities:
+    - FR-DATAFRAME-CONVERSIONS-tick-volume: preserve recorded values and unknowns.
+      Logging: DEBUG/INFO records conversion/publication; scoped tests verify results.
+Python API Usage:
+    See the typed conversion/publication functions in this module.
+CLI Usage:
+    uv run pytest tests/workspace/data_manager/test_sources.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -13,7 +27,7 @@ from app.core.host.logging import get_logger
 
 logger = get_logger(__name__)
 BAR_COLUMNS: list[str] = ["Open", "High", "Low", "Close", "Volume", "Spread"]
-TICK_COLUMNS: list[str] = ["Bid", "Ask"]
+TICK_COLUMNS: list[str] = ["Bid", "Ask", "Volume"]
 __all__ = ["BAR_COLUMNS", "TICK_COLUMNS", "bars_to_dataframe", "ticks_to_dataframe"]
 
 
@@ -180,6 +194,7 @@ def ticks_to_dataframe(
     use_ms: bool = False
     bids: list[float] = []
     asks: list[float] = []
+    volumes: list[Any] = []
 
     for tick in ticks:
         t, is_ms, b, a = _parse_tick_record(tick)
@@ -188,6 +203,11 @@ def ticks_to_dataframe(
             use_ms = True
         bids.append(b)
         asks.append(a)
+        volumes.append(
+            tick.get("Volume", tick.get("volume"))
+            if isinstance(tick, dict)
+            else getattr(tick, "volume", None)
+        )
 
     if not timestamps:
         idx = pd.DatetimeIndex([], name="DateTime", dtype="datetime64[ms]")
@@ -220,6 +240,7 @@ def ticks_to_dataframe(
         {
             "Bid": bids,
             "Ask": asks,
+            "Volume": pd.array(volumes, dtype="UInt64"),
         },
         index=index,
     )

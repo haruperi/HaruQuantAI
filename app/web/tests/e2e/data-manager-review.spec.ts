@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 
-async function launch(page: Page) {
+async function launch(page: Page, tick = false) {
   const state = { failQuality: false, qualityRequests: [] as URL[], rowRequests: [] as URL[] };
   await page.addInitScript(() => {
     const original = window.fetch.bind(window);
@@ -22,14 +22,14 @@ async function launch(page: Page) {
     else if (path.includes('/workspace/tabs/')) data = { active_tab: path.split('/').at(-1), selection: null, preview: { state: 'unavailable', reason: 'Select a dataset.', rows: [], limit: 500 } };
     else if (path.endsWith('/home/datasets')) data = [{
       id: 'saved:EURUSD', symbol: 'EURUSD_DUKASCOPY', instrument: 'EURUSD', broker: 'Dukascopy', broker_name: 'Dukascopy', underlying: 'EURUSD',
-      timeframe: 'M1', timezone: 'UTC', date_from: '2021-11-01', date_to: '2026-10-31', total_records: 2629440,
+      timeframe: tick ? 'TICK' : 'M1', timezone: 'UTC', date_from: '2021-11-01', date_to: '2026-10-31', total_records: 2629440,
       source: 'dukascopy', category: 'Forex', data_type: 'Forex', path: 'data/market/dukascopy/m1/eurusd', bar_type: 'start',
     }];
     else if (path.endsWith('/review-data')) {
       state.rowRequests.push(url);
       data = { rows: [
         { id: '1', date: '2021-11-01T03:35:00Z', open: 1.1556, high: 1.1558, low: 1.1555, close: 1.1557, volume: 10, bid: 1.1556, ask: 1.1557 },
-        { id: '2', date: '2021-11-01T03:36:00Z', open: 1.1557, high: 1.1559, low: 1.1556, close: 1.1556, volume: 12, bid: 1.1556, ask: 1.1557 },
+        { id: '2', date: '2021-11-01T03:36:00Z', open: 1.1557, high: 1.1559, low: 1.1556, close: 1.1556, volume: tick ? null : 12, bid: 1.1556, ask: 1.1557 },
       ], total: 2629440, revision: 'revision-1', price_digits: 5 };
     } else if (path.endsWith('/quality-details')) {
       state.qualityRequests.push(url);
@@ -111,4 +111,16 @@ test('quality failure stays in its tab and can retry without breaking Chart', as
   await dialog.getByRole('button', { name: 'Retry quality analysis', exact: true }).click();
   await expect(dialog.getByRole('table', { name: 'Gap summary' })).toBeVisible();
   await expect(dialog.getByRole('alert')).toHaveCount(0);
+});
+
+
+test('tick review displays recorded and unknown Volume distinctly', async ({ page }) => {
+  await launch(page, true);
+  const dialog = page.getByRole('dialog', { name: "View data for 'EURUSD_DUKASCOPY'", exact: true });
+  const rows = dialog.locator('.review-grid-scroll button');
+  await expect(rows.first()).toContainText('10');
+  await expect(rows.nth(1)).toContainText('\u2014');
+  await rows.nth(1).click();
+  await dialog.getByRole('button', {name:'Edit line', exact:true}).click();
+  await expect(dialog.getByRole('spinbutton', {name:'Edit volume', exact:true})).toHaveValue('');
 });

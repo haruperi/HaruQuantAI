@@ -6,6 +6,8 @@ Description:
 Purpose:
     FEAT-MARKET-STORAGE: canonical market history serialization and folder ownership.
 Key Capabilities:
+    - FR-MARKET-STORAGE-tick-volume: preserve recorded uint64 volume and unknown flags.
+      Logging: DEBUG records tick encoding; regression tests verify the log.
     - FR-MARKET-STORAGE-provider-folders: map SQ provider IDs to equity/futures folders.
       Logging: DEBUG records folder resolution; mapping regressions verify the log.
 Python API Usage:
@@ -45,6 +47,7 @@ TICK_SCHEMA = pa.schema(
         ("Bid", pa.int64()),
         ("Ask", pa.int64()),
         ("Flags", pa.uint16()),
+        ("Volume", pa.uint64()),
     ]
 )
 M1_SCHEMA = pa.schema(
@@ -132,6 +135,32 @@ def _unsigned(value: Any, bits: int) -> int:
         raise ValueError("Invalid volume or flags") from error
 
 
+def unsigned_values(
+    frame: pd.DataFrame, name: str, bits: int, *, nullable: bool
+) -> list[int | None]:
+    """Validate integer attributes without inventing values for unknown fields."""
+    if name not in frame:
+        return [None if nullable else 0] * len(frame)
+    return [
+        None if nullable and pd.isna(value) else _unsigned(value, bits)
+        for value in frame[name]
+    ]
+
+
+def encode_attributes(frame: pd.DataFrame, timeframe: str) -> dict[str, Any]:
+    """Encode recorded unsigned attributes, retaining explicitly unknown values."""
+    if timeframe != "TICK":
+        return {"Volume": unsigned_values(frame, "Volume", 64, nullable=False)}
+    logger.debug(
+        "FR-MARKET-STORAGE-tick-volume: encoded %d ticks with nullable volumes",
+        len(frame),
+    )
+    return {
+        "Flags": unsigned_values(frame, "Flags", 16, nullable=True),
+        "Volume": unsigned_values(frame, "Volume", 64, nullable=True),
+    }
+
+
 def encode_frame(frame: pd.DataFrame, timeframe: str, tick_size: float) -> pa.Table:
     """Validate a provider frame and encode prices once into canonical tick units."""
     prices = price_columns(timeframe)
@@ -149,12 +178,7 @@ def encode_frame(frame: pd.DataFrame, timeframe: str, tick_size: float) -> pa.Ta
     data: dict[str, Any] = {"DateTime": dates}
     for column in prices:
         data[column] = [_units(value, step) for value in frame[column]]
-    unsigned, bits = ("Flags", 16) if timeframe == "TICK" else ("Volume", 64)
-    data[unsigned] = (
-        [_unsigned(value, bits) for value in frame[unsigned]]
-        if unsigned in frame
-        else [0] * len(frame)
-    )
+    data.update(encode_attributes(frame, timeframe))
     if timeframe != "TICK":
         if any(
             not low <= min(open_, close) <= max(open_, close) <= high
@@ -205,7 +229,20 @@ def scan_catalog(row: dict[str, Any], *, decode: bool = False) -> pl.LazyFrame:
     paths = catalog_paths(row)
     if not paths:
         raise ValueError("Dataset has no published partitions")
-    lazy = pl.scan_parquet(paths)
+    schema = (
+        pl.Schema(
+            {
+                "DateTime": pl.Datetime("us", "UTC"),
+                "Bid": pl.Int64(),
+                "Ask": pl.Int64(),
+                "Flags": pl.UInt16(),
+                "Volume": pl.UInt64(),
+            }
+        )
+        if row["timeframe"] == "TICK"
+        else None
+    )
+    lazy = pl.scan_parquet(paths, schema=schema, missing_columns="insert")
     if decode:
         lineage = json.loads(row.get("lineage_json") or "{}")
         step = float(lineage["tick_size"])

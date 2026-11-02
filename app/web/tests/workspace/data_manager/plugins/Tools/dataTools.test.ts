@@ -88,3 +88,12 @@ describe('fixed UTC timezone choices', () => {
     }
   });
 });
+
+
+it('retains unknown tick volume without allowing unknown bar volume', () => {
+  const row = {...generateReviewRows(target, 'M1', 'No Session', 1)[0], volume:null};
+  expect(() => validateReviewChange(row, true)).not.toThrow();
+  expect(() => validateReviewChange(row, false)).toThrow('valid numbers');
+  expect(() => validateReviewChange({...row, volume:-1}, true)).toThrow('negative');
+  expect(applyReviewMutation([row], {changed:{[row.id]:{volume:null}}, deleted:[]})[0].volume).toBeNull();
+});

@@ -81,7 +81,7 @@ def test_conversion_schema_precision_and_empty_frames():
     tick = MarketTick(time_msc=1700000000123, bid=1.1, ask=1.2)
     assert ticks_to_dataframe([tick]).index[0].microsecond == 123000
     assert list(bars_to_dataframe([]).columns) == list(frame.columns)
-    assert list(ticks_to_dataframe([]).columns) == ["Bid", "Ask"]
+    assert list(ticks_to_dataframe([]).columns) == ["Bid", "Ask", "Volume"]
 
 
 @pytest.mark.parametrize("module", ["conversions", "history"])

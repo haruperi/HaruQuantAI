@@ -187,7 +187,9 @@ class DatasetReview:
                     "high": float(item.Ask if tick else item.High),
                     "low": float(item.Bid if tick else item.Low),
                     "close": float(mid),
-                    "volume": int(item.get("Volume", 0)),
+                    "volume": None
+                    if pd.isna(item.get("Volume"))
+                    else int(item["Volume"]),
                     "bid": float(item.Bid if tick else mid),
                     "ask": float(item.Ask if tick else mid),
                 }
@@ -215,7 +217,9 @@ class DatasetReview:
             "max": float(frame["Ask" if "Ask" in frame else "High"].max())
             if len(frame)
             else None,
-            "volume": int(frame.Volume.sum()) if "Volume" in frame else 0,
+            "volume": None
+            if "Volume" not in frame or not frame.Volume.notna().any()
+            else int(frame.Volume.sum()),
         }
 
     def quality(

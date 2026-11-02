@@ -1,4 +1,18 @@
-"""Canonical yearly/monthly Parquet files with staged, rollback-safe publication."""
+"""Historical market data storage.
+
+Description:
+    publish canonical partitions and normalize pre-volume tick schemas.
+    Use bounded host-owned workflows and explicit missing values.
+Purpose:
+    FEAT-CANONICAL-PUBLICATION: recorded historical data fidelity.
+Key Capabilities:
+    - FR-CANONICAL-PUBLICATION-tick-volume: preserve recorded values and unknowns.
+      Logging: DEBUG/INFO records conversion/publication; scoped tests verify results.
+Python API Usage:
+    See the typed conversion/publication functions in this module.
+CLI Usage:
+    uv run pytest tests/workspace/data_manager/test_sources.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -190,7 +204,7 @@ def _publish_frame_once(  # noqa: C901 - one rollback scope for snapshot publica
             "date_from": result["date_from"],
             "date_to": result["date_to"],
             "lineage_json": json.dumps(lineage),
-            "schema_version": 2,
+            "schema_version": 3 if record["timeframe"] == "TICK" else 2,
             "updated_at": datetime.now(UTC).isoformat(),
         }
         publication = FilePublication(root, created, record["id"], values["updated_at"])
@@ -377,13 +391,26 @@ def _merge_partition(
         if paths:
             expected = part.schema.remove_metadata()
             if any(
-                not pq.read_schema(path).remove_metadata().equals(expected)
+                not compatible_schema(
+                    pq.read_schema(path).remove_metadata(), expected, timeframe
+                )
                 for path in paths
             ):
                 raise ValueError(
                     "Existing partition schema differs from canonical schema"
                 )
-            connection.read_parquet(paths).create_view("existing")
+            connection.read_parquet(paths, union_by_name=True).create_view(
+                "existing_source"
+            )
+            names = connection.execute("DESCRIBE existing_source").fetchall()
+            projection = (
+                "*"
+                if any(item[0] == "Volume" for item in names)
+                else "*, CAST(NULL AS UBIGINT) AS Volume"
+            )
+            connection.execute(
+                f"CREATE TEMP VIEW existing AS SELECT {projection} FROM existing_source"  # noqa: S608 - fixed projection choices
+            )
             if overwrite:
                 connection.execute(
                     "CREATE TEMP TABLE old_rows AS SELECT *, 0 AS priority "
@@ -408,6 +435,17 @@ def _merge_partition(
             "FROM (SELECT * FROM old_rows UNION ALL SELECT * FROM new_rows)) "
             'WHERE n = 1 ORDER BY "DateTime"'
         )
+        if timeframe == "TICK":
+            core = ", ".join(f'"{name}"' for name in columns if name != "Volume")
+            query = (
+                f"WITH combined AS (SELECT *, count(Volume) OVER "  # noqa: S608 - canonical schema identifiers
+                f"(PARTITION BY {core}) AS known_volumes "
+                "FROM (SELECT * FROM old_rows UNION ALL SELECT * FROM new_rows)) "
+                f"SELECT {quoted} FROM (SELECT *, row_number() OVER "
+                f"(PARTITION BY {quoted} ORDER BY priority {order}) AS n "
+                "FROM combined WHERE Volume IS NOT NULL OR known_volumes=0) "
+                "WHERE n=1 ORDER BY DateTime"
+            )
         reader = connection.execute(query).to_arrow_reader(PART_ROWS)
         path = directory.with_name(
             f".{directory.stem}.{uuid.uuid4().hex}.pending.parquet"
@@ -426,6 +464,14 @@ def _merge_partition(
         with path.open("rb+") as stream:
             os.fsync(stream.fileno())
         return [str(path)]
+
+
+def compatible_schema(actual: pa.Schema, expected: pa.Schema, timeframe: str) -> bool:
+    """Accept only the declared pre-volume tick version during transition."""
+    return actual.equals(expected) or (
+        timeframe == "TICK"
+        and actual.equals(expected.remove(expected.get_field_index("Volume")))
+    )
 
 
 def _validate_previous(

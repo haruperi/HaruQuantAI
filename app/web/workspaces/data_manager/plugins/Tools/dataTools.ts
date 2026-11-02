@@ -24,7 +24,7 @@ export interface CloneDefinition extends ToolTarget {
 
 export interface ReviewRow {
   id: string; date: string; open: number; high: number; low: number; close: number;
-  volume: number; bid: number; ask: number;
+  volume: number | null; bid: number; ask: number;
 }
 
 export interface ReviewPage { rows: ReviewRow[]; total: number; revision: string; price_digits?: number }
@@ -165,9 +165,9 @@ export function applyReviewMutation(rows: ReviewRow[], mutation?: ReviewMutation
 }
 
 export function validateReviewChange(row: ReviewRow, tick: boolean): void {
-  const values = tick ? [row.bid, row.ask, row.volume] : [row.open, row.high, row.low, row.close, row.volume];
+  const values = tick ? [row.bid, row.ask, ...(row.volume === null ? [] : [row.volume])] : [row.open, row.high, row.low, row.close, row.volume];
   if (values.some(value => !Number.isFinite(value))) throw new Error('Edited values must be valid numbers.');
-  if (row.volume < 0) throw new Error('Volume cannot be negative.');
+  if (row.volume !== null && row.volume < 0) throw new Error('Volume cannot be negative.');
   if (tick && row.ask < row.bid) throw new Error('Ask cannot be lower than Bid.');
 }
 

@@ -628,3 +628,69 @@ def test_broker_tick_range_visits_every_hour_without_default_limit(
         assert len(calls) == 2 and all(call["count"] is None for call in calls)
     finally:
         client.disconnect()
+
+
+@pytest.mark.parametrize("timeframe", ["M1", "TICK"])
+def test_adopted_native_precision_survives_subsequent_updates(
+    temp_env, caplog, timeframe
+):
+    import json
+
+    from app.core.data.market_storage import scan_catalog
+
+    service, gateway, root = temp_env
+    with service.catalog_path.open("a") as stream:
+        stream.write("USATECHIDXUSD;USA 100;Indices;America;1;1;3;20;4;1;0.1;6\n")
+    result = service.add("USATECHIDXUSD", data_type=timeframe)
+    assert result["success"]
+    row = gateway.read_records("datamgr_datasets")["data"]["records"][0]
+    lineage = json.loads(row["lineage_json"])
+    lineage.update(tick_size=0.001, provenance="owner-supplied-legacy-history")
+    gateway.update_record(
+        "datamgr_datasets",
+        {"lineage_json": json.dumps(lineage)},
+        filters={"id": row["id"]},
+    )
+    frame = pd.DataFrame(
+        {
+            "Open": [4251.029],
+            "High": [4251.040],
+            "Low": [4251.010],
+            "Close": [4251.030],
+            "Volume": [10],
+        }
+        if timeframe == "M1"
+        else {"Bid": [4251.029], "Ask": [4253.388], "Flags": [3]},
+        index=pd.to_datetime(["2025-01-06T00:00:00Z"]),
+    )
+    with caplog.at_level("INFO"):
+        result = service.download(
+            "USATECHIDXUSD", timeframe=timeframe, data_frame=frame
+        )
+    assert result["success"], result.get("error")
+    row = gateway.read_records("datamgr_datasets")["data"]["records"][0]
+    assert (
+        scan_catalog(row, decode=True).collect()[
+            "Open" if timeframe == "M1" else "Bid"
+        ][0]
+        == 4251.029
+    )
+    assert "FR-DUKASCOPY-adopted-storage-unit" in caplog.text
+
+
+def test_invalid_adopted_storage_unit_fails_closed(temp_env):
+    import json
+
+    service, gateway, _ = temp_env
+    assert service.add("EURUSD")["success"]
+    row = gateway.read_records("datamgr_datasets")["data"]["records"][0]
+    lineage = json.loads(row["lineage_json"])
+    lineage.update(tick_size=0.1, provenance="owner-supplied-legacy-history")
+    gateway.update_record(
+        "datamgr_datasets",
+        {"lineage_json": json.dumps(lineage)},
+        filters={"id": row["id"]},
+    )
+    info = service._ensure_catalog()["EURUSD"]
+    with pytest.raises(ValueError, match="explicit migration"):
+        service._publication_unit("EURUSD", "M1", info)

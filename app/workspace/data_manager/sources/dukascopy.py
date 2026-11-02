@@ -1,4 +1,18 @@
-"""Dukascopy market data ingestion, partitioning, and catalog service."""
+"""Dukascopy market data ingestion, partitioning, and catalog service.
+
+Description:
+    Register symbols and publish bounded market history using host-owned storage.
+    Adopted datasets retain validated native decimal precision on subsequent updates.
+Purpose:
+    FEAT-DUKASCOPY-INGESTION: reusable canonical Dukascopy historical datasets.
+Key Capabilities:
+    - FR-DUKASCOPY-adopted-storage-unit: preserve verified legacy storage precision.
+      Logging: INFO records adopted units; tests verify emitted logs and exact prices.
+Python API Usage:
+    Dukascopy(gateway).download("EURUSD", timeframe="M1", date_from=start, date_to=end)
+CLI Usage:
+    uv run pytest tests/workspace/data_manager/test_dukascopy.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -7,6 +21,7 @@ import re
 import sys
 import time
 from datetime import UTC, datetime
+from decimal import Decimal
 from pathlib import Path
 from typing import Any, cast
 
@@ -501,6 +516,38 @@ class Dukascopy:
             ),
         )
 
+    def _publication_unit(
+        self, target: str, resolution: str, info: dict[str, Any]
+    ) -> float:
+        """Keep adopted prices in their catalogue-validated native decimal unit."""
+        rows = require_data(
+            self.gateway.read_records(
+                "datamgr_datasets",
+                filters={"id": f"dukascopy:{target}:{resolution}"},
+                limit=1,
+            )
+        )["records"]
+        default = float(info["tick_size"])
+        if not rows:
+            return default
+        lineage = json.loads(rows[0]["lineage_json"])
+        if lineage.get("provenance") != "owner-supplied-legacy-history":
+            return default
+        expected = min(Decimal(str(default)), Decimal(1).scaleb(-int(info["decimals"])))
+        stored = Decimal(str(lineage.get("tick_size")))
+        if not stored.is_finite() or stored <= 0 or stored != expected:
+            raise ValueError(
+                "Adopted storage unit does not match catalogue precision; "
+                "explicit migration required"
+            )
+        logger.info(
+            "FR-DUKASCOPY-adopted-storage-unit: %s %s unit=%s",
+            target,
+            resolution,
+            stored,
+        )
+        return float(stored)
+
     def download(
         self,
         symbol: str,
@@ -600,7 +647,7 @@ class Dukascopy:
                 self.storage_root,
                 record,
                 frame,
-                info["tick_size"],
+                self._publication_unit(target, resolution, info),
                 overwrite=overwrite,
                 date_from=lower,
                 date_to=upper,
