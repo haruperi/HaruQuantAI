@@ -1,14 +1,27 @@
 """Sliding sum streaming calculator.
 
-FEAT-INC-CALCULATORS: Stateful streaming window calculators.
-FR-CALC-SUM: O(1) rolling sum calculator with intra-bar update support.
+Description:
+    Provides incremental rolling sum calculation with O(1) sliding window
+    updates and intra-bar update support matching StrategyQuant SumCalculator.
+Purpose:
+    FEAT-CALCULATORS: Stateful streaming window calculators and batch kernels.
+Key Capabilities:
+    - FR-CALC-SUM: O(1) rolling sum calculator with intra-bar update support.
+Python API Usage:
+    from app.extend.calculators.sum import SumCalculator
+    calc = SumCalculator(period=14)
+CLI Usage:
+    uv run pytest tests/extend/calculators/test_calculators.py --no-cov
 """
 
 from __future__ import annotations
 
+import logging
 from typing import override
 
 from app.extend.calculators.base import AbstractCalculator
+
+logger = logging.getLogger(__name__)
 
 
 class SumCalculator(AbstractCalculator):
@@ -31,8 +44,17 @@ class SumCalculator(AbstractCalculator):
             self.last_value = self.current_value
 
         self.current_value = self.last_value - self.old_buffer_value + new_value
+        logger.debug(
+            "FR-CALC-SUM: bar=%d new_value=%f sum=%f",
+            self.current_bar,
+            new_value,
+            self.current_value,
+        )
 
     @override
     def get_value(self) -> float:
         """Return the current computed window sum."""
         return self.current_value
+
+
+__all__ = ["SumCalculator"]

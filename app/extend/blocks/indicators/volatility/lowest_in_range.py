@@ -30,7 +30,7 @@ from app.core.trading.blocks.metadata import (
 )
 from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.calculators.extrema import time_window_extreme, validate_hhmm
+from app.extend.calculators.lowest import time_window_extreme, validate_hhmm
 
 logger = get_logger(__name__)
 

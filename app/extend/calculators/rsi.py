@@ -1,17 +1,31 @@
 """Relative Strength Index batch kernel and streaming calculator.
 
-FEAT-INC-CALCULATORS: Stateful streaming window calculators.
-FR-CALC-RSI: Wilder's RSI with SMA warmup and intra-bar update support.
+Description:
+    Provides streaming RSI calculations with Wilder's smoothing and initial
+    SMA warmup matching StrategyQuant RSICalculator donor behavior, alongside
+    vectorized NumPy batch kernels.
+Purpose:
+    FEAT-CALCULATORS: Stateful streaming window calculators and batch kernels.
+Key Capabilities:
+    - FR-CALC-RSI: Wilder's RSI with SMA warmup and intra-bar update support.
+Python API Usage:
+    from app.extend.calculators.rsi import RSICalculator, rsi_kernel
+    calc = RSICalculator(period=14)
+CLI Usage:
+    uv run pytest tests/extend/calculators/test_calculators.py --no-cov
 """
 
 from __future__ import annotations
 
+import logging
 from typing import Any, override
 
 import numpy as np
 
 from app.extend.calculators.average import AverageCalculator, AverageType
 from app.extend.calculators.base import AbstractCalculator
+
+logger = logging.getLogger(__name__)
 
 
 class RSICalculator(AbstractCalculator):
@@ -78,6 +92,13 @@ class RSICalculator(AbstractCalculator):
         else:
             self.current_value = 50.0
 
+        logger.debug(
+            "FR-CALC-RSI: bar=%d new_value=%f rsi=%f",
+            self.current_bar,
+            new_value,
+            self.current_value,
+        )
+
     @override
     def get_value(self) -> float:
         """Return the current computed RSI value."""
@@ -135,4 +156,8 @@ def rsi_kernel(
         else:
             out[i] = 50.0
 
+    logger.debug("FR-CALC-RSI: computed rsi_kernel length=%d period=%d", n, period)
     return out
+
+
+__all__ = ["RSICalculator", "rsi_kernel"]

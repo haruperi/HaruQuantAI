@@ -1,4 +1,18 @@
-"""Causal session scheduling for the donor's volume and TPO calculations."""
+"""Causal session scheduling for the donor's volume and TPO calculations.
+
+Description:
+    Computes session windows, intraday boundary timestamps, custom hours
+    segmentation, and rolling daily/weekly/monthly slices for market profile
+    indicators.
+Purpose:
+    FEAT-CALCULATORS: Session profile calculation kernels.
+Key Capabilities:
+    - FR-CALC-PROFILE-SESSIONS: Session boundary partitioning and calendar scheduling.
+Python API Usage:
+    from app.extend.calculators.profile_sessions import calculate_sessions
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_profile_sessions.py --no-cov
+"""
 
 from __future__ import annotations
 

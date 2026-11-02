@@ -1,7 +1,17 @@
 """Session histogram calculations shared by volume and time-price profiles.
 
-Prices are bin centres, value-area bounds are bin edges. Accumulation follows
-the donor's newest-first order and lowest-index POC tie rule.
+Description:
+    Computes volume and Time-Price-Opportunity (TPO) session profiles, value
+    area thresholds (VAH, VAL, POC), volume-weighted node distributions, and
+    shape classifications with newest-first accumulation.
+Purpose:
+    FEAT-CALCULATORS: Session profile calculation kernels.
+Key Capabilities:
+    - FR-CALC-PROFILE: Volume and TPO profile binning, value areas, and node statistics.
+Python API Usage:
+    from app.extend.calculators.profile import calculate_profile
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_profile_sessions.py --no-cov
 """
 
 from __future__ import annotations

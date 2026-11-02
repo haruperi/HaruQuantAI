@@ -1,7 +1,8 @@
 """Unit tests for streaming rolling calculators under app.extend.calculators.
 
-FEAT-INC-CALCULATORS: Stateful streaming window calculators.
-FR-CALC-BUFFER, FR-CALC-AVERAGE, FR-CALC-EXTREMA, FR-CALC-RSI, FR-CALC-STDDEV, FR-CALC-SUM.
+FEAT-CALCULATORS: Stateful streaming window calculators and batch kernels.
+FR-CALC-BUFFER, FR-CALC-AVERAGE, FR-CALC-HIGHEST, FR-CALC-LOWEST, FR-CALC-RSI,
+FR-CALC-STDDEV, FR-CALC-SUM.
 """
 
 from __future__ import annotations
@@ -9,7 +10,9 @@ from __future__ import annotations
 import math
 from typing import override
 
+import numpy as np
 import pytest
+from app.core.data.contracts import DataframeSeries
 from app.extend.calculators import (
     AbstractCalculator,
     AverageCalculator,
@@ -20,6 +23,34 @@ from app.extend.calculators import (
     RSICalculator,
     StdDevCalculator,
     SumCalculator,
+    centered_deviation,
+    ema_kernel,
+    lwma_kernel,
+    rolling_highest,
+    rolling_lowest,
+    rsi_kernel,
+    sma_kernel,
+    smma_kernel,
+    std_dev_kernel,
+    tema_kernel,
+    time_window_highest,
+    time_window_lowest,
+)
+from app.extend.calculators.base import to_numpy
+from app.extend.calculators.highest import (
+    rolling_extreme as rolling_extreme_h,
+)
+from app.extend.calculators.highest import (
+    time_window_extreme as time_window_extreme_h,
+)
+from app.extend.calculators.highest import (
+    validate_hhmm,
+)
+from app.extend.calculators.lowest import (
+    rolling_extreme as rolling_extreme_l,
+)
+from app.extend.calculators.lowest import (
+    time_window_extreme as time_window_extreme_l,
 )
 
 
@@ -113,13 +144,11 @@ def test_average_calculator_sma() -> None:
 
 def test_average_calculator_sma_precision_reset() -> None:
     """Test SMA periodic drift reset using average_precision."""
-    # period=10, precision=20 -> reset every (10 * 20)//100 = 2 bars
     sma = AverageCalculator(AverageType.SMA, period=3, average_precision=50)
     values = [10.0, 20.0, 30.0, 40.0, 50.0, 60.0]
     for bar_idx, val in enumerate(values):
         sma.on_bar_update(val, bar_idx)
 
-    # Window of last 3: 40, 50, 60 -> mean 50.0
     assert sma.get_value() == pytest.approx(50.0)
 
 
@@ -131,11 +160,9 @@ def test_average_calculator_ema() -> None:
     ema.on_bar_update(10.0, 0)
     assert ema.get_value() == 10.0
 
-    # bar 1: 20 * 0.5 + 10 * 0.5 = 15.0
     ema.on_bar_update(20.0, 1)
     assert ema.get_value() == pytest.approx(15.0)
 
-    # bar 2: 40 * 0.5 + 15 * 0.5 = 27.5
     ema.on_bar_update(40.0, 2)
     assert ema.get_value() == pytest.approx(27.5)
 
@@ -145,11 +172,9 @@ def test_average_calculator_smma() -> None:
     smma = AverageCalculator(AverageType.SMMA, period=3)
 
     smma.on_bar_update(10.0, 0)
-    # At bar 1, SMMA sets currentValue = newValue
     smma.on_bar_update(20.0, 1)
     assert smma.get_value() == 20.0
 
-    # bar 2: (20 * 2 + 50) / 3 = 90 / 3 = 30.0
     smma.on_bar_update(50.0, 2)
     assert smma.get_value() == pytest.approx(30.0)
 
@@ -161,15 +186,12 @@ def test_average_calculator_lwma() -> None:
     lwma.on_bar_update(10.0, 0)
     assert lwma.get_value() == 10.0
 
-    # bar 1: max = min(3, 1) = 1. Only lag 0 included -> weight 3 / divider 3 = 20.0
     lwma.on_bar_update(20.0, 1)
     assert lwma.get_value() == pytest.approx(20.0)
 
-    # bar 2: max = min(3, 2) = 2. Lag 0 (30.0) * 3 + Lag 1 (20.0) * 2 = 130.0 / 5 = 26.0
     lwma.on_bar_update(30.0, 2)
     assert lwma.get_value() == pytest.approx((30.0 * 3 + 20.0 * 2) / 5)
 
-    # bar 3: max = min(3, 3) = 3. Lag 0 (40.0)*3 + Lag 1 (30.0)*2 + Lag 2 (20.0)*1 = 200 / 6
     lwma.on_bar_update(40.0, 3)
     assert lwma.get_value() == pytest.approx((40.0 * 3 + 30.0 * 2 + 20.0 * 1) / 6)
 
@@ -179,7 +201,6 @@ def test_average_calculator_validation() -> None:
     with pytest.raises(CalculatorError):
         AverageCalculator(99, 14)
 
-    # Negative precision clamped to 0
     calc = AverageCalculator(AverageType.SMA, 14, average_precision=-10)
     assert calc.average_precision == 0
 
@@ -191,6 +212,7 @@ def test_highest_calculator() -> None:
     highest.on_bar_update(10.0, 0)
     assert highest.get_highest_value() == 10.0
     assert highest.get_highest_index() == 0
+    assert highest.get_value() == 10.0
 
     highest.on_bar_update(25.0, 1)
     assert highest.get_highest_value() == 25.0
@@ -200,7 +222,6 @@ def test_highest_calculator() -> None:
     assert highest.get_highest_value() == 25.0
     assert highest.get_highest_index() == 1
 
-    # Bar 3: 5.0 added. 25.0 (at bar 1, lag 2) is still in period 3
     highest.on_bar_update(5.0, 3)
     assert highest.get_highest_value() == 25.0
     assert highest.get_highest_index() == 2
@@ -215,6 +236,11 @@ def test_highest_calculator() -> None:
     assert highest.get_highest_value() == 30.0
     assert highest.get_highest_index() == 0
 
+    # Intra-bar rewrite: price drops to 7.0 on same bar -> scans buffer
+    highest.on_bar_update(7.0, 4)
+    assert highest.get_highest_value() == 15.0
+    assert highest.get_highest_index() == 2
+
 
 def test_lowest_calculator() -> None:
     """Test rolling lowest value and index tracking."""
@@ -223,6 +249,7 @@ def test_lowest_calculator() -> None:
     lowest.on_bar_update(50.0, 0)
     assert lowest.get_lowest_value() == 50.0
     assert lowest.get_lowest_index() == 0
+    assert lowest.get_value() == 50.0
 
     lowest.on_bar_update(20.0, 1)
     assert lowest.get_lowest_value() == 20.0
@@ -232,7 +259,6 @@ def test_lowest_calculator() -> None:
     assert lowest.get_lowest_value() == 20.0
     assert lowest.get_lowest_index() == 1
 
-    # Bar 3: 40.0 added. 20.0 is at lag 2
     lowest.on_bar_update(40.0, 3)
     assert lowest.get_lowest_value() == 20.0
     assert lowest.get_lowest_index() == 2
@@ -242,25 +268,39 @@ def test_lowest_calculator() -> None:
     assert lowest.get_lowest_value() == 35.0
     assert lowest.get_lowest_index() == 2
 
+    # Intra-bar rewrite: price drops to 10.0 on same bar
+    lowest.on_bar_update(10.0, 4)
+    assert lowest.get_lowest_value() == 10.0
+    assert lowest.get_lowest_index() == 0
+
+    # Intra-bar rewrite: price rises to 70.0 on same bar -> scans buffer
+    lowest.on_bar_update(70.0, 4)
+    assert lowest.get_lowest_value() == 35.0
+    assert lowest.get_lowest_index() == 2
+
 
 def test_rsi_calculator() -> None:
     """Test RSI streaming calculations including boundary values."""
     rsi = RSICalculator(period=3)
 
-    # Bar 0: warmup
     rsi.on_bar_update(100.0, 0)
     assert rsi.get_value() == 0.0
 
-    # Bar 1-3: strictly upward price movement
     rsi.on_bar_update(105.0, 1)
     rsi.on_bar_update(110.0, 2)
-    rsi.on_bar_update(115.0, 3)  # current_bar == period -> triggers first SMA
+    rsi.on_bar_update(115.0, 3)
     assert rsi.get_value() == pytest.approx(100.0)
 
-    # Bar 4: slight drop
     rsi.on_bar_update(110.0, 4)
     val = rsi.get_value()
     assert 0.0 < val < 100.0
+
+    # Test flat price movement -> rsi 50
+    flat_rsi = RSICalculator(period=2)
+    flat_rsi.on_bar_update(50.0, 0)
+    flat_rsi.on_bar_update(50.0, 1)
+    flat_rsi.on_bar_update(50.0, 2)
+    assert flat_rsi.get_value() == pytest.approx(50.0)
 
 
 def test_std_dev_calculator() -> None:
@@ -270,15 +310,12 @@ def test_std_dev_calculator() -> None:
     std.on_bar_update(10.0, 0)
     assert std.get_value() == 0.0
 
-    # Window [10, 20]: mean 15. Deviations: -5, +5. variance = (25 + 25) / 2 = 25 -> std = 5.0
     std.on_bar_update(20.0, 1)
     assert std.get_value() == pytest.approx(5.0)
 
-    # Window [10, 20, 30]: mean 20. Deviations: -10, 0, 10. variance = (100 + 0 + 100) / 3 = 66.666667 -> std = sqrt(200/3)
     std.on_bar_update(30.0, 2)
     assert std.get_value() == pytest.approx(math.sqrt(200.0 / 3.0))
 
-    # Window [20, 30, 40]: mean 30. std = sqrt(200/3)
     std.on_bar_update(40.0, 3)
     assert std.get_value() == pytest.approx(math.sqrt(200.0 / 3.0))
 
@@ -293,14 +330,162 @@ def test_sum_calculator() -> None:
     rolling_sum.on_bar_update(20.0, 1)
     assert rolling_sum.get_value() == 30.0
 
-    # Intra-bar rewrite
     rolling_sum.on_bar_update(25.0, 1)
     assert rolling_sum.get_value() == 35.0
 
-    # Bar 2
     rolling_sum.on_bar_update(15.0, 2)
-    assert rolling_sum.get_value() == 50.0  # 10 + 25 + 15
+    assert rolling_sum.get_value() == 50.0
 
-    # Bar 3: drops 10.0, adds 30.0 -> 50 - 10 + 30 = 70.0
     rolling_sum.on_bar_update(30.0, 3)
     assert rolling_sum.get_value() == 70.0
+
+
+def test_moving_average_batch_kernels() -> None:
+    """Test vectorized batch kernels: SMA, EMA, SMMA, LWMA, TEMA."""
+    data = [10.0, 20.0, 30.0, 40.0, 50.0]
+
+    # SMA
+    sma = sma_kernel(data, 3)
+    assert np.isnan(sma[0]) and np.isnan(sma[1])
+    assert sma[2] == pytest.approx(20.0)
+    assert sma[3] == pytest.approx(30.0)
+    assert sma[4] == pytest.approx(40.0)
+
+    # Empty / invalid
+    assert np.all(np.isnan(sma_kernel([], 3)))
+    assert np.all(np.isnan(sma_kernel(data, 0)))
+    assert np.all(np.isnan(sma_kernel(data, 10)))
+
+    # EMA
+    ema = ema_kernel(data, 3)
+    assert np.isnan(ema[0]) and np.isnan(ema[1])
+    assert ema[2] == pytest.approx(20.0)
+    assert not np.isnan(ema[3])
+
+    assert np.all(np.isnan(ema_kernel([], 3)))
+    assert np.all(np.isnan(ema_kernel(data, 0)))
+
+    # SMMA
+    smma = smma_kernel(data, 3)
+    assert np.isnan(smma[0]) and np.isnan(smma[1])
+    assert smma[2] == pytest.approx(20.0)
+
+    assert np.all(np.isnan(smma_kernel([], 3)))
+    assert np.all(np.isnan(smma_kernel(data, 0)))
+
+    # LWMA
+    lwma = lwma_kernel(data, 3)
+    assert np.isnan(lwma[0]) and np.isnan(lwma[1])
+    # [10, 20, 30] * [1, 2, 3] = (10 + 40 + 90) / 6 = 140 / 6 = 23.3333
+    assert lwma[2] == pytest.approx(140.0 / 6.0)
+
+    assert np.all(np.isnan(lwma_kernel([], 3)))
+    assert np.all(np.isnan(lwma_kernel(data, 0)))
+
+    # TEMA
+    tema = tema_kernel(data, 2)
+    assert not np.isnan(tema[-1])
+    assert np.all(np.isnan(tema_kernel([], 2)))
+    assert np.all(np.isnan(tema_kernel(data, 0)))
+    assert np.all(np.isnan(tema_kernel(data, 10)))
+
+
+def test_extrema_batch_and_time_window() -> None:
+    """Test batch rolling extrema and time window filters."""
+    vals = np.array([10.0, 50.0, 30.0, 20.0, 60.0])
+    highs = rolling_highest(vals, 3)
+    assert highs[0] == 10.0
+    assert highs[1] == 50.0
+    assert highs[2] == 50.0
+    assert highs[3] == 50.0
+    assert highs[4] == 60.0
+
+    lows = rolling_lowest(vals, 3)
+    assert lows[0] == 10.0
+    assert lows[1] == 10.0
+    assert lows[2] == 10.0
+    assert lows[3] == 20.0
+    assert lows[4] == 20.0
+
+    # Extreme wrapper functions
+    assert np.array_equal(rolling_extreme_h(vals, 3), highs)
+    assert np.array_equal(rolling_extreme_l(vals, 3), lows)
+
+    # HHMM validation
+    assert validate_hhmm(0) == 0
+    assert validate_hhmm(2359) == 2359
+    assert validate_hhmm(1230) == 1230
+    with pytest.raises(ValueError, match="valid HHMM"):
+        validate_hhmm(-1)
+    with pytest.raises(ValueError, match="valid HHMM"):
+        validate_hhmm(2400)
+    with pytest.raises(ValueError, match="valid HHMM"):
+        validate_hhmm(1260)
+
+    # Time window extreme
+    timestamps = np.array([1700000000, 1700003600, 1700007200], dtype=np.int64)
+    prices = np.array([100.0, 105.0, 95.0])
+    win_h = time_window_highest(timestamps, prices, time_from=0, time_to=2359)
+    assert len(win_h) == 3
+    win_l = time_window_lowest(timestamps, prices, time_from=0, time_to=2359)
+    assert len(win_l) == 3
+
+    assert np.array_equal(
+        time_window_extreme_h(timestamps, prices, time_from=0, time_to=2359),
+        win_h,
+    )
+    assert np.array_equal(
+        time_window_extreme_l(timestamps, prices, time_from=0, time_to=2359),
+        win_l,
+    )
+
+    with pytest.raises(ValueError, match="aligned"):
+        time_window_highest(timestamps[:2], prices, time_from=0, time_to=2359)
+    with pytest.raises(ValueError, match="strictly increasing"):
+        time_window_highest(
+            np.array([100, 100, 100]), prices, time_from=0, time_to=2359
+        )
+    with pytest.raises(ValueError, match="finite"):
+        time_window_highest(
+            timestamps, np.array([1.0, np.nan, 3.0]), time_from=0, time_to=2359
+        )
+
+
+def test_rsi_kernel() -> None:
+    """Test rsi_kernel with standard, empty, and invalid inputs."""
+    data = [100.0, 102.0, 101.0, 104.0, 103.0, 106.0]
+    out = rsi_kernel(data, 3)
+    assert np.isnan(out[0]) and np.isnan(out[1]) and np.isnan(out[2])
+    assert not np.isnan(out[3])
+
+    assert np.all(np.isnan(rsi_kernel([], 3)))
+    assert np.all(np.isnan(rsi_kernel(data, 0)))
+    assert np.all(np.isnan(rsi_kernel(data, 10)))
+
+
+def test_std_dev_kernel_and_centered_deviation() -> None:
+    """Test centered deviation and std dev kernel batch formulas."""
+    vals = np.array([10.0, 20.0, 30.0, 40.0, 50.0])
+    centers = np.array([10.0, 15.0, 20.0, 25.0, 30.0])
+
+    dev = centered_deviation(vals, centers, 3)
+    assert len(dev) == 5
+    assert not np.isnan(dev).any()
+
+    dev_fixed = centered_deviation(vals, centers, 3, fixed_divisor=True)
+    assert len(dev_fixed) == 5
+
+    res = std_dev_kernel(vals, 3)
+    assert len(res) == 5
+
+
+def test_to_numpy_conversion() -> None:
+    """Test to_numpy with numpy array, list, and DataframeSeries."""
+    arr = np.array([1.0, 2.0, 3.0])
+    assert np.array_equal(to_numpy(arr), arr)
+
+    lst = [1.0, 2.0]
+    assert isinstance(to_numpy(lst), np.ndarray)
+
+    dfs = DataframeSeries(np.array([5.0, 6.0]), name="close")
+    assert np.array_equal(to_numpy(dfs), np.array([5.0, 6.0]))

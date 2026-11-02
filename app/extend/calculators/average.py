@@ -1,17 +1,31 @@
 """Moving-average batch kernels and streaming calculators.
 
-FEAT-INC-CALCULATORS: Stateful streaming window calculators.
-FR-CALC-AVERAGE: Moving average algorithms with drift correction and intra-bar support.
+Description:
+    Provides streaming moving average calculations (SMA, EMA, SMMA, LWMA)
+    matching StrategyQuant AverageCalculator donor behavior, alongside
+    vectorized NumPy batch kernels for strategy indicator evaluation.
+Purpose:
+    FEAT-CALCULATORS: Stateful streaming window calculators and batch kernels.
+Key Capabilities:
+    - FR-CALC-AVERAGE: Moving average algorithms with drift correction and
+      intra-bar support.
+Python API Usage:
+    from app.extend.calculators.average import AverageCalculator
+CLI Usage:
+    uv run pytest tests/extend/calculators/test_calculators.py --no-cov
 """
 
 from __future__ import annotations
 
+import logging
 from enum import IntEnum
 from typing import Any, ClassVar, override
 
 import numpy as np
 
 from app.extend.calculators.base import AbstractCalculator, CalculatorError
+
+logger = logging.getLogger(__name__)
 
 
 class AverageType(IntEnum):
@@ -76,6 +90,14 @@ class AverageCalculator(AbstractCalculator):
             self._calculate_smma(self.current_bar, new_value)
         elif self.ma_type == AverageType.LWMA:
             self._calculate_lwma(self.current_bar, new_value)
+
+        logger.debug(
+            "FR-CALC-AVERAGE: type=%s period=%d bar=%d value=%f",
+            self.ma_type.name,
+            self.period,
+            self.current_bar,
+            self.current_value,
+        )
 
     def _calculate_sma(self, current_bar: int, new_value: float) -> None:
         """Compute simple moving average with optional periodic drift reset."""
@@ -245,7 +267,7 @@ def lwma_kernel(
 
     Args:
         data: 1D numerical array of price/indicator values.
-        period: Rolling window length (must be >= 1).
+        period: Smoothing lookback period (must be >= 1).
 
     Returns:
         1D float64 array with NaN warmup for indices < period - 1.
@@ -300,3 +322,14 @@ def tema_kernel(
     valid3 = ~np.isnan(ema3)
     out[valid3] = 3.0 * ema1[valid3] - 3.0 * ema2[valid3] + ema3[valid3]
     return out
+
+
+__all__ = [
+    "AverageCalculator",
+    "AverageType",
+    "ema_kernel",
+    "lwma_kernel",
+    "sma_kernel",
+    "smma_kernel",
+    "tema_kernel",
+]

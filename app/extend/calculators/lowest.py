@@ -1,11 +1,23 @@
-"""Rolling extrema streaming calculators (Highest, Lowest).
+"""Rolling and windowed lowest value calculations.
 
-FEAT-INC-CALCULATORS: Stateful streaming window calculators.
-FR-CALC-EXTREMA: Fast incremental peak/trough and bar-lag tracking over rolling window.
+Description:
+    Provides incremental rolling lowest value calculations, relative bar lag
+    tracking, and time-window trough extraction conforming to StrategyQuant's
+    LowestCalculator snippet.
+Purpose:
+    FEAT-CALCULATORS: Stateful streaming and batch window calculators.
+Key Capabilities:
+    - FR-CALC-LOWEST: Rolling and windowed lowest value calculations.
+Python API Usage:
+    from app.extend.calculators.lowest import LowestCalculator, rolling_lowest
+    calc = LowestCalculator(period=14)
+CLI Usage:
+    uv run pytest tests/extend/calculators/test_calculators.py --no-cov
 """
 
 from __future__ import annotations
 
+import logging
 from collections import deque
 from datetime import UTC, datetime
 from typing import Any, override
@@ -15,11 +27,34 @@ import numpy as np
 
 from app.extend.calculators.base import AbstractCalculator
 
+logger = logging.getLogger(__name__)
+
+_LAST_HHMM = 2359
+_MINUTES_PER_HOUR = 60
+
+
+def validate_hhmm(value: int) -> int:
+    """Validate an actual clock time rather than accepting an invalid minute."""
+    if not 0 <= value <= _LAST_HHMM or value % 100 >= _MINUTES_PER_HOUR:
+        raise ValueError("Time must be a valid HHMM value")
+    return value
+
+
+def rolling_lowest(values: np.ndarray[Any, Any], period: int) -> np.ndarray[Any, Any]:
+    """Linear-time rolling minimum over available history, retaining oldest ties."""
+    return rolling_extreme(values, period, highest=False)
+
 
 def rolling_extreme(
-    values: np.ndarray[Any, Any], period: int, *, highest: bool
+    values: np.ndarray[Any, Any], period: int, *, highest: bool = False
 ) -> np.ndarray[Any, Any]:
     """Linear-time numeric extrema over available history, retaining oldest ties."""
+    logger.debug(
+        "FR-CALC-LOWEST: rolling_extreme length=%d period=%d highest=%s",
+        len(values),
+        period,
+        highest,
+    )
     result = np.empty(len(values), dtype=np.float64)
     candidates: deque[int] = deque()
     for i, value in enumerate(values):
@@ -36,34 +71,45 @@ def rolling_extreme(
     return result
 
 
-_LAST_HHMM = 2359
-_MINUTES_PER_HOUR = 60
+def time_window_lowest(
+    timestamps: np.ndarray[Any, Any],
+    values: np.ndarray[Any, Any],
+    *,
+    time_from: int,
+    time_to: int,
+    timestamp_unit: str = "seconds",
+    timezone: str = "UTC",
+) -> np.ndarray[Any, Any]:
+    """Replay donor completed-window lowest extrema."""
+    return time_window_extreme(
+        timestamps,
+        values,
+        time_from=time_from,
+        time_to=time_to,
+        highest=False,
+        timestamp_unit=timestamp_unit,
+        timezone=timezone,
+    )
 
 
-def validate_hhmm(value: int) -> int:
-    """Validate an actual clock time rather than accepting an invalid minute."""
-    if not 0 <= value <= _LAST_HHMM or value % 100 >= _MINUTES_PER_HOUR:
-        raise ValueError("Time must be a valid HHMM value")
-    return value
-
-
-# Keep completed-window and carry-forward mutations in the donor order.
 def time_window_extreme(  # noqa: C901, PLR0912
     timestamps: np.ndarray[Any, Any],
     values: np.ndarray[Any, Any],
     *,
     time_from: int,
     time_to: int,
-    highest: bool,
-    timestamp_unit: str,
-    timezone: str,
+    highest: bool = False,
+    timestamp_unit: str = "seconds",
+    timezone: str = "UTC",
 ) -> np.ndarray[Any, Any]:
-    """Replay donor completed-window extrema, including initial/sentinel behavior.
-
-    A window is [start, end). Empty completed windows retain the last usable
-    result. The source starts its lowest accumulator at zero on the first bar;
-    this startup quirk is intentionally preserved and reference-tested.
-    """
+    """Replay donor completed-window extrema, including initial/sentinel behavior."""
+    logger.debug(
+        "FR-CALC-LOWEST: time_window_extreme count=%d from=%d to=%d lo=%s",
+        len(values),
+        time_from,
+        time_to,
+        highest,
+    )
     times = np.asarray(timestamps, dtype=np.int64)
     if len(times) != len(values):
         raise ValueError("Time-window extrema require aligned timestamps")
@@ -119,66 +165,8 @@ def time_window_extreme(  # noqa: C901, PLR0912
     return result
 
 
-class HighestCalculator(AbstractCalculator):
-    """Streaming rolling maximum value and bar lag tracker."""
-
-    def __init__(self, period: int) -> None:
-        """Initialize the rolling highest calculator.
-
-        Args:
-            period: Window length in bars.
-        """
-        super().__init__(period)
-        self.highest_index: int = 0
-        self.highest_value: float = -float("inf")
-
-    @override
-    def _calculate(self, new_value: float, is_same_bar: bool) -> None:
-        """Update highest value and its bar lag index."""
-        start_index = (
-            self.current_bar if self.current_bar < self.period else (self.period - 1)
-        )
-
-        if new_value > self.highest_value:
-            self.highest_index = 0
-            self.highest_value = new_value
-        elif self.highest_index < start_index:
-            if not is_same_bar:
-                self.highest_index += 1
-            elif self.highest_index == 0:
-                # Latest value was replaced on the same bar by a lower one
-                self._find_highest_in_buffer(start_index)
-        else:
-            # Trailing extremum expired from the sliding window
-            self._find_highest_in_buffer(start_index)
-
-    def _find_highest_in_buffer(self, start_index: int) -> None:
-        """Scan buffered values to locate maximum and its relative lag."""
-        self.highest_index = 0
-        self.highest_value = -float("inf")
-
-        for a in range(start_index, -1, -1):
-            val = self.buffer_get(a)
-            if val > self.highest_value:
-                self.highest_value = val
-                self.highest_index = a
-
-    def get_highest_value(self) -> float:
-        """Return the highest observed value across the active window."""
-        return self.highest_value
-
-    def get_highest_index(self) -> int:
-        """Return the bar lag index of the highest value (0 = current bar)."""
-        return self.highest_index
-
-    @override
-    def get_value(self) -> float:
-        """Return the highest observed value across the active window."""
-        return self.highest_value
-
-
 class LowestCalculator(AbstractCalculator):
-    """Streaming rolling minimum value and bar lag tracker."""
+    """Streaming rolling minimum value and bar lag tracker (LowestCalculator.java)."""
 
     def __init__(self, period: int) -> None:
         """Initialize the rolling lowest calculator.
@@ -210,6 +198,14 @@ class LowestCalculator(AbstractCalculator):
             # Trailing extremum expired from the sliding window
             self._find_lowest_in_buffer(start_index)
 
+        logger.debug(
+            "FR-CALC-LOWEST: bar=%d new_value=%f lowest=%f index=%d",
+            self.current_bar,
+            new_value,
+            self.lowest_value,
+            self.lowest_index,
+        )
+
     def _find_lowest_in_buffer(self, start_index: int) -> None:
         """Scan buffered values to locate minimum and its relative lag."""
         self.lowest_index = 0
@@ -233,3 +229,13 @@ class LowestCalculator(AbstractCalculator):
     def get_value(self) -> float:
         """Return the lowest observed value across the active window."""
         return self.lowest_value
+
+
+__all__ = [
+    "LowestCalculator",
+    "rolling_extreme",
+    "rolling_lowest",
+    "time_window_extreme",
+    "time_window_lowest",
+    "validate_hhmm",
+]

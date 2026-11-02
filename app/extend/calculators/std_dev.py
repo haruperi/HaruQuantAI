@@ -1,17 +1,31 @@
 """Population standard deviation streaming calculator.
 
-FEAT-INC-CALCULATORS: Stateful streaming window calculators.
-FR-CALC-STDDEV: Rolling standard deviation with intra-bar update support.
+Description:
+    Provides streaming population standard deviation calculations matching
+    StrategyQuant StdDevCalculator donor behavior, alongside vectorized
+    NumPy centered-deviation batch kernels.
+Purpose:
+    FEAT-CALCULATORS: Stateful streaming window calculators and batch kernels.
+Key Capabilities:
+    - FR-CALC-STDDEV: Rolling standard deviation with intra-bar update support.
+Python API Usage:
+    from app.extend.calculators.std_dev import StdDevCalculator, std_dev_kernel
+    calc = StdDevCalculator(period=14)
+CLI Usage:
+    uv run pytest tests/extend/calculators/test_calculators.py --no-cov
 """
 
 from __future__ import annotations
 
+import logging
 import math
 from typing import Any, override
 
 import numpy as np
 
 from app.extend.calculators.base import AbstractCalculator
+
+logger = logging.getLogger(__name__)
 
 _MAX_WINDOW_ELEMENTS = 1_000_000
 
@@ -46,6 +60,11 @@ def centered_deviation(
             result[period - 1 + start : period - 1 + end] = np.sqrt(
                 np.sum(difference * difference, axis=1) / period
             )
+    logger.debug(
+        "FR-CALC-STDDEV: computed centered_deviation length=%d period=%d",
+        len(values),
+        period,
+    )
     return result
 
 
@@ -56,7 +75,9 @@ def std_dev_kernel(values: np.ndarray[Any, Any], period: int) -> np.ndarray[Any,
     for i, value in enumerate(values.tolist()):
         total = value + total - (float(values[i - period]) if i >= period else 0.0)
         centers[i] = total / min(i + 1, period)
-    return centered_deviation(values, centers, period)
+    res = centered_deviation(values, centers, period)
+    logger.debug("FR-CALC-STDDEV: computed std_dev_kernel length=%d", len(values))
+    return res
 
 
 class StdDevCalculator(AbstractCalculator):
@@ -96,8 +117,17 @@ class StdDevCalculator(AbstractCalculator):
             sum_squared_deviations += diff * diff
 
         self.current_value = math.sqrt(sum_squared_deviations / window_size)
+        logger.debug(
+            "FR-CALC-STDDEV: bar=%d new_value=%f std_dev=%f",
+            self.current_bar,
+            new_value,
+            self.current_value,
+        )
 
     @override
     def get_value(self) -> float:
         """Return the current computed standard deviation value."""
         return self.current_value
+
+
+__all__ = ["StdDevCalculator", "centered_deviation", "std_dev_kernel"]

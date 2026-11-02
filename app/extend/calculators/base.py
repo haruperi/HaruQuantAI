@@ -1,7 +1,17 @@
 """Shared array conversion and lifecycle for streaming rolling calculators.
 
-FEAT-INC-CALCULATORS: Stateful streaming window calculators.
-FR-CALC-BUFFER: Circular buffer with intra-bar overwrite and bar advance.
+Description:
+    Provides the abstract foundation for StrategyQuant-compatible streaming
+    rolling window calculators. Manages fixed-size circular ring buffers,
+    tick-level intra-bar overwrites, and bar-advance state transitions.
+Purpose:
+    FEAT-CALCULATORS: Stateful streaming window calculators and batch kernels.
+Key Capabilities:
+    - FR-CALC-BUFFER: Circular buffer with intra-bar overwrite and bar advance.
+Python API Usage:
+    from app.extend.calculators.base import AbstractCalculator, CalculatorError
+CLI Usage:
+    uv run pytest tests/extend/calculators/test_calculators.py --no-cov
 """
 
 from __future__ import annotations
@@ -81,6 +91,12 @@ class AbstractCalculator(ABC):
             self._buffer_set(0, float(new_value))
             self.buffer_last_bar = current_bar
 
+        logger.debug(
+            "FR-CALC-BUFFER: bar=%d new_value=%f same_bar=%s",
+            current_bar,
+            float(new_value),
+            is_same_bar,
+        )
         self._calculate(float(new_value), is_same_bar)
 
     @abstractmethod
@@ -144,3 +160,6 @@ def to_numpy(value: Any) -> np.ndarray[Any, np.dtype[np.float64]]:
     if isinstance(value, DataframeSeries):
         return value.values
     return np.asarray(value, dtype=np.float64)
+
+
+__all__ = ["AbstractCalculator", "CalculatorError", "to_numpy"]

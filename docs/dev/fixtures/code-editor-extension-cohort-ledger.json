@@ -6732,7 +6732,7 @@
       "class_name": "AbstractCalculator",
       "sha256": "eb8fe671b7a89f6e8aab7b8bf592b6763a9afa673b08799002161e3dde689803",
       "classification": "implemented_calculator",
-      "python_target": "app/include/calculators/AbstractCalculator"
+      "python_target": "app/extend/calculators/base.py::AbstractCalculator"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Calculators/AverageCalculator.java",
@@ -6742,7 +6742,7 @@
       "class_name": "AverageCalculator",
       "sha256": "0e08da39a08df8f59dbc1a811a68a03202dd8228227e2dd43cfeb7d47a719785",
       "classification": "implemented_calculator",
-      "python_target": "app/include/calculators/AverageCalculator"
+      "python_target": "app/extend/calculators/average.py::AverageCalculator"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Calculators/HighestCalculator.java",
@@ -6752,7 +6752,7 @@
       "class_name": "HighestCalculator",
       "sha256": "8a09d6f39fef58563880800c046da23ec95845718d747a8976a72163e7f72cb5",
       "classification": "implemented_calculator",
-      "python_target": "app/include/calculators/HighestCalculator"
+      "python_target": "app/extend/calculators/highest.py::HighestCalculator"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Calculators/LowestCalculator.java",
@@ -6762,7 +6762,7 @@
       "class_name": "LowestCalculator",
       "sha256": "e30bca39a9cf10c32df67614435187f773982d6c409319e3ea17e5ad547d1d31",
       "classification": "implemented_calculator",
-      "python_target": "app/include/calculators/LowestCalculator"
+      "python_target": "app/extend/calculators/lowest.py::LowestCalculator"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Calculators/RSICalculator.java",
@@ -6772,7 +6772,7 @@
       "class_name": "RSICalculator",
       "sha256": "d951ca9d106d253204203b6c5a83c5bcc9ca74fe2f565630ade3e99818b1ad7e",
       "classification": "implemented_calculator",
-      "python_target": "app/include/calculators/RSICalculator"
+      "python_target": "app/extend/calculators/rsi.py::RSICalculator"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Calculators/StdDevCalculator.java",
@@ -6782,7 +6782,7 @@
       "class_name": "StdDevCalculator",
       "sha256": "a2c6e30e5255a21ea24f99ae68c4e7ff09584756833f36436cf74f254a79eca3",
       "classification": "implemented_calculator",
-      "python_target": "app/include/calculators/StdDevCalculator"
+      "python_target": "app/extend/calculators/std_dev.py::StdDevCalculator"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Calculators/SumCalculator.java",
@@ -6792,7 +6792,7 @@
       "class_name": "SumCalculator",
       "sha256": "5a7ae9e5f2e529a735b9e71864513e71e176426de54df0c3827e3e39ff305d20",
       "classification": "implemented_calculator",
-      "python_target": "app/include/calculators/SumCalculator"
+      "python_target": "app/extend/calculators/sum.py::SumCalculator"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Functions/ComparatorByProfit.java",

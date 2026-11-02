@@ -31,7 +31,7 @@ from app.core.trading.blocks.metadata import (
 )
 from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.calculators.extrema import rolling_extreme
+from app.extend.calculators.highest import rolling_extreme
 
 logger = get_logger(__name__)
 
