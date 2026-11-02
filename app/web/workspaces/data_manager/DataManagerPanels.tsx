@@ -189,10 +189,9 @@ function formatDateOnly(value: string | undefined): string {
   return match ? match[0] : value.split(/[T ]/)[0] || '—';
 }
 
-export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onActivate, activeDatasetId }: {
+export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
   selectedIds: string[]; onToggle: (id: string) => void; onSelect: (ids: string[]) => void;
   onDeleteRow?: (id: string) => void;
-  onActivate?: (id: string) => void; activeDatasetId?: string | null;
 }) {
   const savedDatasets = useDataManagerStore(state => state.savedDatasets);
   const catalogLoading = useDataManagerStore(state => state.catalogLoading);
@@ -268,9 +267,9 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
         const cloneStatus = cloneIndex >= 0 && tools.job ? cloneIndex < tools.job.completed || tools.job.state === 'completed' ? 'Completed' : `${tools.job.state.charAt(0).toUpperCase()}${tools.job.state.slice(1)} ${tools.job.progress}%` : tools.definitions.some(item => item.id === row.id) ? 'Completed' : '';
         const rowJob = downloadJob?.request.targets.some(target => target.id === row.id) ? downloadJob : null;
         const rowPath = 'path' in row && typeof row.path === 'string' ? normalizeRelativePath(row.path) : '';
-        return <tr key={row.id} className={selectedIds.includes(row.id) || activeDatasetId === row.id ? 'selected' : ''}>
+        return <tr key={row.id} className={selectedIds.includes(row.id) ? 'selected' : ''}>
           <td><input type="checkbox" aria-label={`Select ${row.symbol}`} checked={selectedIds.includes(row.id)} onChange={() => onToggle(row.id)}/></td>
-          <td><button className="dataset-sort" aria-label={`Preview ${row.symbol} ${row.timeframe}`} onPointerDown={event => { if (event.button === 0) onActivate?.(row.id); }} onClick={event => { if (event.detail === 0) onActivate?.(row.id); }}><strong>{row.symbol}</strong></button></td><td>{row.symbolDefinition}</td><td>{row.brokerName}</td><td>{row.underlying}</td>
+          <td><strong>{row.symbol}</strong></td><td>{row.symbolDefinition}</td><td>{row.brokerName}</td><td>{row.underlying}</td>
           <td>{row.timeframe}</td><td>{row.timezone}</td><td>{formatDateOnly(row.from)}</td><td>{formatDateOnly(row.to)}</td><td>{days.toLocaleString()}</td>
           <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row && (row.barType === "end" || row.barType === "End of bar") ? "End of bar" : "Start of bar"}</td><td>{row.category}</td>
           <td title={rowPath || '—'}>{rowPath || '—'}</td>

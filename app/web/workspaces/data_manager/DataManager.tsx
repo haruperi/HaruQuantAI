@@ -445,7 +445,6 @@ export function DataManager() {
       setActiveDatasetId(null); setSelectedBarTime(null); setLinkedSnapshot(null);
     }
   }, [savedDatasets, activeDatasetId]);
-  const activateDataset = (id: string) => { if (id !== activeDatasetId) setSelectedBarTime(null); setActiveDatasetId(id); setChartRequest(value => value + 1); };
 
   const [dialog, setDialog] = useState<DialogState | null>(null);
   const [symbolDialog, setSymbolDialog] = useState<SymbolDialogState | null>(null);
@@ -747,7 +746,7 @@ export function DataManager() {
     switch (id) {
       case 'chart': return <DataManagerChart snapshot={linkedSnapshot} loading={previewLoading} error={previewError} selectedTime={selectedBarTime} onSelectTime={setSelectedBarTime} onRetry={() => retryPreview(value => value + 1)} />;
       case 'home': return <DataManagerHome onNavigateTab={setTab} onOpenImport={() => { setTab('Data sources'); setDialog({ id: 'file-import' }); }} onOpenDownload={() => { setTab('Data sources'); setDialog({ id: 'dukascopy-download' }); }} />;
-      case 'data': return <DatasetTable onActivate={activateDataset} activeDatasetId={activeDatasetId} selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} onDeleteRow={handleDeleteDatasetRow}/>;
+      case 'data': return <DatasetTable selectedIds={selectedDatasetIds} onToggle={toggleDataset} onSelect={setSelectedDatasetIds} onDeleteRow={handleDeleteDatasetRow}/>;
       case 'brokers': return <BrokerProfilesTable loading={brokerLoading} error={brokerLoadError} profiles={brokerProfiles} selected={selectedBrokerIds} symbols={symbolRows} sessions={sessionRows} onSelect={setSelectedBrokerIds} onEdit={openBrokerEdit}/>;
       case 'stock-groups': return <StockGroupsTable groups={stockGroups.groups} selected={selectedStockGroupIds} datasets={toolRows} onSelect={setSelectedStockGroupIds} onEdit={openStockGroupEdit} onUpdate={group=>updateStockGroups([group])}/>;
       case 'custom-data': return <ExternalIndicatorsTable rows={externalIndicators.definitions} selected={selectedExternalNames} job={externalIndicators.job} onSelect={setSelectedExternalNames} onEdit={openExternalEdit} onDelete={item => openExternalDelete([item])}/>;

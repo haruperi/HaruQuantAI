@@ -88,6 +88,12 @@ test('Historical data renders only Home catalog rows and clears a refreshed empt
 test('dataset icon buttons retain keyboard access and edit/delete dialogs', async ({ page }) => {
   await openCatalog(page, () => ({ status: 'success', data: [dataset] }));
   const row = page.getByRole('table', { name: 'Historical data' }).getByRole('row').filter({ hasText: 'EURUSD_REAL' });
+  const symbol = row.getByRole('cell').nth(1);
+  await expect(symbol.getByRole('button')).toHaveCount(0);
+  await symbol.click();
+  await symbol.dblclick();
+  await expect(row.getByRole('checkbox')).not.toBeChecked();
+  await expect(page.locator('[data-workspace-panel="chart"]')).toHaveCount(0);
   const edit = row.getByRole('button', { name: 'Edit dataset EURUSD_REAL', exact: true });
   const remove = row.getByRole('button', { name: 'Delete dataset EURUSD_REAL', exact: true });
   await expect(edit).toHaveAttribute('title', 'Edit dataset EURUSD_REAL');

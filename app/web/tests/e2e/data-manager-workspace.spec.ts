@@ -7,14 +7,14 @@ const layout = {
   tabs: ['data', 'symbols', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: ['Data', 'Symbols', 'Sessions', 'Brokers', 'Custom Data', 'Chart', 'Home', 'Stock groups', 'Log'][index], core: index < 5 })),
   active_tab: 'data', layout: { core_group: 'catalogs', chart_position: 'right' },
 };
-const datasets = ['M1', 'D1'].map((timeframe, index) => ({
+const datasets = ['M1', 'D1'].map((timeframe) => ({
   id: `saved:${timeframe}`, symbol: 'EURUSD', symbolDefinition: 'EURUSD', broker: 'b1', broker_name: 'Research', underlying: 'EURUSD', timeframe, timezone: 'UTC',
   date_from: '2026-01-01', date_to: '2026-01-02', total_days: 1, total_records: 2, bars: 2, source: 'recorded', category: 'Forex', data_type: 'Forex',
   path: '', bar_type: 'start',
 }));
 const recordedRows = [0, 60].map(offset => ({ time: 1767225600 + offset, open: 1, high: 3, low: 0.5, close: 2, volume: 30 }));
 
-async function connect(page: Page, options: { slowMinute?: boolean; missingHistory?: boolean; failInit?: boolean } = {}) {
+async function connect(page: Page, options: { failInit?: boolean } = {}) {
   const calls: string[] = [];
   const browserErrors: string[] = [];
   page.on('pageerror', error => browserErrors.push(error.message));
@@ -41,11 +41,10 @@ async function connect(page: Page, options: { slowMinute?: boolean; missingHisto
     } else if (path.startsWith('/api/v1/data/workspace/tabs/')) {
       const id = normalizeSymbolContract(route.request().postDataJSON())?.context?.dataset_id;
       const selection = datasets.find(row => row.id === id) ?? null;
-      if (options.slowMinute && id === 'saved:M1') await new Promise(resolve => setTimeout(resolve, 900));
       data = { active_tab: path.split('/').at(-1), selection, preview: {
-        state: selection && !options.missingHistory ? 'ready' : 'unavailable',
+        state: selection ? 'ready' : 'unavailable',
         reason: selection ? 'No recorded history path in catalog.' : 'Select a saved dataset.',
-        rows: selection && !options.missingHistory ? recordedRows : [], limit: 500,
+        rows: selection ? recordedRows : [], limit: 500,
       } };
     }
     await route.fulfill({ json: { status: 'success', data } });
@@ -59,7 +58,7 @@ async function connect(page: Page, options: { slowMinute?: boolean; missingHisto
   return calls;
 }
 
-test('top navigation activates every panel, Arrange docks/closes without lower tab headers, and dataset links chart/table', async ({ page }) => {
+test('top navigation activates every panel, Arrange docks/closes without lower tab headers, and chart opens explicitly', async ({ page }) => {
   await connect(page);
   const nav = page.getByRole('navigation', { name: 'Data Manager workspace navigation', exact: true });
   await expect(nav).toBeVisible();
@@ -100,15 +99,10 @@ test('top navigation activates every panel, Arrange docks/closes without lower t
   await expect(host).toHaveAttribute('data-open-panels', /symbols/);
   await expect(page.getByRole('table', { name: 'Symbols', exact: true })).toBeVisible();
   await nav.getByRole('button', { name: 'Data sources', exact: true }).click();
-  await page.getByRole('button', { name: 'Preview EURUSD M1', exact: true }).click();
+  await nav.getByRole('button', { name: 'Chart', exact: true }).click();
   const preview = page.getByRole('main', { name: 'Linked recorded data preview' });
-  await expect(preview).toContainText('EURUSD · M1');
-  await expect(preview.getByRole('table', { name: 'Recorded bars' })).toBeVisible();
-  await preview.getByRole('button', { name: '2026-01-01T00:01:00.000Z', exact: true }).click();
-  await expect(preview.getByLabel('Selected recorded bar')).toContainText('2026-01-01T00:01:00.000Z');
-  await expect(preview.locator('tr[aria-selected="true"]')).toHaveCount(1);
-  await page.getByRole('button', { name: 'Preview EURUSD D1', exact: true }).click();
-  await expect(preview).toContainText('EURUSD · D1');
+  await expect(preview).toContainText('Select a saved dataset.');
+  await expect(preview.getByRole('table', { name: 'Recorded bars' })).toHaveCount(0);
   const dataBox = await page.locator('[data-workspace-panel="data"]').boundingBox();
   const chartBox = await page.locator('[data-workspace-panel="chart"]').boundingBox();
   expect(dataBox && chartBox && chartBox.x >= dataBox.x + dataBox.width - 8).toBeTruthy();
@@ -137,30 +131,45 @@ test('top navigation activates every panel, Arrange docks/closes without lower t
   await page.getByRole('menuitem', { name: 'Close panel', exact: true }).click();
   await expect(page.locator('[data-workspace-panel="chart"]')).toHaveCount(0);
   await nav.getByRole('button', { name: 'Chart', exact: true }).click();
-  await expect(preview).toContainText('EURUSD · D1');
+  await expect(preview).toContainText('Select a saved dataset.');
   await expect(page.locator('[data-workspace-panel="chart"]')).toHaveCount(1);
   await expect(page.getByRole('tab')).toHaveCount(0);
 });
 
-test('switching datasets cancels superseded selection responses', async ({ page }) => {
-  await connect(page, { slowMinute: true });
-  await page.getByRole('button', { name: 'Preview EURUSD M1', exact: true }).click();
-  await expect(page.getByRole('main', { name: 'Linked recorded data preview' })).toContainText('Loading recorded history');
-  await page.getByRole('button', { name: 'Preview EURUSD D1', exact: true }).click();
-  const preview = page.getByRole('main', { name: 'Linked recorded data preview' });
-  await expect(preview).toContainText('EURUSD · D1');
-  await page.getByRole('button', { name: 'Sessions', exact: true }).click();
-  await expect(preview).toContainText('EURUSD · D1');
-  await expect(preview).not.toContainText('EURUSD · M1');
+test('symbol clicks and double clicks leave selection and workspace unchanged', async ({ page }) => {
+  const calls = await connect(page);
+  const table = page.getByRole('table', { name: 'Historical data', exact: true });
+  await expect(table.getByRole('row')).toHaveCount(3);
+  const host = page.locator('.dm-dock-host');
+  const before = await host.getAttribute('data-open-panels');
+  const requests = calls.filter(path => path.includes('/workspace/tabs/')).length;
+  for (const row of await table.locator('tbody tr').all()) {
+    const symbol = row.getByRole('cell').nth(1);
+    await expect(symbol.getByRole('button')).toHaveCount(0);
+    await symbol.click();
+    await symbol.dblclick();
+    await expect(row.getByRole('checkbox')).not.toBeChecked();
+    await expect(row).not.toHaveClass(/selected/);
+    await expect(host).toHaveAttribute('data-open-panels', before!);
+    await expect(page.locator('[data-workspace-panel="chart"]')).toHaveCount(0);
+  }
+  await expect(table.getByRole('button', { name: /^Preview / })).toHaveCount(0);
+  expect(calls.filter(path => path.includes('/workspace/tabs/'))).toHaveLength(requests);
+  const checkbox = table.getByRole('checkbox', { name: 'Select EURUSD', exact: true }).first();
+  await checkbox.check();
+  await table.getByRole('row').nth(1).getByRole('cell').nth(1).click();
+  await expect(checkbox).toBeChecked();
+  await expect(page.locator('[data-workspace-panel="chart"]')).toHaveCount(0);
+  await page.screenshot({ path: join(tmpdir(), 'haru-datamanager-inert-symbols.png') });
 });
 
-test('missing recorded history is explicit and host initialization can retry', async ({ page }) => {
-  await connect(page, { missingHistory: true, failInit: true });
+test('host initialization can retry and chart opens without a dataset selection', async ({ page }) => {
+  await connect(page, { failInit: true });
   await expect(page.getByRole('alert')).toContainText('Workspace unavailable');
   await page.getByRole('button', { name: 'Retry workspace', exact: true }).click();
-  await page.getByRole('button', { name: 'Preview EURUSD M1', exact: true }).click();
+  await page.getByRole('navigation', { name: 'Data Manager workspace navigation' }).getByRole('button', { name: 'Chart', exact: true }).click();
   const preview = page.getByRole('main', { name: 'Linked recorded data preview' });
-  await expect(preview).toContainText('No recorded history path in catalog.');
+  await expect(preview).toContainText('Select a saved dataset.');
   await expect(preview.getByRole('table', { name: 'Recorded bars' })).toHaveCount(0);
   await expect(preview.locator('canvas')).toHaveCount(0);
 });
