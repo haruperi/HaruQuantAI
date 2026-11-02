@@ -4,7 +4,7 @@ Description:
     Implements OverviewStatsCatalog and registers all 7 donor Overview
     templates (AWSharedDefault, DefaultOpenDD, SQDefault, SQDefaultPct,
     SQDefaultWithPortfolio, SQDefaultWithPortfolioPct, TSOverview),
-    rendering structured OverviewMetricRow projections.
+    rendering structured OverviewMetricRow projections via modular snippet classes.
 
 Purpose:
     FEAT-EXTEND-STATS-OVERVIEW: Strategy Overview templates catalog.
@@ -14,6 +14,7 @@ Key Capabilities:
 
 Python API Usage:
     from app.extend.stats.overview_templates import OverviewStatsCatalog
+
     template = OverviewStatsCatalog.get("SQDefault")
     rows = OverviewStatsCatalog.render_rows("SQDefault", stats)
 
@@ -29,23 +30,19 @@ from typing import Any
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
 from app.extend.columns.base import StrategyStatsSnapshot
-from app.extend.columns.databanks import DatabankColumnEvaluator
+from app.extend.stats.base import STANDARD_METRIC_COLUMNS, OverviewTemplate
+from app.extend.stats.overview import (
+    AWSharedDefault,
+    DefaultOpenDD,
+    SQDefault,
+    SQDefaultPct,
+    SQDefaultWithPortfolio,
+    SQDefaultWithPortfolioPct,
+    TSOverview,
+)
 from app.workspace.results.results_overview import OverviewMetricRow
 
 logger = get_logger(__name__)
-
-STANDARD_METRIC_COLUMNS = (
-    "NetProfit",
-    "ProfitFactor",
-    "ReturnDDRatio",
-    "Drawdown",
-    "NumberOfTrades",
-    "WinningPct",
-    "AvgTrade",
-    "SharpeRatio",
-    "MaxProfit",
-    "MaxLoss",
-)
 
 
 @dataclass(frozen=True, slots=True)
@@ -73,109 +70,25 @@ class OverviewStatsTemplate:
         }
 
 
-# Register all 7 donor Overview templates
+# Modular snippet class registry
+OVERVIEW_SNIPPET_CLASSES: dict[str, type[OverviewTemplate]] = {
+    "AWSharedDefault": AWSharedDefault,
+    "DefaultOpenDD": DefaultOpenDD,
+    "SQDefault": SQDefault,
+    "SQDefaultPct": SQDefaultPct,
+    "SQDefaultWithPortfolio": SQDefaultWithPortfolio,
+    "SQDefaultWithPortfolioPct": SQDefaultWithPortfolioPct,
+    "TSOverview": TSOverview,
+}
+
+# Concrete snippet instances
+OVERVIEW_SNIPPETS: dict[str, OverviewTemplate] = {
+    key: cls() for key, cls in OVERVIEW_SNIPPET_CLASSES.items()
+}
+
+# Register all 7 donor Overview template descriptors for backward compatibility
 OVERVIEW_TEMPLATES: dict[str, OverviewStatsTemplate] = {
-    "AWSharedDefault": OverviewStatsTemplate(
-        template_id="AWSharedDefault",
-        label="AW Shared Default",
-        use_pct=False,
-        include_portfolio_comparison=False,
-        use_open_dd=False,
-        metric_column_ids=STANDARD_METRIC_COLUMNS,
-        source_ref="Overview/AWSharedDefault.java",
-    ),
-    "DefaultOpenDD": OverviewStatsTemplate(
-        template_id="DefaultOpenDD",
-        label="Default Open Drawdown",
-        use_pct=False,
-        include_portfolio_comparison=False,
-        use_open_dd=True,
-        metric_column_ids=(
-            "NetProfit",
-            "ProfitFactor",
-            "ReturnOpenDDRatio",
-            "OpenDrawdown",
-            "NumberOfTrades",
-            "WinningPct",
-            "AvgTrade",
-            "SharpeRatio",
-        ),
-        source_ref="Overview/DefaultOpenDD.java",
-    ),
-    "SQDefault": OverviewStatsTemplate(
-        template_id="SQDefault",
-        label="StrategyQuant Default",
-        use_pct=False,
-        include_portfolio_comparison=False,
-        use_open_dd=False,
-        metric_column_ids=STANDARD_METRIC_COLUMNS,
-        source_ref="Overview/SQDefault.java",
-    ),
-    "SQDefaultPct": OverviewStatsTemplate(
-        template_id="SQDefaultPct",
-        label="StrategyQuant Default (%)",
-        use_pct=True,
-        include_portfolio_comparison=False,
-        use_open_dd=False,
-        metric_column_ids=(
-            "NetProfitInPct",
-            "ProfitFactor",
-            "ReturnDDRatio",
-            "DrawdownPct",
-            "NumberOfTrades",
-            "WinningPct",
-            "AvgTrade",
-            "SharpeRatio",
-        ),
-        source_ref="Overview/SQDefaultPct.java",
-    ),
-    "SQDefaultWithPortfolio": OverviewStatsTemplate(
-        template_id="SQDefaultWithPortfolio",
-        label="SQ Default with Portfolio",
-        use_pct=False,
-        include_portfolio_comparison=True,
-        use_open_dd=False,
-        metric_column_ids=STANDARD_METRIC_COLUMNS,
-        source_ref="Overview/SQDefaultWithPortfolio.java",
-    ),
-    "SQDefaultWithPortfolioPct": OverviewStatsTemplate(
-        template_id="SQDefaultWithPortfolioPct",
-        label="SQ Default with Portfolio (%)",
-        use_pct=True,
-        include_portfolio_comparison=True,
-        use_open_dd=False,
-        metric_column_ids=(
-            "NetProfitInPct",
-            "ProfitFactor",
-            "ReturnDDRatio",
-            "DrawdownPct",
-            "NumberOfTrades",
-            "WinningPct",
-            "AvgTrade",
-            "SharpeRatio",
-        ),
-        source_ref="Overview/SQDefaultWithPortfolioPct.java",
-    ),
-    "TSOverview": OverviewStatsTemplate(
-        template_id="TSOverview",
-        label="TradeStation Overview",
-        use_pct=False,
-        include_portfolio_comparison=False,
-        use_open_dd=False,
-        metric_column_ids=(
-            "NetProfit",
-            "GrossProfit",
-            "GrossLoss",
-            "ProfitFactor",
-            "NumberOfTrades",
-            "WinningPct",
-            "AvgTrade",
-            "WinLossRatio",
-            "MaxProfit",
-            "MaxLoss",
-        ),
-        source_ref="Overview/TSOverview.java",
-    ),
+    key: snippet.to_template_descriptor() for key, snippet in OVERVIEW_SNIPPETS.items()
 }
 
 
@@ -184,8 +97,13 @@ class OverviewStatsCatalog:
 
     @classmethod
     def list_templates(cls) -> tuple[OverviewStatsTemplate, ...]:
-        """List all 7 registered Overview templates."""
+        """List all 7 registered Overview template descriptors."""
         return tuple(OVERVIEW_TEMPLATES.values())
+
+    @classmethod
+    def list_snippets(cls) -> tuple[OverviewTemplate, ...]:
+        """List all 7 registered Overview snippet instances."""
+        return tuple(OVERVIEW_SNIPPETS.values())
 
     @classmethod
     def get(cls, template_id: str) -> OverviewStatsTemplate:
@@ -199,39 +117,35 @@ class OverviewStatsCatalog:
         return OVERVIEW_TEMPLATES[template_id]
 
     @classmethod
+    def get_snippet(cls, template_id: str) -> OverviewTemplate:
+        """Lookup snippet instance by ID."""
+        if template_id not in OVERVIEW_SNIPPETS:
+            raise DomainError(
+                code="STATS_TEMPLATE_NOT_FOUND",
+                message=f"Overview template '{template_id}' not found",
+                details={"template_id": template_id},
+            )
+        return OVERVIEW_SNIPPETS[template_id]
+
+    @classmethod
     def render_rows(
         cls, template_id: str, stats: StrategyStatsSnapshot
     ) -> tuple[OverviewMetricRow, ...]:
         """Render OverviewMetricRow sequence for template across All/Long/Short."""
-        tmpl = cls.get(template_id)
+        snippet = cls.get_snippet(template_id)
         logger.info(
             "FR-stats-overview-templates: rendering template=%s with %d metrics",
             template_id,
-            len(tmpl.metric_column_ids),
+            len(snippet.metric_column_ids),
         )
+        return snippet.render_rows(stats)
 
-        rows: list[OverviewMetricRow] = []
-        for col_id in tmpl.metric_column_ids:
-            all_val = DatabankColumnEvaluator.evaluate(
-                col_id, stats, sample_type="FullSample", direction="Both"
-            )
-            long_val = DatabankColumnEvaluator.evaluate(
-                col_id, stats, sample_type="FullSample", direction="BUY"
-            )
-            short_val = DatabankColumnEvaluator.evaluate(
-                col_id, stats, sample_type="FullSample", direction="SELL"
-            )
-            unit = "%" if tmpl.use_pct and "Pct" in col_id else "$"
 
-            rows.append(
-                OverviewMetricRow(
-                    metric_id=col_id,
-                    label=col_id,
-                    all_trades=all_val,
-                    long_trades=long_val,
-                    short_trades=short_val,
-                    unit=unit,
-                )
-            )
-
-        return tuple(rows)
+__all__ = [
+    "OVERVIEW_SNIPPETS",
+    "OVERVIEW_SNIPPET_CLASSES",
+    "OVERVIEW_TEMPLATES",
+    "STANDARD_METRIC_COLUMNS",
+    "OverviewStatsCatalog",
+    "OverviewStatsTemplate",
+]
