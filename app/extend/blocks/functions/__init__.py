@@ -55,6 +55,11 @@ from app.extend.blocks.functions.convert_price_to_pips import (
     convert_price_to_pips_spec,
     convert_price_to_pips_symbol,
 )
+from app.extend.blocks.functions.correlation_coefficient import (
+    CorrelationCoefficient,
+    correlation_kernel,
+)
+from app.extend.blocks.functions.correlation_log import CorrelationLog
 from app.extend.blocks.functions.custom_function import (
     custom_function,
     custom_function_spec,
@@ -101,6 +106,8 @@ __all__ = [
     "POINT_TO_PIP_MULTIPLIER",
     "TIME_HOUR_MULTIPLIER",
     "TIME_MINUTE_MULTIPLIER",
+    "CorrelationCoefficient",
+    "CorrelationLog",
     "Functions",
     "_log_func_eval",
     "abs_val",
@@ -111,6 +118,7 @@ __all__ = [
     "convert_price_to_pips",
     "convert_price_to_pips_spec",
     "convert_price_to_pips_symbol",
+    "correlation_kernel",
     "custom_function",
     "custom_function_spec",
     "division",

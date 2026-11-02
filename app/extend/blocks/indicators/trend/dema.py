@@ -1,0 +1,108 @@
+"""Double Exponential Moving Average (DEMA) strategy block.
+
+Description:
+    Calculates Patrick Mulloy's Double Exponential Moving Average (DEMA)
+    reducing lag by calculating 2*EMA - EMA(EMA).
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-dema: DEMA computation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.dema import DoubleEMA
+    res = DoubleEMA().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+"""
+
+from __future__ import annotations
+
+from typing import ClassVar, override
+
+import numpy as np
+from pydantic import Field
+
+from app.core.host.logging import get_logger
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.metadata import (
+    BlockSpec,
+    ChartPane,
+    ExecutionKind,
+    InputPort,
+    OutputPort,
+    PortType,
+)
+from app.extend.blocks.series import BarData, IndicatorSeries
+from app.extend.calculators.average import ema_kernel
+
+logger = get_logger(__name__)
+
+
+def _safe_ema(x: np.ndarray, period: int) -> np.ndarray:
+    n = len(x)
+    out = np.full(n, np.nan, dtype=np.float64)
+    valid = np.where(~np.isnan(x))[0]
+    if len(valid) >= period:
+        start = int(valid[0])
+        out[start:] = ema_kernel(x[start:], period)
+    return out
+
+
+def dema_kernel(data: np.ndarray, period: int) -> np.ndarray:
+    """Compute Double Exponential Moving Average (2*EMA1 - EMA2)."""
+    ema1 = ema_kernel(data, period)
+    ema2 = _safe_ema(ema1, period)
+    dema = np.full_like(data, np.nan, dtype=np.float64)
+    valid = ~np.isnan(ema1) & ~np.isnan(ema2)
+    dema[valid] = 2.0 * ema1[valid] - ema2[valid]
+    return dema
+
+
+class DoubleEMA(BaseIndicator):
+    """Double Exponential Moving Average (DEMA) block."""
+
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.trend.dema",
+        version="1.0.0",
+        name="Double EMA",
+        description="Double exponential moving average (2*EMA - EMA(EMA))",
+        category="trend",
+        tags=("trend", "ma", "dema", "moving_average"),
+        execution_kind=ExecutionKind.EXPRESSION,
+        chart_pane=ChartPane.MAIN,
+        inputs=(
+            InputPort("close", PortType.SERIES, "Close price series", required=True),
+        ),
+        outputs=(OutputPort("value", PortType.SERIES, "DEMA"),),
+        required_market_inputs=("close",),
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 200, "default": 20},
+        },
+        is_causal=True,
+        is_generation_eligible=True,
+        is_deterministic=True,
+        supports_incremental=False,
+    )
+
+    period: int = Field(default=20, ge=1)
+
+    @override
+    def required_history(self) -> int:
+        """Return minimum history bars needed for valid calculation."""
+        return self.period * 2
+
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        """Compute DEMA values over closing prices."""
+        bars.require_inputs(self.spec.required_market_inputs)
+        close = np.asarray(bars.close, dtype=np.float64)
+        dema = dema_kernel(close, self.period)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-TREND: Calculated DEMA(period=%d) for %d bars",
+            self.period,
+            len(bars),
+        )
+        return {"value": IndicatorSeries(dema, name="DEMA")}
+
+
+__all__ = ["DoubleEMA", "dema_kernel"]

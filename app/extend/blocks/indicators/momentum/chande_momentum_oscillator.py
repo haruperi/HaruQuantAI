@@ -1,0 +1,106 @@
+"""Chande Momentum Oscillator strategy block.
+
+Description:
+    Calculates Tushar Chande's CMO oscillator measuring momentum on both up
+    and down days without smoothing the momentum values.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-chande-momentum-oscillator: Chande momentum oscillator.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.chande_momentum_oscillator import (
+        ChandeMomentumOscillator,
+    )
+    res = ChandeMomentumOscillator().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+"""
+
+from __future__ import annotations
+
+from typing import ClassVar, override
+
+import numpy as np
+from pydantic import Field
+
+from app.core.host.logging import get_logger
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.metadata import (
+    BlockSpec,
+    ChartPane,
+    ExecutionKind,
+    InputPort,
+    OutputPort,
+    PortType,
+)
+from app.extend.blocks.series import BarData, IndicatorSeries
+
+logger = get_logger(__name__)
+
+_EPSILON: float = 1e-12
+_SCALE_100: float = 100.0
+
+
+class ChandeMomentumOscillator(BaseIndicator):
+    """Chande Momentum Oscillator (CMO) block."""
+
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.momentum.chande_momentum_oscillator",
+        version="1.0.0",
+        name="Chande Momentum Oscillator",
+        description="Calculates momentum over positive and negative days directly",
+        category="momentum",
+        tags=("momentum", "oscillator", "cmo", "chande"),
+        execution_kind=ExecutionKind.EXPRESSION,
+        chart_pane=ChartPane.SUB,
+        inputs=(
+            InputPort("close", PortType.SERIES, "Close price series", required=True),
+        ),
+        outputs=(OutputPort("value", PortType.SERIES, "Chande Momentum Oscillator"),),
+        required_market_inputs=("close",),
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 14},
+        },
+        is_causal=True,
+        is_generation_eligible=True,
+        is_deterministic=True,
+        supports_incremental=False,
+    )
+
+    period: int = Field(default=14, ge=1)
+
+    @override
+    def required_history(self) -> int:
+        """Return minimum history bars needed for valid calculation."""
+        return self.period + 1
+
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        """Compute Chande Momentum Oscillator values over historical bars."""
+        bars.require_inputs(self.spec.required_market_inputs)
+        close = np.asarray(bars.close, dtype=np.float64)
+        n = len(close)
+        cmo = np.full(n, np.nan, dtype=np.float64)
+        if n > self.period:
+            diff = np.diff(close)
+            up = np.where(diff > 0.0, diff, 0.0)
+            down = np.where(diff < 0.0, -diff, 0.0)
+            up_cs = np.insert(np.cumsum(up), 0, 0.0)
+            dn_cs = np.insert(np.cumsum(down), 0, 0.0)
+            p = self.period
+            su = up_cs[p:] - up_cs[:-p]
+            sd = dn_cs[p:] - dn_cs[:-p]
+            total = su + sd
+            with np.errstate(divide="ignore", invalid="ignore"):
+                val = np.where(total > _EPSILON, _SCALE_100 * (su - sd) / total, 0.0)
+            cmo[p:] = val
+        logger.debug(
+            "FR-SERVICES-INDICATOR-MOMENTUM: Calculated CMO(period=%d) for %d bars",
+            self.period,
+            len(bars),
+        )
+        return {"value": IndicatorSeries(cmo, name="CMO")}
+
+
+__all__ = ["ChandeMomentumOscillator"]

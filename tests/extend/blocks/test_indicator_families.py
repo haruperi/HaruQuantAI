@@ -148,15 +148,15 @@ def test_family_schema_configuration_and_editor_execution(
 
 
 def test_complete_inventory_and_unique_catalog() -> None:
-    """All 82 indicator classes have independent files, IDs, and registrations."""
+    """All 128 indicator classes have independent files, IDs, and registrations."""
     registry = BlockRegistry()
     registry.discover("app/extend/blocks", authorized_root="app/extend")
     assert registry.diagnostics == []
     indicators = [
         desc for desc in registry.snapshot() if desc.spec.id.startswith("indicator.")
     ]
-    assert len(indicators) == 82
-    assert len({desc.source_file for desc in indicators}) == 82
+    assert len(indicators) == 128
+    assert len({desc.source_file for desc in indicators}) == 128
     for entry in FAMILIES:
         assert registry.require(entry["id"]).spec.id == entry["id"]
     assert not list(Path("app/include/indicators").rglob("*.py"))
