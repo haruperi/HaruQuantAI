@@ -15,7 +15,6 @@ from app.extend.blocks.order.close.close_all_positions import close_all_position
 from app.extend.blocks.order.close.close_position import close_position
 from app.extend.blocks.order.open.enter_at_limit import enter_at_limit
 from app.extend.blocks.order.open.enter_at_market import enter_at_market
-from app.extend.blocks.order.types import TradeFilter
 from app.extend.blocks.strategy_control.account_balance import account_balance
 from app.extend.blocks.strategy_control.account_equity import account_equity
 from app.extend.blocks.strategy_control.bars_since_order_closed import (
@@ -68,6 +67,7 @@ from app.extend.blocks.strategy_control.pending_order_exists import (
 from app.extend.blocks.strategy_control.trade_recently_closed import (
     trade_recently_closed,
 )
+from app.extend.functions.order_functions import TradeFilter
 from app.workspace.brokers.simulator import SimulatorClient
 from app.workspace.trading import Trading
 

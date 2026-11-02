@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -15,11 +16,10 @@ from app.extend.blocks.metadata import (
 from app.extend.blocks.order._common import (
     matching_positions,
 )
-from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import (
+from app.extend.blocks.strategy_control._common import valuation
+from app.extend.functions.order_functions import (
     TradeFilter,
 )
-from app.extend.blocks.strategy_control._common import valuation
 
 
 @block(

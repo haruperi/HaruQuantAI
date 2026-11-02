@@ -8,8 +8,8 @@ from datetime import datetime
 
 from app.core.data import contracts
 from app.core.enums import DealEntry, DealType
-from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import TradeFilter, aware_timestamp
+from app.core.trading.blocks.runtime import TradingRuntime
+from app.extend.functions.order_functions import TradeFilter, aware_timestamp
 
 
 @dataclass(frozen=True, slots=True)

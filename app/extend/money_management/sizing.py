@@ -6,14 +6,15 @@ Description:
     matching StrategyQuant Money Management formula behaviors with strict
     lot-grid alignment and instrument constraints.
 Purpose:
-    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+    FEAT-MONEY-MANAGEMENT: StrategyQuant donor-faithful money management algorithms.
 Key Capabilities:
-    - FR-ORDER-SIZING: Unified multi-model position sizing evaluation.
+    - FR-MM-SIZING-EVAL: Multi-model position sizing evaluation.
+    - FR-MM-LOTS-NORM: Strict tick/lot grid step alignment and clamping.
 Python API Usage:
-    from app.extend.blocks.order.sizing import evaluate_sizing
+    from app.extend.money_management.sizing import evaluate_sizing
     vol = evaluate_sizing("fixed", lots=0.5)
 CLI Usage:
-    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+    uv run pytest tests/extend/blocks/test_order_strategy_control_features.py --no-cov
 """
 
 from __future__ import annotations
@@ -74,7 +75,7 @@ def fixed_lots(
 ) -> float:
     """Return normalized fixed lot size."""
     res = normalize_lots(lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
-    logger.debug("FR-ORDER-SIZING: fixed_lots %s -> %s", lots, res)
+    logger.debug("FR-MM-SIZING-EVAL: fixed_lots %s -> %s", lots, res)
     return res
 
 
@@ -102,7 +103,7 @@ def risk_cash(
     raw_lots = cash_amount / loss_per_lot
     res = normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
     logger.debug(
-        "FR-ORDER-SIZING: risk_cash amount=%s stop_pips=%s -> %s",
+        "FR-MM-SIZING-EVAL: risk_cash amount=%s stop_pips=%s -> %s",
         cash_amount,
         stop_distance_pips,
         res,
@@ -139,7 +140,7 @@ def risk_percent(
         lot_step=lot_step,
     )
     logger.debug(
-        "FR-ORDER-SIZING: risk_percent equity=%s risk_pct=%s stop_pips=%s -> %s",
+        "FR-MM-SIZING-EVAL: risk_percent equity=%s risk_pct=%s stop_pips=%s -> %s",
         equity,
         risk_pct,
         stop_distance_pips,
@@ -180,7 +181,7 @@ def margin_percent(
     raw_lots = target_margin / margin_per_lot
     res = normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
     logger.debug(
-        "FR-ORDER-SIZING: margin_percent equity=%s margin_pct=%s price=%s -> %s",
+        "FR-MM-SIZING-EVAL: margin_percent equity=%s margin_pct=%s price=%s -> %s",
         equity,
         margin_pct,
         price,
@@ -216,7 +217,7 @@ def volatility_risk(
     raw_lots = cash_risk / risk_per_lot
     res = normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
     logger.debug(
-        "FR-ORDER-SIZING: volatility_risk cash=%s atr=%s mult=%s -> %s",
+        "FR-MM-SIZING-EVAL: volatility_risk cash=%s atr=%s mult=%s -> %s",
         cash_risk,
         atr_value,
         multiplier,

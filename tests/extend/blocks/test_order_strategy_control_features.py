@@ -6,14 +6,13 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from app.core.data.contracts import SymbolInfo, SymbolPrice
-from app.extend.blocks.order.atm import ATMBracket, ATMStrategy
-from app.extend.blocks.order.formulas import (
+from app.extend.formulas.price_level import (
     evaluate_price_level,
     price_offset_atr,
     price_offset_percent,
     price_offset_pips,
 )
-from app.extend.blocks.order.sizing import (
+from app.extend.money_management.sizing import (
     evaluate_sizing,
     fixed_lots,
     margin_percent,
@@ -22,7 +21,8 @@ from app.extend.blocks.order.sizing import (
     risk_percent,
     volatility_risk,
 )
-from app.extend.blocks.order.validity import (
+from app.extend.trading.atm import ATMBracket, ATMStrategy
+from app.extend.trading.validity import (
     parse_timeframe_delta,
     schedule_bar_validity,
 )

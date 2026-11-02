@@ -1,16 +1,18 @@
-"""Shared strategy order selection and evaluation-time calculations.
+"""Order scope matching, history order inspection, and price/time calculations.
 
 Description:
     Provides domain types and pure utility functions for trade scope filtering,
     time-series bar offset calculation, pip size determination, and price
-    normalization aligned with broker symbol tick increments.
+    normalization aligned with broker symbol tick increments, conforming to
+    StrategyQuant SQ.Functions.OrderFunctions snippet specifications.
 Purpose:
-    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+    FEAT-FUNCTIONS: StrategyQuant donor-faithful functions and domain utilities.
 Key Capabilities:
-    - FR-ORDER-FILTER: Precise multi-attribute matching against orders.
-    - FR-ORDER-PRICE-NORM: Tick grid alignment conforming to symbol specs.
+    - FR-FUNCTIONS-ORDER-FILTER: Precise multi-attribute matching against orders.
+    - FR-FUNCTIONS-PRICE-NORM: Tick grid alignment conforming to symbol specs.
+    - FR-FUNCTIONS-BARS-SINCE: Count chart bar intervals between events.
 Python API Usage:
-    from app.extend.blocks.order.types import TradeFilter, normalize_price
+    from app.extend.functions.order_functions import TradeFilter, normalize_price
 CLI Usage:
     uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
 """
@@ -86,7 +88,7 @@ def bars_since(timestamp: float, bar_times: Sequence[datetime], as_of: datetime)
         raise ValueError("bar history does not cover the trade timestamp")
     count = sum(timestamp < start <= end for start in starts)
     logger.debug(
-        "FR-ORDER-BARS-SINCE: Calculated %d bars since timestamp=%s as_of=%s",
+        "FR-FUNCTIONS-BARS-SINCE: Calculated %d bars since timestamp=%s as_of=%s",
         count,
         timestamp,
         as_of,
@@ -114,7 +116,7 @@ def normalize_price(value: float, spec: SymbolInfo) -> float:
     if value > 0 and rounded <= 0:
         raise ValueError("positive price is smaller than the symbol tick step")
     logger.debug(
-        "FR-ORDER-PRICE-NORM: Normalized price %s -> %s (tick_step=%s)",
+        "FR-FUNCTIONS-PRICE-NORM: Normalized price %s -> %s (tick_step=%s)",
         value,
         rounded,
         step,

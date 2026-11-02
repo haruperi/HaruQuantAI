@@ -6822,7 +6822,7 @@
       "class_name": "OrderFunctions",
       "sha256": "94eddce3cf560954bafc79520d8f670ab4e138fb144c8e408b701c56f2adc125",
       "classification": "rehomed_domain_helper",
-      "python_target": "app/include/blocks/order/types.py::TradeFilter"
+      "python_target": "app/extend/functions/order_functions.py::TradeFilter"
     },
     {
       "donor_path": "data/reference-donor/internal/extend/Snippets/SQ/Functions/StatFunctions.java",

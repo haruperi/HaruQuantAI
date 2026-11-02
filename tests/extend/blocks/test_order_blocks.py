@@ -47,7 +47,6 @@ from app.core.data.contracts import (
 from app.core.enums import OrderType, TradeRetcode
 from app.extend.blocks.order import (
     Orders,
-    TradeFilter,
     close_all_pending_orders,
     close_all_positions,
     close_best_position,
@@ -61,6 +60,7 @@ from app.extend.blocks.order import (
     set_profit_target,
     set_stop_loss,
 )
+from app.extend.functions.order_functions import TradeFilter
 
 
 def make_mock_runtime(

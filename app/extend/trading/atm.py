@@ -6,15 +6,15 @@ Description:
     trailing stops, and time-based bar-count exits, matching StrategyQuant ATM
     snippet logic.
 Purpose:
-    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+    FEAT-TRADING: StrategyQuant donor-faithful trading and trade management models.
 Key Capabilities:
-    - FR-ORDER-ATM: Partition trade volume across multi-bracket exits.
+    - FR-TRADING-ATM: Partition trade volume across multi-bracket exits.
 Python API Usage:
-    from app.extend.blocks.order.atm import ATMBracket, ATMStrategy
+    from app.extend.trading.atm import ATMBracket, ATMStrategy
     strategy = ATMStrategy(brackets=(ATMBracket(0.5, 20.0), ATMBracket(0.5, 40.0)))
     exits = strategy.build_bracket_exits(0.1, 1.1000, 1, 0.0001)
 CLI Usage:
-    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+    uv run pytest tests/extend/blocks/test_order_strategy_control_features.py --no-cov
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from decimal import Decimal
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.order.sizing import normalize_lots
+from app.extend.money_management.sizing import normalize_lots
 
 logger = get_logger(__name__)
 
@@ -124,7 +124,7 @@ class ATMStrategy:
                 remaining = min_lot
         volumes.append(remaining)
         logger.debug(
-            "FR-ORDER-ATM: Split volume %s across %d brackets -> %s",
+            "FR-TRADING-ATM: Split volume %s across %d brackets -> %s",
             total_volume,
             len(self.brackets),
             volumes,
@@ -188,7 +188,7 @@ class ATMStrategy:
             }
             bracket_specs.append(spec)
         logger.debug(
-            "FR-ORDER-ATM: Built %d bracket exit specs for entry=%s dir=%s",
+            "FR-TRADING-ATM: Built %d bracket exit specs for entry=%s dir=%s",
             len(bracket_specs),
             entry_price,
             direction,

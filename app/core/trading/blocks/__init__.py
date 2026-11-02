@@ -20,6 +20,15 @@ from app.core.trading.blocks.registry import (
     CatalogSnapshot,
     block_registry,
 )
+from app.core.trading.blocks.runtime import (
+    AccountSource,
+    DealSource,
+    OrderExecution,
+    OrderSource,
+    PositionSource,
+    SymbolSource,
+    TradingRuntime,
+)
 from app.core.trading.blocks.series import (
     COMPUTED_PRICE_INPUTS,
     BarData,
@@ -31,6 +40,7 @@ from app.core.trading.blocks.series import (
 
 __all__ = [
     "COMPUTED_PRICE_INPUTS",
+    "AccountSource",
     "BarData",
     "BaseBlock",
     "BaseIndicator",
@@ -40,11 +50,17 @@ __all__ = [
     "BlockSpec",
     "CatalogSnapshot",
     "ChartPane",
+    "DealSource",
     "ExecutionKind",
     "IndicatorSeries",
     "InputPort",
+    "OrderExecution",
+    "OrderSource",
     "OutputPort",
     "PortType",
+    "PositionSource",
+    "SymbolSource",
+    "TradingRuntime",
     "_freeze_mapping",
     "block",
     "block_registry",

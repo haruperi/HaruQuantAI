@@ -22,6 +22,7 @@ from datetime import datetime
 from app.core.data.contracts import TradeResult
 from app.core.enums import OrderType
 from app.core.host.logging import get_logger
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -31,7 +32,6 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.order.open._common import execute_entry
-from app.extend.blocks.order.runtime import TradingRuntime
 
 logger = get_logger(__name__)
 

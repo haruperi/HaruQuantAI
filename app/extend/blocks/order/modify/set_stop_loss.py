@@ -19,6 +19,7 @@ from __future__ import annotations
 
 from app.core.data.contracts import TradeResult
 from app.core.host.logging import get_logger
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -28,8 +29,7 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 from app.extend.blocks.order._common import set_protection
-from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import TradeFilter
+from app.extend.functions.order_functions import TradeFilter
 
 logger = get_logger(__name__)
 

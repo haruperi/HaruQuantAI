@@ -5,11 +5,11 @@ Description:
     symbol sources, and order execution primitives, separating strategy blocks from
     workspace broker implementations.
 Purpose:
-    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+    FEAT-TRADING-BLOCKS: Core trading block execution and runtime protocol contracts.
 Key Capabilities:
-    - FR-ORDER-RUNTIME: Pure protocol contracts for isolated and testable execution.
+    - FR-BLOCK-RUNTIME: Pure protocol contracts for isolated and testable execution.
 Python API Usage:
-    from app.extend.blocks.order.runtime import TradingRuntime, OrderExecution
+    from app.core.trading.blocks.runtime import TradingRuntime, OrderExecution
 CLI Usage:
     uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
 """

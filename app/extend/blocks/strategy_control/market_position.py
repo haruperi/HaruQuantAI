@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -13,8 +14,7 @@ from app.extend.blocks.metadata import (
 from app.extend.blocks.order._common import (
     matching_positions,
 )
-from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import (
+from app.extend.functions.order_functions import (
     TradeFilter,
 )
 

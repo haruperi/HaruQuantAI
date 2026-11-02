@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -10,11 +11,10 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import (
+from app.extend.blocks.strategy_control._common import position_value
+from app.extend.functions.order_functions import (
     TradeFilter,
 )
-from app.extend.blocks.strategy_control._common import position_value
 
 
 @block(

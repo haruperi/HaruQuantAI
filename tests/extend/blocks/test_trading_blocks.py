@@ -21,8 +21,8 @@ from app.core.data.contracts import (
 )
 from app.core.enums import OrderType, TradeRetcode
 from app.extend.blocks.metadata import ExecutionKind
-from app.extend.blocks.order.types import TradeFilter
 from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
+from app.extend.functions.order_functions import TradeFilter
 from app.workspace.brokers.simulator import SimulatorClient
 from app.workspace.trading import (
     AccountProxy,

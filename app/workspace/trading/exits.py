@@ -31,11 +31,15 @@ from typing import Literal
 from app.core.data.contracts import PositionInfo, SymbolInfo, TradeResult
 from app.core.enums import TradeRetcode
 from app.core.host.logging import get_logger
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.order.close.close_position import close_position
 from app.extend.blocks.order.modify.set_profit_target import set_profit_target
 from app.extend.blocks.order.modify.set_stop_loss import set_stop_loss
-from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import TradeFilter, aware_timestamp, bars_since
+from app.extend.functions.order_functions import (
+    TradeFilter,
+    aware_timestamp,
+    bars_since,
+)
 
 logger = get_logger(__name__)
 

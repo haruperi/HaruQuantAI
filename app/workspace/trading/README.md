@@ -47,7 +47,7 @@ Import each operation from its owning module:
 ```python
 from app.extend.blocks.order.open.enter_at_market import enter_at_market
 from app.extend.blocks.order.close.close_best_position import close_best_position
-from app.extend.blocks.order.types import TradeFilter
+from app.extend.functions.order_functions import TradeFilter
 from app.extend.blocks.strategy_control.market_positions_count import (
     market_positions_count,
 )
@@ -84,7 +84,7 @@ qualification limits are documented in `docs/dev/trading-block-migration.md`.
 strategy actions. No broker-specific implementation or background task is added.
 
 ```python
-from app.extend.blocks.order.types import TradeFilter
+from app.extend.functions.order_functions import TradeFilter
 from app.workspace.trading import (
     ExitAfterBars,
     ExitPlan,

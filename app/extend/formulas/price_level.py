@@ -5,14 +5,14 @@ Description:
     and absolute prices) into normalized order prices aligned with instrument tick
     steps, matching StrategyQuant Price and RangeLevel formula behaviors.
 Purpose:
-    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+    FEAT-FORMULAS: StrategyQuant donor-faithful formula price evaluation.
 Key Capabilities:
-    - FR-ORDER-FORMULAS: Evaluate order levels from relative formula offsets.
+    - FR-FORMULA-PRICE-LEVEL: Evaluate normalized prices from relative formula offsets.
 Python API Usage:
-    from app.extend.blocks.order.formulas import evaluate_price_level, price_offset_pips
+    from app.extend.formulas.price_level import evaluate_price_level, price_offset_pips
     level = evaluate_price_level("pips", 1.1000, 1, pips=20.0, pip_size=0.0001)
 CLI Usage:
-    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+    uv run pytest tests/extend/blocks/test_order_strategy_control_features.py --no-cov
 """
 
 from __future__ import annotations
@@ -22,7 +22,7 @@ from typing import Literal
 
 from app.core.data.contracts import SymbolInfo
 from app.core.host.logging import get_logger
-from app.extend.blocks.order.types import normalize_price
+from app.extend.functions.order_functions import normalize_price
 
 logger = get_logger(__name__)
 
@@ -55,7 +55,7 @@ def price_offset_pips(
     sign = -direction if is_protective else direction
     res = base_price + sign * distance
     logger.debug(
-        "FR-ORDER-FORMULAS: price_offset_pips base=%s dir=%s pips=%s -> %s",
+        "FR-FORMULA-PRICE-LEVEL: price_offset_pips base=%s dir=%s pips=%s -> %s",
         base_price,
         direction,
         pips,
@@ -86,7 +86,7 @@ def price_offset_atr(
     sign = -direction if is_protective else direction
     res = base_price + sign * distance
     logger.debug(
-        "FR-ORDER-FORMULAS: price_offset_atr base=%s dir=%s atr=%s mult=%s -> %s",
+        "FR-FORMULA-PRICE-LEVEL: price_offset_atr base=%s dir=%s atr=%s mult=%s -> %s",
         base_price,
         direction,
         atr_value,
@@ -115,7 +115,7 @@ def price_offset_percent(
     sign = -direction if is_protective else direction
     res = base_price + sign * distance
     logger.debug(
-        "FR-ORDER-FORMULAS: price_offset_percent base=%s dir=%s pct=%s -> %s",
+        "FR-FORMULA-PRICE-LEVEL: price_offset_percent base=%s dir=%s pct=%s -> %s",
         base_price,
         direction,
         percent,
@@ -166,7 +166,7 @@ def evaluate_price_level(
     if spec is not None:
         raw = normalize_price(raw, spec)
     logger.debug(
-        "FR-ORDER-FORMULAS: evaluate_price_level mode=%s base=%s dir=%s -> %s",
+        "FR-FORMULA-PRICE-LEVEL: evaluate_price_level mode=%s base=%s dir=%s -> %s",
         mode,
         base_price,
         direction,

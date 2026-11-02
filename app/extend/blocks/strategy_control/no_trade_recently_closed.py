@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -12,12 +13,11 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import (
-    TradeFilter,
-)
 from app.extend.blocks.strategy_control.trade_recently_closed import (
     trade_recently_closed,
+)
+from app.extend.functions.order_functions import (
+    TradeFilter,
 )
 
 

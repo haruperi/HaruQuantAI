@@ -5,14 +5,14 @@ Description:
     into explicit timezone-aware expiration timestamps compatible with broker
     contracts, matching StrategyQuant BarsValid pending order behavior.
 Purpose:
-    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+    FEAT-TRADING: StrategyQuant donor-faithful trading and trade management models.
 Key Capabilities:
-    - FR-ORDER-VALIDITY: Translate bar counts to expiration datetimes.
+    - FR-TRADING-VALIDITY: Translate bar counts to expiration datetimes.
 Python API Usage:
-    from app.extend.blocks.order.validity import schedule_bar_validity
+    from app.extend.trading.validity import schedule_bar_validity
     exp = schedule_bar_validity(bar_start, "H1", 3)
 CLI Usage:
-    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+    uv run pytest tests/extend/blocks/test_order_strategy_control_features.py --no-cov
 """
 
 from __future__ import annotations
@@ -65,7 +65,8 @@ def schedule_bar_validity(
     """
     if valid_bars <= 0:
         logger.debug(
-            "FR-ORDER-VALIDITY: valid_bars=%s -> Good-Till-Cancelled (None)", valid_bars
+            "FR-TRADING-VALIDITY: valid_bars=%s -> Good-Till-Cancelled (None)",
+            valid_bars,
         )
         return None
 
@@ -75,7 +76,7 @@ def schedule_bar_validity(
     delta = parse_timeframe_delta(timeframe)
     expiration = bar_start + valid_bars * delta
     logger.debug(
-        "FR-ORDER-VALIDITY: Scheduled expiration bar_start=%s + %d * %s -> %s",
+        "FR-TRADING-VALIDITY: Scheduled expiration bar_start=%s + %d * %s -> %s",
         bar_start,
         valid_bars,
         delta,

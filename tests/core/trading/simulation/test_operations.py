@@ -31,7 +31,7 @@ from app.extend.blocks.order.open.enter_at_stop import enter_at_stop
 from app.extend.blocks.order.open.enter_reverse_at_market import (
     enter_reverse_at_market,
 )
-from app.extend.blocks.order.types import TradeFilter
+from app.extend.functions.order_functions import TradeFilter
 from app.workspace.trading import Trading
 
 
