@@ -87,7 +87,7 @@ def test_builtin_manifest_and_editor_compilation_of_new_cohorts():
     for rel_path in (
         "app/extend/what_if/by_days.py",
         "app/extend/checker/checkers.py",
-        "app/extend/columns/trades.py",
+        "app/extend/columns/trades/balance.py",
     ):
         info = inspect_path(rel_path)
         assert info.ownership == "builtin"

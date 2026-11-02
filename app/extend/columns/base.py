@@ -20,6 +20,9 @@ CLI Usage:
 
 from __future__ import annotations
 
+import math
+from abc import ABC, abstractmethod
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import Any, Literal
 
@@ -117,3 +120,200 @@ class WalkForwardRunStats:
     trades_count: int = 0
     stagnation_pct: float = 0.0
     score: float = 0.0
+
+
+def safe_divide(num: float, den: float, default: float = 0.0) -> float:
+    """Safely divide numbers, returning default on zero or non-finite denominator."""
+    if den == 0.0 or not math.isfinite(den):
+        return default
+    res = num / den
+    return res if math.isfinite(res) else default
+
+
+def filter_snapshot_trades(
+    stats: StrategyStatsSnapshot,
+    sample_type: str = "FullSample",
+    direction: str = "Both",
+) -> list[dict[str, Any]]:
+    """Filter trades in a strategy stats snapshot by sample type and direction."""
+    target_dir = direction.upper()
+    return [
+        t
+        for t in stats.trades
+        if (
+            sample_type == "FullSample"
+            or t.get("sample_type", "FullSample") == sample_type
+        )
+        and (
+            direction == "Both"
+            or str(t.get("type", t.get("direction", "BUY"))).upper() == target_dir
+        )
+    ]
+
+
+def compute_snapshot_pnl_drawdown(
+    trades: list[dict[str, Any]],
+    initial_deposit: float,
+    metric_dd: float = 0.0,
+) -> tuple[list[float], float, float, float]:
+    """Calculate trade P&L list, gross profit, gross loss, and max drawdown."""
+    pls = [float(t.get("profit_loss", t.get("pnl", 0.0))) for t in trades]
+    gross_profit = sum(p for p in pls if p > 0.0)
+    gross_loss = sum(p for p in pls if p < 0.0)
+
+    peak = initial_deposit
+    curr_bal = initial_deposit
+    max_dd = 0.0
+    for p in pls:
+        curr_bal += p
+        peak = max(peak, curr_bal)
+        dd = peak - curr_bal
+        max_dd = max(max_dd, dd)
+    if not max_dd and metric_dd:
+        max_dd = abs(metric_dd)
+
+    return pls, gross_profit, gross_loss, max_dd
+
+
+class DatabankColumn(ABC):
+    """Base class for StrategyQuant Databank metric columns."""
+
+    def __init__(
+        self,
+        column_id: str,
+        label: str,
+        value_type: ColumnValueType = "NUMBER",
+        decimals: int = 2,
+        *,
+        maximize: bool | None = None,
+        preferred_min: float | None = None,
+        preferred_max: float | None = None,
+        is_dependent_on_trading_period: bool = False,
+        source_ref: str = "",
+    ) -> None:
+        self.column_id = column_id
+        self.label = label
+        self.value_type = value_type
+        self.decimals = decimals
+        self.maximize = maximize
+        self.preferred_min = preferred_min
+        self.preferred_max = preferred_max
+        self.is_dependent_on_trading_period = is_dependent_on_trading_period
+        self.source_ref = source_ref
+
+    @property
+    def descriptor(self) -> ColumnDescriptor:
+        """Return immutable descriptor representation."""
+        return ColumnDescriptor(
+            column_id=self.column_id,
+            category="Databanks",
+            label=self.label,
+            value_type=self.value_type,
+            decimals=self.decimals,
+            maximize=self.maximize,
+            source_ref=self.source_ref,
+        )
+
+    @abstractmethod
+    def compute(
+        self,
+        stats: StrategyStatsSnapshot,
+        *,
+        sample_type: str = "FullSample",
+        direction: str = "Both",
+    ) -> float | int | str:
+        """Compute the column metric from strategy performance snapshot."""
+        ...
+
+    def get_value(
+        self,
+        stats: StrategyStatsSnapshot,
+        *,
+        sample_type: str = "FullSample",
+        direction: str = "Both",
+    ) -> float | int | str:
+        """Alias for compute / metadata extraction."""
+        return self.compute(stats, sample_type=sample_type, direction=direction)
+
+
+class TradelistColumn(ABC):
+    """Base class for StrategyQuant Trades list columns."""
+
+    def __init__(
+        self,
+        column_id: str,
+        label: str,
+        value_type: ColumnValueType = "TEXT",
+        decimals: int = 0,
+        *,
+        source_ref: str = "",
+    ) -> None:
+        self.column_id = column_id
+        self.label = label
+        self.value_type = value_type
+        self.decimals = decimals
+        self.source_ref = source_ref
+
+    @property
+    def descriptor(self) -> ColumnDescriptor:
+        """Return immutable descriptor representation."""
+        return ColumnDescriptor(
+            column_id=self.column_id,
+            category="Trades",
+            label=self.label,
+            value_type=self.value_type,
+            decimals=self.decimals,
+            source_ref=self.source_ref,
+        )
+
+    @abstractmethod
+    def get_value(
+        self,
+        trade: TradeRecord,
+        *,
+        index: int = 1,
+        running_balance: float = 0.0,
+        running_dd_money: float = 0.0,
+        running_dd_pct: float = 0.0,
+    ) -> Any:
+        """Extract or compute column value for a single trade row."""
+        ...
+
+
+class WalkForwardColumn(ABC):
+    """Base class for StrategyQuant Walk-Forward evaluation columns."""
+
+    def __init__(
+        self,
+        column_id: str,
+        label: str,
+        value_type: ColumnValueType = "NUMBER",
+        decimals: int = 2,
+        *,
+        maximize: bool | None = None,
+        source_ref: str = "",
+    ) -> None:
+        self.column_id = column_id
+        self.label = label
+        self.value_type = value_type
+        self.decimals = decimals
+        self.maximize = maximize
+        self.source_ref = source_ref
+
+    @property
+    def descriptor(self) -> ColumnDescriptor:
+        """Return immutable descriptor representation."""
+        return ColumnDescriptor(
+            column_id=self.column_id,
+            category="WalkForward",
+            label=self.label,
+            value_type=self.value_type,
+            decimals=self.decimals,
+            maximize=self.maximize,
+            source_ref=self.source_ref,
+        )
+
+    @abstractmethod
+    def compute(self, wf_runs: Sequence[WalkForwardRunStats]) -> float:
+        """Compute summary walk-forward metric across run sequence."""
+        ...

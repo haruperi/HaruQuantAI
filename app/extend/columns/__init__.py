@@ -6,8 +6,11 @@ from app.extend.columns.base import (
     ColumnCategory,
     ColumnDescriptor,
     ColumnValueType,
+    DatabankColumn,
     StrategyStatsSnapshot,
+    TradelistColumn,
     TradeRecord,
+    WalkForwardColumn,
     WalkForwardRunStats,
 )
 from app.extend.columns.databanks import (
@@ -30,10 +33,13 @@ __all__ = [
     "ColumnCategory",
     "ColumnDescriptor",
     "ColumnValueType",
+    "DatabankColumn",
     "DatabankColumnEvaluator",
     "StrategyStatsSnapshot",
     "TradeColumnEvaluator",
     "TradeRecord",
+    "TradelistColumn",
+    "WalkForwardColumn",
     "WalkForwardColumnEvaluator",
     "WalkForwardRunStats",
 ]
