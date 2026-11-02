@@ -371,7 +371,7 @@ export function useCodeEditorWorkspace() {
   const handleContextMenuAction = async (action: string) => {
     if (documentCommandPending.current) return;
     if (!contextMenu && !['new_file', 'new_dir'].includes(action)) return;
-    const item = contextMenu?.item ?? { id: 'app/extend', name: 'snippets', type: 'directory' as const };
+    const item = contextMenu?.item ?? { id: treeRoot?.id || 'app/extend', name: treeRoot?.name || 'extend', type: 'directory' as const };
     setContextMenu(null);
 
     if (action === 'open') {

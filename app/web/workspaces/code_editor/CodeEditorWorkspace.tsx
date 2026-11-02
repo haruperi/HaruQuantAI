@@ -103,21 +103,52 @@ export function CodeEditorWorkspace() {
           </div>
 
           {/* Tree View */}
-          <div className="flex-1 overflow-y-auto p-1.5 font-mono text-[11px] leading-relaxed">
-            {treeRoot && (
-              <RenderTreeItem
-                item={treeRoot}
-                collapsed={collapsedFolders}
-                selectedPath={selectedNavPath}
-                searchQuery={navSearchQuery}
-                onToggle={(path) => setCollapsedFolders((p) => ({ ...p, [path]: !p[path] }))}
-                onSelectFile={handleOpenPath}
-                onContextMenu={(e, it) => {
-                  e.preventDefault();
-                  setContextMenu({ x: e.clientX, y: e.clientY, item: it });
-                }}
-              />
-            )}
+          <div
+            className="flex-1 overflow-y-auto p-1.5 font-mono text-[11px] leading-relaxed"
+            onContextMenu={(e) => {
+              if (e.target === e.currentTarget && treeRoot) {
+                e.preventDefault();
+                setContextMenu({ x: e.clientX, y: e.clientY, item: treeRoot });
+              }
+            }}
+          >
+            {treeRoot &&
+              (treeRoot.children && (treeRoot.name === 'extend' || treeRoot.id.endsWith('extend')) ? (
+                treeRoot.children.length === 0 ? (
+                  <div className="px-3 py-6 text-center text-xs text-slate-500 font-sans">
+                    No snippets found
+                  </div>
+                ) : (
+                  treeRoot.children.map((child) => (
+                    <RenderTreeItem
+                      key={child.id}
+                      item={child}
+                      collapsed={collapsedFolders}
+                      selectedPath={selectedNavPath}
+                      searchQuery={navSearchQuery}
+                      onToggle={(path) => setCollapsedFolders((p) => ({ ...p, [path]: !p[path] }))}
+                      onSelectFile={handleOpenPath}
+                      onContextMenu={(e, it) => {
+                        e.preventDefault();
+                        setContextMenu({ x: e.clientX, y: e.clientY, item: it });
+                      }}
+                    />
+                  ))
+                )
+              ) : (
+                <RenderTreeItem
+                  item={treeRoot}
+                  collapsed={collapsedFolders}
+                  selectedPath={selectedNavPath}
+                  searchQuery={navSearchQuery}
+                  onToggle={(path) => setCollapsedFolders((p) => ({ ...p, [path]: !p[path] }))}
+                  onSelectFile={handleOpenPath}
+                  onContextMenu={(e, it) => {
+                    e.preventDefault();
+                    setContextMenu({ x: e.clientX, y: e.clientY, item: it });
+                  }}
+                />
+              ))}
           </div>
         </aside>
 

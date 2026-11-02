@@ -1,5 +1,9 @@
 [
   "app/extend/__init__.py",
+  "app/extend/ai_tools/_templates/SKILL.md",
+  "app/extend/ai_tools/_templates/agent.md",
+  "app/extend/ai_tools/_templates/command.md",
+  "app/extend/ai_tools/_templates/rule.md",
   "app/extend/blocks/__init__.py",
   "app/extend/blocks/actions/__init__.py",
   "app/extend/blocks/actions/annotations.py",
