@@ -15,8 +15,8 @@ function draw(change: Partial<typeof defaults>) {
     stroke() { calls.push('wick:' + this.strokeStyle); },
     fillRect() { calls.push('body:' + this.fillStyle); },
     strokeRect() { calls.push('border:' + this.strokeStyle); },
-  } as unknown as CanvasRenderingContext2D;
-  paintSeries(ctx, bars, 0, 1, (i) => i * 30, (value) => 200 - value, 10, 'Candles', 150, {
+  };
+  paintSeries(ctx as unknown as CanvasRenderingContext2D, bars, 0, 1, (i) => i * 30, (value) => 200 - value, 10, 'Candles', 150, {
     ...defaults, ...change,
   });
   return calls;
