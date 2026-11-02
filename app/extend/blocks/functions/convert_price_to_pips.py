@@ -1,4 +1,19 @@
-"""Price to pips conversion strategy block."""
+"""Price to pips conversion strategy block.
+
+Description:
+    Converts price differences to pip units using broker point resolution or
+    explicit pip sizing with non-silent requirement logging.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-pips: Conversion from price differences to pips.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.convert_price_to_pips import convert_price_to_pips
+    pips = convert_price_to_pips(0.002, point=0.00001, digits=5)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,9 +21,9 @@ import inspect
 import math
 from typing import Any
 
-from app.core.host.logging import get_logger
 from app.extend.blocks.base import block
 from app.extend.blocks.functions._common import (
+    _log_func_eval,
     resolve_pip_size,
     resolve_shift_value,
 )
@@ -20,8 +35,6 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-
-logger = get_logger(__name__)
 
 convert_price_to_pips_spec = BlockSpec(
     id="function.convert_price_to_pips",
@@ -73,15 +86,19 @@ def convert_price_to_pips(
     val = resolve_shift_value(price_diff, shift)
     eff_pip = resolve_pip_size(point=point, digits=digits, pip_size=pip_size)
     if eff_pip <= 0.0 or math.isnan(val):
-        return float("nan")
+        return _log_func_eval(
+            "convert_price_to_pips",
+            float("nan"),
+            category="PIPS",
+            detail=f"val={val}, eff_pip={eff_pip}",
+        )
     res = float(val / eff_pip)
-    logger.debug(
-        "FR-SERVICES-FUNCTION-PIPS: convert_price_to_pips(%f, pip=%f) = %f",
-        val,
-        eff_pip,
+    return _log_func_eval(
+        "convert_price_to_pips",
         res,
+        category="PIPS",
+        detail=f"val={val}, pip={eff_pip}",
     )
-    return res
 
 
 async def convert_price_to_pips_symbol(

@@ -1,14 +1,29 @@
-"""Indicator lowest ranking expression strategy block."""
+"""Indicator lowest ranking expression strategy block.
+
+Description:
+    Extracts Nth lowest indicator value in a rolling historical window
+    with non-silent requirement logging and StrategyQuant donor parameter defaults.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-rank: Rolling window lowest value ranking.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.indicator_lowest import indicator_lowest
+    val = indicator_lowest(series, period=5, nth_value=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
 import math
 from typing import Any
 
-from app.core.host.logging import get_logger
 from app.extend.blocks.base import block
 from app.extend.blocks.functions._common import (
     MIN_RANK_PERIOD,
+    _log_func_eval,
     resolve_shift_value,
 )
 from app.extend.blocks.metadata import (
@@ -19,8 +34,6 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-
-logger = get_logger(__name__)
 
 indicator_lowest_spec = BlockSpec(
     id="function.indicator_lowest",
@@ -64,31 +77,33 @@ def indicator_lowest(
         Nth lowest value as float, or -1.0 if out of bounds or invalid.
     """
     if period < MIN_RANK_PERIOD or nth_value < 0 or nth_value >= period:
-        logger.debug(
-            "FR-SERVICES-FUNCTION-RANK: indicator_lowest invalid "
-            "period=%d, nth=%d -> -1.0",
-            period,
-            nth_value,
+        return _log_func_eval(
+            "indicator_lowest",
+            -1.0,
+            category="RANK",
+            detail=f"invalid period={period}, nth={nth_value}",
         )
-        return -1.0
 
     vals: list[float] = []
     for i in range(period):
         v = resolve_shift_value(indicator, shift + i)
         if math.isnan(v):
-            return -1.0
+            return _log_func_eval(
+                "indicator_lowest",
+                -1.0,
+                category="RANK",
+                detail=f"NaN encountered at relative bar {i}",
+            )
         vals.append(v)
 
     vals.sort()
     res = vals[nth_value]
-    logger.debug(
-        "FR-SERVICES-FUNCTION-RANK: indicator_lowest(period=%d, nth=%d, shift=%d) = %s",
-        period,
-        nth_value,
-        shift,
+    return _log_func_eval(
+        "indicator_lowest",
         res,
+        category="RANK",
+        detail=f"period={period}, nth={nth_value}, shift={shift}",
     )
-    return res
 
 
 __all__ = ["indicator_lowest", "indicator_lowest_spec"]

@@ -1,4 +1,19 @@
-"""Get time integer encoding temporal expression strategy block."""
+"""Get time integer encoding temporal expression strategy block.
+
+Description:
+    Encodes hour, minute, and second into integer HHMMSS with non-silent requirement
+    logging matching StrategyQuant donor parameter defaults and semantics.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-temporal: Time integer encoding.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.get_time import get_time
+    time_int = get_time(hour=14, minute=30, second=45)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -29,9 +44,9 @@ get_time_spec = BlockSpec(
     execution_kind=ExecutionKind.EXPRESSION,
     chart_pane=ChartPane.MAIN,
     inputs=(
-        InputPort("hour", PortType.NUMBER, "Hour number 0..23", default=0),
-        InputPort("minute", PortType.NUMBER, "Minute number 0..59", default=0),
-        InputPort("second", PortType.NUMBER, "Second number 0..59", default=0),
+        InputPort("hour", PortType.NUMBER, "Hour 0..23", default=0),
+        InputPort("minute", PortType.NUMBER, "Minute 0..59", default=0),
+        InputPort("second", PortType.NUMBER, "Second 0..59", default=0),
     ),
     outputs=(OutputPort("value", PortType.NUMBER, "Encoded HHMMSS integer"),),
     is_generation_eligible=True,
@@ -45,9 +60,9 @@ def get_time(hour: int = 0, minute: int = 0, second: int = 0) -> int:
     """Encode time as integer HHMMSS.
 
     Args:
-        hour: Hour number 0..23.
-        minute: Minute number 0..59.
-        second: Second number 0..59.
+        hour: Hour 0..23 (default 0).
+        minute: Minute 0..59 (default 0).
+        second: Second 0..59 (default 0).
 
     Returns:
         Integer encoded as HHMMSS.

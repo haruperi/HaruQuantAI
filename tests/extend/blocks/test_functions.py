@@ -1,8 +1,25 @@
-"""Unit tests for discrete function building blocks and Functions facade."""
+"""Comprehensive unit tests for discrete function building blocks and Functions facade.
+
+Description:
+    Validates all 18 StrategyQuant-faithful function building blocks,
+    including discrete functions, parameter defaults, object facades,
+    non-silent requirement logging, and temporal/pips calculation edge cases.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Test suite for function building blocks.
+Key Capabilities:
+    - FR-function-tests: Comprehensive unit tests across all 18 blocks.
+    - FR-function-facade-tests: Object-oriented facade methods including plus.
+    - FR-function-logging-tests: Verify non-silent diagnostic requirement logs.
+Python API Usage:
+    pytest tests/extend/blocks/test_functions.py --no-cov
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
 import asyncio
+import logging
 import math
 from unittest.mock import AsyncMock, MagicMock
 
@@ -52,8 +69,10 @@ from app.extend.blocks.functions import (
     plus_spec,
     register_custom_function,
     resolve_pip_size,
+    round_spec,
     round_to_decimals,
     round_to_decimals_spec,
+    round_val,
     square_root,
     square_root_spec,
 )
@@ -99,9 +118,11 @@ def test_math_blocks_elementary() -> None:
     assert abs_val([-10.0, -20.0], shift=0) == 20.0
     assert abs_val([-10.0, -20.0], shift=1) == 10.0
 
-    # round_to_decimals
+    # round_to_decimals and round_val alias
     assert round_to_decimals(1.234567, decimals=2) == 1.23
     assert round_to_decimals(1.234567, decimals=4) == 1.2346
+    assert round_val(1.234567, decimals=2) == 1.23
+    assert round_spec is round_to_decimals_spec
     assert math.isnan(round_to_decimals(float("nan")))
 
     # exponential
@@ -143,11 +164,16 @@ def test_extrema_blocks() -> None:
 
 def test_temporal_encoding_blocks() -> None:
     """Verify get_date and get_time encoding logic."""
-    # YYYYMMDD
+    # YYYYMMDD with keyword args
     assert get_date(year=2024, month=10, day=28) == 20241028
     assert get_date() == 20160101
     assert DATE_YEAR_MULTIPLIER == 10000
     assert DATE_MONTH_MULTIPLIER == 100
+
+    # Positional order: ISO (year, month, day)
+    assert get_date(2024, 10, 28) == 20241028
+    # Positional order: StrategyQuant donor (day, month, year)
+    assert get_date(28, 10, 2024) == 20241028
 
     # HHMMSS
     assert get_time(hour=14, minute=30, second=45) == 143045
@@ -273,6 +299,7 @@ def test_functions_facade_complete_interface() -> None:
     """Verify Functions facade matches legacy facade and methods."""
     facade = Functions(default_point=0.00001, default_digits=5)
 
+    assert facade.plus(10.0, 5.0) == 15.0
     assert facade.minus(10.0, 4.0) == 6.0
     assert facade.multiplication(3.0, 4.0) == 12.0
     assert facade.division(20.0, 4.0) == 5.0
@@ -296,9 +323,6 @@ def test_functions_facade_complete_interface() -> None:
     # Custom function via facade
     facade.register_custom_function("facade_square", lambda x: x * x)
     assert facade.custom_function("facade_square", 8) == 64
-
-    # Functions does NOT have plus attribute
-    assert not hasattr(facade, "plus")
 
 
 def test_functions_facade_async_symbol_methods() -> None:
@@ -346,3 +370,38 @@ def test_block_specifications_present_and_valid() -> None:
         assert len(spec.inputs) >= 1
         assert len(spec.outputs) == 1
         assert spec.is_causal is True
+
+
+def test_non_silent_requirement_logging(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify function evaluations emit non-silent FR-SERVICES-FUNCTION diagnostic logs."""
+    caplog.set_level(logging.DEBUG)
+
+    # Arithmetic
+    plus(1.0, 2.0)
+    assert any(
+        "FR-SERVICES-FUNCTION-ARITHMETIC" in record.message for record in caplog.records
+    )
+
+    caplog.clear()
+    abs_val(-5.0)
+    assert any(
+        "FR-SERVICES-FUNCTION-MATH" in record.message for record in caplog.records
+    )
+
+    caplog.clear()
+    get_date(2024, 1, 1)
+    assert any(
+        "FR-SERVICES-FUNCTION-TEMPORAL" in record.message for record in caplog.records
+    )
+
+    caplog.clear()
+    indicator_highest([1.0, 2.0, 3.0], period=3, nth_value=0)
+    assert any(
+        "FR-SERVICES-FUNCTION-RANK" in record.message for record in caplog.records
+    )
+
+    caplog.clear()
+    convert_price_to_pips(0.002, point=0.00001, digits=5)
+    assert any(
+        "FR-SERVICES-FUNCTION-PIPS" in record.message for record in caplog.records
+    )

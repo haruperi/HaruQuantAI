@@ -1,4 +1,19 @@
-"""Addition (plus) mathematical expression strategy block."""
+"""Addition (plus) mathematical expression strategy block.
+
+Description:
+    Evaluates arithmetic addition of two operands (scalar, series, or callable)
+    at a historical bar shift with non-silent requirement logging.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-arithmetic: Arithmetic addition evaluation.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.plus import plus
+    res = plus(10.0, 5.0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,6 +21,7 @@ import math
 from typing import Any
 
 from app.extend.blocks.base import block
+from app.extend.blocks.functions._common import _log_func_eval, resolve_shift_value
 from app.extend.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -14,7 +30,6 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.extend.blocks.series import resolve_shift_value
 
 plus_spec = BlockSpec(
     id="function.plus",
@@ -51,8 +66,9 @@ def plus(left: Any, right: Any, shift: int = 0) -> float:
     v1 = resolve_shift_value(left, shift)
     v2 = resolve_shift_value(right, shift)
     if math.isnan(v1) or math.isnan(v2):
-        return float("nan")
-    return v1 + v2
+        return _log_func_eval("plus", float("nan"), category="ARITHMETIC")
+    res = v1 + v2
+    return _log_func_eval("plus", res, category="ARITHMETIC")
 
 
 __all__ = ["plus", "plus_spec"]

@@ -1,4 +1,20 @@
-"""Custom function execution strategy block."""
+"""Custom function execution strategy block.
+
+Description:
+    Executes user-registered custom functions by string identifier with non-silent
+    logging, raising NotImplementedError when unregistered to mirror StrategyQuant
+    donor behavior.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-custom: Dynamic custom function invocation.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.custom_function import custom_function
+    res = custom_function("my_custom_fn", 1, 2)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 

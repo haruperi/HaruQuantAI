@@ -1,4 +1,30 @@
-"""Quantitative arithmetic, math, temporal, ranking, and pip conversion blocks."""
+"""Quantitative arithmetic, math, temporal, ranking, and pip conversion blocks.
+
+Description:
+    Implements all 18 StrategyQuant function snippet classes as modular
+    typed blocks and facades for rule generation, builder integration, and
+    backtesting execution.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: StrategyQuant donor-faithful function blocks.
+Key Capabilities:
+    - FR-function-arithmetic: Four basic arithmetic operations with overflow protection.
+    - FR-function-math: Elementary mathematical functions (abs, round, exp, log, sqrt).
+    - FR-function-extrema: Two-operand maximum and minimum selectors.
+    - FR-function-temporal: Calendar date and time integer encoders.
+    - FR-function-rank: Rolling window highest and lowest order statistics.
+    - FR-function-pips: Broker-calibrated price and pip conversions.
+    - FR-function-custom: Dynamic user function registry and execution.
+Python API Usage:
+    from app.extend.blocks.functions import (
+        Functions,
+        plus,
+        minus,
+        multiplication,
+        division,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -14,6 +40,7 @@ from app.extend.blocks.functions._common import (
     POINT_TOLERANCE,
     TIME_HOUR_MULTIPLIER,
     TIME_MINUTE_MULTIPLIER,
+    _log_func_eval,
     register_custom_function,
     resolve_pip_size,
 )
@@ -55,8 +82,10 @@ from app.extend.blocks.functions.multiplication import (
 )
 from app.extend.blocks.functions.plus import plus, plus_spec
 from app.extend.blocks.functions.round_to_decimals import (
+    round_spec,
     round_to_decimals,
     round_to_decimals_spec,
+    round_val,
 )
 from app.extend.blocks.functions.square_root import square_root, square_root_spec
 
@@ -73,6 +102,7 @@ __all__ = [
     "TIME_HOUR_MULTIPLIER",
     "TIME_MINUTE_MULTIPLIER",
     "Functions",
+    "_log_func_eval",
     "abs_val",
     "abs_val_spec",
     "convert_pips_to_price",
@@ -109,8 +139,10 @@ __all__ = [
     "plus_spec",
     "register_custom_function",
     "resolve_pip_size",
+    "round_spec",
     "round_to_decimals",
     "round_to_decimals_spec",
+    "round_val",
     "square_root",
     "square_root_spec",
 ]

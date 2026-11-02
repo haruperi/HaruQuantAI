@@ -1,4 +1,25 @@
-"""Shared constants, registries, and numerical helpers for function building blocks."""
+"""Shared constants, registries, and numerical helpers for function building blocks.
+
+Description:
+    Provides numerical helpers, precision resolution, custom function
+    registries, shift evaluation, and non-silent diagnostic logging for
+    StrategyQuant-faithful quantitative arithmetic, math, ranking, and
+    temporal expression blocks.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library and helpers.
+Key Capabilities:
+    - FR-function-helpers: Shift resolution, precision, and scaling constants.
+    - FR-function-logging: Non-silent requirement diagnostics.
+    - FR-function-custom: Extensible custom function handler registry.
+Python API Usage:
+    from app.extend.blocks.functions._common import (
+        _log_func_eval,
+        resolve_pip_size,
+        resolve_shift_value,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -23,6 +44,7 @@ __all__ = [
     "TIME_HOUR_MULTIPLIER",
     "TIME_MINUTE_MULTIPLIER",
     "_CUSTOM_REGISTRY",
+    "_log_func_eval",
     "register_custom_function",
     "resolve_pip_size",
     "resolve_shift_value",
@@ -41,6 +63,41 @@ POINT_5_DIGIT: float = 1e-5
 POINT_3_DIGIT: float = 1e-3
 
 _CUSTOM_REGISTRY: dict[str, Callable[..., Any]] = {}
+
+
+def _log_func_eval(
+    block_name: str,
+    result: float,
+    category: str = "MATH",
+    detail: str | None = None,
+) -> float:
+    """Log function evaluation outcome to ensure non-silent execution.
+
+    Args:
+        block_name: Name of the function block.
+        result: Evaluated numerical outcome (scalar or NaN).
+        category: Subcategory tag (e.g. ARITHMETIC, MATH, RANK, TEMPORAL, PIPS).
+        detail: Optional extra context string.
+
+    Returns:
+        The result unmodified.
+    """
+    if detail:
+        logger.debug(
+            "FR-SERVICES-FUNCTION-%s: %s (%s) -> %s",
+            category,
+            block_name,
+            detail,
+            result,
+        )
+    else:
+        logger.debug(
+            "FR-SERVICES-FUNCTION-%s: %s -> %s",
+            category,
+            block_name,
+            result,
+        )
+    return result
 
 
 def resolve_pip_size(

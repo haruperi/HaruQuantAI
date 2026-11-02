@@ -1,13 +1,27 @@
-"""Round to decimals mathematical expression strategy block."""
+"""Round to decimals mathematical expression strategy block.
+
+Description:
+    Rounds numerical operand to specified decimal places at historical shift
+    with non-silent requirement logging and StrategyQuant donor parameter defaults.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-math: Value rounding to decimal precision.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.round_to_decimals import round_to_decimals
+    res = round_to_decimals(1.234567, decimals=4)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
 import math
 from typing import Any
 
-from app.core.host.logging import get_logger
 from app.extend.blocks.base import block
-from app.extend.blocks.functions._common import resolve_shift_value
+from app.extend.blocks.functions._common import _log_func_eval, resolve_shift_value
 from app.extend.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -16,8 +30,6 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-
-logger = get_logger(__name__)
 
 round_to_decimals_spec = BlockSpec(
     id="function.round_to_decimals",
@@ -53,15 +65,18 @@ def round_to_decimals(val: Any, decimals: int = 5, shift: int = 0) -> float:
     """
     v = resolve_shift_value(val, shift)
     if math.isnan(v):
-        return float("nan")
+        return _log_func_eval("round_to_decimals", float("nan"), category="MATH")
     res = round(v, decimals)
-    logger.debug(
-        "FR-SERVICES-FUNCTION-MATH: round_to_decimals(%s, dec=%d) = %s",
-        v,
-        decimals,
+    return _log_func_eval(
+        "round_to_decimals",
         res,
+        category="MATH",
+        detail=f"v={v}, dec={decimals}",
     )
-    return res
 
 
-__all__ = ["round_to_decimals", "round_to_decimals_spec"]
+# StrategyQuant alias
+round_val = round_to_decimals
+round_spec = round_to_decimals_spec
+
+__all__ = ["round_spec", "round_to_decimals", "round_to_decimals_spec", "round_val"]

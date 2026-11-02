@@ -1,13 +1,27 @@
-"""Absolute value mathematical expression strategy block."""
+"""Absolute value mathematical expression strategy block.
+
+Description:
+    Calculates absolute value of numerical operand at specified shift
+    with non-silent requirement logging.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-math: Absolute value calculation.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.abs_val import abs_val
+    res = abs_val(-42.5)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
 import math
 from typing import Any
 
-from app.core.host.logging import get_logger
 from app.extend.blocks.base import block
-from app.extend.blocks.functions._common import resolve_shift_value
+from app.extend.blocks.functions._common import _log_func_eval, resolve_shift_value
 from app.extend.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -16,8 +30,6 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-
-logger = get_logger(__name__)
 
 abs_val_spec = BlockSpec(
     id="function.abs_val",
@@ -53,10 +65,9 @@ def abs_val(val: Any, shift: int = 0) -> float:
     """
     v = resolve_shift_value(val, shift)
     if math.isnan(v):
-        return float("nan")
+        return _log_func_eval("abs_val", float("nan"), category="MATH")
     res = abs(v)
-    logger.debug("FR-SERVICES-FUNCTION-MATH: abs_val(%s) = %s", v, res)
-    return res
+    return _log_func_eval("abs_val", res, category="MATH")
 
 
 __all__ = ["abs_val", "abs_val_spec"]

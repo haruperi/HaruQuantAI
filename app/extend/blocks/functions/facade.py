@@ -1,4 +1,22 @@
-"""Consolidated facade for function building blocks."""
+"""Consolidated facade for function building blocks.
+
+Description:
+    Provides an object-oriented and namespace-bound API facade over discrete
+    StrategyQuant-faithful quantitative arithmetic, mathematical, temporal,
+    ranking, and pip conversion building blocks.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library and facade.
+Key Capabilities:
+    - FR-function-facade: Unified object interface for all function blocks.
+    - FR-function-arithmetic: Arithmetic operations (plus, minus, mult, div).
+    - FR-function-pips: Broker-aware pip scaling and conversion methods.
+Python API Usage:
+    from app.extend.blocks.functions import Functions
+    f = Functions(default_point=0.00001, default_digits=5)
+    res = f.plus(10.0, 5.0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -31,6 +49,7 @@ from app.extend.blocks.functions.maximum import maximum
 from app.extend.blocks.functions.minimum import minimum
 from app.extend.blocks.functions.minus import minus
 from app.extend.blocks.functions.multiplication import multiplication
+from app.extend.blocks.functions.plus import plus
 from app.extend.blocks.functions.round_to_decimals import round_to_decimals
 from app.extend.blocks.functions.square_root import square_root
 
@@ -60,6 +79,10 @@ class Functions:
             default_point,
             default_digits,
         )
+
+    def plus(self, left: Any, right: Any, shift: int = 0) -> float:
+        """Calculate addition of two operands."""
+        return plus(left, right, shift=shift)
 
     def minus(self, left: Any, right: Any, shift: int = 0) -> float:
         """Calculate subtraction of two operands."""

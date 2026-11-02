@@ -1,13 +1,27 @@
-"""Maximum mathematical expression strategy block."""
+"""Maximum mathematical expression strategy block.
+
+Description:
+    Calculates maximum of two numerical operands at specified historical shift
+    with non-silent requirement logging.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-math: Maximum value evaluation.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.maximum import maximum
+    res = maximum(5.0, 10.0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
 import math
 from typing import Any
 
-from app.core.host.logging import get_logger
 from app.extend.blocks.base import block
-from app.extend.blocks.functions._common import resolve_shift_value
+from app.extend.blocks.functions._common import _log_func_eval, resolve_shift_value
 from app.extend.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -17,15 +31,13 @@ from app.extend.blocks.metadata import (
     PortType,
 )
 
-logger = get_logger(__name__)
-
 maximum_spec = BlockSpec(
     id="function.maximum",
     version="1.0.0",
     name="Maximum",
-    description="Determines the maximum of two numerical operands at specified shift",
+    description="Calculates maximum of two numerical operands at specified shift",
     category="functions",
-    tags=("math", "maximum", "max"),
+    tags=("math", "extrema", "maximum", "max"),
     execution_kind=ExecutionKind.EXPRESSION,
     chart_pane=ChartPane.MAIN,
     inputs=(
@@ -54,10 +66,9 @@ def maximum(val1: Any, val2: Any, shift: int = 0) -> float:
     v1 = resolve_shift_value(val1, shift)
     v2 = resolve_shift_value(val2, shift)
     if math.isnan(v1) or math.isnan(v2):
-        return float("nan")
+        return _log_func_eval("maximum", float("nan"), category="MATH")
     res = max(v1, v2)
-    logger.debug("FR-SERVICES-FUNCTION-MATH: max(%s, %s) = %s", v1, v2, res)
-    return res
+    return _log_func_eval("maximum", res, category="MATH", detail=f"v1={v1}, v2={v2}")
 
 
 __all__ = ["maximum", "maximum_spec"]

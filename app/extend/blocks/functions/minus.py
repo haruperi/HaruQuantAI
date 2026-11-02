@@ -1,13 +1,27 @@
-"""Minus (subtraction) mathematical expression strategy block."""
+"""Minus (subtraction) mathematical expression strategy block.
+
+Description:
+    Evaluates arithmetic subtraction of two operands (scalar, series, or callable)
+    at a historical bar shift with non-silent requirement logging.
+Purpose:
+    FEAT-FUNCTIONS-BLOCKS: Quantitative function block library.
+Key Capabilities:
+    - FR-function-arithmetic: Arithmetic subtraction evaluation.
+    - FR-function-logging: Non-silent requirement diagnostics.
+Python API Usage:
+    from app.extend.blocks.functions.minus import minus
+    res = minus(10.0, 3.0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_functions.py --no-cov
+"""
 
 from __future__ import annotations
 
 import math
 from typing import Any
 
-from app.core.host.logging import get_logger
 from app.extend.blocks.base import block
-from app.extend.blocks.functions._common import resolve_shift_value
+from app.extend.blocks.functions._common import _log_func_eval, resolve_shift_value
 from app.extend.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -16,8 +30,6 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-
-logger = get_logger(__name__)
 
 minus_spec = BlockSpec(
     id="function.minus",
@@ -58,16 +70,9 @@ def minus(left: Any, right: Any, shift: int = 0) -> float:
     v1 = resolve_shift_value(left, shift)
     v2 = resolve_shift_value(right, shift)
     if math.isnan(v1) or math.isnan(v2):
-        return float("nan")
+        return _log_func_eval("minus", float("nan"), category="ARITHMETIC")
     res = v1 - v2
-    logger.debug(
-        "FR-SERVICES-FUNCTION-ARITHMETIC: minus(shift=%d) %s - %s = %s",
-        shift,
-        v1,
-        v2,
-        res,
-    )
-    return res
+    return _log_func_eval("minus", res, category="ARITHMETIC")
 
 
 __all__ = ["minus", "minus_spec"]
