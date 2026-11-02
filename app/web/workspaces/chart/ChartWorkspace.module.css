@@ -1500,3 +1500,66 @@
   --cq-hover: #e9edf5;
   color: var(--cq-text);
 }
+
+
+/* Per-chart symbol / interval controls: remain clickable independently of the chart canvas.
+   The legend itself does not intercept chart gestures outside these controls. */
+.root :global(.cq-legend-multi) {
+  top: 7px;
+  left: 8px;
+  max-width: calc(100% - 16px);
+}
+.root :global(.cq-pane-controls) {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: 5px;
+  width: max-content;
+  max-width: 100%;
+  min-height: 30px;
+  margin-bottom: 5px;
+  padding: 2px;
+  border: 1px solid var(--cq-border);
+  border-radius: 6px;
+  color: var(--cq-text);
+  background: var(--cq-panel);
+  pointer-events: auto;
+}
+.root :global(.cq-pane-controls .cq-pane-symbol) {
+  display: flex;
+  gap: 5px;
+  align-items: center;
+  justify-content: flex-start;
+  min-width: 0;
+  min-height: 26px;
+  padding: 3px 6px;
+  font-size: 12px;
+  border-radius: 4px;
+}
+.root :global(.cq-pane-symbol strong) {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.root :global(.cq-pane-controls .cq-symbol-logo) {
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+  font-size: 10px;
+}
+.root :global(.cq-pane-controls select) {
+  width: auto;
+  min-width: 55px;
+  max-width: 70px;
+  height: 26px;
+  padding: 3px 4px;
+  border-radius: 4px;
+  font-size: 12px;
+  background: var(--cq-bg);
+  cursor: pointer;
+}
+.root :global(.cq-pane-controls button:focus-visible),
+.root :global(.cq-pane-controls select:focus-visible) {
+  outline: 2px solid #2962ff;
+  outline-offset: 1px;
+}
