@@ -366,13 +366,18 @@ class Data:
         )
 
     def _remove_cached_files(self, row: dict[str, Any]) -> None:
-        """Remove retired canonical files only when no catalog still references them."""
+        """Remove retired canonical files and empty directories."""
+        from contextlib import suppress
+
         from .partition_files import dataset_lock
 
-        lineage = json.loads(row.get("lineage_json") or "{}")
-        if lineage.get("storage") != "canonical-partitions-v1":
+        if not row.get("path"):
             return
         root = Path(row["path"]).resolve()
+        if not root.exists() or not root.is_dir():
+            return
+
+        lineage = json.loads(row.get("lineage_json") or "{}")
         with dataset_lock(root):
             active = require_data(self.gateway.read_records("datamgr_datasets"))[
                 "records"
@@ -380,15 +385,31 @@ class Data:
             referenced = {
                 Path(path).resolve() for item in active for path in catalog_paths(item)
             }
-            for value in lineage.get("partitions", []):
-                path = Path(value).resolve()
-                if (
-                    path.is_relative_to(root)
-                    and path != root
-                    and path.suffix == ".parquet"
-                    and path not in referenced
-                ):
-                    path.unlink(missing_ok=True)
+            if lineage.get("storage") == "canonical-partitions-v1":
+                for value in lineage.get("partitions", []):
+                    path = Path(value).resolve()
+                    if (
+                        path.is_relative_to(root)
+                        and path != root
+                        and path.suffix == ".parquet"
+                        and path not in referenced
+                    ):
+                        path.unlink(missing_ok=True)
+
+            # Clean up empty subdirectories within root (e.g. tick year/month folders)
+            for sub in sorted(
+                root.glob("**/"), key=lambda p: len(p.parts), reverse=True
+            ):
+                if sub != root and sub.is_dir():
+                    with suppress(OSError):
+                        sub.rmdir()
+
+            # Clean up root folder if empty and no active catalog item references it
+            if root != root.parent and not any(
+                ref.is_relative_to(root) for ref in referenced
+            ):
+                with suppress(OSError):
+                    root.rmdir()
 
     def clear(self, dataset_id: str) -> dict[str, Any]:
         """Clear recorded dataset observations while retaining catalog record."""

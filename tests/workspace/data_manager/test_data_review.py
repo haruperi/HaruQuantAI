@@ -66,6 +66,49 @@ def test_clear_removes_owned_cache_and_preserves_unrelated_files(recorded_histor
     assert DatasetReview(gateway, identifier).rows()["total"] == 0
 
 
+def test_delete_dataset_removes_empty_dataset_directory(recorded_history):
+    from pathlib import Path
+
+    from app.core.data.market_storage import catalog_paths
+    from app.workspace.data_manager.data.feature import Data
+
+    gateway, identifier, _ = recorded_history
+    record = DatasetReview(gateway, identifier).record
+    dataset_dir = Path(record["path"]).resolve()
+    paths = [Path(value) for value in catalog_paths(record)]
+
+    assert all(path.exists() for path in paths)
+    assert dataset_dir.exists() and dataset_dir.is_dir()
+
+    res = Data(gateway).delete(identifier)
+    assert res["success"]
+    assert all(not path.exists() for path in paths)
+    assert not dataset_dir.exists()
+
+
+def test_delete_dataset_preserves_dataset_dir_if_unrelated_file_present(
+    recorded_history,
+):
+    from pathlib import Path
+
+    from app.core.data.market_storage import catalog_paths
+    from app.workspace.data_manager.data.feature import Data
+
+    gateway, identifier, _ = recorded_history
+    record = DatasetReview(gateway, identifier).record
+    dataset_dir = Path(record["path"]).resolve()
+    paths = [Path(value) for value in catalog_paths(record)]
+
+    unrelated = dataset_dir / "custom_notes.txt"
+    unrelated.write_text("user notes")
+
+    res = Data(gateway).delete(identifier)
+    assert res["success"]
+    assert all(not path.exists() for path in paths)
+    assert dataset_dir.exists()
+    assert unrelated.read_text() == "user notes"
+
+
 def test_saved_session_lunch_excludes_closed_market_gap(recorded_history):
     import json
     import sqlite3
