@@ -1,4 +1,18 @@
-"""Consolidated facade for evaluating quantitative comparison blocks."""
+"""Consolidated facade for evaluating quantitative comparison blocks.
+
+Description:
+    Provides an object-oriented Comparisons facade interface over
+    underlying discrete StrategyQuant comparison condition blocks.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: Provide object-oriented facade for comparison
+    rule evaluation.
+Key Capabilities:
+    - FR-comparison-facade: Unified access to comparisons and crossovers.
+Python API Usage:
+    from app.extend.blocks.comparisons.facade import Comparisons
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 

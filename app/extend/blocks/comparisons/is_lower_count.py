@@ -1,4 +1,17 @@
-"""Is Lower Count condition persistence strategy block."""
+"""Is Lower Count condition persistence strategy block.
+
+Description:
+    Evaluates whether left < right remains true across a window of bars,
+    matching StrategyQuant IsLowerCount snippet.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful IsLowerCount block.
+Key Capabilities:
+    - FR-comparison-count: Test inequality persistence across lookback window.
+Python API Usage:
+    from app.extend.blocks.comparisons.is_lower_count import is_lower_count
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -8,6 +21,7 @@ from typing import Any
 from app.extend.blocks.base import block
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COUNT_PRECISION,
+    _log_comparison,
     _pair,
 )
 from app.extend.blocks.metadata import (
@@ -31,8 +45,13 @@ is_lower_count_spec = BlockSpec(
     inputs=(
         InputPort("left", PortType.ANY, "Left operand"),
         InputPort("right", PortType.ANY, "Right operand"),
-        InputPort("bars", PortType.NUMBER, "Number of lookback bars"),
-        InputPort("not_strict", PortType.BOOLEAN, "Allow equal values"),
+        InputPort("bars", PortType.NUMBER, "Number of lookback bars", default=2),
+        InputPort(
+            "not_strict",
+            PortType.BOOLEAN,
+            "Allow equal values",
+            default=False,
+        ),
     ),
     outputs=(OutputPort("condition", PortType.BOOLEAN, "True if condition persisted"),),
     is_generation_eligible=True,
@@ -53,17 +72,17 @@ def is_lower_count(
 ) -> bool:
     """Evaluate whether left < right remains true across a window of bars."""
     if bars < 1:
-        return False
+        return _log_comparison("is_lower_count", False)
     at_least_once = False
     for i in range(bars):
         l_val, r_val = _pair(left, right, shift + i, precision)
         if math.isnan(l_val) or math.isnan(r_val) or l_val > r_val:
-            return False
+            return _log_comparison("is_lower_count", False)
         if l_val == r_val and not not_strict:
-            return False
+            return _log_comparison("is_lower_count", False)
         if l_val < r_val:
             at_least_once = True
-    return at_least_once
+    return _log_comparison("is_lower_count", at_least_once)
 
 
 __all__ = ["is_lower_count", "is_lower_count_spec"]

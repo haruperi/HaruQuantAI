@@ -1,12 +1,33 @@
 """Unit tests for modular comparison condition strategy blocks under app.extend.blocks.comparisons.
 
-FEAT-INC-BLOCKS-CONDITIONS: Modular comparison condition strategy blocks.
-FR-COND-ARITHMETIC, FR-COND-CROSSOVER, FR-COND-TREND, FR-COND-COUNT, FR-COND-PERCENTILE, FR-COND-LOGIC, FR-COND-MA, FR-COND-FACADE.
+Description:
+    Validates StrategyQuant-faithful comparison building blocks, including
+    arithmetic comparisons, crossover logic, trend and turning point detection,
+    count and percentile calculations, logical operators, moving average comparisons,
+    and facade bindings, along with non-silent requirement logging.
+Purpose:
+    FEAT-INC-BLOCKS-CONDITIONS: Modular comparison condition strategy blocks.
+Key Capabilities:
+    - FR-cond-arithmetic: Arithmetic comparison tests.
+    - FR-cond-crossover: Crossover detection tests.
+    - FR-cond-trend: Trend and turning point tests.
+    - FR-cond-count: Count and percentile tests.
+    - FR-cond-logic: Logical operator tests.
+    - FR-cond-ma: Moving average comparison tests.
+    - FR-cond-facade: Facade and spec tests.
+    - FR-cond-logging: Explicit non-silent requirement logging tests.
+Python API Usage:
+    pytest tests/extend/blocks/test_comparisons.py --no-cov
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
 """
 
 from __future__ import annotations
 
+import logging
+
 import numpy as np
+import pytest
 from app.extend.blocks.comparisons import (
     Comparisons,
     MAType,
@@ -34,6 +55,7 @@ from app.extend.blocks.comparisons import (
     indicator_below_ma_spec,
     indicator_crosses_above_ma,
     indicator_crosses_above_ma_spec,
+    indicator_crosses_below_ma,
     indicator_crosses_below_ma_spec,
     is_falling,
     is_falling_spec,
@@ -132,6 +154,11 @@ def test_crossovers() -> None:
     assert crosses_below(left_rev, right, shift=0)
     assert not crosses_above(left_rev, right, shift=0)
 
+    # Insufficient length handling
+    short = np.array([10.0])
+    assert not crosses_above(short, right, shift=0)
+    assert not crosses_below(short, right, shift=0)
+
 
 def test_trend_and_turning_points() -> None:
     """Test is_rising, is_falling, changes_up, changes_down."""
@@ -140,9 +167,18 @@ def test_trend_and_turning_points() -> None:
     assert is_rising(rising_series, bars=3, shift=0)
     assert not is_falling(rising_series, bars=3, shift=0)
 
+    # Test not_strict parameter in is_rising
+    flat_rising = np.array([10.0, 20.0, 20.0, 30.0])
+    assert not is_rising(flat_rising, bars=3, not_strict=False, shift=0)
+    assert is_rising(flat_rising, bars=3, not_strict=True, shift=0)
+
     falling_series = np.array([40.0, 30.0, 20.0, 10.0])
     assert is_falling(falling_series, bars=3, shift=0)
     assert not is_rising(falling_series, bars=3, shift=0)
+
+    flat_falling = np.array([40.0, 30.0, 30.0, 20.0])
+    assert not is_falling(flat_falling, bars=3, not_strict=False, shift=0)
+    assert is_falling(flat_falling, bars=3, not_strict=True, shift=0)
 
     # Turning points: [v2, v1, v0] where v2 is oldest (shift 2), v0 is newest (shift 0)
     trough_series = np.array([100.0, 20.0, 10.0, 30.0])
@@ -170,6 +206,10 @@ def test_count_and_percentile() -> None:
     assert is_greater_percentile(series, percentile=80.0, bars=5, shift=0)
     assert not is_lower_percentile(series, percentile=20.0, bars=5, shift=0)
 
+    # Edge case: bars <= 0
+    assert not is_greater_count(left, right, bars=0)
+    assert not is_greater_percentile(series, percentile=50.0, bars=0)
+
 
 def test_logical_operators() -> None:
     """Test condition_and, condition_or, condition_not."""
@@ -187,21 +227,46 @@ def test_indicator_moving_averages() -> None:
     """Test moving average calculation and comparative conditions."""
     series = np.array([10.0, 20.0, 30.0, 40.0, 50.0])
     # SMA of last 3 bars (shift 0: 50, 40, 30) -> mean 40.0
-    ma_val = calculate_ma(series, period=3, ma_type=MAType.SMA, shift=0)
-    assert ma_val == 40.0
+    sma_val = calculate_ma(series, period=3, ma_type=MAType.SMA, shift=0)
+    assert sma_val == 40.0
 
     wma_val = calculate_wma(series, period=3, shift=0)
     # Weights 3, 2, 1 for 50, 40, 30 -> (150 + 80 + 30) / 6 = 260 / 6 = 43.333333
     assert abs(wma_val - (260.0 / 6.0)) < 1e-5
+    assert (
+        abs(calculate_ma(series, period=3, ma_type=MAType.WMA, shift=0) - (260.0 / 6.0))
+        < 1e-5
+    )
+
+    # EMA and Hull MA
+    ema_val = calculate_ma(series, period=3, ma_type=MAType.EMA, shift=0)
+    assert np.isfinite(ema_val)
+    hull_val = calculate_ma(series, period=4, ma_type=MAType.HULL, shift=0)
+    assert np.isfinite(hull_val)
+
+    # Error handling for invalid MA type
+    with pytest.raises(ValueError, match="Unsupported MAType"):
+        calculate_ma(series, period=3, ma_type=999)
 
     # 50.0 is above SMA 40.0
     assert indicator_above_ma(series, period=3, ma_type=MAType.SMA, shift=0)
     assert not indicator_below_ma(series, period=3, ma_type=MAType.SMA, shift=0)
 
     # Crossover of indicator vs MA
-    cross_series = np.array([10.0, 20.0, 15.0, 35.0])
+    cross_above_series = np.array([10.0, 20.0, 15.0, 35.0])
     assert indicator_crosses_above_ma(
-        cross_series, period=2, ma_type=MAType.SMA, shift=0
+        cross_above_series, period=2, ma_type=MAType.SMA, shift=0
+    )
+    assert not indicator_crosses_below_ma(
+        cross_above_series, period=2, ma_type=MAType.SMA, shift=0
+    )
+
+    cross_below_series = np.array([35.0, 15.0, 20.0, 10.0])
+    assert indicator_crosses_below_ma(
+        cross_below_series, period=2, ma_type=MAType.SMA, shift=0
+    )
+    assert not indicator_crosses_above_ma(
+        cross_below_series, period=2, ma_type=MAType.SMA, shift=0
     )
 
 
@@ -219,3 +284,17 @@ def test_comparisons_facade() -> None:
     assert Comparisons.condition_and(True, True)
     assert Comparisons.condition_or(False, True)
     assert Comparisons.condition_not(False)
+
+
+def test_non_silent_requirement_logging(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify comparison evaluation emits FR-LIBS-COMPARISON-EVAL requirement log."""
+    caplog.set_level(logging.DEBUG)
+
+    res = is_greater(10.0, 5.0)
+    assert res is True
+    assert any("FR-LIBS-COMPARISON-EVAL" in record.message for record in caplog.records)
+
+    caplog.clear()
+    res2 = condition_and(True, False)
+    assert res2 is False
+    assert any("FR-LIBS-COMPARISON-EVAL" in record.message for record in caplog.records)

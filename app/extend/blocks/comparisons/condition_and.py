@@ -1,4 +1,17 @@
-"""Logical AND condition composition strategy block."""
+"""Logical AND condition composition strategy block.
+
+Description:
+    Evaluates short-circuit logical AND across multiple condition expressions,
+    matching StrategyQuant AND snippet.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful AND block.
+Key Capabilities:
+    - FR-comparison-logic: Short-circuit logical AND reduction.
+Python API Usage:
+    from app.extend.blocks.comparisons.condition_and import condition_and
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,6 +19,7 @@ from collections.abc import Callable
 from typing import Any
 
 from app.extend.blocks.base import block
+from app.extend.blocks.comparisons._common import _log_comparison
 from app.extend.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -46,8 +60,8 @@ def condition_and(*conditions: bool | Callable[[], Any] | Any) -> bool:
     for cond in conditions:
         val = cond() if callable(cond) else cond
         if not bool(val):
-            return False
-    return True
+            return _log_comparison("condition_and", False)
+    return _log_comparison("condition_and", True)
 
 
 __all__ = ["condition_and", "condition_and_spec"]

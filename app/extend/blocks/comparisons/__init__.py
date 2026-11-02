@@ -1,6 +1,26 @@
 """Comparative condition strategy blocks and logical operators.
 
-FEAT-INC-BLOCKS-CONDITIONS: Modular comparison condition building blocks.
+Description:
+    Implements all 21 StrategyQuant comparison snippet classes as modular
+    typed blocks and facades for rule generation, builder integration, and
+    backtesting execution.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful comparison blocks.
+Key Capabilities:
+    - FR-comparison-arithmetic: Order and equality comparison predicates.
+    - FR-comparison-crossover: Directional line crossing predicates.
+    - FR-comparison-trends: Monotonic rising, falling, and turning checks.
+    - FR-comparison-count: Multi-bar condition persistence and percentiles.
+    - FR-comparison-ma: Indicator moving average relationship checks.
+    - FR-comparison-logic: Short-circuit AND, OR, and NOT logical operators.
+Python API Usage:
+    from app.extend.blocks.comparisons import (
+        Comparisons,
+        crosses_above,
+        is_greater,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
 """
 
 from __future__ import annotations
@@ -10,6 +30,7 @@ from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
     DEFAULT_COUNT_PRECISION,
     MIN_TREND_BARS,
+    _log_comparison,
     calculate_ma,
     calculate_wma,
     resolve_shift_value,
@@ -105,6 +126,7 @@ __all__ = [
     "MIN_TREND_BARS",
     "Comparisons",
     "MAType",
+    "_log_comparison",
     "calculate_ma",
     "calculate_wma",
     "changes_down",

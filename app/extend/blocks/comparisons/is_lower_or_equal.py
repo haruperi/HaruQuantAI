@@ -1,4 +1,19 @@
-"""Is Lower Than Or Equal comparative condition strategy block."""
+"""Is Lower Or Equal comparative condition strategy block.
+
+Description:
+    Evaluates whether left operand is lower than or equal to right operand,
+    matching StrategyQuant IsLowerOrEqual snippet.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful IsLowerOrEqual block.
+Key Capabilities:
+    - FR-comparison-inequality: Test lower than or equal comparison.
+Python API Usage:
+    from app.extend.blocks.comparisons.is_lower_or_equal import (
+        is_lower_or_equal,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -8,6 +23,7 @@ from typing import Any
 from app.extend.blocks.base import block
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
+    _log_comparison,
     _pair,
 )
 from app.extend.blocks.metadata import (
@@ -25,12 +41,12 @@ is_lower_or_equal_spec = BlockSpec(
     name="Is Lower Or Equal",
     description="Evaluates whether left operand is lower than or equal to right",
     category="comparisons",
-    tags=("condition", "comparison", "lower_or_equal"),
+    tags=("condition", "comparison", "order", "is_lower_or_equal"),
     execution_kind=ExecutionKind.CONDITION,
     chart_pane=ChartPane.MAIN,
     inputs=(
-        InputPort("left", PortType.ANY, "Left operand (value or series)"),
-        InputPort("right", PortType.ANY, "Right operand (value or series)"),
+        InputPort("left", PortType.ANY, "Left operand (series or value)"),
+        InputPort("right", PortType.ANY, "Right operand (series or value)"),
     ),
     outputs=(OutputPort("condition", PortType.BOOLEAN, "True if left <= right"),),
     is_generation_eligible=True,
@@ -50,11 +66,20 @@ def is_lower_or_equal(
     shift2: int | None = None,
     round_digits: int | None = None,
 ) -> bool:
-    """Evaluate whether left value is lower than or equal to right value."""
+    """Evaluate whether left operand is lower than or equal to right operand."""
     val1, val2 = _pair(
-        left, right, shift, precision, s1=shift1, s2=shift2, rd=round_digits
+        left,
+        right,
+        shift,
+        precision,
+        s1=shift1,
+        s2=shift2,
+        rd=round_digits,
     )
-    return not (math.isnan(val1) or math.isnan(val2)) and val1 <= val2
+    if math.isnan(val1) or math.isnan(val2):
+        return _log_comparison("is_lower_or_equal", False)
+    res = val1 <= val2
+    return _log_comparison("is_lower_or_equal", res)
 
 
 __all__ = ["is_lower_or_equal", "is_lower_or_equal_spec"]

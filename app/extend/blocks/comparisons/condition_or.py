@@ -1,4 +1,17 @@
-"""Logical OR condition composition strategy block."""
+"""Logical OR condition composition strategy block.
+
+Description:
+    Evaluates short-circuit logical OR across multiple condition expressions,
+    matching StrategyQuant OR snippet.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful OR block.
+Key Capabilities:
+    - FR-comparison-logic: Short-circuit logical OR reduction.
+Python API Usage:
+    from app.extend.blocks.comparisons.condition_or import condition_or
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,6 +19,7 @@ from collections.abc import Callable
 from typing import Any
 
 from app.extend.blocks.base import block
+from app.extend.blocks.comparisons._common import _log_comparison
 from app.extend.blocks.metadata import (
     BlockSpec,
     ChartPane,
@@ -46,8 +60,8 @@ def condition_or(*conditions: bool | Callable[[], Any] | Any) -> bool:
     for cond in conditions:
         val = cond() if callable(cond) else cond
         if bool(val):
-            return True
-    return False
+            return _log_comparison("condition_or", True)
+    return _log_comparison("condition_or", False)
 
 
 __all__ = ["condition_or", "condition_or_spec"]

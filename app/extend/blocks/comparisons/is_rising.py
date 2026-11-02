@@ -1,4 +1,17 @@
-"""Is Rising comparative condition strategy block."""
+"""Is Rising comparative condition strategy block.
+
+Description:
+    Evaluates whether indicator is rising monotonically over a bar window,
+    matching StrategyQuant IsRising snippet.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful IsRising block.
+Key Capabilities:
+    - FR-comparison-trend: Test monotonic rising progression over window.
+Python API Usage:
+    from app.extend.blocks.comparisons.is_rising import is_rising
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -9,6 +22,7 @@ from app.extend.blocks.base import block
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
     MIN_TREND_BARS,
+    _log_comparison,
     resolve_shift_value,
     round_value,
 )
@@ -32,8 +46,13 @@ is_rising_spec = BlockSpec(
     chart_pane=ChartPane.MAIN,
     inputs=(
         InputPort("indicator", PortType.SERIES, "Indicator series"),
-        InputPort("bars", PortType.NUMBER, "Number of lookback bars"),
-        InputPort("not_strict", PortType.BOOLEAN, "Allow flat intervals"),
+        InputPort("bars", PortType.NUMBER, "Number of lookback bars", default=2),
+        InputPort(
+            "not_strict",
+            PortType.BOOLEAN,
+            "Allow flat intervals",
+            default=False,
+        ),
     ),
     outputs=(OutputPort("condition", PortType.BOOLEAN, "True if rising"),),
     is_generation_eligible=True,
@@ -54,22 +73,22 @@ def is_rising(
 ) -> bool:
     """Evaluate whether indicator is rising monotonically over a bar window."""
     if bars < MIN_TREND_BARS:
-        return False
+        return _log_comparison("is_rising", False)
     p = precision if round_digits is None else round_digits
     prev_val = round_value(resolve_shift_value(indicator, bars + shift - 1), p)
     if math.isnan(prev_val):
-        return False
+        return _log_comparison("is_rising", False)
     at_least_once = False
     for i in range(1, bars):
         curr_val = round_value(resolve_shift_value(indicator, bars + shift - 1 - i), p)
         if math.isnan(curr_val) or curr_val < prev_val:
-            return False
+            return _log_comparison("is_rising", False)
         if curr_val == prev_val and not not_strict:
-            return False
+            return _log_comparison("is_rising", False)
         if curr_val > prev_val:
             at_least_once = True
         prev_val = curr_val
-    return at_least_once
+    return _log_comparison("is_rising", at_least_once)
 
 
 __all__ = ["is_rising", "is_rising_spec"]

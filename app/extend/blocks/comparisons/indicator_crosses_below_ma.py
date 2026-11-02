@@ -1,4 +1,19 @@
-"""Indicator Crosses Below MA comparative condition strategy block."""
+"""Indicator Crosses Below MA comparative condition strategy block.
+
+Description:
+    Evaluates whether indicator crosses below its MA from shift + 1 to shift,
+    matching StrategyQuant IndicatorCrossesBelowMA snippet.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful IndicatorCrossesBelowMA.
+Key Capabilities:
+    - FR-comparison-crossover: Detect indicator crossing below its moving average.
+Python API Usage:
+    from app.extend.blocks.comparisons.indicator_crosses_below_ma import (
+        indicator_crosses_below_ma,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -9,6 +24,7 @@ from app.core.enums import MAType
 from app.extend.blocks.base import block
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
+    _log_comparison,
     calculate_ma,
     resolve_shift_value,
     round_value,
@@ -35,8 +51,13 @@ indicator_crosses_below_ma_spec = BlockSpec(
     chart_pane=ChartPane.MAIN,
     inputs=(
         InputPort("indicator", PortType.SERIES, "Base indicator series"),
-        InputPort("period", PortType.NUMBER, "Moving average period"),
-        InputPort("ma_type", PortType.NUMBER, "MA Type (1=SMA, 2=EMA, 3=WMA, 4=HULL)"),
+        InputPort("period", PortType.NUMBER, "Moving average period", default=14),
+        InputPort(
+            "ma_type",
+            PortType.NUMBER,
+            "MA Type (1=SMA, 2=EMA, 3=WMA, 4=HULL)",
+            default=1,
+        ),
     ),
     outputs=(OutputPort("condition", PortType.BOOLEAN, "True if crossed below MA"),),
     is_generation_eligible=True,
@@ -59,8 +80,9 @@ def indicator_crosses_below_ma(
     ma_curr = calculate_ma(indicator, period, ma_type, shift, precision)
     ma_prev = calculate_ma(indicator, period, ma_type, shift + 1, precision)
     if any(math.isnan(v) for v in (ind_curr, ind_prev, ma_curr, ma_prev)):
-        return False
-    return ind_prev > ma_prev and ind_curr < ma_curr
+        return _log_comparison("indicator_crosses_below_ma", False)
+    res = ind_prev > ma_prev and ind_curr < ma_curr
+    return _log_comparison("indicator_crosses_below_ma", res)
 
 
 __all__ = ["indicator_crosses_below_ma", "indicator_crosses_below_ma_spec"]

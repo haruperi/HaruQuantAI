@@ -1,4 +1,24 @@
-"""Shared internal utilities and numerical helpers for comparison condition blocks."""
+"""Shared internal utilities and numerical helpers for comparison condition blocks.
+
+Description:
+    Provides numerical helpers, moving average calculations (SMA, EMA,
+    WMA, Hull), operand shift resolution, rounding utilities, and
+    non-silent diagnostic logging for quantitative comparison blocks.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: Provide shared calculation and logging
+    utilities for comparison blocks.
+Key Capabilities:
+    - FR-comparison-helpers: Operand resolution and moving average computations.
+    - FR-comparison-logging: Non-silent debug requirement logging.
+Python API Usage:
+    from app.extend.blocks.comparisons._common import (
+        _log_comparison,
+        calculate_ma,
+        resolve_shift_value,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -10,12 +30,14 @@ import numpy as np
 
 from app.core.data.contracts import DataframeSeries
 from app.core.enums import MAType
+from app.core.host.logging import get_logger
 from app.extend.blocks.series import round_value
 
 __all__ = [
     "DEFAULT_COMPARISON_PRECISION",
     "DEFAULT_COUNT_PRECISION",
     "MIN_TREND_BARS",
+    "_log_comparison",
     "calculate_ma",
     "calculate_wma",
     "resolve_shift_value",
@@ -25,6 +47,15 @@ __all__ = [
 DEFAULT_COMPARISON_PRECISION: int = 6
 DEFAULT_COUNT_PRECISION: int = 5
 MIN_TREND_BARS: int = 2
+
+
+logger = get_logger(__name__)
+
+
+def _log_comparison(name: str, result: bool) -> bool:
+    """Log comparison block evaluation and return boolean result."""
+    logger.debug("FR-LIBS-COMPARISON-EVAL: %s result=%s", name, result)
+    return result
 
 
 def resolve_shift_value(target: Any, shift: int = 0) -> float:

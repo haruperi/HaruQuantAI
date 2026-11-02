@@ -1,4 +1,19 @@
-"""Is Greater Percentile rank comparative condition strategy block."""
+"""Is Greater Percentile rank comparative condition strategy block.
+
+Description:
+    Evaluates whether indicator value exceeds percentile rank over past bars,
+    matching StrategyQuant IsGreaterPercentil snippet.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful IsGreaterPercentil block.
+Key Capabilities:
+    - FR-comparison-percentile: Test percentile rank exceedance over window.
+Python API Usage:
+    from app.extend.blocks.comparisons.is_greater_percentile import (
+        is_greater_percentile,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -8,6 +23,7 @@ from typing import Any
 from app.extend.blocks.base import block
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COUNT_PRECISION,
+    _log_comparison,
     resolve_shift_value,
     round_value,
 )
@@ -33,8 +49,13 @@ is_greater_percentile_spec = BlockSpec(
     chart_pane=ChartPane.MAIN,
     inputs=(
         InputPort("indicator", PortType.SERIES, "Indicator series"),
-        InputPort("percentile", PortType.NUMBER, "Threshold percentage (0-100)"),
-        InputPort("bars", PortType.NUMBER, "Window lookback bars"),
+        InputPort(
+            "percentile",
+            PortType.NUMBER,
+            "Threshold percentage (0-100)",
+            default=50.0,
+        ),
+        InputPort("bars", PortType.NUMBER, "Window lookback bars", default=10),
     ),
     outputs=(OutputPort("condition", PortType.BOOLEAN, "True if rank > percentile"),),
     is_generation_eligible=True,
@@ -53,18 +74,19 @@ def is_greater_percentile(
 ) -> bool:
     """Evaluate whether indicator value exceeds percentile rank over past bars."""
     if bars <= 0:
-        return False
+        return _log_comparison("is_greater_percentile", False)
     curr_val = round_value(resolve_shift_value(indicator, shift), precision)
     if math.isnan(curr_val):
-        return False
+        return _log_comparison("is_greater_percentile", False)
     count = 1
     for i in range(bars):
         prev_val = round_value(resolve_shift_value(indicator, shift + i), precision)
         if math.isnan(prev_val):
-            return False
+            return _log_comparison("is_greater_percentile", False)
         if curr_val > prev_val:
             count += 1
-    return (count / float(bars)) * 100.0 > round_value(percentile, precision)
+    res = (count / float(bars)) * 100.0 > round_value(percentile, precision)
+    return _log_comparison("is_greater_percentile", res)
 
 
 __all__ = ["is_greater_percentile", "is_greater_percentile_spec"]

@@ -1,4 +1,17 @@
-"""Crosses Below comparative crossover condition strategy block."""
+"""Crosses Below comparative crossover condition strategy block.
+
+Description:
+    Evaluates whether left operand crossed below right operand between
+    historical shift + 1 and shift, matching StrategyQuant CrossesBelow.
+Purpose:
+    FEAT-COMPARISONS-BLOCKS: StrategyQuant donor-faithful CrossesBelow block.
+Key Capabilities:
+    - FR-comparison-crossover: Detect downward crossover between operands.
+Python API Usage:
+    from app.extend.blocks.comparisons.crosses_below import crosses_below
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_comparisons.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -8,6 +21,7 @@ from typing import Any
 from app.extend.blocks.base import block
 from app.extend.blocks.comparisons._common import (
     DEFAULT_COMPARISON_PRECISION,
+    _log_comparison,
     _pair,
 )
 from app.extend.blocks.metadata import (
@@ -61,8 +75,9 @@ def crosses_below(
     val11, val21 = _pair(left, right, shift + 1, precision, rd=round_digits)
     val10, val20 = _pair(left, right, shift, precision, rd=round_digits)
     if any(math.isnan(v) for v in (val11, val21, val10, val20)):
-        return False
-    return val11 > val21 and val10 < val20
+        return _log_comparison("crosses_below", False)
+    res = val11 > val21 and val10 < val20
+    return _log_comparison("crosses_below", res)
 
 
 __all__ = ["crosses_below", "crosses_below_spec"]
