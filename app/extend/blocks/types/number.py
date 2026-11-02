@@ -1,4 +1,21 @@
-"""Number constant building block."""
+"""Number constant building block matching StrategyQuant SQ.Blocks.Other.Number.
+
+Description:
+    Provides constant numeric value evaluation returning the float value, supporting
+    both functional @block decoration and object-oriented NumberConstant / Number
+    class instantiation.
+Purpose:
+    FEAT-TYPES-BLOCKS: StrategyQuant donor-faithful primitive type and variable blocks.
+Key Capabilities:
+    - FR-TYPES-NUMBER: Constant numeric value evaluation returning a float.
+Python API Usage:
+    from app.extend.blocks.types.number import Number, number
+    val = number(42.0)
+    block_obj = Number(42.0)
+    res = block_obj.evaluate()
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_types.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -14,8 +31,6 @@ from app.extend.blocks.metadata import (
 )
 
 logger = get_logger(__name__)
-
-__all__ = ["NumberConstant", "number", "number_constant", "number_spec"]
 
 number_spec = BlockSpec(
     id="types.number",
@@ -50,7 +65,7 @@ def number(number: float = 0.0, shift: int = 0) -> float:
     """
     res = float(number)
     logger.debug(
-        "FR-SERVICES-TYPES-NUMBER: number(val=%s, shift=%d) -> %s",
+        "FR-TYPES-NUMBER: number(val=%s, shift=%d) -> %s",
         number,
         shift,
         res,
@@ -83,9 +98,20 @@ class NumberConstant:
         """
         res = float(self.number)
         logger.debug(
-            "FR-SERVICES-TYPES-NUMBER: NumberConstant(val=%s, shift=%d) -> %s",
+            "FR-TYPES-NUMBER: NumberConstant(val=%s, shift=%d) -> %s",
             self.number,
             shift,
             res,
         )
         return res
+
+
+Number = NumberConstant
+
+__all__ = [
+    "Number",
+    "NumberConstant",
+    "number",
+    "number_constant",
+    "number_spec",
+]

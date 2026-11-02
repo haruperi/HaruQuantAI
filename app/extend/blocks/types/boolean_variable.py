@@ -1,4 +1,26 @@
-"""Boolean variable building block."""
+"""Boolean variable block matching StrategyQuant SQ.Blocks.Other.BooleanVariable.
+
+Description:
+    Provides variable-backed boolean evaluation returning 1.0 for True and 0.0 for
+    False, supporting both functional @block evaluation with Variable[bool] / bool
+    and object-oriented BooleanVariable class instantiation.
+Purpose:
+    FEAT-TYPES-BLOCKS: StrategyQuant donor-faithful primitive type and variable blocks.
+Key Capabilities:
+    - FR-TYPES-BOOLEAN-VARIABLE: Evaluate boolean variable container to 1.0 or 0.0.
+Python API Usage:
+    from app.extend.blocks.types.boolean_variable import (
+        BooleanVariable,
+        boolean_variable,
+    )
+    from app.extend.blocks.types.variable import Variable
+    var = Variable("my_flag", "bool", True)
+    val = boolean_variable(var)
+    block_obj = BooleanVariable(var)
+    res = block_obj.evaluate()
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_types.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -52,7 +74,7 @@ def boolean_variable(variable: Variable[bool] | bool, shift: int = 0) -> float:
     raw_val = variable.get_value() if isinstance(variable, Variable) else variable
     res = 1.0 if raw_val else 0.0
     logger.debug(
-        "FR-SERVICES-TYPES-VARIABLES: boolean_variable(shift=%d) -> %s",
+        "FR-TYPES-BOOLEAN-VARIABLE: boolean_variable(shift=%d) -> %s",
         shift,
         res,
     )
@@ -86,7 +108,7 @@ class BooleanVariable:
         )
         res = 1.0 if raw_val else 0.0
         logger.debug(
-            "FR-SERVICES-TYPES-VARIABLES: BooleanVariable(shift=%d) -> %s",
+            "FR-TYPES-BOOLEAN-VARIABLE: BooleanVariable(shift=%d) -> %s",
             shift,
             res,
         )

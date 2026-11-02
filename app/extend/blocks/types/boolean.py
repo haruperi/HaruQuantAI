@@ -1,4 +1,21 @@
-"""Boolean constant building block."""
+"""Boolean constant building block matching StrategyQuant SQ.Blocks.Other.Boolean.
+
+Description:
+    Provides constant boolean value evaluation returning 1.0 for True and 0.0 for
+    False, supporting both functional @block decoration and object-oriented
+    BooleanConstant / Boolean class instantiation.
+Purpose:
+    FEAT-TYPES-BLOCKS: StrategyQuant donor-faithful primitive type and variable blocks.
+Key Capabilities:
+    - FR-TYPES-BOOLEAN: Constant boolean flag evaluation returning 1.0 or 0.0.
+Python API Usage:
+    from app.extend.blocks.types.boolean import Boolean, boolean
+    val = boolean(True)
+    block_obj = Boolean(True)
+    res = block_obj.evaluate()
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_types.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -14,8 +31,6 @@ from app.extend.blocks.metadata import (
 )
 
 logger = get_logger(__name__)
-
-__all__ = ["BooleanConstant", "boolean", "boolean_constant", "boolean_spec"]
 
 boolean_spec = BlockSpec(
     id="types.boolean",
@@ -50,7 +65,7 @@ def boolean(value: bool = False, shift: int = 0) -> float:
     """
     res = 1.0 if value else 0.0
     logger.debug(
-        "FR-SERVICES-TYPES-BOOLEAN: boolean(val=%s, shift=%d) -> %s",
+        "FR-TYPES-BOOLEAN: boolean(val=%s, shift=%d) -> %s",
         value,
         shift,
         res,
@@ -83,9 +98,20 @@ class BooleanConstant:
         """
         res = 1.0 if self.value else 0.0
         logger.debug(
-            "FR-SERVICES-TYPES-BOOLEAN: BooleanConstant(val=%s, shift=%d) -> %s",
+            "FR-TYPES-BOOLEAN: BooleanConstant(val=%s, shift=%d) -> %s",
             self.value,
             shift,
             res,
         )
         return res
+
+
+Boolean = BooleanConstant
+
+__all__ = [
+    "Boolean",
+    "BooleanConstant",
+    "boolean",
+    "boolean_constant",
+    "boolean_spec",
+]

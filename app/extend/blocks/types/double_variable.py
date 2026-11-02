@@ -1,4 +1,23 @@
-"""Double variable building block."""
+"""Double variable building block matching StrategyQuant SQ.Blocks.Other.DoubleVariable.
+
+Description:
+    Provides variable-backed double/float evaluation returning floating-point values,
+    supporting both functional @block evaluation with Variable[float] / float and
+    object-oriented DoubleVariable class instantiation.
+Purpose:
+    FEAT-TYPES-BLOCKS: StrategyQuant donor-faithful primitive type and variable blocks.
+Key Capabilities:
+    - FR-TYPES-DOUBLE-VARIABLE: Evaluate double precision variable to float.
+Python API Usage:
+    from app.extend.blocks.types.double_variable import DoubleVariable, double_variable
+    from app.extend.blocks.types.variable import Variable
+    var = Variable("target_rate", "double", 1.2345)
+    val = double_variable(var)
+    block_obj = DoubleVariable(var)
+    res = block_obj.evaluate()
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_types.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -52,7 +71,7 @@ def double_variable(variable: Variable[float] | float, shift: int = 0) -> float:
     raw_val = variable.get_value() if isinstance(variable, Variable) else variable
     res = float(raw_val)
     logger.debug(
-        "FR-SERVICES-TYPES-VARIABLES: double_variable(shift=%d) -> %s",
+        "FR-TYPES-DOUBLE-VARIABLE: double_variable(shift=%d) -> %s",
         shift,
         res,
     )
@@ -86,7 +105,7 @@ class DoubleVariable:
         )
         res = float(raw_val)
         logger.debug(
-            "FR-SERVICES-TYPES-VARIABLES: DoubleVariable(shift=%d) -> %s",
+            "FR-TYPES-DOUBLE-VARIABLE: DoubleVariable(shift=%d) -> %s",
             shift,
             res,
         )

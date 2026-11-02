@@ -1,4 +1,21 @@
-"""Generic mutable state container for strategy variables."""
+"""Generic mutable state container for strategy variables.
+
+Description:
+    Encapsulates a variable name, type identifier, and typed value,
+    providing getters and setters with non-silent audit logging and
+    value equality checks.
+Purpose:
+    FEAT-TYPES-BLOCKS: StrategyQuant donor-faithful primitive type and variable blocks.
+Key Capabilities:
+    - FR-TYPES-VARIABLE-CONTAINER: Typed mutable variable container with audit logging.
+Python API Usage:
+    from app.extend.blocks.types.variable import Variable
+    var = Variable("counter", "int", 0)
+    var.set_value(1)
+    val = var.value
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_types.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -32,7 +49,7 @@ class Variable[T]:
         self.var_type = var_type
         self._value: T = initial_value
         logger.debug(
-            "FR-SERVICES-TYPES-VARIABLES: Initialized variable '%s' (type=%s, val=%s)",
+            "FR-TYPES-VARIABLE-CONTAINER: Initialized variable '%s' (type=%s, val=%s)",
             self.name,
             self.var_type,
             self._value,
@@ -50,7 +67,7 @@ class Variable[T]:
         """
         self._value = value
         logger.debug(
-            "FR-SERVICES-TYPES-VARIABLES: Updated variable '%s' to %s",
+            "FR-TYPES-VARIABLE-CONTAINER: Updated variable '%s' to %s",
             self.name,
             self._value,
         )

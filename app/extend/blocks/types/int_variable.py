@@ -1,4 +1,23 @@
-"""Int variable building block."""
+"""Int variable building block matching StrategyQuant SQ.Blocks.Other.IntVariable.
+
+Description:
+    Provides variable-backed integer evaluation returning float-cast values,
+    supporting both functional @block evaluation with Variable[int] / int and
+    object-oriented IntVariable class instantiation.
+Purpose:
+    FEAT-TYPES-BLOCKS: StrategyQuant donor-faithful primitive type and variable blocks.
+Key Capabilities:
+    - FR-TYPES-INT-VARIABLE: Evaluate integer variable container cast to float.
+Python API Usage:
+    from app.extend.blocks.types.int_variable import IntVariable, int_variable
+    from app.extend.blocks.types.variable import Variable
+    var = Variable("bar_counter", "int", 42)
+    val = int_variable(var)
+    block_obj = IntVariable(var)
+    res = block_obj.evaluate()
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_types.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -52,7 +71,7 @@ def int_variable(variable: Variable[int] | int, shift: int = 0) -> float:
     raw_val = variable.get_value() if isinstance(variable, Variable) else variable
     res = float(raw_val)
     logger.debug(
-        "FR-SERVICES-TYPES-VARIABLES: int_variable(shift=%d) -> %s",
+        "FR-TYPES-INT-VARIABLE: int_variable(shift=%d) -> %s",
         shift,
         res,
     )
@@ -86,7 +105,7 @@ class IntVariable:
         )
         res = float(raw_val)
         logger.debug(
-            "FR-SERVICES-TYPES-VARIABLES: IntVariable(shift=%d) -> %s",
+            "FR-TYPES-INT-VARIABLE: IntVariable(shift=%d) -> %s",
             shift,
             res,
         )

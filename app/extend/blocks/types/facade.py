@@ -1,4 +1,20 @@
-"""Unified Types facade for primitive types and variables."""
+"""Unified Types facade for primitive types and variables.
+
+Description:
+    Provides an object-oriented and namespace-bound API facade over discrete
+    StrategyQuant-faithful primitive type and variable building blocks.
+Purpose:
+    FEAT-TYPES-BLOCKS: StrategyQuant donor-faithful primitive type and variable blocks.
+Key Capabilities:
+    - FR-TYPES-FACADE: Centralized namespace for constants and variable evaluation.
+Python API Usage:
+    from app.extend.blocks.types import Types
+    b = Types.boolean(True)
+    n = Types.number(12.34)
+    v = Types.create_variable("var1", "int", 5)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_types.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -30,7 +46,7 @@ class Types:
             1.0 if True else 0.0.
         """
         logger.debug(
-            "FR-SERVICES-TYPES-FACADE: Types.boolean(val=%s, shift=%d)",
+            "FR-TYPES-FACADE: Types.boolean(val=%s, shift=%d)",
             value,
             shift,
         )
@@ -48,7 +64,7 @@ class Types:
             1.0 if True else 0.0.
         """
         logger.debug(
-            "FR-SERVICES-TYPES-FACADE: Types.boolean_var(shift=%d)",
+            "FR-TYPES-FACADE: Types.boolean_var(shift=%d)",
             shift,
         )
         return boolean_variable(variable, shift)
@@ -65,7 +81,7 @@ class Types:
             Float value.
         """
         logger.debug(
-            "FR-SERVICES-TYPES-FACADE: Types.double_var(shift=%d)",
+            "FR-TYPES-FACADE: Types.double_var(shift=%d)",
             shift,
         )
         return double_variable(variable, shift)
@@ -82,7 +98,7 @@ class Types:
             Float value.
         """
         logger.debug(
-            "FR-SERVICES-TYPES-FACADE: Types.int_var(shift=%d)",
+            "FR-TYPES-FACADE: Types.int_var(shift=%d)",
             shift,
         )
         return int_variable(variable, shift)
@@ -99,7 +115,7 @@ class Types:
             Float value.
         """
         logger.debug(
-            "FR-SERVICES-TYPES-FACADE: Types.number(val=%s, shift=%d)",
+            "FR-TYPES-FACADE: Types.number(val=%s, shift=%d)",
             number,
             shift,
         )
@@ -118,7 +134,7 @@ class Types:
             Configured Variable instance.
         """
         logger.debug(
-            "FR-SERVICES-TYPES-FACADE: Types.create_variable(name='%s', type=%s)",
+            "FR-TYPES-FACADE: Types.create_variable(name='%s', type=%s)",
             name,
             var_type,
         )
