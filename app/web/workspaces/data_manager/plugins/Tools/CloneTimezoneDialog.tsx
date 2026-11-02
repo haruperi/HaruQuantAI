@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Button, Checkbox, Field, Modal, Select, TextInput } from '../../../../common/components/ui';
-import { cloneTimeLabel, toolTimezones, type CloneSettings, type ToolTarget } from './dataTools';
+import { cloneTimeLabel, timezoneLabel, toolTimezones, type CloneSettings, type ToolTarget } from './dataTools';
 import { useDataTools } from './dataToolsStore';
 import './dataTools.css';
 
@@ -26,9 +26,9 @@ export function CloneTimezoneDialog({ targets, existingNames, externalActive, on
     </fieldset>
     <fieldset><legend>Cloned data timezone</legend><div className="clone-timezone-options">
       <label><input type="radio" name="timezone-mode" checked={settings.timezoneType === 'shift'} onChange={() => patch({ timezoneType: 'shift' })}/><span>add fixed shift</span><TextInput aria-label="Fixed timezone shift" type="number" min={-23} max={23} step={1} disabled={settings.timezoneType !== 'shift'} value={settings.shiftHours} onChange={event => patch({ shiftHours: Number(event.target.value) })}/><small>hours</small></label>
-      <label><input type="radio" name="timezone-mode" checked={settings.timezoneType === 'zone'} onChange={() => patch({ timezoneType: 'zone' })}/><span>choose timezone</span><Select disabled={settings.timezoneType !== 'zone'} value={settings.timezone} onChange={timezone => patch({ timezone })}>{toolTimezones.map(item => <option key={item}>{item}</option>)}</Select></label>
+      <label><input type="radio" name="timezone-mode" checked={settings.timezoneType === 'zone'} onChange={() => patch({ timezoneType: 'zone' })}/><span>choose timezone</span><Select disabled={settings.timezoneType !== 'zone'} value={settings.timezone} onChange={timezone => patch({ timezone })}>{toolTimezones.map(item => <option key={item} value={item}>{timezoneLabel(item)}</option>)}</Select></label>
       <Checkbox label="Remove weekends" checked={settings.removeWeekends} onChange={removeWeekends => patch({ removeWeekends })}/>
     </div></fieldset>
-    <p className="tools-mock-note">The saved clone will use <strong>{cloneTimeLabel(settings)}</strong>; source prices are preserved.</p>
+    <p className="tools-mock-note">The saved clone will use <strong>{settings.timezoneType === 'zone' ? timezoneLabel(settings.timezone) : cloneTimeLabel(settings)}</strong>; source prices are preserved.</p>
   </Modal></div>;
 }

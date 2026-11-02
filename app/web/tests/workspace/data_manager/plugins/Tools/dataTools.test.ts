@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { analyzeQuality, applyReviewMutation, availableReviewTimeframes, createCloneDefinitions, generateReviewRows, reviewKey, selectCloneTargets, selectReviewTarget, validateReviewChange, type CloneSettings, type ToolTarget } from '../../../../../workspaces/data_manager/plugins/Tools/dataTools';
+import { timezoneLabel, toolTimezones, validateCloneSettings, analyzeQuality, applyReviewMutation, availableReviewTimeframes, createCloneDefinitions, generateReviewRows, reviewKey, selectCloneTargets, selectReviewTarget, validateReviewChange, type CloneSettings, type ToolTarget } from '../../../../../workspaces/data_manager/plugins/Tools/dataTools';
 
 const target: ToolTarget = { id:'d1', symbol:'EURUSD', symbolDefinition:'EURUSD', source:'Dukascopy', timeframe:'M1 → H1', timezone:'UTC', from:'2025-01-01', to:'2025-12-31', bars:5000, category:'Forex' };
 const settings: CloneSettings = { postfix:'_{timeframe}_{cloneTime}', timezoneType:'shift', shiftHours:5, timezone:'UTC', removeWeekends:false };
@@ -63,4 +63,28 @@ it('propagates rejected jobs and refuses conflicting submissions',async()=>{
   memory.set('haru-data-tools-v1','bad');vi.resetModules();
   const corrupt=(await import('../../../../../workspaces/data_manager/plugins/Tools/dataToolsStore')).useDataTools;
   expect(corrupt.getState().storageError).toContain('preserved');expect(memory.get('haru-data-tools-v1')).toBe('bad');
+});
+
+describe('fixed UTC timezone choices', () => {
+  it('offers UTC then all positive and negative hourly offsets through twelve', () => {
+    expect(toolTimezones.slice(0, 25).map(timezoneLabel)).toEqual([
+      'UTC', ...Array.from({ length: 12 }, (_, index) => 'UTC+' + (index + 1)),
+      ...Array.from({ length: 12 }, (_, index) => 'UTC-' + (index + 1)),
+    ]);
+    expect(toolTimezones).toContain('Europe/London');
+    for (const zone of toolTimezones) {
+      expect(() => validateCloneSettings({ ...settings, timezoneType: 'zone', timezone: zone })).not.toThrow();
+    }
+  });
+  it('maps IANA signs to fixed offsets in winter and summer', () => {
+    for (const sign of [-1, 1]) for (let hours = 1; hours <= 12; hours++) {
+      const zone = 'Etc/GMT' + (sign > 0 ? '-' : '+') + hours;
+      expect(timezoneLabel(zone)).toBe('UTC' + (sign > 0 ? '+' : '-') + hours);
+      for (const month of ['01', '07']) {
+        const formatter = new Intl.DateTimeFormat('en', { timeZone: zone, timeZoneName: 'longOffset' });
+        const offset = formatter.formatToParts(new Date('2026-' + month + '-15T12:00:00Z')).find(part => part.type === 'timeZoneName')?.value;
+        expect(offset).toBe('GMT' + (sign > 0 ? '+' : '-') + String(hours).padStart(2, '0') + ':00');
+      }
+    }
+  });
 });

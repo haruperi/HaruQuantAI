@@ -73,3 +73,62 @@ test('shows tick-data limitations in Chart and quality tabs', async ({ page }) =
   await dialog.getByRole('tab', { name:'Analyze data quality', exact:true }).click();
   await expect(dialog.getByText('Analyze data quality is not available for Tick and Intraday data.', { exact:true })).toBeVisible();
 });
+
+test('host clone selector offers every fixed UTC offset with correct payload signs', async ({ page }, info) => {
+  const writes: { timezone: string; timezone_type: string }[] = [];
+  await page.addInitScript(() => {
+    const original = window.fetch.bind(window);
+    window.fetch = ((input: RequestInfo | URL, init?: RequestInit) => String(input).includes('/api/v1/events?')
+      ? Promise.resolve(new Response(new ReadableStream<Uint8Array>({ start() {} }), { headers: { 'Content-Type': 'text/event-stream' } }))
+      : original(input, init)) as typeof fetch;
+  });
+  await page.route('**/api/v1/**', async route => {
+    const path = new URL(route.request().url()).pathname;
+    let data: unknown = [];
+    if (path.endsWith('/auth/login')) data = { token: 'isolated-review-session' };
+    else if (path.endsWith('/settings')) data = { revision: 1, values: {} };
+    else if (path.endsWith('/status')) data = { cpu_count: 4 };
+    else if (path === '/api/v1/home') data = { recent_projects: [] };
+    else if (path.endsWith('/data/workspace')) data = {
+      tabs: ['data', 'symbols', 'sessions', 'brokers', 'custom-data', 'chart', 'home', 'stock-groups', 'log'].map((id, index) => ({ id, title: id, core: index < 5 })),
+      active_tab: 'data', layout: { core_group: 'catalogs', chart_position: 'right' },
+    };
+    else if (path.includes('/workspace/tabs/')) data = { active_tab: path.split('/').at(-1), selection: null, preview: { state: 'unavailable', reason: 'Select a dataset.', rows: [], limit: 500 } };
+    else if (path.endsWith('/home/datasets')) data = [{
+      id: 'saved:EURUSD', symbol: 'EURUSD_DUKASCOPY', instrument: 'EURUSD', broker: 'Dukascopy', broker_name: 'Dukascopy', underlying: 'EURUSD',
+      timeframe: 'M1', timezone: 'UTC', date_from: '2021-11-01', date_to: '2026-10-31', total_records: 2629440,
+      source: 'dukascopy', category: 'Forex', data_type: 'Forex', path: 'data/market/dukascopy/m1/eurusd', bar_type: 'start',
+    }];
+
+    else if (path.endsWith('/datasets/clone-timezone')) {
+      writes.push(route.request().postDataJSON());
+      await route.fulfill({ status: 409, json: { status: 'error', error: { code: 'FIXTURE', message: 'Fixture keeps clone draft open' } } }); return;
+    }
+    await route.fulfill({ json: { status: 'success', data } });
+  });
+  await page.goto('/datamanager');
+  const login = page.getByRole('dialog', { name: 'Connect to HaruQuantAI host' });
+  await login.getByLabel('Host password').fill('fixture-password');
+  await login.getByRole('button', { name: 'Connect', exact: true }).click();
+  await expect(login).toHaveCount(0);
+  await page.getByRole('checkbox', { name: 'Select EURUSD_DUKASCOPY', exact: true }).check();
+  await page.getByRole('navigation', { name: 'Data Manager workspace navigation' }).getByRole('button', { name: 'Tools', exact: true }).click();
+  await page.getByRole('button', { name: 'Clone to timezone', exact: true }).click();
+  const dialog = page.getByRole('dialog', { name: "Clone to Timezone for 'EURUSD_DUKASCOPY'", exact: true });
+  await dialog.getByRole('radio', { name: /choose timezone/ }).check();
+  const select = dialog.getByRole('combobox');
+  await expect(select.locator('option')).toHaveCount(32);
+  expect((await select.locator('option').allTextContents()).slice(0, 25)).toEqual([
+    'UTC', ...Array.from({ length: 12 }, (_, index) => 'UTC+' + (index + 1)),
+    ...Array.from({ length: 12 }, (_, index) => 'UTC-' + (index + 1)),
+  ]);
+  for (const [label, value] of [['UTC+12', 'Etc/GMT-12'], ['UTC-12', 'Etc/GMT+12'], ['Europe/London', 'Europe/London']]) {
+    await select.selectOption({ label });
+    await expect(dialog.locator('.tools-mock-note strong')).toHaveText(label);
+    await dialog.getByRole('button', { name: 'Proceed', exact: true }).click();
+    await expect(dialog.getByRole('alert')).toContainText('Fixture keeps clone draft open');
+    expect(writes.at(-1)).toMatchObject({ timezone: value, timezone_type: 'zone' });
+  }
+  await select.selectOption({ label: 'UTC+12' });
+  await page.screenshot({ path: info.outputPath('clone-utc-offset.png') });
+});

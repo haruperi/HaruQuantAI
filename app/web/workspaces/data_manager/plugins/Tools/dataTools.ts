@@ -45,9 +45,16 @@ export interface QualityResult {
 }
 
 export const toolTimezones = [
-  'UTC', 'Europe/London', 'Europe/Prague', 'America/New_York', 'America/Chicago',
+  'UTC',
+  ...Array.from({ length: 12 }, (_, index) => `Etc/GMT-${index + 1}`),
+  ...Array.from({ length: 12 }, (_, index) => `Etc/GMT+${index + 1}`),
+  'Europe/London', 'Europe/Prague', 'America/New_York', 'America/Chicago',
   'Asia/Tokyo', 'Asia/Hong_Kong', 'Australia/Sydney',
 ] as const;
+export function timezoneLabel(timezone: string): string {
+  const offset = /^Etc\/GMT([+-])(\d+)$/.exec(timezone);
+  return offset ? `UTC${offset[1] === '-' ? '+' : '-'}${offset[2]}` : timezone;
+}
 export const toolSessions = ['No Session', 'Forex 24/5', 'CME Equity', 'US stocks', 'Metals'] as const;
 export const reviewTimeframes = ['TICK', 'M1', 'M5', 'M15', 'M30', 'H1', 'H4', 'D1', 'W1', 'MN1'] as const;
 
