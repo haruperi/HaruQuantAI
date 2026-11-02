@@ -3,8 +3,8 @@
   "generated_at": "2026-10-30T05:13:00.064780+00:00",
   "classification": "observed",
   "source_root": "data/reference-donor",
-  "scope": "All Java files in the consolidated donor internal tree; source identity only, not behavior or original encrypted-carrier attribution.",
-  "total_java_files": 2819,
+  "scope": "Retained Java source entries in the consolidated donor internal tree; source identity only, not behavior or original encrypted-carrier attribution.",
+  "total_java_files": 2815,
   "groups": [
     {
       "group": "extend",
@@ -9651,7 +9651,7 @@
     {
       "group": "plugins",
       "source_root": "data/reference-donor/internal/plugins",
-      "java_files": 412,
+      "java_files": 408,
       "source_files": [
         {
           "path": "data/reference-donor/internal/plugins/AppBuilder/Builder/BuilderAppPlugin.java",
@@ -10280,22 +10280,6 @@
         {
           "path": "data/reference-donor/internal/plugins/DataSourceSQFuturesData/SQFuturesData/SQFuturesDataServlet.java",
           "sha256": "4c96b86058aa7725b818626341be2eca9c9dd27c4c5d22f77e3247a5235b2677"
-        },
-        {
-          "path": "data/reference-donor/internal/plugins/DataSourceTD/TD/DataSourceTDPlugin.java",
-          "sha256": "df8f7f58cde93b13ba9423ad1d4b94622500027c4f1238facc303ef096927d73"
-        },
-        {
-          "path": "data/reference-donor/internal/plugins/DataSourceTD/TD/DataSourceTDServlet.java",
-          "sha256": "722a8dee5c4067367390ade448a815306ea76b217957804551c247c229782bb8"
-        },
-        {
-          "path": "data/reference-donor/internal/plugins/DataSourceTD/TD/job/ImportFileJob.java",
-          "sha256": "0a4a17cf7ee5150f95b3aafa462a5aec76bc32b9b4d1f4d01bed554ef5a0c9cc"
-        },
-        {
-          "path": "data/reference-donor/internal/plugins/DataSourceTD/TD/TDDataManager.java",
-          "sha256": "831c0fea8ce513062bd78daa120553f37822b8d4e6f72d19000712ac707b8d5f"
         },
         {
           "path": "data/reference-donor/internal/plugins/DataSourceYahoo/Yahoo/DataSourceYahooPlugin.java",

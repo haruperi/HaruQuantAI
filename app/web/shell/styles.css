@@ -59,7 +59,6 @@
 /* Command icons use shape and restrained color to distinguish action intent. */
 .data-source-button > svg:not(.menu-chevron) { color:#63b3ed; }
 .data-source-button[data-control-id="dukascopy"] > svg:not(.menu-chevron) { color:#f87171; }
-.data-source-button[data-control-id="tickdownloader"] > svg:not(.menu-chevron) { color:#68d391; }
 .data-source-button[data-control-id="file-import"] > svg:not(.menu-chevron) { color:#f6c85f; }
 .data-source-button[data-control-id="sq-equity"] > svg:not(.menu-chevron) { color:#4fd1c5; }
 .data-source-button[data-control-id="sq-futures"] > svg:not(.menu-chevron) { color:#a5b4fc; }

@@ -556,31 +556,6 @@ These are literal client request actions; omitted HTTP method arguments use Back
 
 **Remaining release gate:** reconcile the actual plugin methods and frontend consumers into explicit Python request/result models; select persistence/error/cancellation semantics and add deterministic success and failure fixtures. External connector contracts additionally need an offline transport adapter and response fixtures; discovery of source is not proof that the historical remote endpoint is operational.
 
-## DataSourceTD
-
-Owning order: `03-AppDataManager.md`. Current source folder: `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD`.
-
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTDService.js`: `loadAvailableSymbols(data, callOnSuccess)`, `importData(data, callOnSuccess)`, `importDataAction(symbol, action)`.
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/DataSourceTDImportCtrl.js`: registration/configuration source; no `this` method declaration matched.
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/import/module.js`: registration/configuration source; no `this` method declaration matched.
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/module.js`: registration/configuration source; no `this` method declaration matched.
-
-Available recovered primary Java files: **4**.
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/TD/DataSourceTDPlugin.java`: `getProduct()`, `getPreferredPosition()`, `initPlugin()`, `getHandler()`.
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/TD/DataSourceTDServlet.java`: class declaration / fields.
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/TD/job/ImportFileJob.java`: `messageReceived(GridMessage message)`, `accept(File dir, String name)`, `setProgressListener(DataManagerProgressListener progressListener)`, `call()`.
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/TD/TDDataManager.java`: `get()`, `stopTDImport(String symbol)`, `pauseTDImport(String symbol)`, `restartTDImport(String symbol)`, `importTDData(ImportInfo importInfo, String path, DataManagerProgressListener listener)`.
-
-Shared-library context (responsibility only): `DONOR_REFERENCE_ROOT/internal/libs/datalib/data/DataManager.java`.
-
-**Additional observed client action vocabulary:**
-
-- `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceTD/DataSourceTDService.js`: `dataSourceTD/importData`, `dataSourceTD/importDataAction`, `dataSourceTD/loadAvailableSymbols`.
-
-These are literal client request actions; omitted HTTP method arguments use BackendService defaults and are not inferred here. A forwarded `data`/`details` object is not yet a typed schema.
-
-**Remaining release gate:** reconcile the actual plugin methods and frontend consumers into explicit Python request/result models; select persistence/error/cancellation semantics and add deterministic success and failure fixtures. External connector contracts additionally need an offline transport adapter and response fixtures; discovery of source is not proof that the historical remote endpoint is operational.
-
 ## DataSourceYahoo
 
 Owning order: `03-AppDataManager.md`. Current source folder: `DONOR_REFERENCE_ROOT/internal/plugins/DataSourceYahoo`.

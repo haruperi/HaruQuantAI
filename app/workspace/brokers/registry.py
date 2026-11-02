@@ -60,7 +60,7 @@ _REQ_KEYS: dict[str, tuple[str, ...]] = {
     "crypto": ("api_key", "api_secret"),
     "darwinex": ("api_token",),
 }
-for _p in "simulator live_test dukascopy yahoo files sq_equity sq_futures tick_downloader".split():
+for _p in "simulator live_test dukascopy yahoo files sq_equity sq_futures".split():
     _REQ_KEYS[_p] = ()
 _CURRENCIES: dict[str, str] = {"ctrader": "EUR", "binance": "USDT", "crypto": "USDT"}
 _TRADING_SET = frozenset("simulator live_test metatrader ctrader binance".split())

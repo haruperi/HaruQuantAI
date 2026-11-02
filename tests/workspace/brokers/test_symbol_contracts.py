@@ -19,7 +19,6 @@ from app.workspace.brokers import (
 )
 from app.workspace.brokers.ctrader import CTraderClient
 from app.workspace.brokers.metatrader import MetaTraderClient
-from app.workspace.brokers.tick_downloader import TickDownloaderClient
 from app.workspace.trading import SymbolProxy
 
 
@@ -44,9 +43,7 @@ def test_catalogs_construct_nested_symbols(tmp_path, client_type):
     assert info.spread.default == 2
 
 
-@pytest.mark.parametrize(
-    "client_type", [FilesClient, MetaTraderClient, TickDownloaderClient, YahooClient]
-)
+@pytest.mark.parametrize("client_type", [FilesClient, MetaTraderClient, YahooClient])
 def test_simple_clients_construct_nested_symbols(client_type):
     info = client_type().get_symbol_info("EURUSD")
     assert isinstance(info, SymbolInfo)

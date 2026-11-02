@@ -26,10 +26,8 @@ This audit provides an authoritative, requirement-level inventory of all work or
 4. **Modular Subpackages Supersede Phase 03.9 Contribution Orders:**
    The 31 contribution orders in Phase 03.9 (`I-AppDataManager` through `I-ServletConnection`) are formally superseded by the active, tested modular subpackages under `app/workspace/data_manager/` (`symbols/`, `sessions/`, `brokers/`, `baskets/`, `custom/`, `data/`, `logs/`, `help/`, `sources/`).
 
-5. **TickDownloader Identity & Boundaries (`DataSourceTD`):**
-   `DataSourceTD` represents StrategyQuant's **TickDownloader** ([`app/web/workspaces/data_manager/plugins/TickDownloader/README.md:11`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/web/workspaces/data_manager/plugins/TickDownloader/README.md#L11)). `TickDownloaderClient` ([`app/workspace/brokers/tick_downloader.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/brokers/tick_downloader.py)) provides local tick file reading and UI adaptation. Unconfigured live directory polling or external binary execution is explicitly marked as unavailable.
 
-6. **HTTP Router Mounting:**
+5. **HTTP Router Mounting:**
    The Data Manager REST endpoints are unified via `create_router()` in [`app/workspace/data_manager/__init__.py`](file:///c:/Users/rharu/AppDev/HaruQuantAI/app/workspace/data_manager/__init__.py) and mounted under prefix `/api/v1/data` with session security and scope enforcement (`data:read`, `data:write`).
 
 ---
@@ -75,7 +73,6 @@ Status definitions:
 | **I-DataSourceMt5Api** | `DataSourceMt5Api` | `app/workspace/brokers/metatrader.py` | `test_mt5_symbols.py` | `superseded` | MetaTrader 5 IPC bridge active in `brokers/metatrader.py`. |
 | **I-DataSourceSQEquityData** | `DataSourceSQEquityData` | `app/workspace/brokers/sq_equity.py` | `test_sources.py` | `superseded` | SQ historical equity data feed active in `brokers/sq_equity.py`. |
 | **I-DataSourceSQFuturesData** | `DataSourceSQFuturesData` | `app/workspace/brokers/sq_futures.py` | `test_sources.py` | `superseded` | SQ continuous futures data feed active in `brokers/sq_futures.py`. |
-| **I-DataSourceTD** | `DataSourceTD` | `app/workspace/brokers/tick_downloader.py`, `app/web/workspaces/data_manager/plugins/TickDownloader/` | `test_sources.py`, Vitest `tickDownloader.test.ts` | `bounded` | StrategyQuant TickDownloader (`README.md:11`). Client and UI active; live directory polling unconfigured. |
 | **I-DataSourceYahoo** | `DataSourceYahoo` | `app/workspace/brokers/yahoo.py` | `test_sources.py` | `superseded` | Yahoo Finance ingest active in `brokers/yahoo.py`. |
 | **I-ServletConnection** | `ServletConnection` | `app/workspace/data_manager/brokers/http.py`, `app/core/host/transport.py` | `test_connections.py` | `superseded` | HTTP connection test endpoints active in `brokers/http.py`. |
 
@@ -118,9 +115,7 @@ All conditions required to retire `03-AppDataManager.md` have been formally reso
    `app/workspace/brokers/` is formally ratified as the permanent architectural home for broker and data source connectors. Relocation to `data_sources/` is superseded. Legacy MetaTrader 4 support was purged project-wide in commit `b563292d`.
 3. **Resolution of Phase 03.9 Contribution Orders:**
    The 31 unclosed contribution orders are formally superseded by the active, tested modular subpackages under `app/workspace/data_manager/` (`symbols`, `sessions`, `brokers`, `baskets`, `custom`, `data`, `logs`, `help`, `sources`).
-4. **Resolution of TickDownloader Donor Parity:**
-   `TickDownloaderClient` provides supported local tick reading; external live execution is explicitly documented as unconfigured/unavailable.
-5. **Documentation Synchronization:**
+4. **Documentation Synchronization:**
    `ARCHITECTURE.md` and `PROJECT.md` consistently record `/api/v1/data`, `app/workspace/brokers/`, and the `symbols` subpackage as ratified reality.
-6. **Work Order Retirement:**
+5. **Work Order Retirement:**
    `docs/dev/full-reimplementation/03-AppDataManager.md` is retired and deleted. This completion audit serves as the permanent record of verified requirements and architectural decisions.

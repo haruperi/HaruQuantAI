@@ -24,7 +24,6 @@ app/services/brokers/
   crypto.py            # CryptoClient / BinanceClient(BrokerClient) - Cryptocurrency market data client
   files.py             # FilesClient(BrokerClient) - Local filesystem market data client & CSV/Parquet codecs
   yahoo.py             # YahooClient(BrokerClient) - Yahoo Finance market data client
-  tick_downloader.py   # TickDownloaderClient(BrokerClient) - Historical tick downloader client
   sq_equity.py         # SQEquityClient(BrokerClient) - StrategyQuant US Equities daily bundled client & .dat codec
   sq_futures.py        # SQFuturesClient(BrokerClient) - StrategyQuant Continuous Futures minute/daily bundled client
 
@@ -314,7 +313,6 @@ The broker architecture organizes all brokers into standard Python classes inher
 6. `CryptoClient` / `BinanceClient`: Cryptocurrency Spot and USD-M Futures candle client (Binance, Bitfinex, Coinbase, Poloniex).
 7. `FilesClient`: Local filesystem market data client supporting CSV, TSV, and Parquet historical files.
 8. `YahooClient`: Yahoo Finance public market data and symbol metadata client (v8 chart API).
-9. `TickDownloaderClient`: High-precision tick and trade volume historical data downloader client.
 10. `SimulatorClient`: Headless pure-Python execution and historical simulation client.
 11. `CTraderClient`: Spotware cTrader Open API Protobuf/TLS execution and data client.
 

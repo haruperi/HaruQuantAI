@@ -53,7 +53,6 @@ _FACTORIES_RAW = (
     "darwinex:darwinex:DarwinexClient sq_equity:sq_equity:SQEquityClient "
     "sq_futures:sq_futures:SQFuturesClient crypto:crypto:CryptoClient "
     "binance:crypto:BinanceClient files:files:FilesClient "
-    "tick_downloader:tick_downloader:TickDownloaderClient "
     "metatrader:metatrader:MetaTraderClient ctrader:ctrader:CTraderClient "
     "simulator:simulator:SimulatorClient live_test:registry:LiveTest"
 )

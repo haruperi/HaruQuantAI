@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { datasets } from '../../Common/fixtures';
-import { useDataManagerStore, useTickDownloader } from '../../Common/dataManagerStore';
+import { useDataManagerStore } from '../../Common/dataManagerStore';
 import { useSymbols } from '../../Catalogs/Symbols/symbolsStore';
 import { useFileSymbols } from '../fileSymbolsStore';
 import { effectiveSymbols, newSymbol, validateName, type FileSymbol } from '../fileSymbols';
@@ -10,7 +10,6 @@ export type AddPopupProps = { onClose: () => void; onSaved: () => void; mass?: {
 export function useFilesAdd({ onClose, onSaved, mass }: AddPopupProps) {
   const file = useFileSymbols();
   const data = useDataManagerStore();
-  const td = useTickDownloader();
   const catalog = useSymbols();
   const all = catalog.loaded ? catalog.symbols : effectiveSymbols(file.symbols, file.overrides, file.removed);
   const brokers = [{ id: '-1', name: 'Default', postfix: '' }, ...data.brokers.filter(row => row.mtUse)];
@@ -44,7 +43,7 @@ export function useFilesAdd({ onClose, onSaved, mass }: AddPopupProps) {
   function help() { setHelpOrigin(page === 'symbolDefinition' ? 'symbolDefinition' : 'symbol'); setPage('help'); }
   async function save() {
     try {
-      if (data.storageError || td.storageError) throw new Error(data.storageError || td.storageError);
+      if (data.storageError) throw new Error(data.storageError);
       if (page === 'symbolDefinition') {
         validateName(draft.symbol, [], 'Symbol');
         const profile = brokers.find(row => row.id === draft.broker);
@@ -55,7 +54,7 @@ export function useFilesAdd({ onClose, onSaved, mass }: AddPopupProps) {
       } else {
         if (!item) throw new Error('Choose an symbol.');
         if (mass) { if (!await mass.onSave(item, barType)) return; onSaved(); onClose(); return; }
-        await filesService.addSymbol(symbol, item, barType, [...datasets, ...data.definitions, ...td.definitions].map(row => row.symbol));
+        await filesService.addSymbol(symbol, item, barType, [...datasets, ...data.definitions].map(row => row.symbol));
         onSaved(); onClose();
       }
     } catch (cause) { setError(cause instanceof Error ? cause.message : 'Unable to save.'); }

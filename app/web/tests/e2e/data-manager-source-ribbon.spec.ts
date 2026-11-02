@@ -134,7 +134,6 @@ test('Data sources exposes every provider workflow and remains mock-only', async
     ['Dukascopy data', 'Add new Dukascopy symbol', 'Add Dukascopy data'],
     ['Dukascopy data', 'Download data for existing symbol', 'Download Dukascopy data'],
     ['Dukascopy data', 'Dukascopy Data Disclaimer', 'Dukascopy data disclaimer'],
-    ['TickDownloader import', 'Import TickDownloader data', 'Import data from TickDownloader'],
     ['File import', 'Add symbol', 'Add symbol'],
     ['File import', 'Import one data file', 'Import one data file'],
     ['File import', 'Import multiple files from a folder', 'Mass import'],
@@ -247,4 +246,16 @@ test('Dukascopy disclaimer is informational and closes in both themes', async ({
   await expect(dialog).toHaveCount(0);
   await expect(page.getByRole('button', { name: 'Dukascopy data', exact: true })).toBeFocused();
   await expect(page.getByLabel('Data Manager progress')).toContainText('No active operations');
+});
+
+
+test('Data sources ribbon contains the eight supported providers', async ({ page }) => {
+  await page.goto('/datamanager');
+  const ribbon = page.locator('.data-source-ribbon');
+  await expect(ribbon).toBeVisible();
+  await expect.poll(() => ribbon.locator('.provider-actions button.data-source-button[data-control-id]').evaluateAll(buttons => buttons.map(button => button.getAttribute('data-control-id')))).toEqual([
+    'dukascopy', 'file-import', 'sq-equity', 'sq-futures',
+    'darwinex', 'crypto', 'yahoo', 'mt5',
+  ]);
+  await page.screenshot({ path: 'test-results/data-source-providers.png', fullPage: true });
 });

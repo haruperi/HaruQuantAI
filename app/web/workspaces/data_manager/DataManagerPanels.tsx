@@ -8,7 +8,7 @@ import { type SessionDefinition, type CatalogSession, type SessionBroker } from 
 import { summarizeGroup, type StockGroupDefinition } from './plugins/Catalogs/StockGroups/stockGroups';
 import { activeExternalLines, externalTypeLabel, externalIndicatorTypes, type ExternalIndicatorDefinition } from './plugins/Indicators/externalIndicators';
 import { useExternalIndicators } from './plugins/Indicators/externalIndicatorsStore';
-import { normalizeRelativePath, useDataManagerStore, useDukascopyDownloads, useTickDownloader } from './plugins/Common/dataManagerStore';
+import { normalizeRelativePath, useDataManagerStore, useDukascopyDownloads } from './plugins/Common/dataManagerStore';
 import { useFileSymbols } from './plugins/FileImport/fileSymbolsStore';
 import { commissionInfo, type CatalogSymbol } from './plugins/Catalogs/Symbols/symbolsApiClient';
 import { useSymbols } from './plugins/Catalogs/Symbols/symbolsStore';
@@ -193,7 +193,6 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
   onDeleteRow?: (id: string) => void;
   onActivate?: (id: string) => void; activeDatasetId?: string | null;
 }) {
-  const td = useTickDownloader();
   const savedDatasets = useDataManagerStore(state => state.savedDatasets);
   const catalogLoading = useDataManagerStore(state => state.catalogLoading);
   const catalogError = useDataManagerStore(state => state.catalogError);
@@ -266,7 +265,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
         const exportStatus = exportIndex >= 0 && exports.job ? exports.job.state === 'completed' ? 'Completed' : `${exports.job.state.charAt(0).toUpperCase()}${exports.job.state.slice(1)} ${exports.job.progress}%` : '';
         const cloneIndex = tools.job?.tasks.findIndex(task => task.source.id === row.id || task.definition.id === row.id) ?? -1;
         const cloneStatus = cloneIndex >= 0 && tools.job ? cloneIndex < tools.job.completed || tools.job.state === 'completed' ? 'Completed' : `${tools.job.state.charAt(0).toUpperCase()}${tools.job.state.slice(1)} ${tools.job.progress}%` : tools.definitions.some(item => item.id === row.id) ? 'Completed' : '';
-        const rowJob = row.id.startsWith('td:') && td.job?.request.symbols.some(symbol => `td:${symbol + td.job!.request.postfix}` === row.id) ? td.job : downloadJob?.request.targets.some(target => target.id === row.id) ? downloadJob : null;
+        const rowJob = downloadJob?.request.targets.some(target => target.id === row.id) ? downloadJob : null;
         const rowPath = 'path' in row && typeof row.path === 'string' ? normalizeRelativePath(row.path) : '';
         return <tr key={row.id} className={selectedIds.includes(row.id) || activeDatasetId === row.id ? 'selected' : ''}>
           <td><input type="checkbox" aria-label={`Select ${row.symbol}`} checked={selectedIds.includes(row.id)} onChange={() => onToggle(row.id)}/></td>

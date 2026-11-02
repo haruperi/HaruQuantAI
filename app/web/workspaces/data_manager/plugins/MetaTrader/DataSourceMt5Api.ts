@@ -1,6 +1,6 @@
 import { datasets } from '../Common/fixtures';
 import { reservedCrypto, useCrypto } from '../Crypto/cryptoStore';
-import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
+import { useDataManagerStore, useDukascopyDownloads } from '../Common/dataManagerStore';
 import { reservedDarwinex, useDarwinex } from '../Darwinex/darwinexStore';
 import { activeImport, useFileImports } from '../FileImport/fileImportStore';
 import { useFileSymbols } from '../FileImport/fileSymbolsStore';
@@ -11,16 +11,15 @@ import { reservedYahoo, useYahoo } from '../Yahoo/yahooStore';
 
 export function mt5Context(): { existing: string[]; active: boolean } {
   const data = useDataManagerStore.getState();
-  const td = useTickDownloader.getState();
   const files = useFileSymbols.getState();
   const imports = useFileImports.getState();
   const mt5 = useMt5Import.getState();
-  const error = data.storageError || td.storageError || files.storageError || imports.storageError || mt5.storageError;
+  const error = data.storageError || files.storageError || imports.storageError || mt5.storageError;
   if (error) throw new Error(error);
-  const rows = [...datasets, ...data.definitions, ...td.definitions, ...files.definitions, ...imports.records,
+  const rows = [...datasets, ...data.definitions, ...files.definitions, ...imports.records,
     ...reservedSQDefinitions(), ...reservedDarwinex(), ...reservedCrypto(), ...reservedYahoo(), ...reservedMt5(),
     ...(activeImport(imports.job?.state) ? imports.job!.tasks.map(task => task.record) : [])];
-  const active = [td.job?.state, imports.job?.state, useSQData.getState().job?.state,
+  const active = [imports.job?.state, useSQData.getState().job?.state,
     useDukascopyDownloads.getState().job?.state, useDarwinex.getState().job?.state,
     useCrypto.getState().job?.state, useYahoo.getState().job?.state].some(mt5Active);
   return { existing: rows.map(row => row.symbol), active };

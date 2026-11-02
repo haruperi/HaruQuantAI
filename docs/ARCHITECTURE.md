@@ -47,7 +47,7 @@ HaruQuantAI is a high-performance quantitative research, strategy generation, an
 |  +--------------------------------+  +-----------------------------------------+  |
 |  | Broker Connectors & Feeds (brokers/)                                        |  |
 |  |  * dukascopy   * darwinex   * metatrader (MT5)   * sq_equity   * sq_futures |  |
-|  |  * crypto      * files      * yahoo              * tick_downloader          |  |
+|  |  * crypto      * files      * yahoo                                         |  |
 |  +-----------------------------------------------------------------------------+  |
 |                                                                                   |
 |  [Future Workspaces: Code Editor | AlgoWizard | Results | Retester | Builder ...]  |
@@ -174,7 +174,6 @@ Coordinates workstation entry, project registry, dashboard configuration (`dashb
 6. **`crypto`:** Binance and cryptocurrency exchange feeds.
 7. **`files`:** Generic local filesystem market data client (CSV, TSV, Parquet).
 8. **`yahoo`:** Yahoo Finance daily and intraday bar provider.
-9. **`tick_downloader`:** High-precision tick downloader engine.
 
 ### 5.4 Planned Workspaces
 * **`app/workspace/code_editor/`:** Multi-language algorithmic code authoring.

@@ -1,5 +1,4 @@
 import { yahooProvider } from '../Yahoo/module';
-import { tdProvider } from '../TickDownloader/module';
 import { equityProvider } from '../SQData/Equity/module';
 import { futuresProvider } from '../SQData/Futures/module';
 import { mt5Provider } from '../MetaTrader/module';
@@ -13,7 +12,6 @@ export type DataSourceDialogId =
   | 'dukascopy-add'
   | 'dukascopy-download'
   | 'dukascopy-information'
-  | 'tickdownloader-import'
   | 'file-add'
   | 'file-import'
   | 'file-mass-import'
@@ -86,7 +84,6 @@ export interface DataSourceContextAction {
 
 export const dataSourceProviders: readonly DataSourceProvider[] = [
   dukascopyProvider,
-  tdProvider,
   filesProvider,
   equityProvider,
   futuresProvider,

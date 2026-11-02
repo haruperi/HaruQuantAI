@@ -32,7 +32,6 @@ if TYPE_CHECKING:
     from .simulator import SimulatorClient
     from .sq_equity import SQEquityClient
     from .sq_futures import SQFuturesClient
-    from .tick_downloader import TickDownloaderClient
     from .yahoo import YahooClient
 
 
@@ -59,7 +58,6 @@ __all__ = [
     "SQEquityClient",
     "SQFuturesClient",
     "SimulatorClient",
-    "TickDownloaderClient",
     "TradingClient",
     "YahooClient",
     "binance",
@@ -75,6 +73,5 @@ __all__ = [
     "simulator",
     "sq_equity",
     "sq_futures",
-    "tick_downloader",
     "yahoo",
 ]

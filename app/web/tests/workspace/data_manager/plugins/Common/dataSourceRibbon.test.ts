@@ -3,10 +3,9 @@ import { describe, expect, it } from 'vitest';
 import { dataSourceContextActions, dataSourceProviders } from '../../../../../workspaces/data_manager/plugins/Common/dataSourceRibbon';
 
 describe('Data sources control inventory', () => {
-  it('keeps the nine provider controls in their documented order', () => {
+  it('keeps the eight provider controls in their documented order', () => {
     expect(dataSourceProviders.map(provider => provider.id)).toEqual([
       'dukascopy',
-      'tickdownloader',
       'file-import',
       'sq-equity',
       'sq-futures',
@@ -22,7 +21,7 @@ describe('Data sources control inventory', () => {
       provider.commands.flatMap(command => command.children ?? [command]),
     );
 
-    expect(leaves).toHaveLength(24);
+    expect(leaves).toHaveLength(23);
     for (const command of leaves) {
       expect(Boolean(command.dialog) !== Boolean(command.action)).toBe(true);
     }

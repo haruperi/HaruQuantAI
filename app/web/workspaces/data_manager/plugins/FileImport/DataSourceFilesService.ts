@@ -7,7 +7,7 @@ import { reservedYahoo, useYahoo } from '../Yahoo/yahooStore';
 import { reservedSQDefinitions, useSQData } from '../SQData/sqDataStore';
 import { reservedMt5, useMt5Import } from '../MetaTrader/mt5ImportStore';
 import { datasets } from '../Common/fixtures';
-import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
+import { useDataManagerStore, useDukascopyDownloads } from '../Common/dataManagerStore';
 import { activeImport, useFileImports } from './fileImportStore';
 import { useFileSymbols } from './fileSymbolsStore';
 import { readImportFile, type ImportTask, type ImportRecord, type ImportFormat } from './fileImport';
@@ -16,13 +16,13 @@ import type { FileSymbol, FileDefinition } from './fileSymbols';
 export const filesService = {
   read: readImportFile,
   massContext(records: ImportRecord[]): { id: string; symbol: string; source: string }[] {
-    const data = useDataManagerStore.getState(), td = useTickDownloader.getState(), symbols = useFileSymbols.getState();
-    if (data.storageError || td.storageError || symbols.storageError) throw new Error(data.storageError || td.storageError || symbols.storageError);
-    const existing = [...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...datasets, ...data.definitions, ...td.definitions, ...symbols.definitions, ...records];
+    const data = useDataManagerStore.getState(), symbols = useFileSymbols.getState();
+    if (data.storageError || symbols.storageError) throw new Error(data.storageError || symbols.storageError);
+    const existing = [...reservedYahoo(), ...reservedCrypto(), ...reservedDarwinex(), ...reservedSQDefinitions(), ...reservedMt5(), ...datasets, ...data.definitions, ...symbols.definitions, ...records];
     return existing;
   },
   async start(tasks: ImportTask[], timezone: string, group: string, skipped: number): Promise<void> {
-    await useFileImports.getState().start(tasks, timezone, group, skipped, [useYahoo.getState().job?.state, useCrypto.getState().job?.state, useDarwinex.getState().job?.state, useSQData.getState().job?.state, useMt5Import.getState().job?.state, useDukascopyDownloads.getState().job?.state, useTickDownloader.getState().job?.state].some(activeImport));
+    await useFileImports.getState().start(tasks, timezone, group, skipped, [useYahoo.getState().job?.state, useCrypto.getState().job?.state, useDarwinex.getState().job?.state, useSQData.getState().job?.state, useMt5Import.getState().job?.state, useDukascopyDownloads.getState().job?.state].some(activeImport));
   },
   async addSymbolDefinition(value: FileSymbol, brokerIds: string[]): Promise<FileSymbol> {
     const saved = {...value,...toFileSymbol(await saveRemoteSymbol(value, value.brokerName || 'File'))};

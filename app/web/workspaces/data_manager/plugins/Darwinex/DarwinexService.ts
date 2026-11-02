@@ -1,5 +1,5 @@
 import { datasets } from '../Common/fixtures';
-import { useDataManagerStore, useDukascopyDownloads, useTickDownloader } from '../Common/dataManagerStore';
+import { useDataManagerStore, useDukascopyDownloads } from '../Common/dataManagerStore';
 import { useFileSymbols } from '../FileImport/fileSymbolsStore';
 import { useFileImports } from '../FileImport/fileImportStore';
 import { reservedSQDefinitions, useSQData } from '../SQData/sqDataStore';
@@ -11,11 +11,11 @@ import { darwinexCatalogue, darwinexDefinitions, discoverDarwinex, type Darwinex
 import { useAppStore } from '../../../../shell/store';
 
 export function darwinexContext(): { existing: string[]; active: boolean } {
-  const data = useDataManagerStore.getState(), td = useTickDownloader.getState(), files = useFileSymbols.getState(), imports = useFileImports.getState();
-  const error = data.storageError || td.storageError || files.storageError || imports.storageError;
+  const data = useDataManagerStore.getState(), files = useFileSymbols.getState(), imports = useFileImports.getState();
+  const error = data.storageError || files.storageError || imports.storageError;
   if (error) throw new Error(error);
-  const rows = [...datasets, ...data.definitions, ...td.definitions, ...files.definitions, ...imports.records, ...reservedCrypto(), ...reservedYahoo(), ...reservedSQDefinitions(), ...reservedDarwinex(), ...reservedMt5(), ...(darwinexActive(imports.job?.state) ? imports.job!.tasks.map(task => task.record) : [])];
-  return { existing: rows.map(row => row.symbol), active: [td.job?.state, imports.job?.state, useSQData.getState().job?.state, useMt5Import.getState().job?.state, useDukascopyDownloads.getState().job?.state, useCrypto.getState().job?.state, useYahoo.getState().job?.state].some(darwinexActive) };
+  const rows = [...datasets, ...data.definitions, ...files.definitions, ...imports.records, ...reservedCrypto(), ...reservedYahoo(), ...reservedSQDefinitions(), ...reservedDarwinex(), ...reservedMt5(), ...(darwinexActive(imports.job?.state) ? imports.job!.tasks.map(task => task.record) : [])];
+  return { existing: rows.map(row => row.symbol), active: [imports.job?.state, useSQData.getState().job?.state, useMt5Import.getState().job?.state, useDukascopyDownloads.getState().job?.state, useCrypto.getState().job?.state, useYahoo.getState().job?.state].some(darwinexActive) };
 }
 export const darwinexService = {
   catalogue: darwinexCatalogue,

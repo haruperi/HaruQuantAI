@@ -63,7 +63,6 @@ import { BrokerProfilesModal } from './plugins/Catalogs/BrokerProfiles/BrokerPro
 import { BrokerStocksDialog } from './plugins/Catalogs/BrokerProfiles/BrokerStocksDialog';
 import { BrokerTransferDialog } from './plugins/Catalogs/BrokerProfiles/BrokerTransferDialog';
 import { brokerCounts, type BrokerProfile } from './plugins/Catalogs/BrokerProfiles/brokerProfiles';
-import { TickDownloaderImportDialog } from './plugins/TickDownloader/module';
 import { ImportPopup } from './plugins/Dukascopy/import/module';
 import { DisclaimerPopup } from './plugins/Dukascopy/disclaimer/module';
 import { eligibleTargets, simulationSummary, type DownloadTarget } from './plugins/Dukascopy/dukascopyDownload';
@@ -72,7 +71,6 @@ import {
   normalizeRelativePath,
   useDataManagerStore,
   useDukascopyDownloads,
-  useTickDownloader,
 } from './plugins/Common/dataManagerStore';
 import { CsvExportDialog } from './plugins/Export/CsvExportDialog';
 import { Mt5ExportDialog } from './plugins/Export/Mt5ExportDialog';
@@ -162,7 +160,7 @@ function Mt5ProviderIcon({ size = 27 }: { size?: number }) {
 }
 
 const providerIcons: Record<string, ComponentType<{ size?: number }>> = {
-  dukascopy: Plus, tickdownloader: Download, 'file-import': FileUp,
+  dukascopy: Plus, 'file-import': FileUp,
   'sq-equity': Database, 'sq-futures': Server, darwinex: Cloud, crypto: Bitcoin,
   yahoo: YahooProviderIcon, mt5: Mt5ProviderIcon,
 };
@@ -225,7 +223,7 @@ function DataSourceDialog({ state, selectedCount, selectedIds, onClose, onSecond
   const titles: Record<DataSourceDialogId, string> = {
     'new-symbol': 'Add symbol',
     'dukascopy-add': 'Add Dukascopy data', 'dukascopy-download': 'Download Dukascopy data',
-    'dukascopy-information': 'Dukascopy data disclaimer', 'tickdownloader-import': 'Import data from TickDownloader',
+    'dukascopy-information': 'Dukascopy data disclaimer',
     'file-add': 'Add symbol', 'file-import': 'Import one data file', 'file-mass-import': 'Import multiple data files',
     'sq-equity-find': 'Find and add Equity data',
     'sq-futures-find': 'Find and add Futures data', 'darwinex-add': 'Add Darwinex Tick Data',
@@ -339,7 +337,6 @@ export function DataManager() {
   const brokerLoadError = useDataManagerStore(state => state.brokerError);
   const brokerJob = useDataManagerStore(state => state.brokerJob);
   const download = useDukascopyDownloads();
-  const td = useTickDownloader();
   const imports = useFileImports();
   const sq = useSQData();
   const historical = useHistoricalSources();
@@ -384,15 +381,10 @@ export function DataManager() {
   useEffect(() => { if (darwinex.job?.state !== 'running') return; const timer = window.setInterval(() => useDarwinex.getState().advance(), 250); return () => window.clearInterval(timer); }, [darwinex.job?.state]);
   const [fileTarget, setFileTarget] = useState<FileDefinition | null>(null);
   const [symbolJob, setSymbolJob] = useState<{ label: string; state: 'running' | 'completed' | 'failed'; progress: number; error?: string } | null>(null);
-  const [progressOwner, setProgressOwner] = useState<'market' | 'symbols' | 'download' | 'td' | 'file' | 'sq' | 'darwinex' | 'crypto' | 'yahoo' | 'mt5' | 'export' | 'tools' | 'external' | 'stock-groups' | 'broker'>(() => sourceActive(historical.job?.status) ? 'market' : ['running','paused'].includes(brokerJob?.state??'')?'broker':stockGroupJobActive(stockGroups.job?.state) ? 'stock-groups' : externalJobActive(externalIndicators.job?.state) ? 'external' : toolsActive(tools.job?.state) ? 'tools' : exportActive(exports.job?.state) ? 'export' : mt5Active(mt5.job?.state) ? 'mt5' : yahooActive(yahoo.job?.state) ? 'yahoo' : cryptoActive(crypto.job?.state) ? 'crypto' : darwinexActive(darwinex.job?.state) ? 'darwinex' : sqActive(sq.job?.state) ? 'sq' : activeImport(imports.job?.state) ? 'file' : ['running', 'paused'].includes(download.job?.state ?? '') ? 'download' : activeImport(td.job?.state) ? 'td' : brokerJob?'broker':stockGroups.job ? 'stock-groups' : externalIndicators.job ? 'external' : tools.job ? 'tools' : exports.job ? 'export' : mt5.job ? 'mt5' : yahoo.job ? 'yahoo' : crypto.job ? 'crypto' : darwinex.job ? 'darwinex' : sq.job ? 'sq' : imports.job ? 'file' : td.job ? 'td' : historical.job ? 'market' : 'download');
-  const providerJob = progressOwner === 'market' ? historicalJob : progressOwner === 'symbols' ? symbolJob : progressOwner === 'broker'?brokerJob:progressOwner === 'stock-groups' ? stockGroups.job : progressOwner === 'external' ? externalIndicators.job : progressOwner === 'tools' ? tools.job : progressOwner === 'export' ? exports.job : progressOwner === 'mt5' ? mt5.job : progressOwner === 'yahoo' ? yahoo.job : progressOwner === 'crypto' ? crypto.job : progressOwner === 'darwinex' ? darwinex.job : progressOwner === 'sq' ? sq.job : progressOwner === 'file' ? imports.job : progressOwner === 'td' ? td.job : download.job;
+  const [progressOwner, setProgressOwner] = useState<'market' | 'symbols' | 'download' | 'file' | 'sq' | 'darwinex' | 'crypto' | 'yahoo' | 'mt5' | 'export' | 'tools' | 'external' | 'stock-groups' | 'broker'>(() => sourceActive(historical.job?.status) ? 'market' : ['running','paused'].includes(brokerJob?.state??'')?'broker':stockGroupJobActive(stockGroups.job?.state) ? 'stock-groups' : externalJobActive(externalIndicators.job?.state) ? 'external' : toolsActive(tools.job?.state) ? 'tools' : exportActive(exports.job?.state) ? 'export' : mt5Active(mt5.job?.state) ? 'mt5' : yahooActive(yahoo.job?.state) ? 'yahoo' : cryptoActive(crypto.job?.state) ? 'crypto' : darwinexActive(darwinex.job?.state) ? 'darwinex' : sqActive(sq.job?.state) ? 'sq' : activeImport(imports.job?.state) ? 'file' : ['running', 'paused'].includes(download.job?.state ?? '') ? 'download' : brokerJob?'broker':stockGroups.job ? 'stock-groups' : externalIndicators.job ? 'external' : tools.job ? 'tools' : exports.job ? 'export' : mt5.job ? 'mt5' : yahoo.job ? 'yahoo' : crypto.job ? 'crypto' : darwinex.job ? 'darwinex' : sq.job ? 'sq' : imports.job ? 'file' : historical.job ? 'market' : 'download');
+  const providerJob = progressOwner === 'market' ? historicalJob : progressOwner === 'symbols' ? symbolJob : progressOwner === 'broker'?brokerJob:progressOwner === 'stock-groups' ? stockGroups.job : progressOwner === 'external' ? externalIndicators.job : progressOwner === 'tools' ? tools.job : progressOwner === 'export' ? exports.job : progressOwner === 'mt5' ? mt5.job : progressOwner === 'yahoo' ? yahoo.job : progressOwner === 'crypto' ? crypto.job : progressOwner === 'darwinex' ? darwinex.job : progressOwner === 'sq' ? sq.job : progressOwner === 'file' ? imports.job : download.job;
   useEffect(() => { if (sq.job?.state !== 'running') return; const timer = window.setInterval(() => useSQData.getState().advance(), 250); return () => window.clearInterval(timer); }, [sq.job?.state]);
-  const providerAction = progressOwner === 'market' ? historical.action : progressOwner === 'symbols' ? (() => undefined) : progressOwner === 'broker'?useDataManagerStore.getState().brokerAction:progressOwner === 'stock-groups' ? stockGroups.action : progressOwner === 'external' ? externalIndicators.action : progressOwner === 'tools' ? tools.action : progressOwner === 'export' ? exports.action : progressOwner === 'mt5' ? mt5.action : progressOwner === 'yahoo' ? yahoo.action : progressOwner === 'crypto' ? crypto.action : progressOwner === 'darwinex' ? darwinex.action : progressOwner === 'sq' ? sq.action : progressOwner === 'file' ? imports.action : progressOwner === 'td' ? td.action : download.action;
-  useEffect(() => {
-    if (td.job?.state !== 'running') return;
-    const timer = window.setInterval(() => useTickDownloader.getState().advance(), 250);
-    return () => window.clearInterval(timer);
-  }, [td.job?.state]);
+  const providerAction = progressOwner === 'market' ? historical.action : progressOwner === 'symbols' ? (() => undefined) : progressOwner === 'broker'?useDataManagerStore.getState().brokerAction:progressOwner === 'stock-groups' ? stockGroups.action : progressOwner === 'external' ? externalIndicators.action : progressOwner === 'tools' ? tools.action : progressOwner === 'export' ? exports.action : progressOwner === 'mt5' ? mt5.action : progressOwner === 'yahoo' ? yahoo.action : progressOwner === 'crypto' ? crypto.action : progressOwner === 'darwinex' ? darwinex.action : progressOwner === 'sq' ? sq.action : progressOwner === 'file' ? imports.action : download.action;
   useEffect(() => { if (imports.job?.state !== 'running') return; const timer = window.setInterval(() => useFileImports.getState().advance(), 250); return () => window.clearInterval(timer); }, [imports.job?.state]);
   const [downloadTargets, setDownloadTargets] = useState<DownloadTarget[]>([]);
   useEffect(() => {
@@ -580,7 +572,7 @@ export function DataManager() {
     if (providerJob?.state === 'completed') void useDataManagerStore.getState().syncRemoteDatasets();
   }, [providerJob?.state]);
 
-  const startOperation = (label: string) => { if ([td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(state => state === 'running' || state === 'paused')) { setSelectionMessage('Finish or stop the active data operation first.'); return; } setSelectionMessage(''); setOpenMenu(null); setNestedOpen(false); setOperationLabel(label); setProgress(4); setOperationState('running'); notify(`${label} started`); };
+  const startOperation = (label: string) => { if ([download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(state => state === 'running' || state === 'paused')) { setSelectionMessage('Finish or stop the active data operation first.'); return; } setSelectionMessage(''); setOpenMenu(null); setNestedOpen(false); setOperationLabel(label); setProgress(4); setOperationState('running'); notify(`${label} started`); };
   const runDirectAction = (action: DirectDataSourceAction) => {
     if (sourceActive(historical.job?.status) || activeImport(download.job?.state)) { setSelectionMessage('Finish or stop the active download first.'); return; }
     let rows = savedDatasets ?? [];
@@ -602,7 +594,7 @@ export function DataManager() {
       if (command.dialog?.endsWith('-download') && !selected.length) { setSelectionMessage('Select saved datasets for this source first.'); return; }
       setHistoricalDialog({provider: source === 'crypto' ? selected[0].source : source, targets: command.dialog?.endsWith('-download') ? selected : []}); return;
     }
-    if (['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download', 'sq-equity-find', 'sq-futures-find', 'tickdownloader-import', 'dukascopy-add', 'dukascopy-download', 'file-import', 'file-mass-import'].includes(command.dialog ?? '') && (activeImport(operationState) || [td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport))) { setSelectionMessage('Finish or stop the active data operation first.'); setOpenMenu(null); return; }
+    if (['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download', 'sq-equity-find', 'sq-futures-find', 'dukascopy-add', 'dukascopy-download', 'file-import', 'file-mass-import'].includes(command.dialog ?? '') && (activeImport(operationState) || [download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, externalIndicators.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport))) { setSelectionMessage('Finish or stop the active data operation first.'); setOpenMenu(null); return; }
     if (command.dialog === 'yahoo-download') {
       setOpenMenu(null); setNestedOpen(false);
       try { const targets = yahooTargets(yahoo.definitions.filter(row => selectedDatasetIds.includes(row.id))).map(row => ({ ...row, ...simulationSummary(row, yahoo.ranges[row.id] ?? []) })); setYahooDownloadTargets(targets); setSelectionMessage(''); setDialog({ id: 'yahoo-download' }); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select Yahoo data.'); }
@@ -620,7 +612,7 @@ export function DataManager() {
     }
     if (command.dialog === 'file-import') {
       setOpenMenu(null); setNestedOpen(false);
-      const rows = definitions.filter(row => selectedDatasetIds.includes(row.id) && ['File import','files','tickdownloader'].includes(row.source));
+      const rows = definitions.filter(row => selectedDatasetIds.includes(row.id) && ['File import','files'].includes(row.source));
       const row = rows[0];
       if (!row) { setSelectionMessage('You must select at least one File record.'); return; }
       if ('cloned' in row && row.cloned) { setSelectionMessage('Cannot import into cloned data.'); return; }
@@ -737,14 +729,14 @@ export function DataManager() {
     void useSymbols.getState().refreshFromServer();
   };
   const removeSymbolRows = (rows: CatalogSymbol[]) => void runSymbolJob(`Deleting ${rows.length} symbol${rows.length === 1 ? '' : 's'}`, async () => { const count = await useSymbols.getState().removeSymbols(rows.map(item => item.id)); setSelectedSymbolIds(current => current.filter(id => !rows.some(item => item.id === id))); return `Deleted ${count} symbol${count === 1 ? '' : 's'}.`; });
-  const otherProviderActive = activeImport(operationState) || [symbolJob?.state, td.job?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport);
+  const otherProviderActive = activeImport(operationState) || [symbolJob?.state, download.job?.state, imports.job?.state, sq.job?.state, darwinex.job?.state, crypto.job?.state, yahoo.job?.state, mt5.job?.state, exports.job?.state, tools.job?.state, stockGroups.job?.state,brokerJob?.state].some(activeImport);
   const externalActive = otherProviderActive || externalJobActive(externalIndicators.job?.state);
   const otherDataActive = externalActive || exportActive(exports.job?.state);
   const anyDataActive = otherDataActive || toolsActive(tools.job?.state);
   const openExport = (kind: ExportKind) => { try { if (anyDataActive) throw new Error('Finish or stop the active data operation first.'); const targets = selectExportTargets(exportRows, selectedDatasetIds, kind); setExportDialog({ kind, targets }); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select data for export.'); } };
   const openClone = () => { try { if (anyDataActive) throw new Error('Finish or stop the active data operation first.'); const targets = selectCloneTargets(toolRows, selectedDatasetIds); setCloneTargets(targets); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to select data to clone.'); } };
   const openReview = () => { try { if (anyDataActive) throw new Error('Cannot view data while an operation is in progress.'); const target = selectReviewTarget(toolRows, selectedDatasetIds); setReviewTarget(target); setSelectionMessage(''); } catch (cause) { setSelectionMessage(cause instanceof Error ? cause.message : 'Unable to view data.'); } };
-  const progressText = selectionMessage || (progressOwner === 'market' ? historical.error : '') || (progressOwner === 'download' ? download.storageError : '') || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'market' ? 'Data operation' : progressOwner === 'symbols' ? symbolJob?.label : progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : progressOwner === 'td' ? 'TickDownloader import' : 'Dukascopy download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
+  const progressText = selectionMessage || (progressOwner === 'market' ? historical.error : '') || (progressOwner === 'download' ? download.storageError : '') || (operationState === 'idle' ? (providerJob ? `${progressOwner === 'market' ? 'Data operation' : progressOwner === 'symbols' ? symbolJob?.label : progressOwner === 'broker'?'Broker data update':progressOwner === 'stock-groups' ? 'Stock group data update' : progressOwner === 'external' ? `Custom data import for '${externalIndicators.job?.indicator}'` : progressOwner === 'tools' ? 'Clone to timezone' : progressOwner === 'export' ? exports.job?.label : progressOwner === 'mt5' ? 'MT5 mock import' : progressOwner === 'yahoo' ? `Yahoo mock ${yahoo.job?.kind}` : progressOwner === 'crypto' ? `Crypto mock ${crypto.job?.kind}` : progressOwner === 'darwinex' ? `Darwinex mock ${darwinex.job?.kind}` : progressOwner === 'sq' && sq.job ? providerLabel(sq.job.provider) : progressOwner === 'file' ? 'File import' : 'Dukascopy download'} ${providerJob.state} ${providerJob.progress}%${providerJob.error ? `: ${providerJob.error}` : progressOwner === 'external' && externalIndicators.job?.state === 'completed' && externalIndicators.job.ignored ? ` — ${externalIndicators.job.ignored} invalid rows ignored` : progressOwner === 'file' && imports.job?.state === 'completed' ? ` — ${imports.job.completed} imported, ${imports.job.skipped} skipped, ${imports.job.tasks.reduce((n, task) => n + task.ignored, 0)} invalid rows ignored` : ''}` : 'No active operations') : operationState === 'paused' ? `${operationLabel} paused at ${progress}%` : operationState === 'cancelled' ? `${operationLabel} cancelled` : operationState === 'completed' ? `${operationLabel} complete` : `${operationLabel}… ${progress}%`);
 
   const handleDeleteDatasetRow = (id: string) => {
     setSelectedDatasetIds([id]);
@@ -850,7 +842,6 @@ export function DataManager() {
   )}
   {dialog?.id === 'sq-equity-find' && <SQEquityAddPopup onClose={closeDialog} onStarted={() => { setProgressOwner('sq'); setOperationState('idle'); setSelectionMessage(''); }}/>}
   {dialog?.id === 'sq-futures-find' && <SQFuturesAddPopup onClose={closeDialog} onStarted={() => { setProgressOwner('sq'); setOperationState('idle'); setSelectionMessage(''); }}/>}
-  {dialog?.id === 'tickdownloader-import' && <TickDownloaderImportDialog onClose={closeDialog} onStarted={() => { setProgressOwner('td'); setOperationState('idle'); notify('TickDownloader import started (simulation)'); }}/>}
   {dialog?.id === 'file-add' && <FileSymbolDialog onClose={closeDialog} onSaved={() => notify('File symbol added')}/>}
   {dialog?.id === 'file-import' && fileTarget && <FileImportDialog target={fileTarget} onClose={closeDialog} onStarted={() => { setProgressOwner('file'); setOperationState('idle'); }}/>}
   {dialog?.id === 'file-mass-import' && <FileMassImportDialog onClose={closeDialog} onStarted={() => { setProgressOwner('file'); setOperationState('idle'); }}/>}
@@ -896,5 +887,5 @@ export function DataManager() {
   {brokerDialog?.kind==='stocks'&&<BrokerStocksDialog profile={brokerDialog.source} onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='load'&&<BrokerTransferDialog onClose={()=>setBrokerDialog(null)} onSaved={message=>notify(message)}/>}
   {brokerDialog?.kind==='delete'&&<div className="broker-flow"><Modal title={brokerDialog.selected.length===1?'Remove broker':'Remove brokers'} width={520} onClose={()=>{if(!brokerDeleting){setBrokerDialog(null);setBrokerError('');}}} footer={<><Button disabled={brokerDeleting} onClick={()=>{setBrokerDialog(null);setBrokerError('');}}>No</Button><Button className="primary" disabled={brokerDeleting} onClick={async ()=>{if(brokerDeleting)return;setBrokerDeleting(true);setBrokerError('');try{const ids=brokerDialog.selected.map(row=>row.id);await useDataManagerStore.getState().removeBrokers(ids);setSelectedBrokerIds(current=>current.filter(id=>!ids.includes(id)));notify(ids.length===1?'Broker removed':'Brokers removed');setBrokerDialog(null);setBrokerError('');}catch(cause){setBrokerError(cause instanceof Error?cause.message:'Unable to remove brokers.');}finally{setBrokerDeleting(false);}}}>Yes</Button></>}>{brokerError&&<p className="broker-error" role="alert">{brokerError}</p>}<p>Are you sure you want to remove selected brokers ({brokerDialog.selected.length})? Their stock memberships will also be removed. Profiles used by symbols, sessions or saved datasets cannot be removed.</p></Modal></div>}
-  {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'tickdownloader-import' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={dialog.targetIds ? dialog.targetIds.length : selectedDatasetIds.length} selectedIds={dialog.targetIds ?? selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
+  {dialog && !['mt5-import', 'yahoo-add', 'yahoo-download', 'crypto-add', 'crypto-download', 'darwinex-add', 'darwinex-import', 'darwinex-download'].includes(dialog.id) && dialog.id !== 'sq-equity-find' && dialog.id !== 'sq-futures-find' && dialog.id !== 'file-import' && dialog.id !== 'file-mass-import' && dialog.id !== 'file-add' && dialog.id !== 'dukascopy-information' && dialog.id !== 'dukascopy-add' && dialog.id !== 'dukascopy-download' && <DataSourceDialog state={dialog} selectedCount={dialog.targetIds ? dialog.targetIds.length : selectedDatasetIds.length} selectedIds={dialog.targetIds ?? selectedDatasetIds} onClose={closeDialog} onSecondary={id => setDialog({ id })} onComplete={message => { notify(message); closeDialog(); }}/>}</div>;
 }

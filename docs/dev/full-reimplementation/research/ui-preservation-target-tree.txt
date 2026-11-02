@@ -156,7 +156,6 @@ app/web/
 │   │   ├── data-manager-sq-data.spec.ts
 │   │   ├── data-manager-stock-groups.spec.ts
 │   │   ├── data-manager-symbols.spec.ts
-│   │   ├── data-manager-tickdownloader.spec.ts
 │   │   ├── data-manager-tools.spec.ts
 │   │   ├── data-manager-workspace.spec.ts
 │   │   ├── data-manager-yahoo.spec.ts
@@ -279,10 +278,6 @@ app/web/
 │   │   │   │   │   ├── sourceMapping.test.ts
 │   │   │   │   │   ├── sourceMappingValidation.ts
 │   │   │   │   │   └── sqData.test.ts
-│   │   │   │   ├── TickDownloader/
-│   │   │   │   │   ├── sourceMapping.test.ts
-│   │   │   │   │   ├── sourceMappingValidation.ts
-│   │   │   │   │   └── tickDownloader.test.ts
 │   │   │   │   ├── Tools/
 │   │   │   │   │   └── dataTools.test.ts
 │   │   │   │   ├── Yahoo/
@@ -754,17 +749,6 @@ app/web/
 │   │   │   │   ├── source-map.json
 │   │   │   │   ├── sqData.ts
 │   │   │   │   └── sqDataStore.ts
-│   │   │   ├── TickDownloader/
-│   │   │   │   ├── import/
-│   │   │   │   │   ├── DataSourceTDImportCtrl.ts
-│   │   │   │   │   ├── importPopup.tsx
-│   │   │   │   │   └── module.ts
-│   │   │   │   ├── DataSourceTDService.ts
-│   │   │   │   ├── module.ts
-│   │   │   │   ├── README.md
-│   │   │   │   ├── source-map.json
-│   │   │   │   ├── styles.css
-│   │   │   │   └── tickDownloader.ts
 │   │   │   ├── Tools/
 │   │   │   │   ├── CloneTimezoneDialog.tsx
 │   │   │   │   ├── DataReviewChart.tsx
