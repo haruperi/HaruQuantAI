@@ -1,8 +1,20 @@
 """ATM (Advanced Trade Management) multi-bracket exit strategy models.
 
-Enables multi-target and multi-exit behavior: partitioning position volume
-into brackets with distinct profit targets, stop losses, break-even triggers,
-trailing stops, and time-based bar-count exits.
+Description:
+    Enables multi-target and multi-exit behavior: partitioning position volume
+    into brackets with distinct profit targets, stop losses, break-even triggers,
+    trailing stops, and time-based bar-count exits, matching StrategyQuant ATM
+    snippet logic.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-ATM: Partition trade volume across multi-bracket exits.
+Python API Usage:
+    from app.extend.blocks.order.atm import ATMBracket, ATMStrategy
+    strategy = ATMStrategy(brackets=(ATMBracket(0.5, 20.0), ATMBracket(0.5, 40.0)))
+    exits = strategy.build_bracket_exits(0.1, 1.1000, 1, 0.0001)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
 """
 
 from __future__ import annotations
@@ -12,7 +24,10 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Any
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.order.sizing import normalize_lots
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -108,6 +123,12 @@ class ATMStrategy:
             else:
                 remaining = min_lot
         volumes.append(remaining)
+        logger.debug(
+            "FR-ORDER-ATM: Split volume %s across %d brackets -> %s",
+            total_volume,
+            len(self.brackets),
+            volumes,
+        )
         return volumes
 
     def build_bracket_exits(
@@ -149,23 +170,30 @@ class ATMStrategy:
 
             trailing_act = bracket.trailing_activation_pips * pip_size
 
-            bracket_specs.append(
-                {
-                    "volume": vol,
-                    "stop_loss": sl_price,
-                    "profit_target": tp_price,
-                    "move_sl_to_be": (
-                        {"activation": be_activation, "offset": be_offset}
-                        if be_activation is not None
-                        else None
-                    ),
-                    "trailing_stop": (
-                        {"distance": trailing_dist, "activation": trailing_act}
-                        if trailing_dist is not None
-                        else None
-                    ),
-                    "exit_after_bars": bracket.exit_after_bars,
-                }
-            )
-
+            spec = {
+                "volume": vol,
+                "profit_target": tp_price,
+                "stop_loss": sl_price,
+                "move_sl_to_be": (
+                    {"activation": be_activation, "offset": be_offset}
+                    if be_activation is not None
+                    else None
+                ),
+                "trailing_stop": (
+                    {"distance": trailing_dist, "activation": trailing_act}
+                    if trailing_dist is not None
+                    else None
+                ),
+                "exit_after_bars": bracket.exit_after_bars,
+            }
+            bracket_specs.append(spec)
+        logger.debug(
+            "FR-ORDER-ATM: Built %d bracket exit specs for entry=%s dir=%s",
+            len(bracket_specs),
+            entry_price,
+            direction,
+        )
         return bracket_specs
+
+
+__all__ = ["ATMBracket", "ATMStrategy"]

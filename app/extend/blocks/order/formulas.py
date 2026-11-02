@@ -1,7 +1,18 @@
 """Price formula evaluation for order entry levels and protective boundaries.
 
-Translates high-level trading formula offsets (pips, ATR multiples, percentages,
-and points) into normalized absolute order prices aligned with instrument tick steps.
+Description:
+    Translates high-level trading formula offsets (pips, ATR multiples, percentages,
+    and absolute prices) into normalized order prices aligned with instrument tick
+    steps, matching StrategyQuant Price and RangeLevel formula behaviors.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-FORMULAS: Evaluate order levels from relative formula offsets.
+Python API Usage:
+    from app.extend.blocks.order.formulas import evaluate_price_level, price_offset_pips
+    level = evaluate_price_level("pips", 1.1000, 1, pips=20.0, pip_size=0.0001)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
 """
 
 from __future__ import annotations
@@ -10,7 +21,10 @@ import math
 from typing import Literal
 
 from app.core.data.contracts import SymbolInfo
+from app.core.host.logging import get_logger
 from app.extend.blocks.order.types import normalize_price
+
+logger = get_logger(__name__)
 
 
 def price_offset_pips(
@@ -39,7 +53,15 @@ def price_offset_pips(
 
     distance = pips * pip_size
     sign = -direction if is_protective else direction
-    return base_price + sign * distance
+    res = base_price + sign * distance
+    logger.debug(
+        "FR-ORDER-FORMULAS: price_offset_pips base=%s dir=%s pips=%s -> %s",
+        base_price,
+        direction,
+        pips,
+        res,
+    )
+    return res
 
 
 def price_offset_atr(
@@ -62,7 +84,16 @@ def price_offset_atr(
 
     distance = atr_value * multiplier
     sign = -direction if is_protective else direction
-    return base_price + sign * distance
+    res = base_price + sign * distance
+    logger.debug(
+        "FR-ORDER-FORMULAS: price_offset_atr base=%s dir=%s atr=%s mult=%s -> %s",
+        base_price,
+        direction,
+        atr_value,
+        multiplier,
+        res,
+    )
+    return res
 
 
 def price_offset_percent(
@@ -82,7 +113,15 @@ def price_offset_percent(
 
     distance = base_price * (percent / 100.0)
     sign = -direction if is_protective else direction
-    return base_price + sign * distance
+    res = base_price + sign * distance
+    logger.debug(
+        "FR-ORDER-FORMULAS: price_offset_percent base=%s dir=%s pct=%s -> %s",
+        base_price,
+        direction,
+        percent,
+        res,
+    )
+    return res
 
 
 PriceFormulaMode = Literal["pips", "atr", "percent", "absolute"]
@@ -125,5 +164,21 @@ def evaluate_price_level(
         raise ValueError(f"Unknown price formula mode: {mode}")
 
     if spec is not None:
-        return normalize_price(raw, spec)
+        raw = normalize_price(raw, spec)
+    logger.debug(
+        "FR-ORDER-FORMULAS: evaluate_price_level mode=%s base=%s dir=%s -> %s",
+        mode,
+        base_price,
+        direction,
+        raw,
+    )
     return raw
+
+
+__all__ = [
+    "PriceFormulaMode",
+    "evaluate_price_level",
+    "price_offset_atr",
+    "price_offset_percent",
+    "price_offset_pips",
+]

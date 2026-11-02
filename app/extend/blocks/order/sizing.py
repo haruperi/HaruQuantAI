@@ -1,8 +1,19 @@
 """Position sizing algorithms and formula evaluation for orders.
 
-Provides canonical calculation of trade volumes from risk models (fixed lots,
-cash risk, percent equity, percent margin, and volatility-adjusted risk),
-with strict lot-grid alignment and instrument constraints.
+Description:
+    Provides canonical calculation of trade volumes from risk models (fixed lots,
+    cash risk, percent equity, percent margin, and volatility-adjusted risk),
+    matching StrategyQuant Money Management formula behaviors with strict
+    lot-grid alignment and instrument constraints.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-SIZING: Unified multi-model position sizing evaluation.
+Python API Usage:
+    from app.extend.blocks.order.sizing import evaluate_sizing
+    vol = evaluate_sizing("fixed", lots=0.5)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
 """
 
 from __future__ import annotations
@@ -10,6 +21,10 @@ from __future__ import annotations
 import math
 from decimal import Decimal
 from typing import Literal
+
+from app.core.host.logging import get_logger
+
+logger = get_logger(__name__)
 
 MAX_PERCENT: float = 100.0
 
@@ -58,7 +73,9 @@ def fixed_lots(
     lot_step: float = 0.01,
 ) -> float:
     """Return normalized fixed lot size."""
-    return normalize_lots(lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    res = normalize_lots(lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    logger.debug("FR-ORDER-SIZING: fixed_lots %s -> %s", lots, res)
+    return res
 
 
 def risk_cash(
@@ -83,7 +100,14 @@ def risk_cash(
 
     loss_per_lot = stop_distance_pips * pip_value
     raw_lots = cash_amount / loss_per_lot
-    return normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    res = normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    logger.debug(
+        "FR-ORDER-SIZING: risk_cash amount=%s stop_pips=%s -> %s",
+        cash_amount,
+        stop_distance_pips,
+        res,
+    )
+    return res
 
 
 def risk_percent(
@@ -106,7 +130,7 @@ def risk_percent(
         raise ValueError("Risk percentage must be in (0, 100]")
 
     cash_amount = equity * (risk_pct / MAX_PERCENT)
-    return risk_cash(
+    res = risk_cash(
         cash_amount,
         stop_distance_pips,
         pip_value=pip_value,
@@ -114,6 +138,14 @@ def risk_percent(
         max_lot=max_lot,
         lot_step=lot_step,
     )
+    logger.debug(
+        "FR-ORDER-SIZING: risk_percent equity=%s risk_pct=%s stop_pips=%s -> %s",
+        equity,
+        risk_pct,
+        stop_distance_pips,
+        res,
+    )
+    return res
 
 
 def margin_percent(
@@ -146,7 +178,15 @@ def margin_percent(
     target_margin = equity * (margin_pct / MAX_PERCENT)
     margin_per_lot = (price * contract_size) / leverage
     raw_lots = target_margin / margin_per_lot
-    return normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    res = normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    logger.debug(
+        "FR-ORDER-SIZING: margin_percent equity=%s margin_pct=%s price=%s -> %s",
+        equity,
+        margin_pct,
+        price,
+        res,
+    )
+    return res
 
 
 def volatility_risk(
@@ -174,7 +214,15 @@ def volatility_risk(
 
     risk_per_lot = atr_value * multiplier * point_value
     raw_lots = cash_risk / risk_per_lot
-    return normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    res = normalize_lots(raw_lots, min_lot=min_lot, max_lot=max_lot, lot_step=lot_step)
+    logger.debug(
+        "FR-ORDER-SIZING: volatility_risk cash=%s atr=%s mult=%s -> %s",
+        cash_risk,
+        atr_value,
+        multiplier,
+        res,
+    )
+    return res
 
 
 SizingMethod = Literal[
@@ -242,3 +290,16 @@ def evaluate_sizing(
             lot_step=lot_step,
         )
     raise ValueError(f"Unknown sizing method: {method}")
+
+
+__all__ = [
+    "MAX_PERCENT",
+    "SizingMethod",
+    "evaluate_sizing",
+    "fixed_lots",
+    "margin_percent",
+    "normalize_lots",
+    "risk_cash",
+    "risk_percent",
+    "volatility_risk",
+]

@@ -1,4 +1,18 @@
-"""Structural runtime boundary; blocks never import workspace or broker modules."""
+"""Structural runtime boundary for order execution and broker contracts.
+
+Description:
+    Defines structural protocols for order sources, position sources, account sources,
+    symbol sources, and order execution primitives, separating strategy blocks from
+    workspace broker implementations.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-RUNTIME: Pure protocol contracts for isolated and testable execution.
+Python API Usage:
+    from app.extend.blocks.order.runtime import TradingRuntime, OrderExecution
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+"""
 
 # ruff: noqa: N802 -- matches the existing raw trading API
 from __future__ import annotations
@@ -135,3 +149,14 @@ class TradingRuntime(Protocol):
     @property
     def trade(self) -> OrderExecution:
         """Concrete execution access."""
+
+
+__all__ = [
+    "AccountSource",
+    "DealSource",
+    "OrderExecution",
+    "OrderSource",
+    "PositionSource",
+    "SymbolSource",
+    "TradingRuntime",
+]

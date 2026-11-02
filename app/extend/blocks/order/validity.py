@@ -1,13 +1,28 @@
 """Bar-validity scheduling for pending orders.
 
-Translates discrete chart-bar validity counts (e.g., expire after 3 H1 bars)
-into explicit timezone-aware expiration timestamps compatible with broker contracts.
+Description:
+    Translates discrete chart-bar validity counts (e.g., expire after N bars)
+    into explicit timezone-aware expiration timestamps compatible with broker
+    contracts, matching StrategyQuant BarsValid pending order behavior.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-VALIDITY: Translate bar counts to expiration datetimes.
+Python API Usage:
+    from app.extend.blocks.order.validity import schedule_bar_validity
+    exp = schedule_bar_validity(bar_start, "H1", 3)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
 """
 
 from __future__ import annotations
 
 import re
 from datetime import datetime, timedelta
+
+from app.core.host.logging import get_logger
+
+logger = get_logger(__name__)
 
 TIMEFRAME_PATTERNS = {
     "M": lambda n: timedelta(minutes=n),
@@ -49,10 +64,28 @@ def schedule_bar_validity(
     Raises ValueError if bar_start is naive (lacks tzinfo).
     """
     if valid_bars <= 0:
+        logger.debug(
+            "FR-ORDER-VALIDITY: valid_bars=%s -> Good-Till-Cancelled (None)", valid_bars
+        )
         return None
 
     if bar_start.tzinfo is None or bar_start.utcoffset() is None:
         raise ValueError("bar_start must be timezone-aware")
 
     delta = parse_timeframe_delta(timeframe)
-    return bar_start + valid_bars * delta
+    expiration = bar_start + valid_bars * delta
+    logger.debug(
+        "FR-ORDER-VALIDITY: Scheduled expiration bar_start=%s + %d * %s -> %s",
+        bar_start,
+        valid_bars,
+        delta,
+        expiration,
+    )
+    return expiration
+
+
+__all__ = [
+    "TIMEFRAME_PATTERNS",
+    "parse_timeframe_delta",
+    "schedule_bar_validity",
+]

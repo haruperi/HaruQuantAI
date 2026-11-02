@@ -1,4 +1,19 @@
-"""Shared strategy order selection and evaluation-time calculations."""
+"""Shared strategy order selection and evaluation-time calculations.
+
+Description:
+    Provides domain types and pure utility functions for trade scope filtering,
+    time-series bar offset calculation, pip size determination, and price
+    normalization aligned with broker symbol tick increments.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-FILTER: Precise multi-attribute matching against orders.
+    - FR-ORDER-PRICE-NORM: Tick grid alignment conforming to symbol specs.
+Python API Usage:
+    from app.extend.blocks.order.types import TradeFilter, normalize_price
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -10,6 +25,9 @@ from decimal import Decimal
 from itertools import pairwise
 
 from app.core.data.contracts import OrderInfo, PositionInfo, SymbolInfo
+from app.core.host.logging import get_logger
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -66,7 +84,14 @@ def bars_since(timestamp: float, bar_times: Sequence[datetime], as_of: datetime)
         return -1
     if timestamp < starts[0]:
         raise ValueError("bar history does not cover the trade timestamp")
-    return sum(timestamp < start <= end for start in starts)
+    count = sum(timestamp < start <= end for start in starts)
+    logger.debug(
+        "FR-ORDER-BARS-SINCE: Calculated %d bars since timestamp=%s as_of=%s",
+        count,
+        timestamp,
+        as_of,
+    )
+    return count
 
 
 def pip_size(price: float | None, tick_size: float) -> float:
@@ -88,4 +113,19 @@ def normalize_price(value: float, spec: SymbolInfo) -> float:
     rounded = float(round(Decimal(str(value)) / grid) * grid)
     if value > 0 and rounded <= 0:
         raise ValueError("positive price is smaller than the symbol tick step")
+    logger.debug(
+        "FR-ORDER-PRICE-NORM: Normalized price %s -> %s (tick_step=%s)",
+        value,
+        rounded,
+        step,
+    )
     return rounded
+
+
+__all__ = [
+    "TradeFilter",
+    "aware_timestamp",
+    "bars_since",
+    "normalize_price",
+    "pip_size",
+]

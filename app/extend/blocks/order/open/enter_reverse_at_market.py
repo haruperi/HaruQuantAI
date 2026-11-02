@@ -1,4 +1,19 @@
-"""Canonical enter reverse at market strategy block."""
+"""Enter Reverse At Market strategy block.
+
+Description:
+    Opens a market order in the requested direction, first closing all matching
+    opposite positions and verifying their complete closure, matching StrategyQuant
+    EnterReverseAtMarket snippet logic.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-ENTER-REVERSE-AT-MARKET: Reverse market position.
+Python API Usage:
+    from app.extend.blocks.order.open import enter_reverse_at_market
+    result = await enter_reverse_at_market(runtime, "EURUSD", 1, 0.1)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -11,6 +26,7 @@ from app.core.data.contracts import (
     TradeResult,
 )
 from app.core.enums import OrderType, TradeRetcode
+from app.core.host.logging import get_logger
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -24,31 +40,31 @@ from app.extend.blocks.order._common import (
     matching_positions,
 )
 from app.extend.blocks.order.runtime import TradingRuntime
-from app.extend.blocks.order.types import (
-    TradeFilter,
+from app.extend.blocks.order.types import TradeFilter
+
+logger = get_logger(__name__)
+
+enter_reverse_at_market_spec = BlockSpec(
+    id="order.enter_reverse_at_market",
+    name="Enter Reverse At Market",
+    description="Close matching opposite positions, confirm closure, then enter.",
+    category="order",
+    execution_kind=ExecutionKind.ORDER,
+    inputs=(
+        InputPort("context", PortType.ANY),
+        InputPort("symbol", PortType.STRING),
+        InputPort("direction", PortType.NUMBER),
+        InputPort("volume", PortType.NUMBER),
+    ),
+    outputs=(OutputPort("result", PortType.ANY),),
+    required_market_inputs=(),
+    is_generation_eligible=False,
+    is_deterministic=False,
+    is_causal=True,
 )
 
 
-@block(
-    BlockSpec(
-        id="order.enter_reverse_at_market",
-        name="Enter Reverse At Market",
-        description="Close matching opposite positions, confirm closure, then enter.",
-        category="order",
-        execution_kind=ExecutionKind.ORDER,
-        inputs=(
-            InputPort("context", PortType.ANY),
-            InputPort("symbol", PortType.STRING),
-            InputPort("direction", PortType.NUMBER),
-            InputPort("volume", PortType.NUMBER),
-        ),
-        outputs=(OutputPort("result", PortType.ANY),),
-        required_market_inputs=(),
-        is_generation_eligible=False,
-        is_deterministic=False,
-        is_causal=True,
-    )
-)
+@block(enter_reverse_at_market_spec)
 async def enter_reverse_at_market(
     context: TradingRuntime,
     symbol: str,
@@ -66,6 +82,14 @@ async def enter_reverse_at_market(
     Direction is 1 for buy and -1 for sell; None means an entry was skipped.
     Size, stop loss, and target are evaluated values, not strategy formulas.
     """
+    logger.debug(
+        "FR-ORDER-ENTER-REVERSE-AT-MARKET: Reverse %s dir=%s vol=%s (sl=%s, tp=%s)",
+        symbol,
+        direction,
+        volume,
+        sl,
+        tp,
+    )
     async with context.trade.operation_lock:
         request = await context.trade.prepare_entry_request(
             symbol,
@@ -83,6 +107,9 @@ async def enter_reverse_at_market(
         if not allow_duplicate_trades and await matching_positions(
             context, replace(scope, direction=direction)
         ):
+            logger.debug(
+                "FR-ORDER-ENTER-REVERSE-AT-MARKET: Skip entry - duplicate disallowed"
+            )
             return None
         return await _reverse_entry(
             context, request, scope, allow_duplicate_trades=allow_duplicate_trades
@@ -98,9 +125,12 @@ async def _reverse_entry(
 ) -> TradeResult | None:
     direction = 1 if request.order_type == OrderType.BUY else -1
     opposite_scope = replace(scope, direction=-direction)
-    results = await close_positions(
-        context, await matching_positions(context, opposite_scope)
+    opposite_positions = await matching_positions(context, opposite_scope)
+    logger.debug(
+        "FR-ORDER-ENTER-REVERSE-AT-MARKET: Found %d opposite positions to close",
+        len(opposite_positions),
     )
+    results = await close_positions(context, opposite_positions)
     if results and results[-1].retcode != int(TradeRetcode.DONE):
         return results[-1]
     if await matching_positions(context, opposite_scope):
@@ -116,3 +146,6 @@ async def _reverse_entry(
     if not math.isfinite(request.price) or request.price <= 0:
         raise ValueError("reversal requires a positive market quote")
     return await context.trade.send_checked(request)
+
+
+__all__ = ["enter_reverse_at_market", "enter_reverse_at_market_spec"]

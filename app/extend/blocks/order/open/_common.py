@@ -1,4 +1,18 @@
-"""Shared pending replacement workflow."""
+"""Shared pending replacement and entry execution workflow.
+
+Description:
+    Provides shared helper logic for market, limit, and stop entry execution
+    under a unified runtime operation lock, including order checks, pending
+    order cancellations, and position duplication guards.
+Purpose:
+    FEAT-ORDER-BLOCKS: StrategyQuant donor-faithful order execution blocks.
+Key Capabilities:
+    - FR-ORDER-OPEN-COMMON: Coordinate pending replacement and entry checks safely.
+Python API Usage:
+    from app.extend.blocks.order.open._common import execute_entry
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_order_blocks.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -11,6 +25,7 @@ from app.core.data.contracts import (
     TradeResult,
 )
 from app.core.enums import OrderType, TradeRetcode
+from app.core.host.logging import get_logger
 from app.extend.blocks.order._common import (
     cancel_orders,
     matching_orders,
@@ -20,6 +35,8 @@ from app.extend.blocks.order.runtime import TradingRuntime
 from app.extend.blocks.order.types import (
     TradeFilter,
 )
+
+logger = get_logger(__name__)
 
 
 async def _enter_pending(
@@ -34,12 +51,22 @@ async def _enter_pending(
     )
     orders = await matching_orders(context, pending_scope)
     if orders and (not replace_existing):
+        logger.debug("FR-ORDER-OPEN-COMMON: Pending order exists & replace=False; skip")
         return None
     checked = await context.trade.OrderCheck(request)
     if checked.retcode not in (0, int(TradeRetcode.DONE)):
+        logger.debug(
+            "FR-ORDER-OPEN-COMMON: OrderCheck rejected: code=%s comment=%s",
+            checked.retcode,
+            checked.comment,
+        )
         return TradeResult(
             retcode=checked.retcode, comment=checked.comment, raw=checked
         )
+    logger.debug(
+        "FR-ORDER-OPEN-COMMON: Canceling %d pending orders for replacement",
+        len(orders),
+    )
     results = await cancel_orders(context, orders)
     if results and results[-1].retcode != int(TradeRetcode.DONE):
         return results[-1]
@@ -83,9 +110,16 @@ async def execute_entry(
         )
         scope = TradeFilter(symbol, magic=request.magic, comment=comment)
         if not allow_duplicate_trades and await matching_positions(context, scope):
+            logger.debug(
+                "FR-ORDER-OPEN-COMMON: Duplicate disallowed for scope=%s; skip",
+                scope,
+            )
             return None
         if buy_type == OrderType.BUY:
             return await context.trade.send_checked(request)
         return await _enter_pending(
             context, request, scope, replace_existing=replace_existing
         )
+
+
+__all__ = ["execute_entry"]
