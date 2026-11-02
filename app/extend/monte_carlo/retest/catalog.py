@@ -32,27 +32,74 @@ from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
+from app.extend.monte_carlo.retest.base import MonteCarloRetest
+from app.extend.monte_carlo.retest.randomize_history_data import (
+    RandomizeHistoryData,
+)
+from app.extend.monte_carlo.retest.randomize_history_data_fixed_range import (
+    RandomizeHistoryDataFixedRange,
+)
+from app.extend.monte_carlo.retest.randomize_history_data_ohlc import (
+    RandomizeHistoryDataOHLC,
+)
+from app.extend.monte_carlo.retest.randomize_min_distance import (
+    RandomizeMinDistance,
+)
+from app.extend.monte_carlo.retest.randomize_slippage import RandomizeSlippage
+from app.extend.monte_carlo.retest.randomize_spread import RandomizeSpread
+from app.extend.monte_carlo.retest.randomize_starting_bar import (
+    RandomizeStartingBar,
+)
+from app.extend.monte_carlo.retest.randomize_strategy_parameters import (
+    RandomizeStrategyParameters,
+)
+from app.extend.monte_carlo.retest.randomize_strategy_parameters_customizable import (
+    RandomizeStrategyParametersCustomizable,
+)
 from app.workspace.algo_wizard.models import HSLStrategyDocument
 
 logger = get_logger(__name__)
 
 BarRecord = MarketBar
 
+# Map of all 9 donor snippet classes
+RETEST_CLASSES: dict[str, type[MonteCarloRetest]] = {
+    "RandomizeHistoryData": RandomizeHistoryData,
+    "RandomizeHistoryDataFixedRange": RandomizeHistoryDataFixedRange,
+    "RandomizeHistoryDataOHLC": RandomizeHistoryDataOHLC,
+    "RandomizeMinDistance": RandomizeMinDistance,
+    "RandomizeSlippage": RandomizeSlippage,
+    "RandomizeSpread": RandomizeSpread,
+    "RandomizeStartingBar": RandomizeStartingBar,
+    "RandomizeStrategyParameters": RandomizeStrategyParameters,
+    "RandomizeStrategyParametersCustomizable": (
+        RandomizeStrategyParametersCustomizable
+    ),
+}
+
 
 class MCRetestPerturbator:
     """Catalog and applicator for all 9 Monte Carlo Retest perturbation methods."""
 
-    METHODS: tuple[str, ...] = (
-        "RandomizeHistoryData",
-        "RandomizeHistoryDataFixedRange",
-        "RandomizeHistoryDataOHLC",
-        "RandomizeMinDistance",
-        "RandomizeSlippage",
-        "RandomizeSpread",
-        "RandomizeStartingBar",
-        "RandomizeStrategyParameters",
-        "RandomizeStrategyParametersCustomizable",
-    )
+    METHODS: tuple[str, ...] = tuple(RETEST_CLASSES.keys())
+
+    @classmethod
+    def get_retest_class(cls, definition_id: str) -> type[MonteCarloRetest]:
+        """Look up the perturbation class for a definition ID."""
+        if definition_id not in RETEST_CLASSES:
+            raise DomainError(
+                code="RETEST_METHOD_NOT_FOUND",
+                message=f"Monte Carlo retest method '{definition_id}' not found",
+                details={"definition_id": definition_id},
+            )
+        return RETEST_CLASSES[definition_id]
+
+    @classmethod
+    def create_retest(cls, definition_id: str, **kwargs: Any) -> MonteCarloRetest:
+        """Instantiate a Monte Carlo retest perturbation class."""
+        retest_cls = cls.get_retest_class(definition_id)
+        return retest_cls(**kwargs)
 
     @classmethod
     def perturb(

@@ -1,5 +1,7 @@
 """Unit tests for RandomlySkipTrades per RET-004 specification."""
 
+from typing import cast, override
+
 import pytest
 from app.extend.monte_carlo.manipulation.randomly_skip_trades import (
     RandomlySkipTrades,
@@ -16,6 +18,7 @@ class FakeRng(SkipRandom):
         self.draws = list(draws)
         self.requested_bounds: list[int] = []
 
+    @override
     def next_index(self, upper_exclusive: int) -> int:
         self.requested_bounds.append(upper_exclusive)
         return self.draws.pop(0)
@@ -96,7 +99,7 @@ class TestRandomlySkipTrades:
             RandomlySkipTrades(probability=101)
 
         with pytest.raises(ValidationError):
-            RandomlySkipTrades(probability=True)  # type: ignore[arg-type]
+            RandomlySkipTrades(probability=True)
 
     def test_rng_out_of_bounds_errors(self) -> None:
         """RNG returning out of bounds or non-int raises exact ValueError."""
@@ -114,8 +117,9 @@ class TestRandomlySkipTrades:
 
         # Bool returned
         class BoolRng(SkipRandom):
+            @override
             def next_index(self, upper_exclusive: int) -> int:
-                return True  # type: ignore[return-value]
+                return cast("int", True)
 
         with pytest.raises(ValueError, match="random index outside requested bounds"):
             RandomlySkipTrades(probability=100).apply(rec, rng=BoolRng())

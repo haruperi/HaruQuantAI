@@ -1,5 +1,7 @@
 """Unit tests for Monte Carlo manipulation methods."""
 
+from typing import override
+
 from app.extend.monte_carlo.manipulation import (
     MACHRBlockRandomization,
     RandomizeTradesOrder,
@@ -16,6 +18,7 @@ class QueueRng(SkipRandom):
     def __init__(self, draws: list[int]) -> None:
         self.draws = list(draws)
 
+    @override
     def next_index(self, upper_exclusive: int) -> int:
         if not self.draws:
             return 0
