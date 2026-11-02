@@ -2,15 +2,31 @@
 
 from __future__ import annotations
 
+from collections.abc import Sequence
+from typing import override
+
 import pytest
-from app.extend.correlation_of.catalog import (
+from app.extend.correlation_of import (
+    DATA_TYPE_PL,
+    DATA_TYPE_TRADES,
     CorrelationOfCatalog,
     CorrelationOrderRecord,
+    CorrelationPeriod,
+    CorrelationType,
+    Loss,
+    NumberOfClosedPositions,
+    NumberOfClosedTrades,
+    NumberOfOpenPositions,
+    NumberOfOpenTrades,
+    ProfitLoss,
+    TimePeriod,
+    get_period_bucket,
+    next_period_bucket,
 )
 
 
 class TestCorrelationOfCatalog:
-    """Test suite for CorrelationOfCatalog."""
+    """Test suite for CorrelationOfCatalog and modular correlation snippets."""
 
     def test_golden_fixtures(self) -> None:
         """Assert exact golden fixtures from normative work order."""
@@ -202,3 +218,215 @@ class TestCorrelationOfCatalog:
                 period=p,  # type: ignore[arg-type]
             )
             assert len(open_buckets) >= 1
+
+
+class TestIndividualCorrelationSnippets:
+    """Test suite validating direct snippet classes matching SQ donor files."""
+
+    def test_loss_snippet(self) -> None:
+        """Assert Loss attributes, compute_periods, and should_skip_period behavior."""
+        loss_metric = Loss()
+        assert loss_metric.name == "Loss"
+        assert loss_metric.data_type == DATA_TYPE_PL
+
+        # Non-loss periods are skipped: both >= 0
+        assert loss_metric.should_skip_period(0.0, 50.0) is True
+        assert loss_metric.should_skip_period(100.0, 200.0) is True
+        # If at least one has a loss, do not skip
+        assert loss_metric.should_skip_period(-10.0, 50.0) is False
+        assert loss_metric.should_skip_period(-10.0, -20.0) is False
+
+        orders = [
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=-50.0,
+                is_canceled=False,
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=100.0,
+                is_canceled=True,  # Canceled order skipped
+            ),
+        ]
+        res = loss_metric.compute_periods(orders, "DAY")
+        b = get_period_bucket(2000, "DAY")
+        assert res[b] == -50.0
+
+    def test_number_of_closed_positions_snippet(self) -> None:
+        """Assert NumberOfClosedPositions long (+1) and short (-1) accumulation."""
+        pos_metric = NumberOfClosedPositions()
+        assert pos_metric.name == "Number of closed positions"
+        assert pos_metric.data_type == DATA_TYPE_TRADES
+        assert pos_metric.should_skip_period(0.0, 0.0) is False
+
+        orders = [
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=10.0,
+                is_long=True,
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=5.0,
+                is_long=False,
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=5.0,
+                is_long=False,
+                is_canceled=True,
+            ),
+        ]
+        res = pos_metric.compute_periods(orders, "DAY")
+        b = get_period_bucket(2000, "DAY")
+        assert res[b] == 0.0  # +1 (long) - 1 (short)
+
+    def test_number_of_closed_trades_snippet(self) -> None:
+        """Assert NumberOfClosedTrades counts all closed trades."""
+        trades_metric = NumberOfClosedTrades()
+        assert trades_metric.name == "Number of closed trades"
+        assert trades_metric.data_type == DATA_TYPE_TRADES
+
+        orders = [
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=10.0,
+                is_long=False,
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=20.0,
+                is_long=True,
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=30.0,
+                is_canceled=True,
+            ),
+        ]
+        res = trades_metric.compute_periods(orders, "DAY")
+        b = get_period_bucket(2000, "DAY")
+        assert res[b] == 2.0
+
+    def test_number_of_open_positions_snippet(self) -> None:
+        """Assert NumberOfOpenPositions accumulates across overlapping active periods."""
+        open_pos_metric = NumberOfOpenPositions()
+        assert open_pos_metric.name == "Number of open positions"
+        assert open_pos_metric.data_type == DATA_TYPE_TRADES
+
+        t_open = 1767225600000  # 2026-01-01 00:00:00
+        t_close = 1767398400000  # 2026-01-03 00:00:00
+        orders = [
+            CorrelationOrderRecord(
+                open_time_ms=t_open,
+                close_time_ms=t_close,
+                profit_loss=0.0,
+                is_long=False,  # Short -> -1.0
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=t_open,
+                close_time_ms=t_close,
+                profit_loss=0.0,
+                is_long=True,
+                is_canceled=True,  # Canceled -> ignored
+            ),
+        ]
+        res = open_pos_metric.compute_periods(orders, "DAY")
+        assert len(res) == 2
+        for val in res.values():
+            assert val == -1.0
+
+    def test_number_of_open_trades_snippet(self) -> None:
+        """Assert NumberOfOpenTrades accumulates across overlapping active periods."""
+        open_trades_metric = NumberOfOpenTrades()
+        assert open_trades_metric.name == "Number of open trades"
+        assert open_trades_metric.data_type == DATA_TYPE_TRADES
+
+        t_open = 1767225600000
+        t_close = 1767398400000
+        orders = [
+            CorrelationOrderRecord(
+                open_time_ms=t_open,
+                close_time_ms=t_close,
+                profit_loss=0.0,
+                is_long=False,
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=t_open,
+                close_time_ms=t_close,
+                profit_loss=0.0,
+                is_long=True,
+                is_canceled=True,
+            ),
+        ]
+        res = open_trades_metric.compute_periods(orders, "DAY")
+        assert len(res) == 2
+        for val in res.values():
+            assert val == 1.0
+
+    def test_profit_loss_snippet(self) -> None:
+        """Assert ProfitLoss snippet accumulates signed P/L."""
+        pl_metric = ProfitLoss()
+        assert pl_metric.name == "Profit/Loss"
+        assert pl_metric.data_type == DATA_TYPE_PL
+        assert pl_metric.should_skip_period(10.0, 20.0) is False
+
+        orders = [
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=125.5,
+            ),
+            CorrelationOrderRecord(
+                open_time_ms=1000,
+                close_time_ms=2000,
+                profit_loss=-25.5,
+            ),
+        ]
+        res = pl_metric.compute_periods(orders, "DAY")
+        b = get_period_bucket(2000, "DAY")
+        assert res[b] == 100.0
+
+    def test_time_period_and_base_methods(self) -> None:
+        """Assert TimePeriod dataclass and base method behavior."""
+        tp = TimePeriod(from_ms=1000, to_ms=2000, value=42.0)
+        assert tp.from_ms == 1000
+        assert tp.to_ms == 2000
+        assert tp.value == 42.0
+
+        # Subclass CorrelationType for base method testing
+        class CustomCorrelation(CorrelationType):
+            @override
+            def compute_periods(
+                self,
+                orders: Sequence[CorrelationOrderRecord],
+                period: CorrelationPeriod,
+                periods: dict[int, float] | None = None,
+            ) -> dict[int, float]:
+                return {}
+
+        custom = CustomCorrelation("Custom", DATA_TYPE_PL)
+        assert custom.name == "Custom"
+        assert custom.data_type == DATA_TYPE_PL
+        assert custom.should_skip_period(1.0, 2.0) is False
+
+        order = CorrelationOrderRecord(
+            open_time_ms=1000,
+            close_time_ms=2000,
+            profit_loss=0.0,
+            is_canceled=True,
+        )
+        assert custom.is_canceled_order(order) is True
+
+    def test_next_period_bucket_invalid(self) -> None:
+        """Assert next_period_bucket raises ValueError on invalid period."""
+        with pytest.raises(ValueError, match=r"^Unknown correlation period: INVALID$"):
+            next_period_bucket(1000, "INVALID")  # type: ignore[arg-type]

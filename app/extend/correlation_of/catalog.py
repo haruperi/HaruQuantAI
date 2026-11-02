@@ -1,10 +1,10 @@
 """CorrelationOf catalog, period bucketing, and Pearson correlation.
 
 Description:
-    Computes period-bucketed metrics across six definitions (ProfitLoss,
-    Loss, NumberOfClosedTrades, NumberOfOpenTrades, NumberOfClosedPositions,
-    NumberOfOpenPositions) and performs pairwise Pearson correlation with
-    definition-specific skipping logic.
+    Manages registered CorrelationType definitions (ProfitLoss, Loss,
+    NumberOfClosedTrades, NumberOfOpenTrades, NumberOfClosedPositions,
+    NumberOfOpenPositions), dispatches period bucketing, and performs
+    pairwise Pearson correlation with definition-specific skip rules.
 Purpose:
     FEAT-PORTFOLIO-MASTER: Provide multi-strategy correlation metrics.
 Key Capabilities:
@@ -25,82 +25,49 @@ from __future__ import annotations
 
 import math
 from collections.abc import Mapping, Sequence
-from dataclasses import dataclass
-from datetime import UTC, datetime, timedelta
-from typing import Literal
 
 from app.core.host.logging import get_logger
+from app.extend.correlation_of.base import (
+    CorrelationOrderRecord,
+    CorrelationPeriod,
+    CorrelationType,
+    get_period_bucket,
+    next_period_bucket,
+)
+from app.extend.correlation_of.loss import Loss
+from app.extend.correlation_of.number_of_closed_positions import (
+    NumberOfClosedPositions,
+)
+from app.extend.correlation_of.number_of_closed_trades import (
+    NumberOfClosedTrades,
+)
+from app.extend.correlation_of.number_of_open_positions import (
+    NumberOfOpenPositions,
+)
+from app.extend.correlation_of.number_of_open_trades import (
+    NumberOfOpenTrades,
+)
+from app.extend.correlation_of.profit_loss import ProfitLoss
 
 logger = get_logger(__name__)
 
-CorrelationPeriod = Literal["HOUR", "DAY", "WEEK", "MONTH", "YEAR"]
+# Maintain internal aliases for backward compatibility
+_get_period_bucket = get_period_bucket
+_next_period_bucket = next_period_bucket
 
-_SUPPORTED_DEFINITIONS: frozenset[str] = frozenset(
-    {
-        "ProfitLoss",
-        "Loss",
-        "NumberOfClosedTrades",
-        "NumberOfOpenTrades",
-        "NumberOfClosedPositions",
-        "NumberOfOpenPositions",
-    }
-)
-
-_DECEMBER: int = 12
 _MIN_CORRELATION_PAIRS: int = 2
 _EPSILON: float = 1e-12
 
+_INSTANCES: dict[str, CorrelationType] = {
+    "ProfitLoss": ProfitLoss(),
+    "Loss": Loss(),
+    "NumberOfClosedTrades": NumberOfClosedTrades(),
+    "NumberOfOpenTrades": NumberOfOpenTrades(),
+    "NumberOfClosedPositions": NumberOfClosedPositions(),
+    "NumberOfOpenPositions": NumberOfOpenPositions(),
+}
 
-@dataclass(frozen=True, slots=True)
-class CorrelationOrderRecord:
-    """Historical or candidate order execution record for correlation."""
-
-    open_time_ms: int
-    close_time_ms: int
-    profit_loss: float
-    is_canceled: bool = False
-    is_open_position: bool = False
-    is_long: bool = True
-
-
-def _get_period_bucket(t_ms: int, period: CorrelationPeriod) -> int:
-    """Return UTC period start epoch milliseconds for given timestamp."""
-    dt = datetime.fromtimestamp(t_ms / 1000.0, tz=UTC)
-    if period == "HOUR":
-        b_dt = dt.replace(minute=0, second=0, microsecond=0)
-    elif period == "DAY":
-        b_dt = dt.replace(hour=0, minute=0, second=0, microsecond=0)
-    elif period == "WEEK":
-        b_dt = (dt - timedelta(days=dt.weekday())).replace(
-            hour=0, minute=0, second=0, microsecond=0
-        )
-    elif period == "MONTH":
-        b_dt = dt.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-    elif period == "YEAR":
-        b_dt = dt.replace(month=1, day=1, hour=0, minute=0, second=0, microsecond=0)
-    else:
-        raise ValueError(f"Unknown correlation period: {period}")
-    return int(b_dt.timestamp() * 1000)
-
-
-def _next_period_bucket(bucket_ms: int, period: CorrelationPeriod) -> int:
-    """Return next UTC period start epoch milliseconds."""
-    dt = datetime.fromtimestamp(bucket_ms / 1000.0, tz=UTC)
-    if period == "HOUR":
-        n_dt = dt + timedelta(hours=1)
-    elif period == "DAY":
-        n_dt = dt + timedelta(days=1)
-    elif period == "WEEK":
-        n_dt = dt + timedelta(weeks=1)
-    elif period == "MONTH":
-        year = dt.year + (1 if dt.month == _DECEMBER else 0)
-        month = 1 if dt.month == _DECEMBER else dt.month + 1
-        n_dt = dt.replace(year=year, month=month, day=1)
-    elif period == "YEAR":
-        n_dt = dt.replace(year=dt.year + 1, month=1, day=1)
-    else:
-        raise ValueError(f"Unknown correlation period: {period}")
-    return int(n_dt.timestamp() * 1000)
+_SUPPORTED_DEFINITIONS: frozenset[str] = frozenset(_INSTANCES.keys())
 
 
 class CorrelationOfCatalog:
@@ -110,6 +77,24 @@ class CorrelationOfCatalog:
     def definitions(cls) -> frozenset[str]:
         """Return registered correlation definition identifiers."""
         return _SUPPORTED_DEFINITIONS
+
+    @classmethod
+    def get_type(cls, definition_id: str) -> CorrelationType:
+        """Resolve a CorrelationType instance by definition identifier.
+
+        Args:
+            definition_id: Identifier corresponding to the correlation metric.
+
+        Returns:
+            Resolved CorrelationType instance.
+
+        Raises:
+            ValueError: If definition_id is not registered.
+        """
+        instance = _INSTANCES.get(definition_id)
+        if instance is None:
+            raise ValueError(f"Unknown correlation definition: {definition_id}")
+        return instance
 
     @classmethod
     def compute_periods(
@@ -132,27 +117,8 @@ class CorrelationOfCatalog:
         Raises:
             ValueError: If definition_id is unknown.
         """
-        if definition_id not in _SUPPORTED_DEFINITIONS:
-            raise ValueError(f"Unknown correlation definition: {definition_id}")
-
-        buckets: dict[int, float] = {}
-        for order in orders:
-            if order.is_canceled:
-                continue
-
-            if definition_id in {
-                "ProfitLoss",
-                "Loss",
-                "NumberOfClosedTrades",
-                "NumberOfClosedPositions",
-            }:
-                cls._accumulate_closed(definition_id, order, period, buckets)
-            elif definition_id in {
-                "NumberOfOpenTrades",
-                "NumberOfOpenPositions",
-            }:
-                cls._accumulate_open(definition_id, order, period, buckets)
-
+        metric = cls.get_type(definition_id)
+        buckets = metric.compute_periods(orders, period=period)
         logger.debug(
             "Computed %d period buckets for definition '%s' (period=%s)",
             len(buckets),
@@ -160,50 +126,6 @@ class CorrelationOfCatalog:
             period,
         )
         return buckets
-
-    @classmethod
-    def _accumulate_closed(
-        cls,
-        definition_id: str,
-        order: CorrelationOrderRecord,
-        period: CorrelationPeriod,
-        buckets: dict[int, float],
-    ) -> None:
-        """Accumulate an event based on order close time."""
-        b_ms = _get_period_bucket(order.close_time_ms, period)
-        current = buckets.get(b_ms, 0.0)
-
-        if definition_id in {"ProfitLoss", "Loss"}:
-            buckets[b_ms] = current + order.profit_loss
-        elif definition_id == "NumberOfClosedTrades":
-            buckets[b_ms] = current + 1.0
-        elif definition_id == "NumberOfClosedPositions":
-            delta = 1.0 if order.is_long else -1.0
-            buckets[b_ms] = current + delta
-
-    @classmethod
-    def _accumulate_open(
-        cls,
-        definition_id: str,
-        order: CorrelationOrderRecord,
-        period: CorrelationPeriod,
-        buckets: dict[int, float],
-    ) -> None:
-        """Accumulate an event across overlapping active order periods."""
-        cur_b = _get_period_bucket(order.open_time_ms, period)
-        end_b = _get_period_bucket(order.close_time_ms, period)
-
-        while cur_b <= end_b:
-            next_b = _next_period_bucket(cur_b, period)
-            # Overlap: cur_b < close_time_ms and next_b >= open_time_ms
-            if cur_b < order.close_time_ms and next_b >= order.open_time_ms:
-                current = buckets.get(cur_b, 0.0)
-                if definition_id == "NumberOfOpenTrades":
-                    buckets[cur_b] = current + 1.0
-                elif definition_id == "NumberOfOpenPositions":
-                    delta = 1.0 if order.is_long else -1.0
-                    buckets[cur_b] = current + delta
-            cur_b = next_b
 
     @classmethod
     def pearson(
@@ -225,6 +147,7 @@ class CorrelationOfCatalog:
         Returns:
             Pearson correlation in [-1.0, 1.0] rounded to 4 decimals (or 0.0).
         """
+        metric = cls.get_type(definition_id)
         all_keys = sorted(set(series_a.keys()) | set(series_b.keys()))
         pairs: list[tuple[float, float]] = []
 
@@ -233,7 +156,7 @@ class CorrelationOfCatalog:
             val_b = series_b.get(k, 0.0)
 
             # Skip rules per definition
-            if definition_id == "Loss" and val_a >= 0.0 and val_b >= 0.0:
+            if metric.should_skip_period(val_a, val_b):
                 continue
             if not allow_empty_periods and val_a == 0.0 and val_b == 0.0:
                 continue
