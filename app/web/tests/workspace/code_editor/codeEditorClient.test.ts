@@ -11,8 +11,8 @@ describe('codeEditorClient', () => {
     const client = createCodeEditorClient({ fetchFn, baseUrl: '/api/v1' });
     await client.reloadDisk('app/extend/user/a.py', true);
     expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/file/reload', expect.objectContaining({ body: JSON.stringify({ file_path: 'app/extend/user/a.py', discard_dirty: true }) }));
-    await client.repairImports('app/extend/user/a.py', '', { Symbol: 'app.include.user.source' });
-    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/imports/repair', expect.objectContaining({ body: JSON.stringify({ file_path: 'app/extend/user/a.py', content: '', selections: { Symbol: 'app.include.user.source' } }) }));
+    await client.repairImports('app/extend/user/a.py', '', { Symbol: 'app.extend.user.source' });
+    expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/imports/repair', expect.objectContaining({ body: JSON.stringify({ file_path: 'app/extend/user/a.py', content: '', selections: { Symbol: 'app.extend.user.source' } }) }));
     await client.startCompilation('package', 'app/extend/user/package');
     expect(fetchFn).toHaveBeenLastCalledWith('/api/v1/code-editor/compilations', expect.objectContaining({ body: JSON.stringify({ scope: 'package', file_path: 'app/extend/user/package' }) }));
     await client.cancelCompilation('editor-1');

@@ -2,13 +2,16 @@
 
 from __future__ import annotations
 
+import importlib
+
+import pytest
 from app.core.generators import RandomGenerator
-from app.include.generators import RandomGenerator as OldRandomGenerator
 
 
 def test_generator_move_preserves_state() -> None:
-    """Verify old/new identity, initial draw value, and state isolation across clones."""
-    assert RandomGenerator is OldRandomGenerator
+    """Verify legacy bridge is removed, initial draw value, and state isolation across clones."""
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.generators")
 
     original = RandomGenerator(0)
     assert original.next_double() == 0.8444218515250481

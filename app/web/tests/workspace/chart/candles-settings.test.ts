@@ -24,6 +24,7 @@ function draw(change: Partial<typeof defaults>) {
 
 it('uses distinct colors for candle bodies borders and wicks', () => {
   const calls = draw({
+    colorBarsByPreviousClose: true,
     candleUpColor: '#123456', candleDownColor: '#654321',
     candleWickUpColor: '#abcdef', candleWickDownColor: '#fedcba',
     candleBorderUpColor: '#111111', candleBorderDownColor: '#222222',

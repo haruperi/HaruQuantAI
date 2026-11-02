@@ -28,7 +28,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.workspace.brokers.sq_equity import SQEquityClient
-    from app.include.enums import Timeframe
+    from app.core.enums import Timeframe
 
     client = SQEquityClient()
     bars = client.get_bars("AAPL", Timeframe.PERIOD_D1, count=5)
@@ -52,9 +52,9 @@ from typing import Any, override
 
 import pandas as pd  # type: ignore[import-untyped]
 
+from app.core.data.contracts import MarketBar, SymbolInfo, SymbolPrice, SymbolSpread
+from app.core.enums import Timeframe
 from app.core.host.logging import get_logger
-from app.include.contracts import MarketBar, SymbolInfo, SymbolPrice, SymbolSpread
-from app.include.enums import Timeframe
 from app.workspace.data_manager.data.conversions import bars_to_dataframe
 
 from .base import (

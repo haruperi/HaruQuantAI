@@ -5,6 +5,12 @@ from __future__ import annotations
 import math
 from dataclasses import replace
 
+from app.core.data.contracts import (
+    BridgeError,
+    TradeRequest,
+    TradeResult,
+)
+from app.core.enums import OrderType, TradeRetcode
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -21,12 +27,6 @@ from app.extend.blocks.order.runtime import TradingRuntime
 from app.extend.blocks.order.types import (
     TradeFilter,
 )
-from app.include.contracts import (
-    BridgeError,
-    TradeRequest,
-    TradeResult,
-)
-from app.include.enums import OrderType, TradeRetcode
 
 
 @block(

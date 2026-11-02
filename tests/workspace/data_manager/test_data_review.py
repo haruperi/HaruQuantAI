@@ -50,7 +50,7 @@ def test_rename_republishes_files_and_preserves_history(recorded_history):
 def test_clear_removes_owned_cache_and_preserves_unrelated_files(recorded_history):
     from pathlib import Path
 
-    from app.include.market_storage import catalog_paths
+    from app.core.data.market_storage import catalog_paths
     from app.workspace.data_manager.data.feature import Data
 
     gateway, identifier, root = recorded_history

@@ -298,13 +298,9 @@ def test_clean_migration_obsolete_implementations_removed() -> None:
 
 def test_clean_migration_direct_consumer_imports() -> None:
     """Verify all consumers import directly from canonical blocks package."""
-    # 1. app.include package root exposes canonical blocks
-    import app.include as root_inc
-    from app.extend.blocks.comparisons.is_greater import is_greater
-    from app.extend.blocks.functions.plus import plus
-
-    assert root_inc.is_greater is is_greater
-    assert root_inc.plus is plus
+    # 1. app.include package root is removed
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include")
 
     # 2. actions package exposes canonical log_to_file
     import app.extend.blocks.actions as root_act

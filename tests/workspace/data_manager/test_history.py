@@ -8,8 +8,8 @@ from datetime import UTC, datetime
 
 import pandas as pd
 import pytest
-from app.include.contracts import BridgeError, MarketBar, MarketTick
-from app.include.enums import Timeframe
+from app.core.data.contracts import BridgeError, MarketBar, MarketTick
+from app.core.enums import Timeframe
 from app.workspace.data_manager.data.conversions import (
     bars_to_dataframe,
     ticks_to_dataframe,

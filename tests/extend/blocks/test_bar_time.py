@@ -7,6 +7,9 @@ from datetime import UTC, datetime
 
 import pytest
 from app.extend.blocks.bar_time import (
+    BarTime,
+    DateTime,
+    TimeConditions,
     always_false,
     always_false_spec,
     always_true,
@@ -83,11 +86,6 @@ from app.extend.blocks.bar_time import (
 )
 from app.extend.blocks.metadata import BlockSpec, ExecutionKind, PortType
 from app.extend.blocks.registry import block_registry
-from app.include import (
-    BarTime,
-    DateTime,
-    TimeConditions,
-)
 
 
 def _sample_timestamps() -> list[int]:

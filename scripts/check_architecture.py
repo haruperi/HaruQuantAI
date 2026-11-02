@@ -143,6 +143,8 @@ def check_include_facade() -> list[str]:
     """Check <= 100 physical lines and no `__getattr__` in `include/__init__.py`."""
     violations: list[str] = []
     facade_path = APP_ROOT / "include" / "__init__.py"
+    if not facade_path.exists():
+        return violations
     source = facade_path.read_text(encoding="utf-8")
     lines = source.splitlines()
     if len(lines) > 100:

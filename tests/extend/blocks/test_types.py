@@ -165,11 +165,11 @@ def test_block_registry_discovers_types_blocks() -> None:
     assert not registry.diagnostics
 
 
-def test_app_include_reexports_types() -> None:
-    """Verify app.include re-exports foundational types and classes."""
-    import app.include as inc
+def test_app_include_eliminated() -> None:
+    """Verify app.include legacy package is eliminated."""
+    import importlib
 
-    assert hasattr(inc, "BooleanConstant")
-    assert hasattr(inc, "NumberConstant")
-    assert hasattr(inc, "Types")
-    assert hasattr(inc, "Variable")
+    import pytest
+
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include")

@@ -5,7 +5,7 @@ from tempfile import TemporaryDirectory
 
 import pytest
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR, CodeEditorError
+from app.workspace.code_editor._common import EXTEND_DIR, CodeEditorError
 from app.workspace.code_editor.indicator_tester import IndicatorTester
 from app.workspace.code_editor.registry import registry, unresolved_symbols
 from app.workspace.code_editor.routes import CodeEditor
@@ -106,7 +106,7 @@ def test_compile_all_accepts_the_real_unified_library():
 
 
 def test_dynamic_modules_keep_relative_import_context():
-    result = CodeEditor().compile_file(str(INCLUDE_DIR / "contracts.py"))
+    result = CodeEditor().compile_file(str(EXTEND_DIR / "blocks/base.py"))
     assert result["success"], result
 
 

@@ -11,6 +11,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, cast
 
+from app.core.data.contracts import DataInfo
+from app.core.data.market_storage import catalog_paths, safe_component, scan_catalog
 from app.core.host.persistence import HostPersistence, RecordFilter
 from app.core.lib.responses import (
     ErrorCode,
@@ -18,8 +20,6 @@ from app.core.lib.responses import (
     StandardError,
     StandardResponse,
 )
-from app.include.contracts import DataInfo
-from app.include.market_storage import catalog_paths, safe_component, scan_catalog
 
 from ._helpers import (
     DATASETS_CATALOG_FR,

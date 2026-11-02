@@ -1,24 +1,28 @@
-"""Test identity between legacy bridge paths and canonical core data contracts and enums."""
+"""Test canonical core data contracts and enums, and verify legacy include removal."""
 
 from __future__ import annotations
 
+import importlib
+
 import app.core.data.contracts as new_contracts
 import app.core.enums as new_enums
-import app.include.contracts as old_contracts
-import app.include.enums as old_enums
+import pytest
 
 
 def test_canonical_type_identity() -> None:
-    """Verify that importing old and new contracts/enums returns identical objects."""
-    assert old_contracts.MarketBar is new_contracts.MarketBar
-    assert old_contracts.MarketTick is new_contracts.MarketTick
-    assert old_contracts.ChartDef is new_contracts.ChartDef
-    assert old_contracts.DataInfo is new_contracts.DataInfo
-    assert old_contracts.SymbolInfo is new_contracts.SymbolInfo
-    assert old_contracts.TradeRequest is new_contracts.TradeRequest
-    assert old_contracts.TradingSession is new_contracts.TradingSession
-    assert old_enums.Timeframe is new_enums.Timeframe
-    assert old_enums.OrderType is new_enums.OrderType
+    """Verify that canonical contracts and enums are present and legacy bridge is removed."""
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.contracts")
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.enums")
+
+    assert new_contracts.MarketBar is not None
+    assert new_contracts.MarketTick is not None
+    assert new_contracts.ChartDef is not None
+    assert new_contracts.DataInfo is not None
+    assert new_contracts.SymbolInfo is not None
+    assert new_contracts.TradeRequest is not None
+    assert new_contracts.TradingSession is not None
 
     # Exact timeframe second values per WO-C06.01
     assert new_enums.Timeframe.PERIOD_M1.to_seconds() == 60

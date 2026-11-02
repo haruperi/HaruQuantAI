@@ -104,7 +104,7 @@ Custom logic for opening, modifying, or closing trading orders.
 
 from dataclasses import dataclass
 from typing import Any, Mapping
-from app.include.enums import OrderType
+from app.core.enums import OrderType
 
 
 @dataclass

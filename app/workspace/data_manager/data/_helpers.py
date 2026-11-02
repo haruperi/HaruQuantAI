@@ -39,7 +39,7 @@ def validate_dataset_updates(values: Mapping[str, Any]) -> dict[str, Any]:
     from datetime import UTC, datetime
     from pathlib import Path
 
-    from app.include.market_storage import price_columns, safe_component
+    from app.core.data.market_storage import price_columns, safe_component
 
     from .storage import dataset_root
 

@@ -11,10 +11,7 @@ from types import SimpleNamespace
 from unittest.mock import AsyncMock
 
 import pytest
-from app.extend.blocks.metadata import ExecutionKind
-from app.extend.blocks.order.types import TradeFilter
-from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
-from app.include.contracts import (
+from app.core.data.contracts import (
     AccountInfo,
     SymbolInfo,
     SymbolPrice,
@@ -22,7 +19,10 @@ from app.include.contracts import (
     TradeRequest,
     TradeResult,
 )
-from app.include.enums import OrderType, TradeRetcode
+from app.core.enums import OrderType, TradeRetcode
+from app.extend.blocks.metadata import ExecutionKind
+from app.extend.blocks.order.types import TradeFilter
+from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
 from app.workspace.brokers.simulator import SimulatorClient
 from app.workspace.trading import (
     AccountProxy,

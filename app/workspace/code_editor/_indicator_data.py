@@ -73,7 +73,7 @@ def historical_bars(
     review = DatasetReview(gateway, rows[0]["id"])
     if review.calendar() is None:
         # Keep large histories lazy; materialize only the test window.
-        from app.include.market_storage import scan_catalog
+        from app.core.data.market_storage import scan_catalog
 
         lazy = scan_catalog(review.record, decode=True)
         frame = (

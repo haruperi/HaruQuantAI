@@ -24,7 +24,7 @@ def environment(tmp_path):
 
         def get_bars(self, symbol, timeframe, *, date_from, date_to, **kwargs):
             calls.append((date_from, date_to))
-            from app.include.enums import Timeframe
+            from app.core.enums import Timeframe
 
             dates = pd.date_range(
                 date_from,

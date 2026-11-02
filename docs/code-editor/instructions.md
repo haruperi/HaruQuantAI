@@ -158,7 +158,7 @@ actions/
 Existing imports remain valid:
 
 ```python
-from app.include.actions import Actions, ActionRecord, DrawUpArrowAction
+from app.extend.blocks.actions import Actions, ActionRecord, DrawUpArrowAction
 
 record = Actions.draw_up_arrow(shift=3)
 assert isinstance(record, ActionRecord)

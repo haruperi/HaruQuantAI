@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+from app.core.data.contracts import (
+    TradeResult,
+)
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -16,9 +19,6 @@ from app.extend.blocks.order._common import (
 from app.extend.blocks.order.runtime import TradingRuntime
 from app.extend.blocks.order.types import (
     TradeFilter,
-)
-from app.include.contracts import (
-    TradeResult,
 )
 
 

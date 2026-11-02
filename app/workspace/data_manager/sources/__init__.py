@@ -9,7 +9,7 @@ Description:
 
 from __future__ import annotations
 
-from app.include.market_storage import M1_SCHEMA, TICK_SCHEMA
+from app.core.data.market_storage import M1_SCHEMA, TICK_SCHEMA
 from app.workspace.brokers.dukascopy import DukascopyClient
 
 from ._base import BaseSource, Sources

@@ -14,15 +14,7 @@ from typing import TYPE_CHECKING, Any, cast
 if TYPE_CHECKING:
     from .feature import Symbols
 
-from app.core.host.logging import get_logger
-from app.core.host.persistence import HostPersistence, SQLiteValue
-from app.core.lib.responses import (
-    ErrorCode,
-    ResponseMetadata,
-    StandardError,
-    StandardResponse,
-)
-from app.include.contracts import (
+from app.core.data.contracts import (
     BridgeError,
     SymbolInfo,
     SymbolMargin,
@@ -34,6 +26,14 @@ from app.include.contracts import (
     SymbolTrade,
     SymbolVolume,
     default_session_windows,
+)
+from app.core.host.logging import get_logger
+from app.core.host.persistence import HostPersistence, SQLiteValue
+from app.core.lib.responses import (
+    ErrorCode,
+    ResponseMetadata,
+    StandardError,
+    StandardResponse,
 )
 from app.workspace.brokers.metatrader import create_mt5_client
 

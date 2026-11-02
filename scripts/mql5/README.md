@@ -1,7 +1,7 @@
 # Python bridge symbol snapshots
 
 `Experts/PythonBridge.mq5` serializes `SymbolInfo` snapshots using the nested
-contract in `app/include/contracts.py`: `price`, `spread`, `margin`, `volume`,
+contract in `app/core/data/contracts.py`: `price`, `spread`, `margin`, `volume`,
 `trade`, `swap`, `session`, and `state`. The individual native `CSymbolInfo`
 property commands remain independent of the snapshot format.
 

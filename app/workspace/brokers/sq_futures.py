@@ -25,7 +25,7 @@ Key Capabilities:
 Python API Usage:
     ```python
     from app.workspace.brokers.sq_futures import SQFuturesClient
-    from app.include.enums import Timeframe
+    from app.core.enums import Timeframe
 
     client = SQFuturesClient()
     bars = client.get_bars("@ES", Timeframe.PERIOD_D1, count=5)
@@ -42,8 +42,8 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, override
 
+from app.core.enums import Timeframe
 from app.core.host.logging import get_logger
-from app.include.enums import Timeframe
 
 from .base import (
     BridgeError,

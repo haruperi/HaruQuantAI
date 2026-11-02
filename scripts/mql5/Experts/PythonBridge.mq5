@@ -1280,7 +1280,7 @@ string SymbolCommissionsJson(const string sym)
    return result+"]}";
   }
 
-// Snapshot serialization follows app/include/contracts.py. Scalar methods below
+// Snapshot serialization follows app/core/data/contracts.py. Scalar methods below
 // continue to expose the native CSymbolInfo properties independently.
 string SymbolFlagNamesJson(const long mask, const string &labels[])
   {

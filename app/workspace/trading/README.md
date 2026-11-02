@@ -1,9 +1,9 @@
 # Shared trading API
 
 Import `Trading`, `Trade`, and information proxies from `app.workspace.trading`.
-The former `app.include.trading` module and include-level trading exports have
+The former `app.extend.trading` module and include-level trading exports have
 been removed. Contracts, enums, and the `TradingBackend` protocol remain in
-`app.include` so foundational modules do not depend on workspaces.
+`app.core` so foundational modules do not depend on workspaces.
 
 `api.py` composes the eight interfaces and delegates lifecycle, receipts, and
 backend events. `base.py` handles serialized proxy calls, snapshot conversion, request normalization,

@@ -11,9 +11,9 @@ import duckdb
 import pyarrow as pa
 import pyarrow.compute as pc
 
+from app.core.data.market_storage import catalog_paths
+from app.core.enums import Timeframe
 from app.core.host.persistence import HostPersistence
-from app.include.enums import Timeframe
-from app.include.market_storage import catalog_paths
 
 _STEP = timedelta(microseconds=1)
 _MONTHS = 12

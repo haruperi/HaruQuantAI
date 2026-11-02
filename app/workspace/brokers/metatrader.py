@@ -89,7 +89,7 @@ except ImportError:
             pass
 
 
-from app.include.contracts import (
+from app.core.data.contracts import (
     READ_TIMEOUT,
     BridgeEvent,
     MarketBar,
@@ -99,7 +99,7 @@ from app.include.contracts import (
     SymbolPrice,
     TerminalInfo,
 )
-from app.include.enums import (
+from app.core.enums import (
     ReceiptStatus,
     Timeframe,
 )

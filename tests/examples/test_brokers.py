@@ -5,8 +5,8 @@ from unittest.mock import AsyncMock
 
 import pandas as pd
 import pytest
-from app.include.contracts import SymbolInfo, SymbolTrade
-from app.include.enums import OrderFilling
+from app.core.data.contracts import SymbolInfo, SymbolTrade
+from app.core.enums import OrderFilling
 from app.workspace.trading import Trading
 from scripts.examples import brokers
 

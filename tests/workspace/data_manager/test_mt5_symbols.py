@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, Mock
 
 import pytest
 from app import cli
-from app.include.contracts import SymbolInfo, SymbolPrice, SymbolTrade
+from app.core.data.contracts import SymbolInfo, SymbolPrice, SymbolTrade
 from app.workspace.data_manager import symbols as symbols_module
 from app.workspace.data_manager.symbols import Symbols
 

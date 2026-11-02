@@ -89,7 +89,7 @@ existing error/envelope adapter. `http.py` retains compatibility endpoints.
 | Capability | Contract |
 | --- | --- |
 | Disk reload | `/file/reload` requires an open existing file and explicit `discard_dirty` for a dirty buffer; candidate session persistence precedes in-memory replacement |
-| Ownership | `path_policy.py` reads versioned `builtin_files.json`; shipped files and containing directories, host paths and private package names are protected. Update the manifest when shipping new builtins. User-authored files remain writable; builtin clones default to `app/include/user/<original-relative-directory>/<name>_copy.py` |
+| Ownership | `path_policy.py` reads versioned `builtin_files.json`; shipped files and containing directories, host paths and private package names are protected. Update the manifest when shipping new builtins. User-authored files remain writable; builtin clones default to `app/extend/user/<original-relative-directory>/<name>_copy.py` |
 | Navigation/search | Ownership and text filters apply to navigation; entries carry ownership/protection. Search exposes case/regex/whole-word/directory controls; invalid regexes return safe validation errors |
 | Symbols | Static public declarations and member names, overlaid with successfully compiled class metadata; autocomplete resolves class names, imported aliases and simple constructor bindings. It is not a full Python type checker |
 | Indicators | Typed identity `file_path::ClassName`, canonical defaults, output names and protection. Class-qualified identities disambiguate files declaring multiple indicators |

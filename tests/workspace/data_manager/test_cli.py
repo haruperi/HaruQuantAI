@@ -1,8 +1,8 @@
 import argparse
 from unittest.mock import Mock
 
+from app.core.data.contracts import DataInfo
 from app.core.lib.responses import ResponseMetadata, StandardResponse
-from app.include.contracts import DataInfo
 from app.workspace.data_manager.baskets import BasketsCLI, format_basket_table
 from app.workspace.data_manager.brokers import BrokersCLI, format_broker_table
 from app.workspace.data_manager.data._cli import (

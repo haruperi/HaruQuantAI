@@ -8,7 +8,7 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
-from app.include.enums import Timeframe
+from app.core.enums import Timeframe
 
 # --- Dukascopy constants and helpers ---
 

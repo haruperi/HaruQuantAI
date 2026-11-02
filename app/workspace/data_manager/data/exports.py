@@ -13,9 +13,9 @@ from typing import Any
 from fastapi import APIRouter, Request
 from fastapi.responses import FileResponse
 
+from app.core.data.market_storage import safe_component
 from app.core.host.transport import TransportError
 from app.core.lib.responses import ErrorCode
-from app.include.market_storage import safe_component
 
 from .review import DatasetReview
 

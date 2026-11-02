@@ -9,9 +9,9 @@ from typing import Any
 import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
 
+from app.core.data.contracts import BridgeError
+from app.core.data.market_storage import scan_catalog
 from app.core.host.persistence import HostPersistence
-from app.include.contracts import BridgeError
-from app.include.market_storage import scan_catalog
 
 
 def cached_frame(

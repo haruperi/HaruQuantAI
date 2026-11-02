@@ -12,8 +12,8 @@ from __future__ import annotations
 import importlib
 from typing import Any
 
-import app.include.contracts as _contracts
-import app.include.enums as _enums
+import app.core.data.contracts as _contracts
+import app.core.enums as _enums
 from app.core.trading.connection.base import (
     MAX_RESPONSE_BYTES,
     BridgeError,

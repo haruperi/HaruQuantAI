@@ -1,22 +1,26 @@
-"""Test identity and schema specifications for canonical market storage contracts."""
+"""Test specifications for canonical market storage contracts and verify legacy include removal."""
 
 from __future__ import annotations
 
+import importlib
+
 import app.core.data.market_storage as new_storage
-import app.include.market_storage as old_storage
 import pyarrow as pa
 import pytest
 
 
 def test_canonical_storage_module_identity() -> None:
-    """Verify that importing old and new market storage returns identical objects and matches schema."""
-    assert old_storage.encode_frame is new_storage.encode_frame
-    assert old_storage.scan_catalog is new_storage.scan_catalog
-    assert old_storage.TICK_SCHEMA is new_storage.TICK_SCHEMA
-    assert old_storage.M1_SCHEMA is new_storage.M1_SCHEMA
-    assert old_storage.safe_component is new_storage.safe_component
-    assert old_storage.price_columns is new_storage.price_columns
-    assert old_storage.catalog_paths is new_storage.catalog_paths
+    """Verify that market storage matches schema and legacy bridge is removed."""
+    with pytest.raises(ModuleNotFoundError):
+        importlib.import_module("app.include.market_storage")
+
+    assert new_storage.encode_frame is not None
+    assert new_storage.scan_catalog is not None
+    assert new_storage.TICK_SCHEMA is not None
+    assert new_storage.M1_SCHEMA is not None
+    assert new_storage.safe_component is not None
+    assert new_storage.price_columns is not None
+    assert new_storage.catalog_paths is not None
 
     # TICK_SCHEMA: DateTime: timestamp[us, UTC], Bid: int64, Ask: int64, Flags: uint16
     assert [(field.name, field.type) for field in new_storage.TICK_SCHEMA] == [

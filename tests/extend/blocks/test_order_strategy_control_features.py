@@ -5,6 +5,7 @@ from __future__ import annotations
 from datetime import UTC, datetime, timedelta
 
 import pytest
+from app.core.data.contracts import SymbolInfo, SymbolPrice
 from app.extend.blocks.order.atm import ATMBracket, ATMStrategy
 from app.extend.blocks.order.formulas import (
     evaluate_price_level,
@@ -25,7 +26,6 @@ from app.extend.blocks.order.validity import (
     parse_timeframe_delta,
     schedule_bar_validity,
 )
-from app.include.contracts import SymbolInfo, SymbolPrice
 
 # ---------------------------------------------------------------------------
 # 1. Sizing Selection and Formulas

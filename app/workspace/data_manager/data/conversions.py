@@ -8,8 +8,8 @@ from typing import Any
 
 import pandas as pd  # type: ignore[import-untyped]
 
+from app.core.data.contracts import MarketBar, MarketTick
 from app.core.host.logging import get_logger
-from app.include.contracts import MarketBar, MarketTick
 
 logger = get_logger(__name__)
 BAR_COLUMNS: list[str] = ["Open", "High", "Low", "Close", "Volume", "Spread"]

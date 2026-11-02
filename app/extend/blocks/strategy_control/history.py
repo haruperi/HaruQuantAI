@@ -6,10 +6,10 @@ import math
 from dataclasses import dataclass, replace
 from datetime import datetime
 
+from app.core.data import contracts
+from app.core.enums import DealEntry, DealType
 from app.extend.blocks.order.runtime import TradingRuntime
 from app.extend.blocks.order.types import TradeFilter, aware_timestamp
-from app.include import contracts
-from app.include.enums import DealEntry, DealType
 
 
 @dataclass(frozen=True, slots=True)

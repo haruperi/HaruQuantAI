@@ -17,8 +17,8 @@ import pyarrow as pa
 import pyarrow.compute as pc
 import pyarrow.parquet as pq
 
+from app.core.data.market_storage import catalog_paths, encode_frame, safe_component
 from app.core.host.persistence import HostPersistence
-from app.include.market_storage import catalog_paths, encode_frame, safe_component
 
 from .coverage import (
     add_completed_range,

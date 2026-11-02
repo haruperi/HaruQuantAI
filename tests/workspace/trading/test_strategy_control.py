@@ -6,6 +6,8 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 
 import pytest
+from app.core.data.contracts import BridgeError, DealInfo, SymbolInfo, SymbolPrice
+from app.core.enums import DealEntry, DealType, MarginMode
 from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,
 )
@@ -66,8 +68,6 @@ from app.extend.blocks.strategy_control.pending_order_exists import (
 from app.extend.blocks.strategy_control.trade_recently_closed import (
     trade_recently_closed,
 )
-from app.include.contracts import BridgeError, DealInfo, SymbolInfo, SymbolPrice
-from app.include.enums import DealEntry, DealType, MarginMode
 from app.workspace.brokers.simulator import SimulatorClient
 from app.workspace.trading import Trading
 

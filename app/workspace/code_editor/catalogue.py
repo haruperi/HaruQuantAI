@@ -19,7 +19,7 @@ import logging
 from pathlib import Path
 
 from app.core.lib.errors import copy_json
-from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR, PROJECT_ROOT
+from app.workspace.code_editor._common import EXTEND_DIR, PROJECT_ROOT
 from app.workspace.code_editor._indicator_resolver import resolve_indicator
 from app.workspace.code_editor.command_models import IndicatorInfo, SymbolInfo
 from app.workspace.code_editor.path_policy import inspect_path
@@ -102,8 +102,6 @@ def indicator_catalogue() -> list[IndicatorInfo]:
     logger.debug("FR-editor-catalogue: indicators invoked")
     records: list[IndicatorInfo] = []
     indicator_root = EXTEND_DIR / "blocks" / "indicators"
-    if not any(indicator_root.rglob("*.py")):
-        indicator_root = INCLUDE_DIR / "blocks" / "indicators"
     for symbol in symbol_catalogue(indicator_root):
         if symbol.kind != "class":
             continue

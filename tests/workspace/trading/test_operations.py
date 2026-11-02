@@ -6,6 +6,13 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 
 import pytest
+from app.core.data.contracts import (
+    BridgeError,
+    SymbolInfo,
+    TradeCheckResult,
+    TradeResult,
+)
+from app.core.enums import OrderTime, TradeAction, TradeRetcode
 from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,
 )
@@ -23,8 +30,6 @@ from app.extend.blocks.order.open.enter_reverse_at_market import (
     enter_reverse_at_market,
 )
 from app.extend.blocks.order.types import TradeFilter
-from app.include.contracts import BridgeError, SymbolInfo, TradeCheckResult, TradeResult
-from app.include.enums import OrderTime, TradeAction, TradeRetcode
 from app.workspace.brokers.simulator import SimulatorClient
 from app.workspace.trading import Trading
 
@@ -317,7 +322,7 @@ def test_native_zero_check_code_and_rejected_check(setup):
 
 
 def test_filter_exact_magic_zero_and_comment_direction():
-    from app.include.contracts import PositionInfo
+    from app.core.data.contracts import PositionInfo
 
     item = PositionInfo(
         symbol="EURUSD", magic=0, comment="strategy.entry", position_type=1

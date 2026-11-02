@@ -15,6 +15,7 @@ from collections.abc import Callable, Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
+from app.core.data.contracts import TradingSession
 from app.core.host.persistence import HostPersistence
 from app.core.lib.responses import (
     ErrorCode,
@@ -22,7 +23,6 @@ from app.core.lib.responses import (
     StandardError,
     StandardResponse,
 )
-from app.include.contracts import TradingSession
 
 from ._helpers import (
     MAX_SHIFT_MINUTES,

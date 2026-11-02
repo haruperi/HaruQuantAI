@@ -49,7 +49,7 @@ async function mockEditor(page: Page, source = 'value = 1\n') {
     if (endpoint === '/init') data = state();
     else if (endpoint === '/navigator')
       data = {
-        id: 'app/include',
+        id: 'app/extend',
         name: 'snippets',
         type: 'directory',
         children: [{ id: path, path, name: path.split('/').pop(), type: 'file' }],
@@ -154,13 +154,13 @@ test('renaming an open dirty tab preserves content and saves to the new path', a
     .filter({ hasText: 'Navigator' })
     .getByText('example.py', { exact: true })
     .click({ button: 'right' });
-  page.once('dialog', (dialog) => dialog.accept('app/include/renamed.py'));
+  page.once('dialog', (dialog) => dialog.accept('app/extend/renamed.py'));
   await page.getByRole('button', { name: /Rename/ }).click();
   await expect(page.getByRole('button', { name: 'Close renamed.py', exact: true })).toBeVisible();
   await expect(editor).toHaveText('value = 3');
   await page.getByRole('button', { name: 'Save', exact: true }).click();
   await expect.poll(() => mock.saves.length).toBe(1);
-  expect(mock.saves[0]).toEqual({ file_path: 'app/include/renamed.py', content: 'value = 3' });
+  expect(mock.saves[0]).toEqual({ file_path: 'app/extend/renamed.py', content: 'value = 3' });
 });
 
 test('missing historical data is shown as an actionable error', async ({ page }) => {
@@ -254,7 +254,7 @@ test('each tab retains its own undo history', async ({ page }) => {
       json: {
         status: 'success',
         data: {
-          id: 'app/include',
+          id: 'app/extend',
           name: 'include',
           type: 'directory',
           children: [first, second].map((path) => ({ id: path, path, name: path.split('/').pop(), type: 'file' })),
@@ -572,7 +572,7 @@ async function pendingPackage(page: Page, files = [
   await page.route('**/code-editor/navigator', (route) => {
     navigatorRequests++;
     return route.fulfill({ json: { status: 'success', data: {
-      id: 'app/include', name: 'snippets', type: 'directory',
+      id: 'app/extend', name: 'snippets', type: 'directory',
       children: files.map((path) => ({ id: path, path, name: path.split('/').pop(), type: 'file' })),
     } } });
   });
@@ -622,17 +622,17 @@ test('package export sends exact open disk paths and supported metadata', async 
   await expect(modal.getByText(/Archive-relative paths determine import destinations/)).toBeVisible();
   await modal.getByLabel('Pack Name', { exact: true }).fill('Research Pack');
   await modal.getByLabel('Description', { exact: true }).fill('Two Python snippets');
-  await modal.getByLabel('Output File', { exact: true }).fill('app/include/research.zip');
+  await modal.getByLabel('Output File', { exact: true }).fill('app/extend/research.zip');
   await modal.getByRole('button', { name: 'Export Pack', exact: true }).click();
   await expect.poll(() => mock.exports.length).toBe(1);
   expect(mock.exports[0].request().postDataJSON()).toEqual({
-    file_paths: mock.files, archive_path: 'app/include/research.zip',
+    file_paths: mock.files, archive_path: 'app/extend/research.zip',
     metadata: { name: 'Research Pack', description: 'Two Python snippets' },
   });
   await consumePackageResponse(page, mock.exports[0], {
-    status: 'exported', file_count: 2, archive_path: 'app/include/research.zip', files: mock.files,
+    status: 'exported', file_count: 2, archive_path: 'app/extend/research.zip', files: mock.files,
   });
-  await expect(modal.getByText('Successfully exported 2 file(s) to app/include/research.zip', { exact: true })).toBeVisible();
+  await expect(modal.getByText('Successfully exported 2 file(s) to app/extend/research.zip', { exact: true })).toBeVisible();
 });
 
 for (const [option, rule] of [
@@ -644,10 +644,10 @@ for (const [option, rule] of [
     const mock = await pendingPackage(page);
     await page.getByRole('button', { name: 'Import', exact: true }).click();
     const modal = packageModal(page);
-    await modal.getByLabel('Select Pack File', { exact: true }).fill('app/include/source.zip');
+    await modal.getByLabel('Select Pack File', { exact: true }).fill('app/extend/source.zip');
     await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
     await expect.poll(() => mock.inspections.length).toBe(1);
-    expect(mock.inspections[0].request().postDataJSON()).toEqual({ archive_path: 'app/include/source.zip' });
+    expect(mock.inspections[0].request().postDataJSON()).toEqual({ archive_path: 'app/extend/source.zip' });
     await consumePackageResponse(page, mock.inspections[0], packagePreview);
     await expect(modal.getByText(packagePreview[0].filename, { exact: true })).toBeVisible();
     await modal.getByRole('radio', { name: option, exact: true }).check();
@@ -655,7 +655,7 @@ for (const [option, rule] of [
     await modal.getByRole('button', { name: 'Import Pack', exact: true }).click();
     await expect.poll(() => mock.imports.length).toBe(1);
     expect(mock.imports[0].request().postDataJSON()).toEqual({
-      archive_path: 'app/include/source.zip',
+      archive_path: 'app/extend/source.zip',
       resolution_rules: Object.fromEntries(packagePreview.map((entry) => [entry.filename, rule])),
     });
     await consumePackageResponse(page, mock.imports[0], {
@@ -674,7 +674,7 @@ test('package archive changes clear an existing preview and an empty reinspectio
   await expect.poll(() => mock.inspections.length).toBe(1);
   await consumePackageResponse(page, mock.inspections[0], packagePreview);
   await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeEnabled();
-  await modal.getByLabel('Select Pack File', { exact: true }).fill('app/include/empty.zip');
+  await modal.getByLabel('Select Pack File', { exact: true }).fill('app/extend/empty.zip');
   await expect(modal.getByText(packagePreview[0].filename, { exact: true })).toHaveCount(0);
   await expect(modal.getByRole('button', { name: 'Import Pack', exact: true })).toBeDisabled();
   await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
@@ -692,10 +692,10 @@ for (const outcome of ['success', 'failure'] as const) {
     const modal = packageModal(page);
     await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
     await expect.poll(() => mock.inspections.length).toBe(1);
-    await modal.getByLabel('Select Pack File', { exact: true }).fill('app/include/current.zip');
+    await modal.getByLabel('Select Pack File', { exact: true }).fill('app/extend/current.zip');
     await modal.getByRole('button', { name: 'Inspect', exact: true }).click();
     await expect.poll(() => mock.inspections.length).toBe(2);
-    const current = [{ filename: 'app/include/current.py', file_size: 12, exists_locally: false }];
+    const current = [{ filename: 'app/extend/current.py', file_size: 12, exists_locally: false }];
     await consumePackageResponse(page, mock.inspections[1], current);
     await expect(modal.getByText(current[0].filename, { exact: true })).toBeVisible();
     await consumePackageResponse(page, mock.inspections[0], outcome === 'success' ? packagePreview : 'obsolete inspection', outcome === 'failure');
@@ -801,7 +801,7 @@ for (const [status, code, message] of [
     await page.route('**/code-editor/file/save-as', (route) => route.fulfill({
       status, json: { status: 'error', error: { code, message } },
     }));
-    page.once('dialog', (dialog) => dialog.accept('app/include/new.py'));
+    page.once('dialog', (dialog) => dialog.accept('app/extend/new.py'));
     await page.getByRole('button', { name: 'Save As', exact: true }).click();
     await expect(page.getByText(`Save As error: ApiClientError: ${message}`, { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Close first.py', exact: true })).toBeVisible();
@@ -901,10 +901,10 @@ test('complete search controls send flags and directory scope', async ({ page })
   await page.getByLabel('Case sensitive', { exact: true }).check();
   await page.getByLabel('Regular expression', { exact: true }).check();
   await page.getByLabel('Whole word', { exact: true }).check();
-  await page.getByRole('textbox', { name: 'Search directory' }).fill('app/include/user');
+  await page.getByRole('textbox', { name: 'Search directory' }).fill('app/extend/user');
   await page.getByRole('button', { name: 'Find', exact: true }).click();
   await expect.poll(() => searches.length).toBe(1);
-  expect(searches[0]).toEqual({ query: 'Alpha', case_sensitive: true, regex: true, whole_word: true, search_dir: 'app/include/user' });
+  expect(searches[0]).toEqual({ query: 'Alpha', case_sensitive: true, regex: true, whole_word: true, search_dir: 'app/extend/user' });
 });
 
 test('import repair exposes ambiguity and applies an explicit selection', async ({ page }) => {
@@ -914,15 +914,15 @@ test('import repair exposes ambiguity and applies an explicit selection', async 
     const body = route.request().postDataJSON();
     requests.push(body);
     return route.fulfill({ json: { status: 'success', data: Object.keys(body.selections).length ? {
-      content: 'from app.include.user.first import Shared\nvalue = Shared()', added: ['from app.include.user.first import Shared'], unresolved: [],
-    } : { content: body.content, added: [], unresolved: [{ symbol: 'Shared', candidates: ['app.include.user.first', 'app.include.user.second'] }] } } });
+      content: 'from app.extend.user.first import Shared\nvalue = Shared()', added: ['from app.extend.user.first import Shared'], unresolved: [],
+    } : { content: body.content, added: [], unresolved: [{ symbol: 'Shared', candidates: ['app.extend.user.first', 'app.extend.user.second'] }] } } });
   });
   await page.goto('/codeeditor');
   await page.getByRole('button', { name: 'Fix imports', exact: true }).click();
-  await page.getByRole('combobox', { name: 'Import Shared', exact: true }).selectOption('app.include.user.first');
+  await page.getByRole('combobox', { name: 'Import Shared', exact: true }).selectOption('app.extend.user.first');
   await page.getByRole('button', { name: 'Apply import selections', exact: true }).click();
-  await expect(page.getByRole('textbox', { name: 'Source code editor', exact: true })).toContainText('from app.include.user.first import Shared');
-  expect(requests[1].selections).toEqual({ Shared: 'app.include.user.first' });
+  await expect(page.getByRole('textbox', { name: 'Source code editor', exact: true })).toContainText('from app.extend.user.first import Shared');
+  expect(requests[1].selections).toEqual({ Shared: 'app.extend.user.first' });
 });
 
 test('import repair cannot replace a buffer changed while its response was pending', async ({ page }) => {
@@ -942,7 +942,7 @@ test('import repair cannot replace a buffer changed while its response was pendi
 test('typed catalogue supplies symbol and member autocomplete', async ({ page }) => {
   await mockEditor(page);
   await page.route('**/code-editor/catalogue/symbols', route => route.fulfill({ json: { status: 'success', data: [
-    { name: 'QuantumMarker', module: 'app.include.user.marker', file_path: 'app/include/user/marker.py', kind: 'class', members: ['member_value'] },
+    { name: 'QuantumMarker', module: 'app.extend.user.marker', file_path: 'app/extend/user/marker.py', kind: 'class', members: ['member_value'] },
   ] } }));
   await page.goto('/codeeditor');
   const editor = page.getByRole('textbox', { name: 'Source code editor', exact: true });
@@ -1006,7 +1006,7 @@ test('package compilation, compile all and extension reload use distinct scopes'
     return route.fulfill({ json: { status: 'success', data: { job_id: `editor-${requests.length}`, status: 'COMPLETED', progress: 100, message: '', results: [], cancellation_requested: false } } });
   });
   await page.goto('/codeeditor');
-  page.once('dialog', dialog => dialog.accept('app/include/user/package'));
+  page.once('dialog', dialog => dialog.accept('app/extend/user/package'));
   await page.getByRole('button', { name: 'Compile package/plugin', exact: true }).click();
   await expect.poll(() => requests.length).toBe(1);
   await page.getByRole('button', { name: 'Compile all', exact: true }).click();
@@ -1014,7 +1014,7 @@ test('package compilation, compile all and extension reload use distinct scopes'
   await page.getByRole('button', { name: 'Reload extensions', exact: true }).click();
   await expect.poll(() => requests.length).toBe(3);
   expect(requests.map(request => request.scope)).toEqual(['package', 'all', 'registered']);
-  expect(requests[0].file_path).toBe('app/include/user/package');
+  expect(requests[0].file_path).toBe('app/extend/user/package');
 });
 
 test('compilation results stay behind a compact status summary and surface failed files', async ({ page }) => {
@@ -1048,7 +1048,7 @@ test('builtin protection makes the buffer read only and ownership filtering reac
   await page.route('**/code-editor/navigator*', route => {
     filters.push(new URL(route.request().url()).searchParams.get('ownership') ?? 'all');
     return route.fulfill({ json: { status: 'success', data: {
-      id: 'app/include', name: 'snippets', type: 'directory', children: [{
+      id: 'app/extend', name: 'snippets', type: 'directory', children: [{
         id: 'app/extend/blocks/indicators/custom/example.py', name: 'example.py', type: 'file', protected: true, ownership: 'builtin',
       }],
     } } });
@@ -1065,15 +1065,15 @@ test('code export creation uses the selected supported format', async ({ page })
   const requests: unknown[] = [];
   await page.route('**/code-editor/export-templates', route => {
     requests.push(route.request().postDataJSON());
-    return route.fulfill({ json: { status: 'success', data: { file_path: 'app/include/user/code_templates/pseudocode/new.txt.tpl', status: 'saved', bytes_written: 10, diagnostics: [] } } });
+    return route.fulfill({ json: { status: 'success', data: { file_path: 'app/extend/user/code_templates/pseudocode/new.txt.tpl', status: 'saved', bytes_written: 10, diagnostics: [] } } });
   });
   await page.goto('/codeeditor');
   await page.getByRole('button', { name: 'Options', exact: true }).click();
   await page.getByRole('combobox', { name: 'Export template format' }).selectOption('pseudocode');
-  page.once('dialog', dialog => dialog.accept('app/include/user/code_templates/pseudocode/new.txt.tpl'));
+  page.once('dialog', dialog => dialog.accept('app/extend/user/code_templates/pseudocode/new.txt.tpl'));
   await page.getByRole('button', { name: 'Create export template', exact: true }).click();
   await expect.poll(() => requests.length).toBe(1);
-  expect(requests[0]).toEqual({ source_paths: ['app/extend/blocks/indicators/custom/example.py'], target_path: 'app/include/user/code_templates/pseudocode/new.txt.tpl', format_id: 'pseudocode' });
+  expect(requests[0]).toEqual({ source_paths: ['app/extend/blocks/indicators/custom/example.py'], target_path: 'app/extend/user/code_templates/pseudocode/new.txt.tpl', format_id: 'pseudocode' });
 });
 
 test('late reconnect diagnostics cannot overwrite a newly submitted compilation', async ({ page }) => {
@@ -1095,13 +1095,13 @@ test('late reconnect diagnostics cannot overwrite a newly submitted compilation'
 test('missing-file recovery warning is visible and the retained buffer stays editable', async ({ page }) => {
   await mockEditor(page);
   await page.route('**/code-editor/init', route => route.fulfill({ json: { status: 'success', data: {
-    status: 'ready', active_file: 'app/include/user/missing.py', layout: {},
-    open_tabs: [{ file_path: 'app/include/user/missing.py', title: 'missing.py', content: 'recover_me = 1', is_dirty: true, mode: 'python' }],
-    recovery_warnings: ['Missing file: app/include/user/missing.py; buffer retained for Save As'],
+    status: 'ready', active_file: 'app/extend/user/missing.py', layout: {},
+    open_tabs: [{ file_path: 'app/extend/user/missing.py', title: 'missing.py', content: 'recover_me = 1', is_dirty: true, mode: 'python' }],
+    recovery_warnings: ['Missing file: app/extend/user/missing.py; buffer retained for Save As'],
   } } }));
   await page.goto('/codeeditor');
   await expect(page.getByRole('textbox', { name: 'Source code editor', exact: true })).toHaveText('recover_me = 1');
-  await expect(page.getByText('Missing file: app/include/user/missing.py; buffer retained for Save As', { exact: true })).toBeVisible();
+  await expect(page.getByText('Missing file: app/extend/user/missing.py; buffer retained for Save As', { exact: true })).toBeVisible();
   await expect(page.getByRole('button', { name: 'Save As', exact: true })).toBeEnabled();
 });
 
@@ -1124,7 +1124,7 @@ test('template UI includes order subtypes and indicator-derived signal mappings'
   const previews: Array<{ indicator?: string; order_action_type?: string }> = [];
   await page.route('**/code-editor/templates/render', route => {
     previews.push(route.request().postDataJSON());
-    return route.fulfill({ json: { status: 'success', data: { content: 'class NewSnippet: pass', file_path: 'app/include/user/new_snippet.py' } } });
+    return route.fulfill({ json: { status: 'success', data: { content: 'class NewSnippet: pass', file_path: 'app/extend/user/new_snippet.py' } } });
   });
   await page.goto('/codeeditor');
   await page.getByRole('button', { name: 'Create from Template', exact: true }).click();

@@ -4,14 +4,14 @@ import asyncio
 from datetime import UTC, datetime
 
 import pytest
-from app.include.contracts import (
+from app.core.data.contracts import (
     BridgeError,
     PositionInfo,
     TradeCheckResult,
     TradeRequest,
     TradeResult,
 )
-from app.include.enums import OrderType, ReceiptStatus
+from app.core.enums import OrderType, ReceiptStatus
 from app.workspace.brokers.base import TradingClient
 from app.workspace.trading import PositionProxy, Trade, Trading
 from app.workspace.trading.base import normalize_request, serialize_request

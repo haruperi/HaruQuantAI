@@ -5,6 +5,7 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 
+from app.core.data import contracts
 from app.extend.blocks.order._common import (
     matching_orders,
     matching_positions,
@@ -13,7 +14,6 @@ from app.extend.blocks.order.runtime import TradingRuntime
 from app.extend.blocks.order.types import (
     TradeFilter,
 )
-from app.include import contracts
 
 
 def valuation(

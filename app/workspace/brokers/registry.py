@@ -41,8 +41,8 @@ from json import dumps
 from time import perf_counter
 from typing import Any
 
+from app.core.data.contracts import AccountInfo, SymbolInfo, TradeRequest
 from app.core.host.logging import get_logger
-from app.include.contracts import AccountInfo, SymbolInfo, TradeRequest
 
 from . import base as _b
 

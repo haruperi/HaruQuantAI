@@ -9,8 +9,8 @@ from __future__ import annotations
 import math
 from typing import Literal
 
+from app.core.data.contracts import SymbolInfo
 from app.extend.blocks.order.types import normalize_price
-from app.include.contracts import SymbolInfo
 
 
 def price_offset_pips(

@@ -291,12 +291,10 @@ def render_template(
         cls = resolve_indicator(indicator)
         target_dir += "/" + _to_snake_case(cls.__name__)
         content += f"\n# Canonical indicator identity used by this signal.\nINDICATOR = {indicator!r}\nOUTPUT = {cls.spec.outputs[0].name!r}\n"
-        from app.workspace.code_editor._common import EXTEND_DIR, INCLUDE_DIR
+        from app.workspace.code_editor._common import EXTEND_DIR
         from app.workspace.code_editor.catalogue import symbol_catalogue
 
         indicator_root = EXTEND_DIR / "blocks" / "indicators"
-        if not any(indicator_root.rglob("*.py")):
-            indicator_root = INCLUDE_DIR / "blocks" / "indicators"
         candidates = [
             s for s in symbol_catalogue(indicator_root) if s.name == cls.__name__
         ]

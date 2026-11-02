@@ -9,7 +9,7 @@ from datetime import datetime
 from decimal import Decimal
 from itertools import pairwise
 
-from app.include.contracts import OrderInfo, PositionInfo, SymbolInfo
+from app.core.data.contracts import OrderInfo, PositionInfo, SymbolInfo
 
 
 @dataclass(frozen=True, slots=True)

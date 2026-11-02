@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from app.core.data.contracts import (
+    TradeResult,
+)
+from app.core.enums import OrderType
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -12,10 +16,6 @@ from app.extend.blocks.metadata import (
 )
 from app.extend.blocks.order.open._common import execute_entry
 from app.extend.blocks.order.runtime import TradingRuntime
-from app.include.contracts import (
-    TradeResult,
-)
-from app.include.enums import OrderType
 
 
 @block(

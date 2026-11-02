@@ -54,7 +54,6 @@ __all__ = [
     "EditorTab",
     "PROJECT_ROOT",
     "EXTEND_DIR",
-    "INCLUDE_DIR",
     "SNIPPETS_DIR",
     "resolve_safe_path",
     "validate_python_syntax",
@@ -68,7 +67,6 @@ logger = logging.getLogger(__name__)
 # Canonical roots for user extensions and standard include blocks
 PROJECT_ROOT = Path(__file__).resolve().parents[3]
 EXTEND_DIR = PROJECT_ROOT / "app" / "extend"
-INCLUDE_DIR = PROJECT_ROOT / "app" / "include"
 SNIPPETS_DIR = EXTEND_DIR
 
 

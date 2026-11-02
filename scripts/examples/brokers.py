@@ -48,8 +48,7 @@ from typing import Any, Literal
 sys.path.insert(0, str(Path(__file__).resolve().parents[2]))
 
 
-from app.include import format_timestamp
-from app.include.contracts import (
+from app.core.data.contracts import (
     MarketBar,
     MarketTick,
     SymbolInfo,
@@ -57,7 +56,7 @@ from app.include.contracts import (
     TradeRequest,
     TradingBackend,
 )
-from app.include.enums import (
+from app.core.enums import (
     MarginMode,
     OrderFilling,
     OrderType,
@@ -65,6 +64,7 @@ from app.include.enums import (
     Timeframe,
     TradeAction,
 )
+from app.extend.blocks.bar_time import format_timestamp
 from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.ctrader import CTraderClient
 from app.workspace.brokers.metatrader import create_mt5_client

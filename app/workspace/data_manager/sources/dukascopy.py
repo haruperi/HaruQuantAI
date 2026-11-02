@@ -14,6 +14,12 @@ import duckdb
 import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
 
+from app.core.data.market_storage import (
+    catalog_paths,
+    safe_component,
+    scan_catalog,
+)
+from app.core.enums import Timeframe
 from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence
 from app.core.lib.responses import (
@@ -21,12 +27,6 @@ from app.core.lib.responses import (
     ResponseMetadata,
     StandardError,
     StandardResponse,
-)
-from app.include.enums import Timeframe
-from app.include.market_storage import (
-    catalog_paths,
-    safe_component,
-    scan_catalog,
 )
 from app.workspace.brokers.base import BridgeError
 from app.workspace.brokers.dukascopy import DukascopyClient
@@ -740,7 +740,7 @@ class Dukascopy:
         """Query an active snapshot using $PARQUET as the registered relation name."""
         if symbol is None:
             return duckdb.query(query)
-        from app.include.market_storage import catalog_paths
+        from app.core.data.market_storage import catalog_paths
 
         connection = duckdb.connect()
         connection.read_parquet(
