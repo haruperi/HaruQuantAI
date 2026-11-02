@@ -1,3 +1,4 @@
+import { DatasetEditDialog } from './plugins/Common/DatasetEditDialog';
 import { useHistoricalSources } from './plugins/Common/historicalSourceStore';
 import { useSessions } from './plugins/Catalogs/Sessions/sessionStore';
 import { useEffect, useState } from 'react';
@@ -280,20 +281,4 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow }: {
     </table></div>
   {editingDataset && <DatasetEditDialog row={editingDataset} onClose={()=>setEditingDataset(null)}/>}
   </main>;
-}
-
-
-export function DatasetEditDialog({row,onClose}:{row:import('./plugins/Common/dataManagerStore').MockDefinition;onClose:()=>void}) {
-  const [value,setValue] = useState({...row}); const [pending,setPending] = useState(false); const [error,setError] = useState('');
-  const brokers=useDataManagerStore(state=>state.brokers); const symbols=useSymbols(state=>state.symbols); const sessions=useSessions(state=>state.sessions);
-  async function save() {setPending(true);setError('');try{await useDataManagerStore.getState().editDataset(row.id,value);onClose();}catch(cause){setError(String(cause));}finally{setPending(false);}}
-  return <Modal title="Dataset properties" width={600} onClose={onClose} footer={<><Button disabled={pending} onClick={onClose}>Close</Button><Button disabled={pending} onClick={()=>void save()}>Save properties</Button></>}>
-    {error && <p role="alert">{error}</p>}
-    <Field label="Dataset name"><TextInput value={value.symbol} disabled={pending} onChange={event=>setValue({...value,symbol:event.target.value})}/></Field>
-    <Field label="Broker profile"><select value={value.broker} onChange={event=>setValue({...value,broker:event.target.value})}><option value={row.broker}>{row.brokerName}</option>{brokers.map(broker=><option key={broker.id} value={broker.name}>{broker.name}</option>)}</select></Field>
-    <Field label="Symbol specification"><select value={value.symbol_definition_id ?? ''} onChange={event=>setValue({...value,symbol_definition_id:event.target.value ? Number(event.target.value) : null})}><option value="">No specification</option>{symbols.map(symbol=><option key={symbol.id} value={symbol.id}>{symbol.symbol}</option>)}</select></Field>
-    <Field label="Trading session"><select value={value.session_id ?? ''} onChange={event=>setValue({...value,session_id:event.target.value ? Number(event.target.value) : null})}><option value="">No session</option>{sessions.map(session=><option key={session.id} value={session.id}>{session.name}</option>)}</select></Field>
-    <Field label="Category"><TextInput value={value.category} onChange={event=>setValue({...value,category:event.target.value})}/></Field>
-    <Field label="Display timezone"><TextInput value={value.timezone} onChange={event=>setValue({...value,timezone:event.target.value})}/></Field><p>Changing the display timezone preserves recorded instants. Use Clone to shift timestamps.</p>
-  </Modal>;
 }

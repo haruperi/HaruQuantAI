@@ -107,7 +107,7 @@ test('dataset icon buttons retain keyboard access and edit/delete dialogs', asyn
   await page.keyboard.press('Shift+Tab');
   await expect(edit).toBeFocused();
   await page.keyboard.press('Enter');
-  const properties = page.getByRole('dialog', { name: 'Dataset properties', exact: true });
+  const properties = page.getByRole('dialog', { name: 'Edit symbol', exact: true });
   await expect(properties).toBeVisible();
   await properties.getByRole('button', { name: 'Close', exact: true }).last().click();
   await expect(row.getByRole('checkbox')).not.toBeChecked();
