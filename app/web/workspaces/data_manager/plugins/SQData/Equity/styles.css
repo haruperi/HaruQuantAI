@@ -35,3 +35,55 @@
 .sq-data-grid .plain-table tr.selected { background:color-mix(in srgb, var(--accent) 18%, var(--panel)); }
 .sq-data-grid .plain-table tr[aria-disabled=true] { opacity:1; color:var(--muted); }
 .sq-data-flow textarea { background:var(--bg); color:var(--text); border:1px solid var(--line); font:inherit; padding:8px; }
+
+/* Backend-backed equity search; scoped independently of the legacy SQ view. */
+.sq-equity-search-flow .modal.sq-equity-search-modal { max-width:calc(100vw - 32px); max-height:calc(100dvh - 32px); font-size:14px; }
+.sq-equity-search-flow .modal.sq-equity-search-modal>header { min-height:46px; flex-shrink:0; padding-left:24px; }
+.sq-equity-search-flow .modal.sq-equity-search-modal>header h2 { font-size:20px; font-weight:500; }
+.sq-equity-search-flow .modal.sq-equity-search-modal>header button { margin-right:8px; }
+.sq-equity-search-flow .modal.sq-equity-search-modal>.modal-content { padding:20px; min-height:0; }
+.sq-equity-search-panel { padding:22px 18px; background:var(--panel2); border:1px solid var(--line); box-shadow:0 2px 5px #0003; }
+.sq-equity-search-panel h3 { font-size:18px; margin:0 0 14px; }
+.sq-equity-search-fields { display:flex; flex-direction:column; gap:16px; }
+.sq-equity-field { display:grid; grid-template-columns:145px minmax(0,1fr); gap:16px; align-items:start; }
+.sq-equity-field>span { text-align:right; padding-top:6px; }
+.sq-equity-search-fields select { width:210px; max-width:100%; padding:6px 12px; font:inherit; color:var(--text); background:var(--bg); border:1px solid var(--line2); }
+.sq-equity-options { margin-left:161px; display:grid; grid-template-columns:1fr 1fr; gap:16px; align-items:start; }
+.sq-equity-options>div { display:flex; flex-direction:column; gap:14px; }
+.sq-equity-switch { display:inline-flex; gap:14px; align-items:center; cursor:pointer; }
+.sq-equity-switch input { appearance:none; flex:0 0 36px; width:36px; height:18px; border-radius:12px; background:var(--muted); border:1px solid var(--line2); position:relative; cursor:pointer; margin:0; }
+.sq-equity-switch input::before { content:''; position:absolute; width:20px; height:20px; left:-1px; top:-2px; border-radius:50%; background:var(--text); box-shadow:0 1px 3px #0005; }
+.sq-equity-switch input:checked { background:color-mix(in srgb,var(--accent) 50%,var(--panel)); }
+.sq-equity-switch input:checked::before { left:16px; background:var(--accent); }
+.sq-equity-switch input:focus-visible { outline:2px solid var(--accent); outline-offset:4px; }
+.sq-equity-switch:has(input:disabled) { opacity:.55; cursor:not-allowed; }
+.sq-equity-switch input:disabled { cursor:not-allowed; }
+.sq-equity-search-text textarea { height:clamp(150px,27vh,310px); width:100%; resize:vertical; min-height:100px; font:inherit; padding:10px; color:var(--text); background:var(--bg); border:1px solid var(--line2); }
+.sq-equity-search-actions { margin-left:161px; }
+.sq-equity-help { margin:0 0 18px; color:var(--muted); font-style:italic; line-height:1.6; }
+.sq-equity-search-actions .primary { padding:8px 16px; font:inherit; }
+.sq-equity-metadata-note { color:var(--muted); margin:12px 0 0; font-size:12px; }
+.sq-equity-availability { margin-top:16px; margin-bottom:12px; }
+.sq-equity-availability p { margin:4px 0 10px; line-height:1.5; }
+.sq-equity-availability p>span { display:inline-block; width:25px; color:var(--muted); }
+.sq-equity-search-flow .modal.sq-equity-search-modal>footer { height:auto; min-height:100px; padding:18px 20px; display:flex; flex-direction:column; align-items:stretch; gap:20px; flex-shrink:0; background:var(--panel); }
+.sq-equity-consent { display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:6px; }
+.sq-equity-footer-actions { display:flex; justify-content:flex-end; align-items:center; gap:16px; }
+.sq-equity-result-grid { max-height:40vh; overflow:auto; border:1px solid var(--line); }
+.sq-equity-result-grid table { width:100%; }
+.sq-equity-result-grid th:first-child { width:40px; }
+.sq-equity-search-panel .sq-data-error { margin:14px 0 0; }
+@media(max-width:650px) {
+  .sq-equity-search-flow .modal.sq-equity-search-modal { max-width:calc(100vw - 16px); max-height:calc(100dvh - 16px); }
+  .sq-equity-search-flow .modal.sq-equity-search-modal>header { padding-left:14px; }
+  .sq-equity-search-flow .modal.sq-equity-search-modal>header h2 { font-size:17px; }
+  .sq-equity-search-flow .modal.sq-equity-search-modal>.modal-content { padding:10px; }
+  .sq-equity-search-panel { padding:14px 12px; }
+  .sq-equity-field { grid-template-columns:minmax(0,1fr); gap:8px; }
+  .sq-equity-field>span { text-align:left; padding:0; }
+  .sq-equity-options { margin:0; grid-template-columns:minmax(0,1fr); }
+  .sq-equity-search-actions { margin-left:0; }
+  .sq-equity-search-text textarea { height:150px; }
+  .sq-equity-consent { justify-content:flex-start; }
+  .sq-equity-search-flow .modal.sq-equity-search-modal>footer { padding:12px 16px; gap:12px; }
+}
