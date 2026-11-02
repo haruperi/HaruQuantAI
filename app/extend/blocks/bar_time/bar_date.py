@@ -1,10 +1,23 @@
-"""Bar Date temporal value strategy block."""
+"""Bar Date temporal value strategy block.
+
+Description:
+    Extracts date of bar at specified historical shift as YYYYMMDD integer,
+    matching StrategyQuant BarDate snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful BarDate block.
+Key Capabilities:
+    - FR-bar-time-value: Extract bar date in YYYYMMDD format.
+Python API Usage:
+    from app.extend.blocks.bar_time.bar_date import bar_date
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import DateTime, resolve_time_ms
+from app.extend.blocks.bar_time._common import DateTime, _log_val, resolve_time_ms
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -41,4 +54,5 @@ def bar_date(source: Any, shift: int = 0) -> int:
     if hasattr(source, "bar_date") and callable(source.bar_date):
         return int(source.bar_date(shift))
     ms = resolve_time_ms(source, shift)
-    return DateTime.get_ymd(ms) if ms != -1 else -1
+    res = DateTime.get_ymd(ms) if ms != -1 else -1
+    return _log_val("bar_date", shift, res)

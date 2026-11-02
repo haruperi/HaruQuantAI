@@ -1,4 +1,19 @@
-"""Backward-compatible class facades for BarTime and TimeConditions."""
+"""Backward-compatible class facades for BarTime and TimeConditions.
+
+Description:
+    Provides object-oriented BarTime and TimeConditions facade interfaces
+    over underlying discrete bar/time StrategyQuant blocks and DateTime
+    timestamp series.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: Provide object-oriented facades for strategy authoring.
+Key Capabilities:
+    - FR-bar-time-facade: Unified access to bar-shift temporal extraction.
+    - FR-time-conditions-facade: Unified access to temporal condition predicates.
+Python API Usage:
+    from app.extend.blocks.bar_time.facade import BarTime, TimeConditions
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 

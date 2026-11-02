@@ -1,10 +1,23 @@
-"""Current Bar index value strategy block."""
+"""Current Bar index value strategy block.
+
+Description:
+    Retrieves current active bar counter or completed bar index offset,
+    matching StrategyQuant CurrentBar snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful CurrentBar block.
+Key Capabilities:
+    - FR-bar-time-value: Retrieve current bar counter/index.
+Python API Usage:
+    from app.extend.blocks.bar_time.current_bar import current_bar
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import resolve_bar_count
+from app.extend.blocks.bar_time._common import _log_val, resolve_bar_count
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -38,7 +51,15 @@ current_bar_spec = BlockSpec(
 @block(current_bar_spec)
 def current_bar(source: Any, shift: int = 0) -> int:
     """Retrieve bar index / completed bar count."""
-    if hasattr(source, "current_bar") and callable(source.current_bar):
-        return int(source.current_bar(shift))
+    for attr in ("current_bar", "get_current_bar", "getCurrentBar"):
+        if hasattr(source, attr):
+            fn = getattr(source, attr)
+            if callable(fn):
+                try:
+                    res = int(fn(shift))
+                except TypeError:
+                    res = int(fn())
+                return _log_val("current_bar", shift, res)
     n = resolve_bar_count(source)
-    return (n - 1 - shift) if (0 <= shift < n) else -1
+    res = (n - 1 - shift) if (0 <= shift < n) else -1
+    return _log_val("current_bar", shift, res)

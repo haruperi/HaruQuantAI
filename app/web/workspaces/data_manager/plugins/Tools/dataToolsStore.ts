@@ -4,7 +4,7 @@ import { createSymbolDataClient } from '../Common/symbolContract';
 import { normalizeLegacyBranding } from '../../../../shell/branding';
 import { create } from 'zustand';
 import {type DomainClient } from '../../../../shell/transport';
-import { createCloneDefinitions, validateCloneSettings, validateReviewChange, type CloneDefinition, type CloneSettings, type ReviewMutation, type ReviewRow, type ToolJobState, type ToolTarget } from './dataTools';
+import { createCloneDefinitions, validateCloneSettings, validateReviewChange, type CloneDefinition, type CloneSettings, type ReviewMutation, type ReviewRow, type ReviewPage, type RemoteQualityResult, type ToolJobState, type ToolTarget } from './dataTools';
 
 let dataClient = createSymbolDataClient('/data');
 
@@ -22,10 +22,10 @@ interface Store extends Saved {
   action: (action: 'pause' | 'resume' | 'stop') => void;
   saveReview: (key: string, rows: ReviewRow[], changed: Record<string, Partial<ReviewRow>>, deleted: string[], tick: boolean) => void;
   cloneRemote: (payload: { dataset_id: string; timezone_type?: string; shift_hours?: number; timezone?: string; remove_weekends?: boolean; postfix?: string }) => Promise<unknown>;
-  fetchReviewRows: (datasetId: string, limit?: number, offset?: number, timeframe?: string, session?: string) => Promise<{rows: ReviewRow[]; total: number; revision: string}>;
+  fetchReviewRows: (datasetId: string, limit?: number, offset?: number, timeframe?: string, session?: string) => Promise<ReviewPage>;
   saveRemoteReviewChanges: (datasetId: string, changedBars: Array<Record<string, unknown>>, deletedTimestamps: string[], revision?: string) => Promise<unknown>;
   fetchQualitySummary: (datasetId: string) => Promise<unknown>;
-  fetchQualityDetails: (datasetId: string, limit?: number, offset?: number, timeframe?: string, session?: string) => Promise<unknown>;
+  fetchQualityDetails: (datasetId: string, limit?: number, offset?: number, timeframe?: string, session?: string) => Promise<RemoteQualityResult>;
   getIndexForDate: (datasetId: string, targetDate: string) => Promise<number>;
   massDeleteRemote: (datasetIds: string[], action?: 'remove' | 'clear', force?: boolean) => Promise<unknown>;
 }
@@ -73,7 +73,7 @@ export const useDataTools = create<Store>((set, get) => {
       return dataClient.post('/datasets/clone-timezone', payload);
     },
     fetchReviewRows: async (datasetId, limit = 500, offset = 0, timeframe, session) => {
-      return dataClient.get<{rows: ReviewRow[]; total: number; revision: string}>(`/datasets/${encodeURIComponent(datasetId)}/review-data?limit=${limit}&offset=${offset}${timeframe ? `&timeframe=${encodeURIComponent(timeframe)}` : ''}${session ? `&session=${encodeURIComponent(session)}` : ''}`);
+      return dataClient.get<ReviewPage>(`/datasets/${encodeURIComponent(datasetId)}/review-data?limit=${limit}&offset=${offset}${timeframe ? `&timeframe=${encodeURIComponent(timeframe)}` : ''}${session ? `&session=${encodeURIComponent(session)}` : ''}`);
     },
     saveRemoteReviewChanges: async (datasetId, changedBars, deletedTimestamps, revision) => {
       return dataClient.post(`/datasets/${encodeURIComponent(datasetId)}/save-changes`, {
@@ -86,7 +86,7 @@ export const useDataTools = create<Store>((set, get) => {
       return dataClient.get(`/datasets/${encodeURIComponent(datasetId)}/quality-summary`);
     },
     fetchQualityDetails: async (datasetId, limit = 100, offset = 0, timeframe, session) => {
-      return dataClient.get(`/datasets/${encodeURIComponent(datasetId)}/quality-details?limit=${limit}&offset=${offset}${timeframe ? `&timeframe=${encodeURIComponent(timeframe)}` : ''}${session ? `&session=${encodeURIComponent(session)}` : ''}`);
+      return dataClient.get<RemoteQualityResult>(`/datasets/${encodeURIComponent(datasetId)}/quality-details?limit=${limit}&offset=${offset}${timeframe ? `&timeframe=${encodeURIComponent(timeframe)}` : ''}${session ? `&session=${encodeURIComponent(session)}` : ''}`);
     },
     getIndexForDate: async (datasetId, targetDate) => {
       const res = await dataClient.get<{ index: number }>(`/datasets/${encodeURIComponent(datasetId)}/index-for-date?target_date=${encodeURIComponent(targetDate)}`);

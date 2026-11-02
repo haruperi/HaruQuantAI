@@ -1,4 +1,16 @@
-"""Always True condition strategy block."""
+"""Always True condition strategy block.
+
+Description:
+    Evaluates constant True condition predicate for trading rule logic.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful AlwaysTrue block.
+Key Capabilities:
+    - FR-bar-time-predicate: Always returns boolean True condition.
+Python API Usage:
+    from app.extend.blocks.bar_time.always_true import always_true
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 

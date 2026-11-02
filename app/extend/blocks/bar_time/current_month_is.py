@@ -1,9 +1,23 @@
-"""Current Month Is condition strategy block."""
+"""Current Month Is condition strategy block.
+
+Description:
+    Evaluates whether current broker month equals target month,
+    matching StrategyQuant CurrentMonthIs snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful CurrentMonthIs block.
+Key Capabilities:
+    - FR-bar-time-predicate: Compare current broker month against target.
+Python API Usage:
+    from app.extend.blocks.bar_time.current_month_is import current_month_is
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
+from app.extend.blocks.bar_time._common import _log_cond
 from app.extend.blocks.bar_time.current_month import current_month
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
@@ -19,9 +33,9 @@ current_month_is_spec = BlockSpec(
     id="condition.current_month_is",
     version="1.0.0",
     name="Current Month Is",
-    description="Evaluate whether current month equals target month (1-12)",
+    description="Evaluate whether current month matches target month (1-12)",
     category="bar_time",
-    tags=("condition", "month", "clock"),
+    tags=("condition", "month"),
     execution_kind=ExecutionKind.CONDITION,
     chart_pane=ChartPane.MAIN,
     inputs=(
@@ -48,7 +62,8 @@ current_month_is_spec = BlockSpec(
 
 @block(current_month_is_spec)
 def current_month_is(source: Any = None, month: int = 1) -> bool:
-    """Evaluate whether current month equals target month (1-12)."""
+    """Evaluate whether current month matches target month (1-12)."""
     if hasattr(source, "current_month_is") and callable(source.current_month_is):
         return bool(source.current_month_is(month))
-    return current_month(source) == month
+    res = current_month(source) == month
+    return _log_cond("current_month_is", month, res)

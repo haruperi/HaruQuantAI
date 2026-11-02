@@ -1,10 +1,23 @@
-"""Bar Week Of Month temporal value strategy block."""
+"""Bar Week Of Month temporal value strategy block.
+
+Description:
+    Extracts Monday-aligned week of month (1-6) of bar at specified shift,
+    matching StrategyQuant BarWeekOfMonth snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful BarWeekOfMonth block.
+Key Capabilities:
+    - FR-bar-time-value: Extract bar week of month (1-6).
+Python API Usage:
+    from app.extend.blocks.bar_time.bar_week_of_month import bar_week_of_month
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import DateTime, resolve_time_ms
+from app.extend.blocks.bar_time._common import DateTime, _log_val, resolve_time_ms
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -41,4 +54,5 @@ def bar_week_of_month(source: Any, shift: int = 0) -> int:
     if hasattr(source, "bar_week_of_month") and callable(source.bar_week_of_month):
         return int(source.bar_week_of_month(shift))
     ms = resolve_time_ms(source, shift)
-    return DateTime.get_week_of_month(ms) if ms != -1 else -1
+    res = DateTime.get_week_of_month(ms) if ms != -1 else -1
+    return _log_val("bar_week_of_month", shift, res)

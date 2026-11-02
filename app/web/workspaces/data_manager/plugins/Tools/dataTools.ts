@@ -27,6 +27,14 @@ export interface ReviewRow {
   volume: number; bid: number; ask: number;
 }
 
+export interface ReviewPage { rows: ReviewRow[]; total: number; revision: string; price_digits?: number }
+export interface RemoteQualityResult {
+  total: number; counts: Record<string, number>; percents: Record<string, number>;
+  issues: { date: string; kind: string }[]; issue_count: number; gap_policy: string;
+  spike_threshold: number; offset: number; limit: number;
+  coverage: { date: string; observed: number; expected: number; issues: number }[];
+}
+
 export interface ReviewMutation { changed: Record<string, Partial<ReviewRow>>; deleted: string[] }
 export interface QualityIssue { id: string; date: string; kind: 'Gap' | 'Spike' | 'Bad OHLC'; row: ReviewRow }
 export interface QualityResult {

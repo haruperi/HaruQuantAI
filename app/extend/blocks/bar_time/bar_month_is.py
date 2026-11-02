@@ -1,4 +1,17 @@
-"""Bar Month Is condition strategy block."""
+"""Bar Month Is condition strategy block.
+
+Description:
+    Evaluates whether bar month equals target month at shift,
+    matching StrategyQuant BarMonthIs snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful BarMonthIs block.
+Key Capabilities:
+    - FR-bar-time-predicate: Compare bar month against target month.
+Python API Usage:
+    from app.extend.blocks.bar_time.bar_month_is import bar_month_is
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -27,10 +40,10 @@ bar_month_is_spec = BlockSpec(
     chart_pane=ChartPane.MAIN,
     inputs=(
         InputPort("source", PortType.ANY, "Bar time source or series"),
-        InputPort("month", PortType.NUMBER, "Target month (1-12)"),
+        InputPort("month", PortType.NUMBER, "Target month (1-12)", default=1),
         InputPort("shift", PortType.NUMBER, "Historical bar shift offset", default=0),
     ),
-    outputs=(OutputPort("condition", PortType.BOOLEAN, "True if month matches"),),
+    outputs=(OutputPort("condition", PortType.BOOLEAN, "True if bar month matches"),),
     is_generation_eligible=True,
     is_deterministic=True,
     is_causal=True,
@@ -38,9 +51,10 @@ bar_month_is_spec = BlockSpec(
 
 
 @block(bar_month_is_spec)
-def bar_month_is(source: Any, month: int, shift: int = 0) -> bool:
+def bar_month_is(source: Any, month: int = 1, shift: int = 0) -> bool:
     """Evaluate whether bar month equals target month (1-12)."""
     if hasattr(source, "bar_month_is") and callable(source.bar_month_is):
         return bool(source.bar_month_is(month, shift))
-    m = bar_month(source, shift)
-    return _log_cond("bar_month_is", month, m == month if m != -1 else False)
+    bm = bar_month(source, shift)
+    res = (bm == month) if bm != -1 else False
+    return _log_cond("bar_month_is", month, res)

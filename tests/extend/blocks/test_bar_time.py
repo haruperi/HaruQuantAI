@@ -1,4 +1,20 @@
-"""Comprehensive unit tests for BarAndTime modular blocks and facades."""
+"""Comprehensive unit tests for BarAndTime modular blocks and facades.
+
+Description:
+    Validates all 37 StrategyQuant-faithful bar and time building blocks,
+    including discrete functions, parameter defaults, object facades,
+    non-silent requirement logging, and calendar calculation edge cases.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: Test suite for bar and time building blocks.
+Key Capabilities:
+    - FR-bar-time-tests: Comprehensive unit tests across all 37 blocks.
+    - FR-bar-time-calendar-tests: Verify scalar and weekend edge cases.
+    - FR-bar-time-logging-tests: Verify non-silent diagnostic requirement logs.
+Python API Usage:
+    pytest tests/extend/blocks/test_bar_time.py --no-cov
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -299,3 +315,93 @@ def test_block_specs_and_registry() -> None:
     desc = block_registry.register_block(bar_date)
     assert desc.spec.id == bar_date_spec.id
     assert block_registry.get(bar_date_spec.id) is not None
+
+
+def test_trading_day_calendar_and_scalar() -> None:
+    """Verify first and last trading day evaluation on scalar timestamps."""
+    # Jan 15, 2025 (Wednesday) is NOT the first trading day of January
+    mid_month = datetime(2025, 1, 15, 10, 0, 0, tzinfo=UTC)
+    assert is_month_first_trading_day(mid_month) is False
+    assert is_month_last_trading_day(mid_month) is False
+
+    # Jan 1, 2025 (Wednesday) IS the first trading day of January
+    first_day = datetime(2025, 1, 1, 9, 30, 0, tzinfo=UTC)
+    assert is_month_first_trading_day(first_day) is True
+    assert is_month_last_trading_day(first_day) is False
+
+    # Jan 31, 2025 (Friday) IS the last trading day of January
+    last_day = datetime(2025, 1, 31, 16, 0, 0, tzinfo=UTC)
+    assert is_month_first_trading_day(last_day) is False
+    assert is_month_last_trading_day(last_day) is True
+
+    # Feb 2025 starts on a Saturday (Feb 1, 2025)
+    feb_sat = datetime(2025, 2, 1, 12, 0, 0, tzinfo=UTC)
+    # With weekends excluded, Saturday is not the first trading day
+    assert is_month_first_trading_day(feb_sat, include_weekends=False) is False
+    # With weekends included, Saturday is the first trading day
+    assert is_month_first_trading_day(feb_sat, include_weekends=True) is True
+
+    # Feb 3, 2025 (Monday) is the first trading day when weekends excluded
+    feb_mon = datetime(2025, 2, 3, 9, 30, 0, tzinfo=UTC)
+    assert is_month_first_trading_day(feb_mon, include_weekends=False) is True
+
+
+def test_parameter_defaults() -> None:
+    """Verify donor parameter default values across condition blocks."""
+    # Jan 5, 2025 was Sunday (0 in original SQ dow) at 00:00
+    sunday_midnight = datetime(2025, 1, 5, 0, 0, 0, tzinfo=UTC)
+
+    # Defaults: day=0 (Sunday), hour=0, minute=0, month=1
+    assert bar_day_of_week_is(sunday_midnight) is True
+    assert bar_day_of_week_is_not(sunday_midnight) is False
+    assert bar_hour_is(sunday_midnight) is True
+    assert bar_hour_is_bigger(sunday_midnight) is False
+    assert bar_hour_is_smaller(sunday_midnight) is False
+    assert bar_minute_is(sunday_midnight) is True
+    assert bar_month_is(sunday_midnight) is True
+    assert bar_month_is_not(sunday_midnight) is False
+    assert bar_time_is(sunday_midnight) is True
+
+    assert current_day_of_week_is(sunday_midnight) is True
+    assert current_hour_is(sunday_midnight) is True
+    assert current_minute_is(sunday_midnight) is True
+    assert current_month_is(sunday_midnight) is True
+    assert current_time_is(sunday_midnight) is True
+
+
+def test_source_object_attributes_and_fallbacks() -> None:
+    """Verify source objects with 0-arg and custom methods."""
+
+    class MockChart:
+        def current_bar(self) -> int:
+            return 42
+
+        @property
+        def is_bar_open(self) -> bool:
+            return True
+
+    chart = MockChart()
+    assert current_bar(chart) == 42
+    assert is_bar_open(chart) is True
+
+    class MockEvent:
+        update_event_type = "BarOpen"
+
+    assert is_bar_open(MockEvent()) is True
+
+
+def test_non_silent_requirement_logging(caplog: pytest.LogCaptureFixture) -> None:
+    """Verify value and condition blocks emit non-silent requirement logs."""
+    import logging
+
+    caplog.set_level(logging.DEBUG)
+
+    dt = datetime(2025, 1, 15, 14, 30, 0, tzinfo=UTC)
+    bar_hour(dt)
+    assert any(
+        "FR-LIBS-BAR-TIME-EXTRACT" in record.message for record in caplog.records
+    )
+
+    caplog.clear()
+    bar_hour_is(dt, 14)
+    assert any("FR-LIBS-TIME-CONDITIONS" in record.message for record in caplog.records)

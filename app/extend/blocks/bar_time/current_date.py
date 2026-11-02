@@ -1,10 +1,27 @@
-"""Current Date temporal value strategy block."""
+"""Current Date temporal value strategy block.
+
+Description:
+    Retrieves current active broker or system date as YYYYMMDD integer,
+    matching StrategyQuant CurrentDate snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful CurrentDate block.
+Key Capabilities:
+    - FR-bar-time-value: Retrieve current date in YYYYMMDD format.
+Python API Usage:
+    from app.extend.blocks.bar_time.current_date import current_date
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import DateTime, resolve_current_time_ms
+from app.extend.blocks.bar_time._common import (
+    DateTime,
+    _log_val,
+    resolve_current_time_ms,
+)
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -45,4 +62,5 @@ def current_date(source: Any = None) -> int:
     if hasattr(source, "current_date") and callable(source.current_date):
         return int(source.current_date())
     ms = resolve_current_time_ms(source)
-    return DateTime.get_ymd(ms)
+    res = DateTime.get_ymd(ms)
+    return _log_val("current_date", 0, res)

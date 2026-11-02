@@ -1,4 +1,29 @@
-"""Common internal utilities and numerical helpers for bar and time blocks."""
+"""Common internal utilities and numerical helpers for bar and time blocks.
+
+Description:
+    Provides DateTime numerical arithmetic, timestamp normalization,
+    epoch conversion, and non-silent requirement logging utilities for
+    StrategyQuant-compatible bar and time building blocks.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: Provide underlying datetime arithmetic and
+    logging helpers.
+Key Capabilities:
+    - FR-bar-time-normalization: Parse and normalize epoch ms/sec and
+      datetime objects.
+    - FR-bar-time-calendar: Calculate day-of-week, days in month, and
+      Monday-aligned week of month.
+    - FR-bar-time-logging: Non-silent debug logging for conditions and
+      extracted values.
+Python API Usage:
+    from app.extend.blocks.bar_time._common import (
+        DateTime,
+        _log_cond,
+        _log_val,
+        resolve_time_ms,
+    )
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -17,6 +42,8 @@ __all__ = [
     "HHMM_PACKED_SEC_THRESHOLD",
     "MS_THRESHOLD",
     "DateTime",
+    "_log_cond",
+    "_log_val",
     "format_timestamp",
     "normalize_timestamps",
     "resolve_bar_count",
@@ -115,6 +142,12 @@ def format_timestamp(
 def _log_cond(name: str, arg: int, res: bool) -> bool:
     """Log temporal condition evaluation and return boolean result."""
     logger.debug("FR-LIBS-TIME-CONDITIONS: %s(%d)=%s", name, arg, res)
+    return res
+
+
+def _log_val(name: str, arg: int, res: int) -> int:
+    """Log temporal value extraction and return integer result."""
+    logger.debug("FR-LIBS-BAR-TIME-EXTRACT: %s(%d)=%d", name, arg, res)
     return res
 
 

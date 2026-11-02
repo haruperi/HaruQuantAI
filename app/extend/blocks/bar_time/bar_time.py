@@ -1,10 +1,23 @@
-"""Bar Time temporal value strategy block."""
+"""Bar Time temporal value strategy block.
+
+Description:
+    Extracts time of bar at specified historical shift as packed HHMM integer,
+    matching StrategyQuant BarTime snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful BarTime block.
+Key Capabilities:
+    - FR-bar-time-value: Extract bar time in packed HHMM integer format.
+Python API Usage:
+    from app.extend.blocks.bar_time.bar_time import bar_time
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import DateTime, resolve_time_ms
+from app.extend.blocks.bar_time._common import DateTime, _log_val, resolve_time_ms
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -41,4 +54,5 @@ def bar_time(source: Any, shift: int = 0) -> int:
     if hasattr(source, "bar_time") and callable(source.bar_time):
         return int(source.bar_time(shift))
     ms = resolve_time_ms(source, shift)
-    return DateTime.get_hhmm(ms) if ms != -1 else -1
+    res = DateTime.get_hhmm(ms) if ms != -1 else -1
+    return _log_val("bar_time", shift, res)

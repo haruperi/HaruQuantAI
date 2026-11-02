@@ -1,4 +1,17 @@
-"""Bar Time Is condition strategy block."""
+"""Bar Time Is condition strategy block.
+
+Description:
+    Evaluates whether bar time matches target hour and minute (or packed HHMM),
+    matching StrategyQuant BarTimeIs snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful BarTimeIs block.
+Key Capabilities:
+    - FR-bar-time-predicate: Compare bar time against target hour/minute.
+Python API Usage:
+    from app.extend.blocks.bar_time.bar_time_is import bar_time_is
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -32,7 +45,12 @@ bar_time_is_spec = BlockSpec(
     chart_pane=ChartPane.MAIN,
     inputs=(
         InputPort("source", PortType.ANY, "Bar time source or series"),
-        InputPort("hour_or_hhmm", PortType.NUMBER, "Hour (0-23) or packed HHMM"),
+        InputPort(
+            "hour_or_hhmm",
+            PortType.NUMBER,
+            "Hour (0-23) or packed HHMM",
+            default=0,
+        ),
         InputPort(
             "minute",
             PortType.NUMBER,
@@ -51,7 +69,7 @@ bar_time_is_spec = BlockSpec(
 @block(bar_time_is_spec)
 def bar_time_is(
     source: Any,
-    hour_or_hhmm: int,
+    hour_or_hhmm: int = 0,
     minute: int | None = None,
     shift: int = 0,
 ) -> bool:
@@ -70,5 +88,5 @@ def bar_time_is(
             if hour_or_hhmm >= HHMM_PACKED_SEC_THRESHOLD
             else hour_or_hhmm
         )
-        res = bt != -1 and bt == target
+        res = (bt == target) if bt != -1 else False
     return _log_cond("bar_time_is", hour_or_hhmm, res)

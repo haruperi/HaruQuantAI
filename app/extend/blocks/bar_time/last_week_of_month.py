@@ -1,10 +1,27 @@
-"""Last Week Of Month condition strategy block."""
+"""Last Week Of Month condition strategy block.
+
+Description:
+    Evaluates whether bar falls within the last Monday-aligned week of month,
+    matching StrategyQuant LastWeekOfMonth snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful LastWeekOfMonth block.
+Key Capabilities:
+    - FR-bar-time-predicate: Test if bar week of month == last week of month.
+Python API Usage:
+    from app.extend.blocks.bar_time.last_week_of_month import last_week_of_month
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import DateTime, _log_cond, resolve_time_ms
+from app.extend.blocks.bar_time._common import (
+    DateTime,
+    _log_cond,
+    resolve_time_ms,
+)
 from app.extend.blocks.base import block
 from app.extend.blocks.metadata import (
     BlockSpec,

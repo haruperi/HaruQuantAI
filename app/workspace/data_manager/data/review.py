@@ -1,8 +1,23 @@
-"""Authoritative historical queries, session-aware review and quality analysis."""
+"""Authoritative historical review.
+
+Description:
+    Queries recorded prices, delegates bounded quality analysis and saves reviewed
+    edits under the dataset writer lock. Review responses expose price precision.
+Purpose:
+    FEAT-DATA-REVIEW: Authoritative chart, row and quality review.
+Key Capabilities:
+    - FR-DATA-REVIEW-price-precision: Log verified price precision and its source.
+    - FR-DATA-QUALITY-bounded-analysis: Verify delegated analysis completion logs.
+Python API Usage:
+    DatasetReview(gateway, dataset_id).rows(limit=500)
+CLI Usage:
+    uv run pytest tests/workspace/data_manager/test_data_review.py --no-cov
+"""
 
 from __future__ import annotations
 
 import json
+from decimal import Decimal
 from typing import Any, cast
 
 import pandas as pd  # type: ignore[import-untyped]
@@ -10,16 +25,18 @@ from fastapi import APIRouter, Request
 
 from app.core.data.contracts import TradingSession
 from app.core.data.market_storage import scan_catalog
+from app.core.host.logging import get_logger
 from app.core.host.transport import TransportError
 from app.core.lib.responses import ErrorCode
 
 from ._helpers import _MAX_CHART_ROWS
 from .partition_files import dataset_lock
+from .quality import analyze_quality
 from .storage import publish_frame, require_data
 
 _DATE_LENGTH = 10
-_SPIKE_THRESHOLD = 0.1
-_MAX_EXPECTED_ROWS = 2_000_000
+_MAX_PRICE_DIGITS = 20
+logger = get_logger(__name__)
 
 
 class DatasetReview:
@@ -181,6 +198,7 @@ class DatasetReview:
             "offset": offset,
             "limit": limit,
             "revision": self.record["updated_at"],
+            "price_digits": self.price_digits(),
         }
 
     def summary(self, **query: Any) -> dict[str, Any]:
@@ -200,79 +218,51 @@ class DatasetReview:
             "volume": int(frame.Volume.sum()) if "Volume" in frame else 0,
         }
 
-    def quality(self, **query: Any) -> dict[str, Any]:
-        """Audit actual observations; expected bar gaps respect saved sessions."""
-        frame = self.frame(**query)
-        issues = []
-        if frame.empty:
-            return {
-                "total": 0,
-                "issues": [],
-                "counts": {},
-                "gap_policy": "no observations",
-            }
-        issues = [
-            {"date": stamp.isoformat(), "kind": "Duplicate"}
-            for stamp in frame.index[frame.index.duplicated()]
-        ]
-        tick = "Bid" in frame
-        invalid = frame.isna().any(axis=1)
-        if tick:
-            invalid |= frame.Ask < frame.Bid
-        else:
-            invalid |= (frame.High < frame[["Open", "Close", "Low"]].max(axis=1)) | (
-                frame.Low > frame[["Open", "Close", "High"]].min(axis=1)
+    def quality(
+        self, limit: int = 500, offset: int = 0, **query: Any
+    ) -> dict[str, Any]:
+        """Audit the complete history and retain only the requested issue page."""
+        return analyze_quality(
+            self.frame(**query),
+            query.get("timeframe") or self.record["timeframe"],
+            self.calendar(query.get("session")),
+            limit=limit,
+            offset=offset,
+        )
+
+    def price_digits(self) -> int:
+        """Prefer saved instrument digits, otherwise use canonical storage precision."""
+        identifier = self.record.get("symbol_definition_id")
+        if identifier is not None:
+            rows = require_data(
+                self.gateway.read_records(
+                    "datamgr_symbols", filters={"id": identifier}, limit=1
+                )
+            )["records"]
+            if rows:
+                value = rows[0].get("decimals")
+                if (
+                    isinstance(value, (int, float))
+                    and 0 <= value <= _MAX_PRICE_DIGITS
+                    and int(value) == value
+                ):
+                    logger.debug(
+                        "FR-DATA-REVIEW-price-precision: instrument digits=%d", value
+                    )
+                    return int(value)
+            logger.warning(
+                "FR-DATA-REVIEW-price-precision: linked digits unavailable; "
+                "using stored units"
             )
-        for stamp in frame.index[invalid]:
-            issues.append(
-                {
-                    "date": stamp.isoformat(),
-                    "kind": "Invalid quote" if tick else "Bad OHLC",
-                }
-            )
-        close = (frame.Bid + frame.Ask) / 2 if tick else frame.Close
-        for stamp in frame.index[
-            close.pct_change(fill_method=None).abs() > _SPIKE_THRESHOLD
-        ]:
-            issues.append(
-                {
-                    "date": stamp.isoformat(),
-                    "kind": "Spike",
-                    "threshold": _SPIKE_THRESHOLD,
-                }
-            )
-        calendar = self.calendar(query.get("session"))
-        timeframe = query.get("timeframe") or self.record["timeframe"]
-        if not tick and timeframe[0] in "MHD" and timeframe != "MN1":
-            unit = {"M": "min", "H": "h", "D": "D"}[timeframe[0]]
-            frequency = f"{int(timeframe[1:])}{unit}"
-            if (frame.index.max() - frame.index.min()) / pd.Timedelta(
-                frequency
-            ) > _MAX_EXPECTED_ROWS:
-                raise ValueError("Choose a shorter interval for quality analysis")
-            expected = pd.date_range(
-                frame.index.min(), frame.index.max(), freq=frequency
-            )
-            if len(expected) > _MAX_EXPECTED_ROWS:
-                raise ValueError("Choose a shorter interval for quality analysis")
-            issues.extend(
-                {"date": stamp.isoformat(), "kind": "Gap"}
-                for stamp in expected.difference(frame.index)
-                if calendar is None or calendar.is_within_session(stamp.to_pydatetime())
-            )
-        counts = {
-            kind: sum(item["kind"] == kind for item in issues)
-            for kind in {item["kind"] for item in issues}
-        }
-        return {
-            "total": len(frame),
-            "issues": issues,
-            "counts": counts,
-            "gap_policy": "saved session"
-            if calendar
-            else "continuous (no session assigned)",
-            "spike_threshold": _SPIKE_THRESHOLD,
-        }
+        step = Decimal(str(json.loads(self.record["lineage_json"])["tick_size"]))
+        if not step.is_finite() or step <= 0:
+            raise ValueError("Stored price precision is unavailable")
+        exponent = cast("int", step.normalize().as_tuple().exponent)
+        digits = max(0, -exponent)
+        if digits > _MAX_PRICE_DIGITS:
+            raise ValueError("Stored price precision exceeds review limits")
+        logger.debug("FR-DATA-REVIEW-price-precision: stored digits=%d", digits)
+        return digits
 
     def save_changes(
         self, changed: list[dict[str, Any]], deleted: list[str], revision: str | None
@@ -342,14 +332,11 @@ def register_review_routes(router: APIRouter) -> None:
             elif action == "review-summary":
                 data = service.summary(**query)
             elif action in {"quality-summary", "quality-details"}:
-                data = service.quality(**query)
-                total = len(data["issues"])
-                data["issues"] = (
-                    data["issues"][offset : offset + limit]
-                    if action == "quality-details"
-                    else []
+                data = service.quality(
+                    limit=limit if action == "quality-details" else 0,
+                    offset=offset,
+                    **query,
                 )
-                data["issue_count"] = total
             elif action == "index-for-date":
                 data = {
                     "index": int(

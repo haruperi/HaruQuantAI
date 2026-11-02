@@ -1,4 +1,17 @@
-"""First Week Of Month condition strategy block."""
+"""First Week Of Month condition strategy block.
+
+Description:
+    Evaluates whether bar falls within the first Monday-aligned week of month,
+    matching StrategyQuant FirstWeekOfMonth snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful FirstWeekOfMonth block.
+Key Capabilities:
+    - FR-bar-time-predicate: Test if bar week of month == 1.
+Python API Usage:
+    from app.extend.blocks.bar_time.first_week_of_month import first_week_of_month
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -41,6 +54,5 @@ def first_week_of_month(source: Any, shift: int = 0) -> bool:
     """Evaluate whether bar falls within first Monday-aligned week of month."""
     if hasattr(source, "first_week_of_month") and callable(source.first_week_of_month):
         return bool(source.first_week_of_month(shift))
-    return _log_cond(
-        "first_week_of_month", shift, bar_week_of_month(source, shift) == 1
-    )
+    res = bar_week_of_month(source, shift) == 1
+    return _log_cond("first_week_of_month", shift, res)

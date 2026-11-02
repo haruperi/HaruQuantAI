@@ -1,4 +1,16 @@
-"""Always False condition strategy block."""
+"""Always False condition strategy block.
+
+Description:
+    Evaluates constant False condition predicate for trading rule logic.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful AlwaysFalse block.
+Key Capabilities:
+    - FR-bar-time-predicate: Always returns boolean False condition.
+Python API Usage:
+    from app.extend.blocks.bar_time.always_false import always_false
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 

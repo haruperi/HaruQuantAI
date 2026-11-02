@@ -1,4 +1,20 @@
-"""Bar and Time strategy blocks and temporal calculation facades."""
+"""Bar and Time strategy blocks and temporal calculation facades.
+
+Description:
+    Implements all 37 StrategyQuant BarAndTime snippet classes as modular
+    typed blocks and facades for rule generation, builder integration, and
+    backtesting execution.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful BarAndTime building blocks.
+Key Capabilities:
+    - FR-bar-time-discrete: All 37 discrete temporal value and condition blocks.
+    - FR-bar-time-facades: BarTime and TimeConditions object-oriented facades.
+    - FR-bar-time-registration: BlockSpec descriptors for algo generation.
+Python API Usage:
+    from app.extend.blocks.bar_time import BarTime, bar_date, bar_hour_is
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 

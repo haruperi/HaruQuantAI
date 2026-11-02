@@ -146,3 +146,146 @@ def test_saved_session_lunch_excludes_closed_market_gap(recorded_history):
     quality = DatasetReview(gateway, identifier).quality()
     assert quality["gap_policy"] == "saved session"
     assert quality["counts"].get("Gap", 0) == 0
+
+
+def test_quality_long_history_bounds_expected_grid_and_issue_page(monkeypatch, caplog):
+    import pandas as pd
+    from app.workspace.data_manager.data import quality
+
+    index = pd.DatetimeIndex(["2020-01-01", "2025-01-01"], tz="UTC")
+    frame = pd.DataFrame(
+        {
+            "Open": [1.0, 1.0],
+            "High": [1.0, 1.0],
+            "Low": [1.0, 1.0],
+            "Close": [1.0, 1.0],
+            "Volume": [1, 1],
+        },
+        index=index,
+    )
+    original = pd.date_range
+    chunk_sizes = []
+
+    def bounded(*args, **kwargs):
+        chunk_sizes.append(kwargs["periods"])
+        assert kwargs["periods"] <= quality.EXPECTED_CHUNK
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(pd, "date_range", bounded)
+    with caplog.at_level("INFO"):
+        result = quality.analyze_quality(frame, "M1", None, limit=3, offset=100)
+    expected = int((index[-1] - index[0]) / pd.Timedelta(minutes=1)) + 1
+    assert expected > 2_000_000
+    assert result["counts"]["Gap"] == expected - 2
+    assert result["issue_count"] == expected - 2
+    assert len(result["issues"]) == 3
+    assert result["issues"][0]["date"] == "2020-01-01T01:41:00+00:00"
+    assert sum(day["expected"] for day in result["coverage"]) == expected
+    assert sum(day["observed"] for day in result["coverage"]) == 2
+    assert sum(day["issues"] for day in result["coverage"]) == expected - 2
+    assert len(chunk_sizes) > 1
+    assert "FR-DATA-QUALITY-bounded-analysis" in caplog.text
+
+
+def test_quality_counts_percentages_and_independent_pagination():
+    import pandas as pd
+    from app.workspace.data_manager.data.quality import analyze_quality
+
+    index = pd.DatetimeIndex(
+        [
+            "2025-01-01T00:00Z",
+            "2025-01-01T00:01Z",
+            "2025-01-01T00:03Z",
+        ]
+    )
+    frame = pd.DataFrame(
+        {"Open": [1, 1, 2], "High": [1, 0, 2], "Low": [1, 1, 2], "Close": [1, 1, 2]},
+        index=index,
+    )
+    first = analyze_quality(frame, "M1", None, limit=1)
+    second = analyze_quality(frame, "M1", None, limit=1, offset=1)
+    assert first["counts"]["Bad OHLC"] == 1
+    assert first["counts"]["Spike"] == 1
+    assert first["counts"]["Gap"] == 1
+    assert first["issue_count"] == 3
+    assert first["percents"]["Gap"] == pytest.approx(100 / 3)
+    assert first["issues"][0]["kind"] == "Bad OHLC"
+    assert second["issues"][0]["kind"] == "Spike"
+    assert first["coverage"] == second["coverage"]
+    assert first["counts"] == second["counts"]
+    assert analyze_quality(frame.iloc[:0], "M1", None)["issue_count"] == 0
+    with pytest.raises(ValueError, match="pagination"):
+        analyze_quality(frame, "M1", None, limit=1001)
+
+
+def test_review_returns_storage_precision(recorded_history, caplog):
+    gateway, identifier, _ = recorded_history
+    with caplog.at_level("DEBUG"):
+        result = DatasetReview(gateway, identifier).rows()
+    assert result["price_digits"] == 4
+    assert "FR-DATA-REVIEW-price-precision" in caplog.text
+
+
+def test_review_prefers_linked_instrument_digits(recorded_history, caplog):
+    gateway, identifier, _ = recorded_history
+    review = DatasetReview(gateway, identifier)
+    original = gateway.read_records
+    review.record["symbol_definition_id"] = 12
+
+    def records(table, **kwargs):
+        if table == "datamgr_symbols":
+            assert kwargs["filters"] == {"id": 12}
+            return {"success": True, "data": {"records": [{"decimals": 5}]}}
+        return original(table, **kwargs)
+
+    from unittest.mock import patch
+
+    with patch.object(gateway, "read_records", side_effect=records):
+        with caplog.at_level("DEBUG"):
+            assert review.rows()["price_digits"] == 5
+    assert "instrument digits=5" in caplog.text
+
+
+def test_quality_http_keeps_complete_counts_when_paging(recorded_history):
+    from app.workspace.data_manager.data.review import register_review_routes
+    from fastapi import APIRouter, FastAPI
+    from fastapi.testclient import TestClient
+
+    gateway, identifier, _ = recorded_history
+    app = FastAPI()
+    app.state.persistence = gateway
+    router = APIRouter()
+    register_review_routes(router)
+    app.include_router(router)
+    with TestClient(app) as client:
+        first = client.get(f"/datasets/{identifier}/quality-details?limit=1").json()
+        second = client.get(
+            f"/datasets/{identifier}/quality-details?limit=1&offset=1"
+        ).json()
+        summary = client.get(f"/datasets/{identifier}/quality-summary").json()
+        assert len(first["data"]["issues"]) == 1
+        assert second["data"]["issues"] == []
+        assert second["data"]["issue_count"] == 1
+        assert summary["data"]["issues"] == []
+        assert summary["data"]["counts"] == first["data"]["counts"]
+        assert summary["data"]["coverage"] == first["data"]["coverage"]
+
+
+def test_quality_ticks_duplicates_empty_page_and_unsupported_gap_frequency():
+    import pandas as pd
+    from app.workspace.data_manager.data.quality import analyze_quality
+
+    index = pd.DatetimeIndex(["2025-01-01T00:00Z"] * 2)
+    ticks = pd.DataFrame({"Bid": [1.0, 3.0], "Ask": [1.1, 2.0]}, index=index)
+    result = analyze_quality(ticks, "TICK", None, offset=100)
+    assert result["issues"] == []
+    assert result["counts"]["Duplicate"] == 1
+    assert result["counts"]["Invalid quote"] == 1
+    assert result["counts"]["Spike"] == 1
+    assert result["issue_count"] == 3
+    bars = pd.DataFrame(
+        {"Open": [1], "High": [1], "Low": [1], "Close": [1]}, index=index[:1]
+    )
+    assert analyze_quality(bars, "MN1", None)["issue_count"] == 0
+    with pytest.raises(ValueError, match="timeframe"):
+        analyze_quality(bars, "M0", None)

@@ -1,4 +1,17 @@
-"""Bar Month Is Not condition strategy block."""
+"""Bar Month Is Not condition strategy block.
+
+Description:
+    Evaluates whether bar month does not equal target month at shift,
+    matching StrategyQuant BarMonthIsNot snippet.
+Purpose:
+    FEAT-BAR-TIME-BLOCKS: StrategyQuant donor-faithful BarMonthIsNot block.
+Key Capabilities:
+    - FR-bar-time-predicate: Compare bar month against non-target month.
+Python API Usage:
+    from app.extend.blocks.bar_time.bar_month_is_not import bar_month_is_not
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_bar_time.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -20,23 +33,17 @@ bar_month_is_not_spec = BlockSpec(
     id="condition.bar_month_is_not",
     version="1.0.0",
     name="Bar Month Is Not",
-    description="Evaluate whether bar month does not equal target month (1-12)",
+    description="Evaluate whether bar month is not target month (1-12)",
     category="bar_time",
     tags=("condition", "month", "bar"),
     execution_kind=ExecutionKind.CONDITION,
     chart_pane=ChartPane.MAIN,
     inputs=(
         InputPort("source", PortType.ANY, "Bar time source or series"),
-        InputPort("month", PortType.NUMBER, "Target month (1-12)"),
+        InputPort("month", PortType.NUMBER, "Non-target month (1-12)", default=1),
         InputPort("shift", PortType.NUMBER, "Historical bar shift offset", default=0),
     ),
-    outputs=(
-        OutputPort(
-            "condition",
-            PortType.BOOLEAN,
-            "True if month does not match",
-        ),
-    ),
+    outputs=(OutputPort("condition", PortType.BOOLEAN, "True if bar month != target"),),
     is_generation_eligible=True,
     is_deterministic=True,
     is_causal=True,
@@ -44,9 +51,10 @@ bar_month_is_not_spec = BlockSpec(
 
 
 @block(bar_month_is_not_spec)
-def bar_month_is_not(source: Any, month: int, shift: int = 0) -> bool:
-    """Evaluate whether bar month does not equal target month (1-12)."""
+def bar_month_is_not(source: Any, month: int = 1, shift: int = 0) -> bool:
+    """Evaluate whether bar month is not target month (1-12)."""
     if hasattr(source, "bar_month_is_not") and callable(source.bar_month_is_not):
         return bool(source.bar_month_is_not(month, shift))
-    m = bar_month(source, shift)
-    return _log_cond("bar_month_is_not", month, m != month if m != -1 else False)
+    bm = bar_month(source, shift)
+    res = (bm != month) if bm != -1 else False
+    return _log_cond("bar_month_is_not", month, res)
