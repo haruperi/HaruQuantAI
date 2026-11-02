@@ -28,9 +28,16 @@ from dataclasses import dataclass
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.extend.columns.base import TradeRecord
 
 logger = get_logger(__name__)
+
+
+@dataclass(frozen=True, slots=True)
+class TradeRecord:
+    """Historical trade record snapshot for legacy outlier analysis."""
+
+    ticket: int = 1
+    profit_loss: float = 0.0
 
 
 @dataclass(frozen=True, slots=True)
