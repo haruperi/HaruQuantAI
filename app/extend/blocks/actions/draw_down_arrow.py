@@ -1,4 +1,21 @@
-"""Draw down arrow chart annotation action block."""
+"""Draw down arrow chart annotation action block.
+
+Description:
+    Records a down arrow annotation on the chart at a given relative bar
+    shift according to StrategyQuant chart visualization rules.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-DRAW-DOWN-ARROW: Record down arrow chart annotation descriptor.
+Python API Usage:
+    from app.extend.blocks.actions.draw_down_arrow import (
+        DrawDownArrow,
+        draw_down_arrow,
+    )
+    rec = draw_down_arrow(shift=1)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -56,13 +73,17 @@ class DrawDownArrowAction(BaseBlock):
     def execute(self) -> ActionRecord:
         """Execute down arrow annotation action."""
         logger.debug(
-            "FR-SERVICES-ACTION-DRAW: DrawDownArrow(shift=%d)",
+            "FR-ACTIONS-DRAW-DOWN-ARROW: DrawDownArrow(shift=%d)",
             self.shift,
         )
         return ActionRecord(
             action_type="draw_down_arrow",
             params={"shift": self.shift},
         )
+
+
+# Direct donor class alias matching SQ.Blocks.OtherActions.DrawDownArrow
+DrawDownArrow = DrawDownArrowAction
 
 
 def draw_down_arrow(shift: int = 0) -> ActionRecord:
@@ -78,4 +99,4 @@ def draw_down_arrow(shift: int = 0) -> ActionRecord:
     return action.execute()
 
 
-__all__ = ["DrawDownArrowAction", "draw_down_arrow"]
+__all__ = ["DrawDownArrow", "DrawDownArrowAction", "draw_down_arrow"]

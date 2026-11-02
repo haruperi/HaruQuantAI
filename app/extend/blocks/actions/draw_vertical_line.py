@@ -1,4 +1,21 @@
-"""Draw vertical line chart annotation action block."""
+"""Draw vertical line chart annotation action block.
+
+Description:
+    Records a vertical line annotation on the chart at a given relative bar
+    shift according to StrategyQuant chart visualization rules.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-DRAW-VERTICAL-LINE: Record vertical line chart annotation.
+Python API Usage:
+    from app.extend.blocks.actions.draw_vertical_line import (
+        DrawVerticalLine,
+        draw_vertical_line,
+    )
+    rec = draw_vertical_line(shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -56,13 +73,17 @@ class DrawVerticalLineAction(BaseBlock):
     def execute(self) -> ActionRecord:
         """Execute vertical line annotation action."""
         logger.debug(
-            "FR-SERVICES-ACTION-DRAW: DrawVerticalLine(shift=%d)",
+            "FR-ACTIONS-DRAW-VERTICAL-LINE: DrawVerticalLine(shift=%d)",
             self.shift,
         )
         return ActionRecord(
             action_type="draw_vertical_line",
             params={"shift": self.shift},
         )
+
+
+# Direct donor class alias matching SQ.Blocks.OtherActions.DrawVerticalLine
+DrawVerticalLine = DrawVerticalLineAction
 
 
 def draw_vertical_line(shift: int = 0) -> ActionRecord:
@@ -78,4 +99,4 @@ def draw_vertical_line(shift: int = 0) -> ActionRecord:
     return action.execute()
 
 
-__all__ = ["DrawVerticalLineAction", "draw_vertical_line"]
+__all__ = ["DrawVerticalLine", "DrawVerticalLineAction", "draw_vertical_line"]

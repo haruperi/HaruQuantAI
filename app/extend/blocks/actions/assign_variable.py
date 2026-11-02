@@ -1,4 +1,22 @@
-"""Action block to assign values or formulas to variables."""
+"""Action block to assign values or formulas to variables.
+
+Description:
+    Provides StrategyQuant-compatible variable assignment execution,
+    supporting numeric values, callables, formula evaluators, and
+    boolean coercion according to StrategyQuant rules.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-ASSIGN-VARIABLE: Assign values to state containers with coercion.
+Python API Usage:
+    from app.extend.blocks.actions.assign_variable import (
+        AssignVariable,
+        assign_variable,
+    )
+    rec = assign_variable(var, 123.45)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -91,7 +109,7 @@ class AssignVariableAction(BaseBlock):
             self.variable.set_value(final_val)
         var_name = getattr(self.variable, "name", str(self.variable))
         logger.debug(
-            "FR-SERVICES-ACTION-ASSIGN: Assigned '%s' = %s (is_bool=%s)",
+            "FR-ACTIONS-ASSIGN-VARIABLE: Assigned '%s' = %s (is_bool=%s)",
             var_name,
             final_val,
             self.is_boolean,
@@ -104,6 +122,10 @@ class AssignVariableAction(BaseBlock):
                 "is_boolean": self.is_boolean,
             },
         )
+
+
+# Direct donor class alias matching SQ.Blocks.OtherActions.AssignVariable
+AssignVariable = AssignVariableAction
 
 
 def assign_variable(
@@ -129,4 +151,4 @@ def assign_variable(
     return action.execute()
 
 
-__all__ = ["AssignVariableAction", "assign_variable"]
+__all__ = ["AssignVariable", "AssignVariableAction", "assign_variable"]

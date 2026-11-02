@@ -1,4 +1,21 @@
-"""Draw up arrow chart annotation action block."""
+"""Draw up arrow chart annotation action block.
+
+Description:
+    Records an up arrow annotation on the chart at a given relative bar
+    shift according to StrategyQuant chart visualization rules.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-DRAW-UP-ARROW: Record up arrow chart annotation descriptor.
+Python API Usage:
+    from app.extend.blocks.actions.draw_up_arrow import (
+        DrawUpArrow,
+        draw_up_arrow,
+    )
+    rec = draw_up_arrow(shift=1)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -56,13 +73,17 @@ class DrawUpArrowAction(BaseBlock):
     def execute(self) -> ActionRecord:
         """Execute up arrow annotation action."""
         logger.debug(
-            "FR-SERVICES-ACTION-DRAW: DrawUpArrow(shift=%d)",
+            "FR-ACTIONS-DRAW-UP-ARROW: DrawUpArrow(shift=%d)",
             self.shift,
         )
         return ActionRecord(
             action_type="draw_up_arrow",
             params={"shift": self.shift},
         )
+
+
+# Direct donor class alias matching SQ.Blocks.OtherActions.DrawUpArrow
+DrawUpArrow = DrawUpArrowAction
 
 
 def draw_up_arrow(shift: int = 0) -> ActionRecord:
@@ -78,4 +99,4 @@ def draw_up_arrow(shift: int = 0) -> ActionRecord:
     return action.execute()
 
 
-__all__ = ["DrawUpArrowAction", "draw_up_arrow"]
+__all__ = ["DrawUpArrow", "DrawUpArrowAction", "draw_up_arrow"]

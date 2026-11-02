@@ -1,4 +1,18 @@
-"""Foundational action records and constants for trading action blocks."""
+"""Foundational action records and constants for trading action blocks.
+
+Description:
+    Provides core action execution data models, including immutable ActionRecord
+    descriptors and StrategyQuant-compatible constants like ORDER_NOT_DEFINED.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-BASE-RECORD: Immutable action audit execution descriptor.
+Python API Usage:
+    from app.extend.blocks.actions.base import ORDER_NOT_DEFINED, ActionRecord
+    rec = ActionRecord(action_type="custom", params={})
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 

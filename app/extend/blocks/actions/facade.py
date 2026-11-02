@@ -1,4 +1,18 @@
-"""Centralized facade for action building blocks."""
+"""Unified Actions facade for trading rule and annotation action blocks.
+
+Description:
+    Provides an object-oriented and namespace-bound API facade over discrete
+    StrategyQuant-faithful action building blocks.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-FACADE: Centralized namespace for strategy action execution.
+Python API Usage:
+    from app.extend.blocks.actions import Actions
+    Actions.send_email("Subject", "Body")
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -41,7 +55,7 @@ class Actions:
             ActionRecord instance.
         """
         logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.assign(var='%s')",
+            "FR-ACTIONS-FACADE: Actions.assign(var='%s')",
             variable.name,
         )
         return assign_variable(variable, value, is_boolean)
@@ -51,19 +65,16 @@ class Actions:
         command: str = "",
         handler: Callable[[str], Any] | None = None,
     ) -> ActionRecord:
-        """Trigger a custom action.
+        """Execute custom action command.
 
         Args:
-            command: Command string (default: "").
-            handler: Optional callable.
+            command: Command string.
+            handler: Optional command handler.
 
         Returns:
             ActionRecord instance.
         """
-        logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.custom(cmd='%s')",
-            command,
-        )
+        logger.debug("FR-ACTIONS-FACADE: Actions.custom(cmd='%s')", command)
         return custom_action(command, handler)
 
     @staticmethod
@@ -77,7 +88,7 @@ class Actions:
             ActionRecord instance.
         """
         logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.draw_down_arrow(shift=%d)",
+            "FR-ACTIONS-FACADE: Actions.draw_down_arrow(shift=%d)",
             shift,
         )
         return draw_down_arrow(shift)
@@ -92,10 +103,7 @@ class Actions:
         Returns:
             ActionRecord instance.
         """
-        logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.draw_up_arrow(shift=%d)",
-            shift,
-        )
+        logger.debug("FR-ACTIONS-FACADE: Actions.draw_up_arrow(shift=%d)", shift)
         return draw_up_arrow(shift)
 
     @staticmethod
@@ -109,7 +117,7 @@ class Actions:
             ActionRecord instance.
         """
         logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.draw_vertical_line(shift=%d)",
+            "FR-ACTIONS-FACADE: Actions.draw_vertical_line(shift=%d)",
             shift,
         )
         return draw_vertical_line(shift)
@@ -120,7 +128,7 @@ class Actions:
         message: str = "",
         base_dir: Path | str | None = None,
     ) -> ActionRecord:
-        """Record file log entry.
+        """Log message to designated file.
 
         Args:
             filename: Destination file name.
@@ -130,25 +138,20 @@ class Actions:
         Returns:
             ActionRecord instance.
         """
-        logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.log_file(file='%s')",
-            filename,
-        )
+        logger.debug("FR-ACTIONS-FACADE: Actions.log_file(file='%s')", filename)
         return log_to_file(filename, message, base_dir)
 
     @staticmethod
     def log_journal(message: str = "some message") -> ActionRecord:
-        """Record journal log entry.
+        """Log message to system journal.
 
         Args:
-            message: Message text.
+            message: Log message text.
 
         Returns:
             ActionRecord instance.
         """
-        logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.log_journal()",
-        )
+        logger.debug("FR-ACTIONS-FACADE: Actions.log_journal(msg='%s')", message)
         return log_to_journal(message)
 
     @staticmethod
@@ -157,20 +160,17 @@ class Actions:
         message: str = "some message",
         dispatcher: Callable[[str, str], bool] | None = None,
     ) -> ActionRecord:
-        """Dispatch email notification.
+        """Send email alert notification.
 
         Args:
-            subject: Email subject.
-            message: Message text.
-            dispatcher: Optional delivery callback.
+            subject: Notification subject.
+            message: Message content.
+            dispatcher: Optional email dispatcher.
 
         Returns:
             ActionRecord instance.
         """
-        logger.debug(
-            "FR-SERVICES-ACTIONS-FACADE: Actions.send_email(subj='%s')",
-            subject,
-        )
+        logger.debug("FR-ACTIONS-FACADE: Actions.send_email(subj='%s')", subject)
         return send_email(subject, message, dispatcher)
 
 

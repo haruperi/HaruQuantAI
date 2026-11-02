@@ -1,4 +1,21 @@
-"""Log to journal action block."""
+"""Log to journal action block.
+
+Description:
+    Writes diagnostic and audit log messages to the platform journal or
+    terminal log stream.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-LOG-TO-JOURNAL: Write log message to platform journal stream.
+Python API Usage:
+    from app.extend.blocks.actions.log_to_journal import (
+        LogToJournal,
+        log_to_journal,
+    )
+    rec = log_to_journal("System initialized")
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -55,11 +72,15 @@ class LogToJournalAction(BaseBlock):
 
     def execute(self) -> ActionRecord:
         """Execute journal logging."""
-        logger.info("FR-SERVICES-ACTION-LOG: JOURNAL: %s", self.message)
+        logger.info("FR-ACTIONS-LOG-TO-JOURNAL: JOURNAL: %s", self.message)
         return ActionRecord(
             action_type="log_to_journal",
             params={"message": self.message},
         )
+
+
+# Direct donor class alias matching SQ.Blocks.OtherActions.LogToJournal
+LogToJournal = LogToJournalAction
 
 
 def log_to_journal(message: str = "some message") -> ActionRecord:
@@ -75,4 +96,4 @@ def log_to_journal(message: str = "some message") -> ActionRecord:
     return action.execute()
 
 
-__all__ = ["LogToJournalAction", "log_to_journal"]
+__all__ = ["LogToJournal", "LogToJournalAction", "log_to_journal"]

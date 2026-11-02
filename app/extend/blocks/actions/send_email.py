@@ -1,4 +1,21 @@
-"""Send email notification action block."""
+"""Send email notification action block.
+
+Description:
+    Dispatches or records email notification alerts with subject line and body
+    content using an optional dispatcher callback.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-SEND-EMAIL: Dispatch email alert notification.
+Python API Usage:
+    from app.extend.blocks.actions.send_email import (
+        SendEmail,
+        send_email,
+    )
+    rec = send_email("Alert", "Margin threshold reached")
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -79,7 +96,7 @@ class SendEmailAction(BaseBlock):
     def execute(self) -> ActionRecord:
         """Execute email notification."""
         logger.info(
-            "FR-SERVICES-ACTION-EMAIL: EMAIL: [%s] %s",
+            "FR-ACTIONS-SEND-EMAIL: EMAIL: [%s] %s",
             self.email_subject,
             self.message,
         )
@@ -94,6 +111,10 @@ class SendEmailAction(BaseBlock):
                 "delivered": delivered,
             },
         )
+
+
+# Direct donor class alias matching SQ.Blocks.OtherActions.SendEmail
+SendEmail = SendEmailAction
 
 
 def send_email(
@@ -119,4 +140,4 @@ def send_email(
     return action.execute()
 
 
-__all__ = ["SendEmailAction", "send_email"]
+__all__ = ["SendEmail", "SendEmailAction", "send_email"]

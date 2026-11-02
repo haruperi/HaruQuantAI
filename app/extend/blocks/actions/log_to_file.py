@@ -1,4 +1,21 @@
-"""Log to file side-effect strategy action block."""
+"""Log to file side-effect strategy action block.
+
+Description:
+    Appends message text to a designated file during strategy execution,
+    supporting optional sandboxed directory containment.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-LOG-TO-FILE: Append diagnostic message text to file destination.
+Python API Usage:
+    from app.extend.blocks.actions.log_to_file import (
+        LogToFile,
+        log_to_file,
+    )
+    rec = log_to_file("strategy.log", "Event occurred")
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -86,7 +103,7 @@ class LogToFileAction(BaseBlock):
             written_path = str(target)
 
         logger.debug(
-            "FR-SERVICES-ACTION-LOG: LogToFile(file='%s', msg='%s')",
+            "FR-ACTIONS-LOG-TO-FILE: LogToFile(file='%s', msg='%s')",
             self.filename,
             self.message,
         )
@@ -98,6 +115,10 @@ class LogToFileAction(BaseBlock):
                 "path": written_path,
             },
         )
+
+
+# Direct donor class alias matching SQ.Blocks.OtherActions.LogToFile
+LogToFile = LogToFileAction
 
 
 def log_to_file(
@@ -114,4 +135,4 @@ def log_to_file(
     return action.execute()
 
 
-__all__ = ["LogToFileAction", "log_to_file"]
+__all__ = ["LogToFile", "LogToFileAction", "log_to_file"]

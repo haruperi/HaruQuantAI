@@ -1,4 +1,21 @@
-"""Custom executable action block."""
+"""Custom executable action block.
+
+Description:
+    Carries an arbitrary custom command string and executes an optional
+    callable handler to dispatch custom scripting or external commands.
+Purpose:
+    FEAT-ACTION-BLOCKS: StrategyQuant donor-faithful action blocks.
+Key Capabilities:
+    - FR-ACTIONS-CUSTOM: Execute custom command strings with optional handler.
+Python API Usage:
+    from app.extend.blocks.actions.custom_action import (
+        CustomAction,
+        custom_action,
+    )
+    rec = custom_action("Alert('Hello')", handler)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_actions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -68,7 +85,7 @@ class CustomAction(BaseBlock):
     def execute(self) -> ActionRecord:
         """Execute custom action and invoke handler if provided."""
         logger.debug(
-            "FR-SERVICES-ACTION-CUSTOM: Executing custom action command '%s'",
+            "FR-ACTIONS-CUSTOM: Executing custom action command '%s'",
             self.command,
         )
         result = None
