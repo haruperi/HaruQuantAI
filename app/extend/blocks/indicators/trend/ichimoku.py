@@ -1,6 +1,18 @@
-"""Ichimoku indicator and related signal helpers.
+"""Ichimoku trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ICHIMOKU: validated batch calculation.
+Description:
+    Calculates Ichimoku Kinko Hyo components (Tenkan-sen, Kijun-sen,
+    Senkou Spans, Chikou).
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Ichimoku cloud and equilibrium lines.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.ichimoku import Ichimoku
+    res = Ichimoku().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

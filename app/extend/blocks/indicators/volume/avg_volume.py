@@ -1,6 +1,17 @@
-"""AvgVolume indicator and related signal helpers.
+"""AvgVolume volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-AVGVOLUME: validated batch calculation.
+Description:
+    Calculates rolling average volume over configurable lookback period.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Average volume calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.avg_volume import AvgVolume
+    res = AvgVolume().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

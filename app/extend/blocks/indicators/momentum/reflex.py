@@ -1,6 +1,17 @@
-"""Reflex indicator and related signal helpers.
+"""Reflex momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-REFLEX: validated batch calculation.
+Description:
+    Calculates Ehlers Reflex indicator measuring cycle turns in price trend.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Reflex cycle indicator calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.reflex import Reflex
+    res = Reflex().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

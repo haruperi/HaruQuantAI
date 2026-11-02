@@ -1,6 +1,17 @@
-"""Trend indicator and related signal helpers.
+"""Trend trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-TREND: validated batch calculation.
+Description:
+    Evaluates consolidated price action uptrend and downtrend condition states.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Uptrend and downtrend binary state detection.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.trend import Trend
+    res = Trend().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

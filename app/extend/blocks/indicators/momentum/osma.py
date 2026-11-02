@@ -1,6 +1,17 @@
-"""OSMA indicator and related signal helpers.
+"""OSMA momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-OSMA: validated batch calculation.
+Description:
+    Calculates Oscillator Moving Average (OSMA) histogram of MACD.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: OSMA oscillator computation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.osma import OSMA
+    res = OSMA().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

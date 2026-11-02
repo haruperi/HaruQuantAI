@@ -1,6 +1,17 @@
-"""MFI indicator and related signal helpers.
+"""MFI volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-MFI: validated batch calculation.
+Description:
+    Calculates Money Flow Index (MFI) volume-weighted momentum oscillator.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Money flow index calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.mfi import MFI
+    res = MFI().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

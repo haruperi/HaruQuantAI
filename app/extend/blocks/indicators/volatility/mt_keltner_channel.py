@@ -1,6 +1,19 @@
-"""MTKeltnerChannel indicator and related signal helpers.
+"""MTKeltnerChannel volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-MTKELTNERCHANNEL: validated batch calculation.
+Description:
+    Calculates Multi-Timeframe Keltner Channel envelope projection.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Multi-timeframe Keltner Channel calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.mt_keltner_channel import (
+        MTKeltnerChannel,
+    )
+    res = MTKeltnerChannel().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

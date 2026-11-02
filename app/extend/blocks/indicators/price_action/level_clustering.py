@@ -1,6 +1,19 @@
-"""LevelClustering indicator and related signal helpers.
+"""LevelClustering price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-LEVELCLUSTERING: validated batch calculation.
+Description:
+    Identifies high-density price cluster zones and horizontal levels.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Price level clustering and support/resistance.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.level_clustering import (
+        LevelClustering,
+    )
+    res = LevelClustering().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

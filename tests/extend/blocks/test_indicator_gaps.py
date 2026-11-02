@@ -1,4 +1,18 @@
-"""Unit tests for all 13 indicator block families and condition helpers."""
+"""Unit tests for all indicator block families, condition helpers, and logging.
+
+Description:
+    Validates calculations, condition compositions, parameter spaces,
+    and non-silent requirement logging across StrategyQuant-faithful indicator blocks.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Test suite for indicator building blocks.
+Key Capabilities:
+    - FR-indicator-gaps-tests: Comprehensive verification across 13 indicator families.
+    - FR-indicator-logging-tests: Verify non-silent requirement diagnostics under caplog.
+Python API Usage:
+    pytest tests/extend/blocks/test_indicator_gaps.py --no-cov
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_gaps.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -1034,3 +1048,45 @@ def test_williams_pr_and_series_data_only() -> None:
     assert is_lower(s, s, shift1=1, shift2=1 + 1) is True
     assert changes_up(s, shift=0) is True
     assert changes_down(IndicatorSeries([-75.0, -40.0, -55.0]), shift=0) is True
+
+
+def test_indicator_non_silent_requirement_logging(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    """Verify indicator batch calculations emit non-silent requirement logs."""
+    import logging
+
+    from app.extend.blocks.indicators.momentum.rsi import RSI
+    from app.extend.blocks.indicators.trend.sma import SMA
+    from app.extend.blocks.indicators.volatility.bollinger_bands import BollingerBands
+
+    caplog.set_level(logging.DEBUG)
+
+    test_bars = BarData.from_arrays(
+        open=np.full(30, 100.0),
+        high=np.full(30, 105.0),
+        low=np.full(30, 95.0),
+        close=np.full(30, 102.0),
+        volume=np.full(30, 1000.0),
+    )
+
+    # Trend calculation log
+    SMA(period=5).calculate(test_bars)
+    assert any(
+        "FR-SERVICES-INDICATOR-TREND" in record.message for record in caplog.records
+    )
+
+    # Momentum calculation log
+    caplog.clear()
+    RSI(period=5).calculate(test_bars)
+    assert any(
+        "FR-SERVICES-INDICATOR-MOMENTUM" in record.message for record in caplog.records
+    )
+
+    # Volatility calculation log
+    caplog.clear()
+    BollingerBands(period=5).calculate(test_bars)
+    assert any(
+        "FR-SERVICES-INDICATOR-VOLATILITY" in record.message
+        for record in caplog.records
+    )

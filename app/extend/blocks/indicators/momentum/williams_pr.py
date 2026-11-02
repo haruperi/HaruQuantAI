@@ -1,6 +1,17 @@
-"""WilliamsPR indicator and related signal helpers.
+"""WilliamsPR momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-WILLIAMSPR: validated batch calculation.
+Description:
+    Calculates Williams %R dynamic overbought/oversold momentum indicator.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Williams %R calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.williams_pr import WilliamsPR
+    res = WilliamsPR().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

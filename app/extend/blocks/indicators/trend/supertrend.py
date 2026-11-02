@@ -1,6 +1,18 @@
-"""SuperTrend indicator and related signal helpers.
+"""SuperTrend trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-SUPERTREND: validated batch calculation.
+Description:
+    Calculates SuperTrend ATR-based trend direction and trailing support
+    and resistance bands.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: SuperTrend trailing volatility stop.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.supertrend import SuperTrend
+    res = SuperTrend().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

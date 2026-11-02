@@ -1,6 +1,17 @@
-"""TrueRange indicator and related signal helpers.
+"""TrueRange volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-TRUERANGE: validated batch calculation.
+Description:
+    Calculates single-bar True Range considering prior bar close gap.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: True range volatility calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.true_range import TrueRange
+    res = TrueRange().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

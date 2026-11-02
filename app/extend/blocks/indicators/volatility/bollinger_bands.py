@@ -1,4 +1,18 @@
-"""Bollinger Bands (BB) strategy indicator block."""
+"""BollingerBands volatility indicator strategy block.
+
+Description:
+    Calculates Bollinger Bands upper band, lower band, and middle moving average.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Bollinger Bands envelope calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.bollinger_bands import BollingerBands
+    res = BollingerBands().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -7,6 +21,7 @@ from typing import Any, ClassVar, override
 import numpy as np
 from pydantic import Field
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -68,6 +83,9 @@ def _bollinger_bands_kernel(
         "bandwidth": bandwidth_arr,
         "range": range_arr,
     }
+
+
+logger = get_logger(__name__)
 
 
 class BollingerBands(BaseIndicator):
@@ -133,6 +151,13 @@ class BollingerBands(BaseIndicator):
             Dictionary with upper, middle, lower, bandwidth, and range series.
         """
         bands = _bollinger_bands_kernel(bars.close, self.period, self.deviation)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated BollingerBands("
+            "period=%d, deviation=%.2f) for %d bars",
+            self.period,
+            self.deviation,
+            len(bars),
+        )
         return {
             "upper": IndicatorSeries(bands["upper"], name="BB.Upper"),
             "middle": IndicatorSeries(bands["middle"], name="BB.Middle"),

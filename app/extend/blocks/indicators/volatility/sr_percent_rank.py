@@ -1,6 +1,17 @@
-"""SRPercentRank indicator and related signal helpers.
+"""SRPercentRank volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-SRPERCENTRANK: validated batch calculation.
+Description:
+    Calculates Support/Resistance percentile ranking relative to historical envelope.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Support and resistance percentile rank.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.sr_percent_rank import SRPercentRank
+    res = SRPercentRank().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

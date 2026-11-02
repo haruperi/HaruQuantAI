@@ -1,4 +1,18 @@
-"""Canonical indicators, loaded individually on demand."""
+"""__init__ volatility indicator strategy block.
+
+Description:
+    Volatility indicator package exports and lazy loading registry.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Volatility indicator exports.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.__init__ import __init__
+    res = __init__().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 

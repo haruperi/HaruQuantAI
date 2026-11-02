@@ -1,6 +1,17 @@
-"""PriceVelocity indicator and related signal helpers.
+"""PriceVelocity momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-PRICEVELOCITY: validated batch calculation.
+Description:
+    Calculates price change velocity per bar over lookback window.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Price velocity calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.price_velocity import PriceVelocity
+    res = PriceVelocity().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

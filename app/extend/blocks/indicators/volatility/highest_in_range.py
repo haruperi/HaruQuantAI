@@ -1,4 +1,18 @@
-"""HighestInRange numeric indicator block from the donor range family."""
+"""HighestInRange volatility indicator strategy block.
+
+Description:
+    Calculates highest price observed within a bounded rolling window.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Highest price in range calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.highest_in_range import HighestInRange
+    res = HighestInRange().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,6 +20,7 @@ from typing import ClassVar, Literal, override
 
 from pydantic import Field, field_validator
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -16,6 +31,8 @@ from app.extend.blocks.metadata import (
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.extrema import time_window_extreme, validate_hhmm
+
+logger = get_logger(__name__)
 
 
 class HighestInRange(BaseIndicator):
@@ -74,5 +91,9 @@ class HighestInRange(BaseIndicator):
             highest=True,
             timestamp_unit=self.timestamp_unit,
             timezone=self.timezone,
+        )
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated HighestInRange for %d bars",
+            len(bars),
         )
         return {"value": IndicatorSeries(values, name="HighestInRange")}

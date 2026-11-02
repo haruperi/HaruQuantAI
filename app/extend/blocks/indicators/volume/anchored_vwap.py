@@ -1,6 +1,17 @@
-"""AnchoredVWAP indicator and related signal helpers.
+"""AnchoredVWAP volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ANCHOREDVWAP: validated batch calculation.
+Description:
+    Calculates Anchored Volume Weighted Average Price (AVWAP) from specific event.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Anchored VWAP volume weighted price.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.anchored_vwap import AnchoredVWAP
+    res = AnchoredVWAP().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

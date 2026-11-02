@@ -1,6 +1,17 @@
-"""Fibo indicator and related signal helpers.
+"""Fibo price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-FIBO: validated batch calculation.
+Description:
+    Calculates Fibonacci retracement and expansion support/resistance levels.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Fibonacci retracement level calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.fibo import Fibo
+    res = Fibo().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

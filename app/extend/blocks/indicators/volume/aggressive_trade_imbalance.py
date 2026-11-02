@@ -1,6 +1,19 @@
-"""AggressiveTradeImbalance indicator and related signal helpers.
+"""AggressiveTradeImbalance volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-AGGRESSIVETRADEIMBALANCE: validated batch calculation.
+Description:
+    Calculates order flow aggressive buy/sell trade volume imbalance.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Aggressive trade imbalance calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.aggressive_trade_imbalance import (
+        AggressiveTradeImbalance,
+    )
+    res = AggressiveTradeImbalance().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

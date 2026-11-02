@@ -1,6 +1,18 @@
-"""DirectionalIndex indicator and related signal helpers.
+"""DirectionalIndex trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-DIRECTIONALINDEX: validated batch calculation.
+Description:
+    Calculates Directional Movement Index (+DI, -DI) line differences
+    and crossovers.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Directional Index trend component calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.directional_index import DirectionalIndex
+    res = DirectionalIndex().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

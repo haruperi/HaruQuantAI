@@ -1,4 +1,18 @@
-"""BiggestRange numeric indicator block from the donor range family."""
+"""BiggestRange volatility indicator strategy block.
+
+Description:
+    Identifies largest bar range in rolling lookback window.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Rolling maximum bar range calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.biggest_range import BiggestRange
+    res = BiggestRange().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -7,6 +21,7 @@ from typing import ClassVar, override
 import numpy as np
 from pydantic import Field
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -17,6 +32,8 @@ from app.extend.blocks.metadata import (
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.extrema import rolling_extreme
+
+logger = get_logger(__name__)
 
 
 class BiggestRange(BaseIndicator):
@@ -55,4 +72,8 @@ class BiggestRange(BaseIndicator):
         rounded = np.floor(ranges * 100_000_000.0 + 0.5) / 100_000_000.0
         values = rolling_extreme(rounded, self.period, highest=True)
         values = np.maximum(values, 0.0)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated BiggestRange for %d bars",
+            len(bars),
+        )
         return {"value": IndicatorSeries(values, name="BiggestRange")}

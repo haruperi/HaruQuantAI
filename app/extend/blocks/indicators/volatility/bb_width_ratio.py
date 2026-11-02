@@ -1,4 +1,18 @@
-"""BBWidthRatio numeric Bollinger variant with donor startup semantics."""
+"""BBWidthRatio volatility indicator strategy block.
+
+Description:
+    Calculates Bollinger BandWidth ratio normalizing bandwidth by middle SMA.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Bollinger BandWidth ratio calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.bb_width_ratio import BBWidthRatio
+    res = BBWidthRatio().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -7,6 +21,7 @@ from typing import ClassVar, Literal, override
 import numpy as np
 from pydantic import Field
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -23,6 +38,8 @@ from app.extend.blocks.series import (
 )
 from app.extend.calculators.average import AverageCalculator, AverageType
 from app.extend.calculators.std_dev import centered_deviation
+
+logger = get_logger(__name__)
 
 
 class BBWidthRatio(BaseIndicator):
@@ -82,5 +99,9 @@ class BBWidthRatio(BaseIndicator):
         result = np.zeros(len(values))
         np.divide(
             2 * self.deviation * deviation, centers, out=result, where=centers > 0
+        )
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated BBWidthRatio for %d bars",
+            len(bars),
         )
         return {"value": IndicatorSeries(result, name="BBWidthRatio")}

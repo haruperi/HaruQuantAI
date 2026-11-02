@@ -1,6 +1,19 @@
-"""ChoppinessIndex indicator and related signal helpers.
+"""ChoppinessIndex regime indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-CHOPPINESSINDEX: validated batch calculation.
+Description:
+    Calculates Choppiness Index differentiating trending from ranging regimes.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-regime: Choppiness index market regime classification.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.regime.choppiness import (
+        ChoppinessIndex,
+    )
+    res = ChoppinessIndex().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

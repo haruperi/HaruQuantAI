@@ -1,6 +1,17 @@
-"""Stochastic indicator and related signal helpers.
+"""Stochastic momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-STOCHASTIC: validated batch calculation.
+Description:
+    Calculates Stochastic Oscillator %K and %D lines relative to high/low range.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Stochastic oscillator calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.stochastic import Stochastic
+    res = Stochastic().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

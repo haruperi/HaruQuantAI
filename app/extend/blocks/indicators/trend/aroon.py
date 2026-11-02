@@ -1,6 +1,17 @@
-"""Aroon indicator and related signal helpers.
+"""Aroon trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-AROON: validated batch calculation.
+Description:
+    Calculates Aroon Up, Aroon Down, and Aroon Oscillator trend indicators.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Aroon cycle and trend direction.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.aroon import Aroon
+    res = Aroon().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

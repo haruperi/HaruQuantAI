@@ -1,6 +1,17 @@
-"""PriceGap indicator and related signal helpers.
+"""PriceGap price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-PRICEGAP: validated batch calculation.
+Description:
+    Detects opening, runaway, and exhaustion price gaps in time series.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Price gap detection.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.price_gap import PriceGap
+    res = PriceGap().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

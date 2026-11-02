@@ -1,6 +1,17 @@
-"""StdDev indicator and related signal helpers.
+"""StdDev volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-STDDEV: validated batch calculation.
+Description:
+    Calculates rolling price standard deviation volatility metric.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Standard deviation volatility calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.std_dev import StdDev
+    res = StdDev().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

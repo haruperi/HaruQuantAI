@@ -1,4 +1,17 @@
-"""Executable donor compositions, shared algorithms and catalog publication guarantees."""
+"""Executable donor compositions, shared algorithms and catalog publication guarantees.
+
+Description:
+    Validates StrategyQuant composition recipes, AST verification of clean
+    indicator codebases, dynamic condition binding, and catalog snapshots.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Composition recipe verification for donor condition blocks.
+Key Capabilities:
+    - FR-indicator-compositions-tests: Composition binding and catalog tests.
+Python API Usage:
+    pytest tests/extend/blocks/test_indicator_compositions.py --no-cov
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_compositions.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -15,20 +28,24 @@ from app.extend.blocks.composition import (
     composition_manifest,
 )
 from app.extend.blocks.indicators.momentum.rsi import RSI
-from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
+from app.extend.blocks.registry import (
+    BlockRegistry,
+    BlockRegistryError,
+    CatalogSnapshot,
+)
 from app.extend.blocks.series import BarData, IndicatorSeries
 from pydantic import ValidationError
 
 
 @pytest.fixture(scope="module")
-def catalog():
+def catalog() -> CatalogSnapshot:
     registry = BlockRegistry()
     registry.discover("app/extend/blocks")
     assert not registry.diagnostics
     return registry.snapshot()
 
 
-def configuration(descriptor) -> dict[str, Any]:
+def configuration(descriptor: Any) -> dict[str, Any]:
     schema = descriptor.parameter_schema
     return {
         name: schema["properties"][name].get("minimum", 0.0)
@@ -56,7 +73,9 @@ def bars(count: int = 320) -> BarData:
     )
 
 
-def test_every_donor_indicator_and_pattern_has_an_explicit_mapping(catalog) -> None:
+def test_every_donor_indicator_and_pattern_has_an_explicit_mapping(
+    catalog: CatalogSnapshot,
+) -> None:
     mappings = composition_manifest()["mappings"]
     assert len(mappings) == 508
     assert len({row["donor"] for row in mappings}) == 508
@@ -66,9 +85,12 @@ def test_every_donor_indicator_and_pattern_has_an_explicit_mapping(catalog) -> N
     )
     for row in mappings:
         if row["status"] in ("composition", "specialized_signal"):
-            descriptor = catalog.require(row["id"])
-            assert descriptor.source_file.endswith(
-                row["owner_id"].split(".")[-1] + ".py"
+            descriptor: Any = catalog.require(row["id"])
+            assert (
+                descriptor.source_file is not None
+                and descriptor.source_file.endswith(
+                    row["owner_id"].split(".")[-1] + ".py"
+                )
             ) or row["owner_id"] in (
                 "indicator.trend.sma",
                 "indicator.trend.parabolic_sar",
@@ -86,26 +108,30 @@ def test_every_donor_indicator_and_pattern_has_an_explicit_mapping(catalog) -> N
             assert row["status"] == "excluded_diagnostic"
 
 
-def test_all_generic_recipes_execute_with_explicit_inputs(catalog) -> None:
+def test_all_generic_recipes_execute_with_explicit_inputs(
+    catalog: CatalogSnapshot,
+) -> None:
     source = bars()
     for row in composition_manifest()["mappings"]:
         if row["status"] != "composition":
             continue
-        descriptor = catalog.require(row["id"])
+        descriptor: Any = catalog.require(row["id"])
         configured = descriptor.instantiate(**configuration(descriptor))
         assert isinstance(configured(source), bool), row["donor"]
 
 
-def test_rsi_turn_and_macd_crossover_are_shared_compositions(catalog) -> None:
+def test_rsi_turn_and_macd_crossover_are_shared_compositions(
+    catalog: CatalogSnapshot,
+) -> None:
     source = bars(3)
-    rsi = catalog.require("signal.rsi.rsi_changes_up").target
+    rsi: Any = catalog.require("signal.rsi.rsi_changes_up").target
     assert rsi.evaluate_outputs(
         {"i0": {"value": IndicatorSeries([3.0, 1.0, 2.0])}}, source
     )
     assert not rsi.evaluate_outputs(
         {"i0": {"value": IndicatorSeries([1.0, 1.0, 2.0])}}, source
     )
-    macd = catalog.require("signal.macd.macd_main_cross_above_signal").target
+    macd: Any = catalog.require("signal.macd.macd_main_cross_above_signal").target
     outputs = {
         "i0": {
             "main": IndicatorSeries([0.0, 1.0, 3.0]),
@@ -117,8 +143,10 @@ def test_rsi_turn_and_macd_crossover_are_shared_compositions(catalog) -> None:
     assert not macd.evaluate_outputs(outputs, source)  # A touch is not a strict cross.
 
 
-def test_aroon_inclusive_boundary_is_not_replaced_with_strict_cross(catalog) -> None:
-    recipe = catalog.require("signal.aroon.aroon_rise_from_bottom").target
+def test_aroon_inclusive_boundary_is_not_replaced_with_strict_cross(
+    catalog: CatalogSnapshot,
+) -> None:
+    recipe: Any = catalog.require("signal.aroon.aroon_rise_from_bottom").target
     source = bars(2)
     outputs = {
         "i0": {"up": IndicatorSeries([8.0, 9.0]), "down": IndicatorSeries([40.0, 40.0])}
@@ -128,8 +156,10 @@ def test_aroon_inclusive_boundary_is_not_replaced_with_strict_cross(catalog) -> 
     assert not recipe.evaluate_outputs(outputs, source)
 
 
-def test_bar_open_comparison_uses_previous_band_and_raw_price(catalog) -> None:
-    recipe = catalog.require("signal.bollinger_bands.bb_bar_opens_above_up").target
+def test_bar_open_comparison_uses_previous_band_and_raw_price(
+    catalog: CatalogSnapshot,
+) -> None:
+    recipe: Any = catalog.require("signal.bollinger_bands.bb_bar_opens_above_up").target
     source = BarData.from_arrays(open=[0.0, 20.0000001])
     outputs = {"i0": {"upper": IndicatorSeries([20.0, 1000.0])}}
     assert recipe.evaluate_outputs(outputs, source)
@@ -138,8 +168,10 @@ def test_bar_open_comparison_uses_previous_band_and_raw_price(catalog) -> None:
     assert not recipe.evaluate_outputs(outputs, source)
 
 
-def test_explicit_four_digit_read_and_missing_history(catalog) -> None:
-    recipe = catalog.require("signal.cci.cci_rising").target
+def test_explicit_four_digit_read_and_missing_history(
+    catalog: CatalogSnapshot,
+) -> None:
+    recipe: Any = catalog.require("signal.cci.cci_rising").target
     source = bars(2)
     outputs = {"i0": {"value": IndicatorSeries([1.00001, 1.00002])}}
     assert not recipe.evaluate_outputs(outputs, source)
@@ -148,14 +180,15 @@ def test_explicit_four_digit_read_and_missing_history(catalog) -> None:
         recipe.evaluate_outputs({"i0": {"value": IndicatorSeries([1.0])}}, source)
 
 
-def test_parameter_and_selector_validation(catalog) -> None:
+def test_parameter_and_selector_validation(catalog: CatalogSnapshot) -> None:
     descriptor = catalog.require("signal.rsi.rsi_rising")
     for kwargs in ({"shift": -1}, {"shift": True}, {"period": "14"}, {"unknown": 1}):
         with pytest.raises(BlockRegistryError):
             descriptor.instantiate(**kwargs)
     for kwargs in ({"shift": -1}, {"period": "14"}):
         with pytest.raises(ValidationError):
-            descriptor.target(bars(), **kwargs)
+            typing_target: Any = descriptor.target
+            typing_target(bars(), **kwargs)
     with pytest.raises(BlockRegistryError):
         catalog.require("signal.moving_average.ma_rising").instantiate(period=1)
     with pytest.raises(BlockRegistryError):
@@ -178,16 +211,19 @@ def test_parameter_and_selector_validation(catalog) -> None:
     adx.instantiate(level=20.0)
 
 
-def test_missing_external_profile_feed_never_uses_rolling_profile(catalog) -> None:
+def test_missing_external_profile_feed_never_uses_rolling_profile(
+    catalog: CatalogSnapshot,
+) -> None:
     descriptor = catalog.require("signal.volume_profile.vp_price_above_poc")
     source = BarData.from_arrays(close=[1.0, 2.0])
     with pytest.raises(ValueError, match="vp_poc"):
-        descriptor.target(source)
+        typing_target: Any = descriptor.target
+        typing_target(source)
     assert not descriptor.spec.is_generation_eligible
 
 
-def test_computed_from_is_explicit_and_causal(catalog) -> None:
-    recipe = catalog.require("signal.rsi.rsi_rising").target
+def test_computed_from_is_explicit_and_causal(catalog: CatalogSnapshot) -> None:
+    recipe: Any = catalog.require("signal.rsi.rsi_rising").target
     with pytest.raises(ValueError, match="high"):
         recipe(BarData.from_arrays(close=[1.0, 2.0]), computed_from=2)
     source = bars(70)
@@ -201,7 +237,9 @@ def test_computed_from_is_explicit_and_causal(catalog) -> None:
         assert recipe(prefix) == recipe(source, shift=70 - count)
 
 
-def test_snapshots_freeze_recipe_and_pin_indicator_implementations(tmp_path) -> None:
+def test_snapshots_freeze_recipe_and_pin_indicator_implementations(
+    tmp_path: Path,
+) -> None:
     path = tmp_path / "rsi.py"
     template = """from typing import ClassVar
 from pydantic import Field
@@ -224,7 +262,7 @@ class TestRSI(BaseIndicator):
     registry.register_file(path, tmp_path)
     assert registry.snapshot().require(signal_id).instantiate()(bars(3))
     assert not old.require(signal_id).instantiate()(bars(3))
-    target = old.require(signal_id).target
+    target: Any = old.require(signal_id).target
     with pytest.raises(TypeError):
         target.definition.recipe["nodes"]["i0"]["indicator"] = "changed"
     valid = registry.snapshot()
@@ -282,13 +320,15 @@ def test_old_indicator_comparison_wrappers_are_removed() -> None:
                 ), str(path)
 
 
-def test_specialized_signal_bindings_distinguish_maps_from_series(catalog) -> None:
+def test_specialized_signal_bindings_distinguish_maps_from_series(
+    catalog: CatalogSnapshot,
+) -> None:
     from app.extend.blocks.metadata import PortType
 
     for row in composition_manifest()["mappings"]:
         if row["status"] != "specialized_signal":
             continue
-        descriptor = catalog.require(row["id"])
+        descriptor: Any = catalog.require(row["id"])
         inputs = {port.name: port for port in descriptor.spec.inputs}
         assert set(inputs) == set(descriptor.input_bindings)
         for name, binding in descriptor.input_bindings.items():
@@ -298,8 +338,10 @@ def test_specialized_signal_bindings_distinguish_maps_from_series(catalog) -> No
             descriptor.input_bindings["new"] = {}
 
 
-def test_required_history_tracks_configuration_and_offsets(catalog) -> None:
-    recipe = catalog.require("signal.rsi.rsi_rising").target
+def test_required_history_tracks_configuration_and_offsets(
+    catalog: CatalogSnapshot,
+) -> None:
+    recipe: Any = catalog.require("signal.rsi.rsi_rising").target
     assert recipe.required_history(period=20, shift=3) == 25
     assert "close" in recipe.required_inputs()
     assert "high" in recipe.required_inputs(computed_from=2)

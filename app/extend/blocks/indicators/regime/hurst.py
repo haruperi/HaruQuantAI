@@ -1,6 +1,17 @@
-"""HurstExponent indicator and related signal helpers.
+"""HurstExponent regime indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-HURSTEXPONENT: validated batch calculation.
+Description:
+    Calculates Hurst Exponent evaluating persistence and mean-reversion tendencies.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-regime: Hurst exponent time-series persistence analysis.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.regime.hurst import HurstExponent
+    res = HurstExponent().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

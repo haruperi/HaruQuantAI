@@ -1,4 +1,18 @@
-"""BBRange numeric Bollinger variant with donor startup semantics."""
+"""BBRange volatility indicator strategy block.
+
+Description:
+    Calculates Bollinger Bands price range between upper and lower bands.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Bollinger Bands spread range calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.bb_range import BBRange
+    res = BBRange().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -7,6 +21,7 @@ from typing import ClassVar, Literal, override
 import numpy as np
 from pydantic import Field
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -22,6 +37,8 @@ from app.extend.blocks.series import (
     computed_price,
 )
 from app.extend.calculators.std_dev import std_dev_kernel
+
+logger = get_logger(__name__)
 
 
 class BBRange(BaseIndicator):
@@ -73,4 +90,8 @@ class BBRange(BaseIndicator):
         if not np.isfinite(values).all():
             raise ValueError("Bollinger input must be finite")
         result = 2 * self.deviation * std_dev_kernel(values, self.period)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated BBRange for %d bars",
+            len(bars),
+        )
         return {"value": IndicatorSeries(result, name="BBRange")}

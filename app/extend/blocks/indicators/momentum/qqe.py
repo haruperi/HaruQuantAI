@@ -1,6 +1,18 @@
-"""QQE indicator and related signal helpers.
+"""QQE momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-QQE: validated batch calculation.
+Description:
+    Calculates Quantitative Qualitative Estimation (QQE) smoothed RSI
+    and fast/slow volatility trail lines.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: QQE indicator calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.qqe import QQE
+    res = QQE().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

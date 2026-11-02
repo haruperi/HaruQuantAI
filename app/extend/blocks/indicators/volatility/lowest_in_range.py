@@ -1,4 +1,18 @@
-"""LowestInRange numeric indicator block from the donor range family."""
+"""LowestInRange volatility indicator strategy block.
+
+Description:
+    Calculates lowest price observed within a bounded rolling window.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Lowest price in range calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.lowest_in_range import LowestInRange
+    res = LowestInRange().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,6 +20,7 @@ from typing import ClassVar, Literal, override
 
 from pydantic import Field, field_validator
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -16,6 +31,8 @@ from app.extend.blocks.metadata import (
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.extrema import time_window_extreme, validate_hhmm
+
+logger = get_logger(__name__)
 
 
 class LowestInRange(BaseIndicator):
@@ -74,5 +91,9 @@ class LowestInRange(BaseIndicator):
             highest=False,
             timestamp_unit=self.timestamp_unit,
             timezone=self.timezone,
+        )
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated LowestInRange for %d bars",
+            len(bars),
         )
         return {"value": IndicatorSeries(values, name="LowestInRange")}

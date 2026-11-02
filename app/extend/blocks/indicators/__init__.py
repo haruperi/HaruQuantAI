@@ -1,4 +1,16 @@
-"""Canonical indicators, loaded individually on demand."""
+"""Indicator package module: __init__.py.
+
+Description:
+    Top-level indicators package unifying all canonical indicator families.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-core: Canonical indicator catalog and lazy exports.
+Python API Usage:
+    from app.extend.blocks.indicators import *
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 

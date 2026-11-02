@@ -1,6 +1,17 @@
-"""ATR indicator and related signal helpers.
+"""ATR volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ATR: validated batch calculation.
+Description:
+    Calculates Average True Range (ATR) measuring market volatility.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Average true range calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.atr import ATR
+    res = ATR().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

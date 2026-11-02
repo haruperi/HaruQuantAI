@@ -1,6 +1,18 @@
-"""AverageDailyRange indicator and related signal helpers.
+"""AverageDailyRange volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-AVERAGEDAILYRANGE: validated batch calculation.
+Description:
+    Calculates Average Daily Range (ADR) measuring average high-low spread
+    across trading days.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Average daily range calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.adr import AverageDailyRange
+    res = AverageDailyRange().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

@@ -1,6 +1,17 @@
-"""ZigZag indicator and related signal helpers.
+"""ZigZag price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ZIGZAG: validated batch calculation.
+Description:
+    Filters minor market noise and connects major swing highs and lows.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Zigzag swing vertex detection.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.zigzag import ZigZag
+    res = ZigZag().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

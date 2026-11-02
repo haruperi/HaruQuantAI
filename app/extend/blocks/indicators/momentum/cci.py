@@ -1,6 +1,18 @@
-"""CCI indicator and related signal helpers.
+"""CCI momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-CCI: validated batch calculation.
+Description:
+    Calculates Commodity Channel Index (CCI) measuring deviation from
+    statistical mean price.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Commodity channel index calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.cci import CCI
+    res = CCI().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

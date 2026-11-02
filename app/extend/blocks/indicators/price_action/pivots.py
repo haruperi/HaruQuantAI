@@ -1,6 +1,17 @@
-"""Pivots indicator and related signal helpers.
+"""Pivots price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-PIVOTS: validated batch calculation.
+Description:
+    Calculates classical floor pivot points and support/resistance lines.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Pivot point support and resistance calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.pivots import Pivots
+    res = Pivots().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

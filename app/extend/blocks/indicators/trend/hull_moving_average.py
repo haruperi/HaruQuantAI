@@ -1,6 +1,17 @@
-"""HullMovingAverage indicator and related signal helpers.
+"""HullMovingAverage trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-HULLMOVINGAVERAGE: validated batch calculation.
+Description:
+    Calculates Hull Moving Average (HMA) combining reduced lag and smooth curve.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Hull moving average computation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.hull_moving_average import HullMovingAverage
+    res = HullMovingAverage().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

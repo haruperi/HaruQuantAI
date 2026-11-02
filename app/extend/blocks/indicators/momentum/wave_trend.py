@@ -1,6 +1,17 @@
-"""WaveTrend indicator and related signal helpers.
+"""WaveTrend momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-WAVETREND: validated batch calculation.
+Description:
+    Calculates WaveTrend oscillator identifying turning points in cyclical trends.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: WaveTrend oscillator computation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.wave_trend import WaveTrend
+    res = WaveTrend().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

@@ -1,7 +1,17 @@
-"""TPOProfile session calculation and indicator-specific conditions.
+"""TPOProfile volume indicator strategy block.
 
-Epoch timestamps use the explicitly configured unit and chart timezone. Supply
-instrument tick_size for fixed bins; range bins require no instrument metadata.
+Description:
+    Calculates Time Price Opportunity (TPO) Market Profile distributions.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Time Price Opportunity profile calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.tpo_profile import TPOProfile
+    res = TPOProfile().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations
@@ -12,6 +22,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import numpy as np
 from pydantic import Field, field_validator, model_validator
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -23,6 +34,8 @@ from app.extend.blocks.metadata import (
 from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.profile import TPO_OUTPUTS
 from app.extend.calculators.profile_sessions import calculate_sessions
+
+logger = get_logger(__name__)
 
 
 class TPOProfile(BaseIndicator):
@@ -83,6 +96,10 @@ class TPOProfile(BaseIndicator):
         """Count distinct time brackets at each price within the selected session."""
         custom = (
             (self.session_start, self.session_end) if self.use_custom_hours else None
+        )
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLUME: Calculated TPOProfile for %d bars",
+            len(bars),
         )
         return calculate_sessions(bars, self.model_dump(), tpo=True, custom=custom)
 

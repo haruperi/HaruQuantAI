@@ -1,6 +1,19 @@
-"""GarmanKlassVolatility indicator and related signal helpers.
+"""GarmanKlassVolatility volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-GARMANKLASSVOLATILITY: validated batch calculation.
+Description:
+    Calculates Garman-Klass volatility estimator incorporating OHLC prices.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Garman-Klass volatility calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.garman_klass import (
+        GarmanKlassVolatility,
+    )
+    res = GarmanKlassVolatility().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

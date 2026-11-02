@@ -1,6 +1,17 @@
-"""GannHiLo indicator and related signal helpers.
+"""GannHiLo trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-GANNHILO: validated batch calculation.
+Description:
+    Calculates Gann Hi-Lo Activator trailing stop and trend direction.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Gann Hi-Lo activator and trend classification.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.gann_hi_lo import GannHiLo
+    res = GannHiLo().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

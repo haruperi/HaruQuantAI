@@ -1,6 +1,17 @@
-"""LinReg indicator and related signal helpers.
+"""LinReg trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-LINREG: validated batch calculation.
+Description:
+    Calculates Linear Regression slope, intercept, and rolling trend projection.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Linear regression trend slope and value.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.lin_reg import LinReg
+    res = LinReg().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

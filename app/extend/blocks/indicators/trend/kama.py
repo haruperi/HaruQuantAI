@@ -1,6 +1,18 @@
-"""KAMA indicator and related signal helpers.
+"""KAMA trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-KAMA: validated batch calculation.
+Description:
+    Calculates Kaufman Adaptive Moving Average (KAMA) adjusting smoothing
+    to market noise.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Adaptive moving average calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.kama import KAMA
+    res = KAMA().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

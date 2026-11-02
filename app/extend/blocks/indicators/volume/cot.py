@@ -1,6 +1,17 @@
-"""COT indicator and related signal helpers.
+"""COT volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-COT: validated batch calculation.
+Description:
+    Calculates Commitments of Traders (COT) commercial/non-commercial positioning.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Commitments of Traders positioning calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.cot import COT
+    res = COT().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

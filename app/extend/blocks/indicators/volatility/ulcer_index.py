@@ -1,6 +1,17 @@
-"""UlcerIndex indicator and related signal helpers.
+"""UlcerIndex volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ULCERINDEX: validated batch calculation.
+Description:
+    Calculates Ulcer Index downside risk volatility metric.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Ulcer index downside volatility.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.ulcer_index import UlcerIndex
+    res = UlcerIndex().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

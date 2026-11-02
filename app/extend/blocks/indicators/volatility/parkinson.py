@@ -1,6 +1,17 @@
-"""ParkinsonVolatility indicator and related signal helpers.
+"""ParkinsonVolatility volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-PARKINSONVOLATILITY: validated batch calculation.
+Description:
+    Calculates Parkinson volatility estimator based on high-low price extremes.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Parkinson extreme value volatility.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.parkinson import ParkinsonVolatility
+    res = ParkinsonVolatility().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

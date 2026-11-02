@@ -1,6 +1,19 @@
-"""HighestLowest indicator and related signal helpers.
+"""HighestLowest price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-HIGHESTLOWEST: validated batch calculation.
+Description:
+    Calculates rolling highest high and lowest low price channels.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Rolling highest high and lowest low levels.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.highest_lowest import (
+        HighestLowest,
+    )
+    res = HighestLowest().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

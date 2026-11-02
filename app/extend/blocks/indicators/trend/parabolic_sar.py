@@ -1,6 +1,17 @@
-"""ParabolicSAR indicator and related signal helpers.
+"""ParabolicSAR trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-PARABOLICSAR: validated batch calculation.
+Description:
+    Calculates Parabolic Stop and Reverse (SAR) trailing price curve.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Parabolic SAR trailing trend reversal.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.parabolic_sar import ParabolicSAR
+    res = ParabolicSAR().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

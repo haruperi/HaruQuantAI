@@ -1,6 +1,19 @@
-"""CumulativeVolumeDelta indicator and related signal helpers.
+"""CumulativeVolumeDelta volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-CUMULATIVEVOLUMEDELTA: validated batch calculation.
+Description:
+    Calculates Cumulative Volume Delta (CVD) tracking net market order pressure.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Cumulative volume delta calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.cumulative_volume_delta import (
+        CumulativeVolumeDelta,
+    )
+    res = CumulativeVolumeDelta().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

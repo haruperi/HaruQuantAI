@@ -1,6 +1,18 @@
-"""CMF indicator and related signal helpers.
+"""CMF volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-CMF: validated batch calculation.
+Description:
+    Calculates Chaikin Money Flow (CMF) measuring institutional
+    accumulation/distribution.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Chaikin money flow calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.cmf import CMF
+    res = CMF().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

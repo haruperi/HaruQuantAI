@@ -1,4 +1,19 @@
-"""Moving Average Convergence Divergence (MACD) strategy indicator block."""
+"""MACD momentum indicator strategy block.
+
+Description:
+    Calculates Moving Average Convergence Divergence (MACD) main line,
+    signal line, and histogram.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: MACD and histogram calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.macd import MACD
+    res = MACD().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -7,6 +22,7 @@ from typing import Any, ClassVar, override
 import numpy as np
 from pydantic import Field
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -62,6 +78,9 @@ def _macd_kernel(
         "signal": signal_arr,
         "histogram": hist_arr,
     }
+
+
+logger = get_logger(__name__)
 
 
 class MACD(BaseIndicator):
@@ -132,6 +151,10 @@ class MACD(BaseIndicator):
             Dictionary with 'main', 'signal', and 'histogram' series.
         """
         lines = _macd_kernel(bars.close, self.fast, self.slow, self.smooth)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-MOMENTUM: Calculated MACD for %d bars",
+            len(bars),
+        )
         return {
             "main": IndicatorSeries(lines["main"], name="MACD.Main"),
             "signal": IndicatorSeries(lines["signal"], name="MACD.Signal"),

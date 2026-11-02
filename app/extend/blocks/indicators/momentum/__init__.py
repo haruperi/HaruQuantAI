@@ -1,4 +1,18 @@
-"""Canonical indicators, loaded individually on demand."""
+"""__init__ momentum indicator strategy block.
+
+Description:
+    Momentum indicator package exports and lazy loading registry.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Momentum indicator exports.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.__init__ import __init__
+    res = __init__().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 

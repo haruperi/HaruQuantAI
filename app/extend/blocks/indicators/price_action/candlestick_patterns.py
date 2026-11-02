@@ -1,6 +1,19 @@
-"""CandlestickPatterns indicator and related signal helpers.
+"""CandlestickPatterns price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-CANDLESTICKPATTERNS: validated batch calculation.
+Description:
+    Evaluates discrete Japanese candlestick patterns across OHLC price history.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Candlestick pattern detection.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.candlestick_patterns import (
+        CandlestickPatterns,
+    )
+    res = CandlestickPatterns().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

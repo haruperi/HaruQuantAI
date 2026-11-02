@@ -1,6 +1,17 @@
-"""DonchianChannels indicator and related signal helpers.
+"""DonchianChannels trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-DONCHIANCHANNELS: validated batch calculation.
+Description:
+    Calculates Donchian Channel upper, lower, and middle breakout bands.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Donchian Channel envelope and breakout levels.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.donchian_channel import DonchianChannels
+    res = DonchianChannels().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

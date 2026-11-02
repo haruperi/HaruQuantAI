@@ -1,6 +1,20 @@
-"""AwesomeOscillator indicator and related signal helpers.
+"""AwesomeOscillator momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-AWESOMEOSCILLATOR: validated batch calculation.
+Description:
+    Calculates Awesome Oscillator (AO) as the difference between 5-period
+    and 34-period SMAs of median prices.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Awesome oscillator computation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.awesome_oscillator import (
+        AwesomeOscillator,
+    )
+    res = AwesomeOscillator().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

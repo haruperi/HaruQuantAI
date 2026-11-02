@@ -1,6 +1,17 @@
-"""KeltnerChannel indicator and related signal helpers.
+"""KeltnerChannel volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-KELTNERCHANNEL: validated batch calculation.
+Description:
+    Calculates Keltner Channel EMA center line with ATR volatility envelope.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Keltner Channel envelope calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.keltner_channel import KeltnerChannel
+    res = KeltnerChannel().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

@@ -1,6 +1,17 @@
-"""LaguerreRSI indicator and related signal helpers.
+"""LaguerreRSI momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-LAGUERRERSI: validated batch calculation.
+Description:
+    Calculates Laguerre RSI using 4-element Laguerre filter for time warp smoothing.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Laguerre RSI calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.laguerre_rsi import LaguerreRSI
+    res = LaguerreRSI().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

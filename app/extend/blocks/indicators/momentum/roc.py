@@ -1,6 +1,17 @@
-"""ROC indicator and related signal helpers.
+"""ROC momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ROC: validated batch calculation.
+Description:
+    Calculates Rate of Change (ROC) percentage difference across lookback window.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Rate of change calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.roc import ROC
+    res = ROC().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

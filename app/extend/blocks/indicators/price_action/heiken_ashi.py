@@ -1,6 +1,19 @@
-"""HeikenAshi indicator and related signal helpers.
+"""HeikenAshi price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-HEIKENASHI: validated batch calculation.
+Description:
+    Calculates Heiken Ashi modified smoothed price candlesticks.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Heiken Ashi price candlestick calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.heiken_ashi import (
+        HeikenAshi,
+    )
+    res = HeikenAshi().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

@@ -1,6 +1,17 @@
-"""DeMarker indicator and related signal helpers.
+"""DeMarker momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-DEMARKER: validated batch calculation.
+Description:
+    Calculates DeMarker indicator evaluating high/low price momentum exhaustion.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: DeMarker indicator computation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.demarker import DeMarker
+    res = DeMarker().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

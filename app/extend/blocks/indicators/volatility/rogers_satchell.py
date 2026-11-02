@@ -1,6 +1,19 @@
-"""RogersSatchellVolatility indicator and related signal helpers.
+"""RogersSatchellVolatility volatility indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ROGERSSATCHELLVOLATILITY: validated batch calculation.
+Description:
+    Calculates Rogers-Satchell volatility estimator allowing for non-zero drift.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
+Key Capabilities:
+    - FR-indicator-volatility: Rogers-Satchell drift-independent volatility.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volatility.rogers_satchell import (
+        RogersSatchellVolatility,
+    )
+    res = RogersSatchellVolatility().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

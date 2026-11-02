@@ -1,6 +1,18 @@
-"""BullsPower indicator and related signal helpers.
+"""BullsPower momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-BULLSPOWER: validated batch calculation.
+Description:
+    Calculates Bulls Power measuring buyers' capability to push price
+    above EMA smoothing baseline.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Bulls power calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.bulls_power import BullsPower
+    res = BullsPower().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

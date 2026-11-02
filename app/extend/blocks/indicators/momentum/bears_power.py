@@ -1,6 +1,18 @@
-"""BearsPower indicator and related signal helpers.
+"""BearsPower momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-BEARSPOWER: validated batch calculation.
+Description:
+    Calculates Bears Power measuring sellers' capability to push price
+    below EMA smoothing baseline.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Bears power calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.bears_power import BearsPower
+    res = BearsPower().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

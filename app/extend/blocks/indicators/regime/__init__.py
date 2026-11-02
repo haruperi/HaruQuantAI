@@ -1,4 +1,16 @@
-"""Canonical indicators, loaded individually on demand."""
+"""Indicator package module: regime/__init__.py.
+
+Description:
+    Market regime indicator package exports and lazy loading registry.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-regime: Regime indicator exports.
+Python API Usage:
+    from app.extend.blocks.indicators import *
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 

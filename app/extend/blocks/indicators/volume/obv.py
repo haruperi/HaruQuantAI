@@ -1,6 +1,17 @@
-"""OBV indicator and related signal helpers.
+"""OBV volume indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-OBV: validated batch calculation.
+Description:
+    Calculates On-Balance Volume (OBV) cumulative volume flow momentum.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: On-balance volume calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.obv import OBV
+    res = OBV().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

@@ -1,4 +1,19 @@
-"""Relative Strength Index (RSI) strategy indicator block."""
+"""RSI momentum indicator strategy block.
+
+Description:
+    Calculates Relative Strength Index (RSI) momentum oscillator evaluating
+    overbought and oversold conditions.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: RSI oscillator calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.rsi import RSI
+    res = RSI().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,6 +21,7 @@ from typing import ClassVar, override
 
 from pydantic import Field
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -17,6 +33,8 @@ from app.extend.blocks.metadata import (
 )
 from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.rsi import rsi_kernel
+
+logger = get_logger(__name__)
 
 
 class RSI(BaseIndicator):
@@ -68,6 +86,11 @@ class RSI(BaseIndicator):
             Dictionary with 'value' series matching input bar length.
         """
         values = rsi_kernel(bars.close, self.period)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-MOMENTUM: Calculated RSI(period=%d) for %d bars",
+            self.period,
+            len(bars),
+        )
         return {"value": IndicatorSeries(values, name="RSI")}
 
 

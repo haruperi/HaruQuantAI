@@ -1,6 +1,20 @@
-"""KaufmanEfficiencyRatio indicator and related signal helpers.
+"""KaufmanEfficiencyRatio trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-KAUFMANEFFICIENCYRATIO: validated batch calculation.
+Description:
+    Calculates Kaufman Efficiency Ratio measuring market trend directness
+    relative to noise.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Efficiency ratio trend quality measurement.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.kaufman_efficiency_ratio import (
+        KaufmanEfficiencyRatio,
+    )
+    res = KaufmanEfficiencyRatio().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

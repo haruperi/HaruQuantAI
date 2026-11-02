@@ -1,7 +1,17 @@
-"""VolumeProfile session calculation and indicator-specific conditions.
+"""VolumeProfile volume indicator strategy block.
 
-Epoch timestamps use the explicitly configured unit and chart timezone. Supply
-instrument tick_size for fixed bins; range bins require no instrument metadata.
+Description:
+    Calculates session Volume Profile (POC, VAH, VAL) across trading hours.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
+Key Capabilities:
+    - FR-indicator-volume: Volume profile price distribution calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
+    res = VolumeProfile().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations
@@ -12,6 +22,7 @@ from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 import numpy as np
 from pydantic import Field, field_validator
 
+from app.core.host.logging import get_logger
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.metadata import (
     BlockSpec,
@@ -23,6 +34,8 @@ from app.extend.blocks.metadata import (
 from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.profile import VOLUME_OUTPUTS
 from app.extend.calculators.profile_sessions import calculate_sessions
+
+logger = get_logger(__name__)
 
 
 class VolumeProfile(BaseIndicator):
@@ -135,6 +148,10 @@ class VolumeProfile(BaseIndicator):
                 result[port.name] = IndicatorSeries(
                     np.zeros(len(bars.close)), name=port.name.upper()
                 )
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLUME: Calculated VolumeProfile for %d bars",
+            len(bars),
+        )
         return result
 
     @staticmethod

@@ -1,6 +1,18 @@
-"""ADX indicator and related signal helpers.
+"""ADX trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-ADX: validated batch calculation.
+Description:
+    Calculates Average Directional Movement Index (ADX) and directional
+    indicators (+DI, -DI).
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: ADX trend strength and directional movement.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.adx import ADX
+    res = ADX().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

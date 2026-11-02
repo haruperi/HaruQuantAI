@@ -1,6 +1,19 @@
-"""ChartPatterns indicator and related signal helpers.
+"""ChartPatterns price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-CHARTPATTERNS: validated batch calculation.
+Description:
+    Detects geometric classical chart formations and channel breakouts.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Chart pattern recognition.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.chart_patterns import (
+        ChartPatterns,
+    )
+    res = ChartPatterns().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

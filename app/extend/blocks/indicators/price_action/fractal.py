@@ -1,6 +1,17 @@
-"""Fractal indicator and related signal helpers.
+"""Fractal price_action indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-FRACTAL: validated batch calculation.
+Description:
+    Identifies Bill Williams 5-bar bullish and bearish swing fractals.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-price-action: Swing fractal detection.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.price_action.fractal import Fractal
+    res = Fractal().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

@@ -1,4 +1,17 @@
-"""Qualify every remaining indicator against pre-migration numerical captures."""
+"""Qualify every remaining indicator against pre-migration numerical captures.
+
+Description:
+    Validates mathematical equivalence, schema parameters, auxiliary feeds,
+    and causal snapshot guarantees across all historical indicator families.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Numerical parity test suite for indicator families.
+Key Capabilities:
+    - FR-indicator-families-tests: Pre-migration capture parity verification.
+Python API Usage:
+    pytest tests/extend/blocks/test_indicator_families.py --no-cov
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+"""
 
 from __future__ import annotations
 

@@ -1,6 +1,19 @@
-"""SchaffTrendCycle indicator and related signal helpers.
+"""SchaffTrendCycle momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-SCHAFFTRENDCYCLE: validated batch calculation.
+Description:
+    Calculates Schaff Trend Cycle (STC) combining MACD and stochastic smoothing.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Schaff trend cycle computation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.schaff_trend_cycle import (
+        SchaffTrendCycle,
+    )
+    res = SchaffTrendCycle().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

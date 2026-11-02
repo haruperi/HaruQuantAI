@@ -1,6 +1,17 @@
-"""Momentum indicator and related signal helpers.
+"""Momentum momentum indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-MOMENTUM: validated batch calculation.
+Description:
+    Calculates standard price momentum measuring rate of price acceleration.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
+Key Capabilities:
+    - FR-indicator-momentum: Price momentum calculation.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.momentum.momentum import Momentum
+    res = Momentum().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

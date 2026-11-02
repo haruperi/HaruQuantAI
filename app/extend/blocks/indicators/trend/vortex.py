@@ -1,6 +1,17 @@
-"""Vortex indicator and related signal helpers.
+"""Vortex trend indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-VORTEX: validated batch calculation.
+Description:
+    Calculates Vortex Indicator positive and negative trend line flows.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
+Key Capabilities:
+    - FR-indicator-trend: Vortex indicator directional flow.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.trend.vortex import Vortex
+    res = Vortex().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations

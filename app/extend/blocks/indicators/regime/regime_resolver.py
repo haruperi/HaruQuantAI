@@ -1,6 +1,19 @@
-"""MarketRegimeResolver indicator and related signal helpers.
+"""MarketRegimeResolver regime indicator strategy block.
 
-FEAT-SERVICES-INDICATOR-MARKETREGIMERESOLVER: validated batch calculation.
+Description:
+    Resolves consolidated multi-dimensional market regime states and labels.
+Purpose:
+    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
+Key Capabilities:
+    - FR-indicator-regime: Multi-dimensional market regime resolution.
+    - FR-indicator-logging: Non-silent calculation diagnostics.
+Python API Usage:
+    from app.extend.blocks.indicators.regime.regime_resolver import (
+        MarketRegimeResolver,
+    )
+    res = MarketRegimeResolver().calculate(bars)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
 """
 
 from __future__ import annotations
