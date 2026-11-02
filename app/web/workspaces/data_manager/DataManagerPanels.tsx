@@ -1,7 +1,8 @@
 import { useHistoricalSources } from './plugins/Common/historicalSourceStore';
 import { useSessions } from './plugins/Catalogs/Sessions/sessionStore';
 import { useEffect, useState } from 'react';
-import { Button, Field, Modal, TextInput } from '../../common/components/ui';
+import { Button, Field, IconButton, Modal, TextInput } from '../../common/components/ui';
+import { Pencil, Trash2 } from 'lucide-react';
 import { brokerCounts, type BrokerProfile } from './plugins/Catalogs/BrokerProfiles/brokerProfiles';
 import { type FileSymbol } from './plugins/FileImport/fileSymbols';
 import { type SessionDefinition, type CatalogSession, type SessionBroker } from './plugins/Catalogs/Sessions/sessions';
@@ -274,7 +275,7 @@ export function DatasetTable({ selectedIds, onToggle, onSelect, onDeleteRow, onA
           <td>{row.bars.toLocaleString()}</td><td>{row.source}</td><td>{"barType" in row && (row.barType === "end" || row.barType === "End of bar") ? "End of bar" : "Start of bar"}</td><td>{row.category}</td>
           <td title={rowPath || '—'}>{rowPath || '—'}</td>
           <td aria-label={`Status for ${row.symbol}`} title={cloneIndex >= 0 ? tools.job?.error : exportIndex >= 0 ? exports.job?.error : mt5Index >= 0 ? mt5.job?.error : yahooIndex >= 0 ? yahoo.job?.error : cryptoIndex >= 0 ? crypto.job?.error : darwinexIndex >= 0 ? darwinex.job?.error : sqTaskIndex >= 0 ? sq.job?.error : fileTaskIndex >= 0 ? imports.job?.error : rowJob?.error}>{marketStatus || (cloneStatus ? cloneStatus : exportStatus ? exportStatus : mt5Status ? mt5Status : yahooStatus ? yahooStatus : cryptoStatus ? cryptoStatus : darwinexStatus ? darwinexStatus : sqStatus ? sqStatus : fileTaskIndex >= 0 && imports.job ? fileTaskIndex < imports.job.completed ? 'Completed' : `${imports.job.state.charAt(0).toUpperCase()}${imports.job.state.slice(1)} ${imports.job.progress}%` : rowJob ? rowJob.state === 'completed' ? 'Completed' : `${rowJob.state.charAt(0).toUpperCase()}${rowJob.state.slice(1)} ${rowJob.progress}%` : row.bars > 0 ? 'Ready' : '')}</td>
-          <td style={{ textAlign: 'center' }}><button aria-label={`Edit dataset ${row.symbol}`} onClick={event=>{event.stopPropagation();setEditingDataset(row);}}>Edit</button><button className="symbol-remove" aria-label={`Delete dataset ${row.symbol}`} title="Delete or clear dataset" onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}>×</button></td>
+          <td><div className="dataset-row-actions"><IconButton title={`Edit dataset ${row.symbol}`} onClick={event => { event.stopPropagation(); setEditingDataset(row); }}><Pencil size={14} aria-hidden="true"/></IconButton><IconButton className="icon-button dataset-delete-action" title={`Delete dataset ${row.symbol}`} onClick={event => { event.stopPropagation(); onDeleteRow?.(row.id); }}><Trash2 size={14} aria-hidden="true"/></IconButton></div></td>
         </tr>;
       })}{!rows.length && <tr><td colSpan={17} className="dataset-empty">{catalogLoading ? 'Loading saved dataset catalog…' : catalogError ? 'Saved dataset catalog unavailable.' : allDatasets.length ? 'No matching data.' : 'No saved datasets found in catalog.'}</td></tr>}</tbody>
     </table></div>

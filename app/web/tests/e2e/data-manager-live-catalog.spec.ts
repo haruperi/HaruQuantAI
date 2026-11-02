@@ -66,7 +66,7 @@ test('Historical data renders only Home catalog rows and clears a refreshed empt
   await expect(row.getByRole('cell')).toHaveText([
     '', 'EURUSD_REAL', 'EURUSD.fx', 'Research Broker', 'EUR/USD Spot', 'M1', 'UTC',
     '2026-01-01', '2026-01-05', '4', '12,345', 'Dukascopy', 'End of bar', 'Forex',
-    'data/history/dukascopy/EURUSD/M1.parquet', 'Ready', '×',
+    'data/history/dukascopy/EURUSD/M1.parquet', 'Ready', '',
   ]);
   await expect(table).not.toContainText('CACHED_FAKE');
   expect(paths).toContain('/api/v1/data/home/datasets');
@@ -83,6 +83,35 @@ test('Historical data renders only Home catalog rows and clears a refreshed empt
   await expect(table).toContainText('No saved datasets found in catalog.');
   await expect(page.getByRole('checkbox', { name: 'Select all visible datasets' })).not.toBeChecked();
   await page.screenshot({ path: join(tmpdir(), 'haru-datamanager-empty-catalog.png') });
+});
+
+test('dataset icon buttons retain keyboard access and edit/delete dialogs', async ({ page }) => {
+  await openCatalog(page, () => ({ status: 'success', data: [dataset] }));
+  const row = page.getByRole('table', { name: 'Historical data' }).getByRole('row').filter({ hasText: 'EURUSD_REAL' });
+  const edit = row.getByRole('button', { name: 'Edit dataset EURUSD_REAL', exact: true });
+  const remove = row.getByRole('button', { name: 'Delete dataset EURUSD_REAL', exact: true });
+  await expect(edit).toHaveAttribute('title', 'Edit dataset EURUSD_REAL');
+  await expect(remove).toHaveAttribute('title', 'Delete dataset EURUSD_REAL');
+  await expect(edit.locator('svg')).toBeVisible();
+  await expect(remove.locator('svg')).toBeVisible();
+  await edit.scrollIntoViewIfNeeded();
+  await edit.focus();
+  await page.keyboard.press('Tab');
+  await expect(remove).toBeFocused();
+  await page.keyboard.press('Shift+Tab');
+  await expect(edit).toBeFocused();
+  await page.keyboard.press('Enter');
+  const properties = page.getByRole('dialog', { name: 'Dataset properties', exact: true });
+  await expect(properties).toBeVisible();
+  await properties.getByRole('button', { name: 'Close', exact: true }).last().click();
+  await expect(row.getByRole('checkbox')).not.toBeChecked();
+  await remove.click();
+  const deletion = page.getByRole('dialog', { name: 'Delete data', exact: true });
+  await expect(deletion).toBeVisible();
+  await deletion.getByRole('button', { name: 'Close', exact: true }).first().click();
+  await expect(row).toBeVisible();
+  await edit.scrollIntoViewIfNeeded();
+  await page.screenshot({ path: join(tmpdir(), 'haru-dataset-row-icons.png') });
 });
 
 test('initial load excludes cache, failures are visible, and retry recovers', async ({ page }) => {
