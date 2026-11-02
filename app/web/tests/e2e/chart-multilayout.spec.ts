@@ -153,3 +153,106 @@ test('crosshair and time window synchronization propagate to other chart canvase
   await page.mouse.wheel(0, -260);
   await expect.poll(() => secondHost.getAttribute('data-synced-time-window')).not.toBe(before);
 });
+
+test('each pane can change its own symbol and timeframe using controls inside that chart', async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto('/chart');
+  await page.getByRole('button', { name: 'Select layout', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Select layout', exact: true })
+    .getByRole('button', { name: '2 charts · 2h' }).click();
+  const panes = page.getByTestId('chart-pane');
+  const first = panes.nth(0), second = panes.nth(1);
+  await expect(second.getByRole('button', { name: 'Chart 2 symbol' })).toBeVisible();
+  await expect(first.getByRole('combobox', { name: 'Chart 1 interval' })).toHaveValue('3m');
+  await expect(second.getByRole('combobox', { name: 'Chart 2 interval' })).toHaveValue('3m');
+
+  // The symbol selector in Chart 2 opens search against Chart 2, not Chart 1.
+  await second.getByRole('button', { name: 'Chart 2 symbol' }).click();
+  await expect(second).toHaveClass(/cq-chart-cell-active/);
+  const symbolSearch = page.getByRole('dialog', { name: 'Symbol search' });
+  await symbolSearch.getByRole('textbox', { name: 'Search symbols' }).fill('EURUSD');
+  await symbolSearch.getByRole('option').filter({ hasText: 'EURUSD' }).click();
+  await expect(symbolSearch).toHaveCount(0);
+  await expect(second.getByRole('button', { name: 'Chart 2 symbol' })).toContainText('EURUSD');
+  await expect(first.getByRole('button', { name: 'Chart 1 symbol' })).toContainText('XAUUSD');
+
+  await second.getByRole('combobox', { name: 'Chart 2 interval' }).selectOption('1h');
+  await first.getByRole('combobox', { name: 'Chart 1 interval' }).selectOption('15m');
+  await expect(first.getByRole('combobox', { name: 'Chart 1 interval' })).toHaveValue('15m');
+  await expect(second.getByRole('combobox', { name: 'Chart 2 interval' })).toHaveValue('1h');
+  await expect(page.getByRole('combobox', { name: 'Interval', exact: true })).toHaveValue('15m');
+
+  await expect.poll(async () => page.evaluate(() => {
+    const one = JSON.parse(localStorage.getItem('haruquantai.chart.v1') || '{}').state?.chart;
+    const two = JSON.parse(localStorage.getItem('haruquantai.chart.v1.pane.1') || '{}').state?.chart;
+    return [one?.symbol, one?.interval, two?.symbol, two?.interval];
+  })).toEqual(['XAUUSD', '15m', 'EURUSD', '1h']);
+
+  await page.reload();
+  await expect(first.getByRole('button', { name: 'Chart 1 symbol' })).toContainText('XAUUSD');
+  await expect(first.getByRole('combobox', { name: 'Chart 1 interval' })).toHaveValue('15m');
+  await expect(second.getByRole('button', { name: 'Chart 2 symbol' })).toContainText('EURUSD');
+  await expect(second.getByRole('combobox', { name: 'Chart 2 interval' })).toHaveValue('1h');
+});
+
+test('per-pane symbol and timeframe changes follow their independent synchronization switches', async ({ page }) => {
+  test.setTimeout(120000);
+  await page.goto('/chart');
+  const picker = page.getByRole('button', { name: 'Select layout', exact: true });
+  await picker.click();
+  await page.getByRole('dialog', { name: 'Select layout', exact: true })
+    .getByRole('button', { name: '2 charts · 2h' }).click();
+  const panes = page.getByTestId('chart-pane');
+  const first = panes.nth(0), second = panes.nth(1);
+
+  await first.getByRole('button', { name: 'Chart 1 symbol' }).click();
+  const search = page.getByRole('dialog', { name: 'Symbol search' });
+  await search.getByRole('textbox', { name: 'Search symbols' }).fill('GBPUSD');
+  await search.getByRole('option').filter({ hasText: 'GBPUSD' }).click();
+  await first.getByRole('combobox', { name: 'Chart 1 interval' }).selectOption('5m');
+
+  // Enabling synchronization copies the active pane values to other panes.
+  await picker.click();
+  const layoutMenu = page.getByRole('dialog', { name: 'Select layout', exact: true });
+  await layoutMenu.getByRole('switch', { name: 'Sync Symbol' }).click();
+  await layoutMenu.getByRole('switch', { name: 'Sync Interval' }).click();
+  await picker.click();
+  await expect(second.getByRole('button', { name: 'Chart 2 symbol' })).toContainText('GBPUSD');
+  await expect(second.getByRole('combobox', { name: 'Chart 2 interval' })).toHaveValue('5m');
+
+  // Changes initiated from another pane now propagate back to Chart 1.
+  await second.getByRole('button', { name: 'Chart 2 symbol' }).click();
+  await search.getByRole('textbox', { name: 'Search symbols' }).fill('BTCUSDT');
+  await search.getByRole('option').filter({ hasText: 'BTCUSDT' }).click();
+  await second.getByRole('combobox', { name: 'Chart 2 interval' }).selectOption('4h');
+  await expect(first.getByRole('button', { name: 'Chart 1 symbol' })).toContainText('BTCUSDT');
+  await expect(first.getByRole('combobox', { name: 'Chart 1 interval' })).toHaveValue('4h');
+
+  // Disabling synchronization restores independent control going forward.
+  await picker.click();
+  await layoutMenu.getByRole('switch', { name: 'Sync Symbol' }).click();
+  await layoutMenu.getByRole('switch', { name: 'Sync Interval' }).click();
+  await picker.click();
+  await first.getByRole('button', { name: 'Chart 1 symbol' }).click();
+  await search.getByRole('textbox', { name: 'Search symbols' }).fill('EURUSD');
+  await search.getByRole('option').filter({ hasText: 'EURUSD' }).click();
+  await first.getByRole('combobox', { name: 'Chart 1 interval' }).selectOption('1D');
+  await expect(second.getByRole('button', { name: 'Chart 2 symbol' })).toContainText('BTCUSDT');
+  await expect(second.getByRole('combobox', { name: 'Chart 2 interval' })).toHaveValue('4h');
+});
+
+test('chart-specific controls remain usable when symbol title is hidden in settings', async ({ page }) => {
+  await page.goto('/chart');
+  await page.getByRole('button', { name: 'Select layout', exact: true }).click();
+  await page.getByRole('dialog', { name: 'Select layout', exact: true })
+    .getByRole('button', { name: '2 charts · 2h' }).click();
+  const pane = page.getByTestId('chart-pane').nth(1);
+  await pane.getByTestId('chart-input').click({ position: { x: 70, y: 90 } });
+  await page.getByRole('button', { name: 'Chart settings', exact: true }).click();
+  const settings = page.getByRole('dialog', { name: 'Chart settings' });
+  await settings.getByRole('button', { name: 'Status line' }).click();
+  await settings.getByLabel('Symbol name and exchange').uncheck();
+  await settings.getByRole('button', { name: 'Ok', exact: true }).click();
+  await expect(pane.getByRole('button', { name: 'Chart 2 symbol' })).toBeVisible();
+  await expect(pane.getByRole('combobox', { name: 'Chart 2 interval' })).toBeVisible();
+});
