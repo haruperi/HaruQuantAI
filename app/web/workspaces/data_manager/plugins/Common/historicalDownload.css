@@ -1,0 +1,22 @@
+.historical-download-flow .modal { max-width:calc(100vw - 24px); max-height:calc(100dvh - 24px); }
+.historical-download-flow .modal-content { display:flex; flex-direction:column; gap:16px; overflow:auto; min-height:0; padding:18px; }
+.historical-download-flow .modal>header,.historical-download-flow .modal>footer { flex-shrink:0; }
+.historical-download-flow .modal>footer { height:auto; padding:12px 18px; gap:10px; }
+.historical-download-flow fieldset { min-width:0; border:1px solid var(--line); padding:16px; }
+.historical-download-flow legend { padding:0 6px; font-weight:600; }
+.historical-date-row { display:grid; grid-template-columns:minmax(210px,1.5fr) repeat(3,minmax(0,1fr)); gap:8px; align-items:center; margin:8px 0; }
+.historical-date-row label { display:grid; grid-template-columns:36px minmax(0,1fr); gap:6px; align-items:center; }
+.historical-date-row .text-input { width:100%; min-width:0; }
+.historical-redownload { display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+.historical-redownload label { display:flex; align-items:center; gap:8px; }
+.historical-download-note { color:var(--muted); font-size:11px; line-height:1.5; }
+.historical-download-error { padding:10px; border-left:3px solid var(--bad); background:color-mix(in srgb,var(--bad) 12%,var(--panel)); }
+.historical-download-connection summary { cursor:pointer; color:var(--muted); }
+.historical-download-connection label { display:flex; flex-direction:column; gap:8px; margin:12px 0; }
+.historical-download-connection select { background:var(--bg); color:var(--text); border:1px solid var(--line); padding:6px; }
+@media(max-width:650px) {
+  .historical-date-row { grid-template-columns:repeat(3,minmax(0,1fr)); }
+  .historical-date-row label { grid-column:1/-1; }
+  .historical-redownload { grid-template-columns:1fr; }
+  .historical-download-flow .modal-content { padding:12px; }
+}

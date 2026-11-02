@@ -13,6 +13,8 @@ Purpose:
     FEAT-BROKER-SQ-EQUITY: StrategyQuant US Equity Market Data and Catalog Broker.
 
 Key Capabilities:
+    - FR-BROKER-SQ-ARCHIVE-AVAILABILITY: Report decoded archive bounds on empty ranges.
+      Logging: INFO for matching rows and WARNING for verified or unknown coverage.
     - FR-BROKER-SQ-EQUITY-SYMBOLS: US Equity Symbol Catalog Resolution
       Associated: `[SQEquityClient.get_symbol_info()]`, `[SQEquityClient.get_symbols()]`
       Logging: Emits INFO log upon resolving symbol info or catalog count,
@@ -289,13 +291,43 @@ class SQEquityClient(BrokerClient):
             with zipfile.ZipFile(io.BytesIO(resp.content)) as z:
                 dat_names = sorted(f for f in z.namelist() if f.endswith(".dat"))
                 for dat_name in dat_names:
-                    year_bars = decode_sq_dat_bytes(
-                        z.read(dat_name),
-                        date_from=date_from,
-                        date_to=date_to,
-                    )
+                    year_bars = decode_sq_dat_bytes(z.read(dat_name))
                     all_bars.extend(year_bars)
 
+        if all_bars:
+            first = datetime.fromtimestamp(min(bar["time"] for bar in all_bars), UTC)
+            last = datetime.fromtimestamp(max(bar["time"] for bar in all_bars), UTC)
+            all_bars = [
+                bar
+                for bar in all_bars
+                if (date_from is None or bar["time"] >= date_from.timestamp())
+                and (date_to is None or bar["time"] <= date_to.timestamp())
+            ]
+            if not all_bars:
+                message = (
+                    f"No {self._asset_label} observations for '{symbol}' in requested "
+                    f"range {date_from.isoformat() if date_from else 'unbounded'} to "
+                    f"{date_to.isoformat() if date_to else 'unbounded'}. "
+                    f"Inspected CDN archives ({', '.join(zip_targets)}) contain "
+                    f"{first.date()} through {last.date()}. "
+                    "Choose a range within these archive dates; current history "
+                    "may require another configured data source."
+                )
+                logger.warning("FR-BROKER-SQ-ARCHIVE-AVAILABILITY: %s", message)
+                raise BridgeError(message, code="NO_DATA")
+        else:
+            message = (
+                f"No decodable {self._asset_label} observations for '{symbol}' "
+                f"in inspected CDN archives ({', '.join(zip_targets)}); "
+                "availability could not be verified."
+            )
+            logger.warning("FR-BROKER-SQ-ARCHIVE-AVAILABILITY: %s", message)
+            raise BridgeError(message, code="NO_DATA")
+        logger.info(
+            "FR-BROKER-SQ-ARCHIVE-AVAILABILITY: %s returned %d matching rows",
+            symbol,
+            len(all_bars),
+        )
         all_bars.sort(key=lambda b: b["time"])
         if count and count > 0 and len(all_bars) > count:
             all_bars = all_bars[-count:]

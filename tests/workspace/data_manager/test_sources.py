@@ -296,3 +296,50 @@ def test_mt5_backend_singleton_uses_the_same_configured_factory_as_cli(monkeypat
     assert base.get_broker("mt5") is client
     assert base.get_broker("metatrader") is client
     factory.assert_called_once_with()
+
+
+def test_wholly_empty_request_retains_provider_details_and_logs(
+    sources, monkeypatch, caplog
+):
+    service, provider = sources
+    row = service.add("sq_futures", [{"symbol": "@ES"}])["data"]["records"][0]
+
+    def empty(*args, **kwargs):
+        raise BridgeError(
+            "Inspected CDN archives contain 2019-01-02 through 2024-05-15.",
+            code="NO_DATA",
+        )
+
+    monkeypatch.setattr(provider, "get_bars", empty)
+    with caplog.at_level("WARNING"), pytest.raises(ValueError) as caught:
+        service.download(row["id"], "2026-01-01", "2026-02-01")
+    assert "@ES" in str(caught.value) and "2026-01-01" in str(caught.value)
+    assert "2024-05-15" in str(caught.value)
+    assert "FR-DATA-SOURCES-EMPTY-RANGE" in caplog.text
+    assert service.record(row["id"])["bars"] == 0
+    assert not list(service.market_root.rglob("*.parquet"))
+    assert provider.closed
+
+
+def test_empty_subinterval_does_not_discard_successful_observations(
+    sources, monkeypatch
+):
+    service, provider = sources
+    row = service.add("coinbase", [{"symbol": "BTC-USD", "timeframe": "M1"}])["data"][
+        "records"
+    ][0]
+    original = provider.get_bars
+    calls = 0
+
+    def partly_empty(*args, **kwargs):
+        nonlocal calls
+        calls += 1
+        if calls == 2:
+            raise BridgeError("No observations in this subinterval", code="NO_DATA")
+        return original(*args, **kwargs)
+
+    monkeypatch.setattr(provider, "get_bars", partly_empty)
+    result = service.download(row["id"], "2025-01-06T00:00:00Z", "2025-01-06T06:39:00Z")
+    assert result["success"]
+    assert result["data"]["received_rows"] > 0
+    assert calls == 2 and provider.closed

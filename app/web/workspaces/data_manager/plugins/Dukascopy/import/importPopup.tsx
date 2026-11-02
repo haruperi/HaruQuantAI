@@ -157,7 +157,7 @@ export function ImportPopup(props: ImportPopupProps) {
                 </div>
               </fieldset>
               <fieldset>
-                <legend>Fast Data Download</legend>
+                <legend>Download server</legend>
                 <div className="dukas-download-modes">
                   <label>
                     <input
@@ -175,9 +175,9 @@ export function ImportPopup(props: ImportPopupProps) {
                       checked={mode === 'cdn'}
                       onChange={() => setMode('cdn')}
                     />{' '}
-                    Fast download from HaruQuantAI CDN (10 x faster download)
+                    Download from configured CDN
                     <small>
-                      If on, Dukascopy data will be downloaded from prepared packages on HaruQuantAI
+                      If on, Dukascopy data will be downloaded from prepared packages on the configured
                       CDN servers. Please note that pre-prepared packages are available only for
                       part of the data.
                     </small>

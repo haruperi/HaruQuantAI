@@ -14,8 +14,12 @@ import { useDataManagerStore } from './dataManagerStore';
 import { sourceClient, refreshSourceCatalog, useHistoricalSources, type SourceRecord } from './historicalSourceStore';
 
 const providers: Record<string, string> = { darwinex: 'Darwinex', binance: 'Binance spot', binance_coinm: 'Binance Coin-M', binance_usdtm: 'Binance USDT-M', bitfinex: 'Bitfinex', coinbase: 'Coinbase', poloniex: 'Poloniex', yahoo: 'Yahoo', sq_equity: 'SQ Equity', sq_futures: 'SQ Futures', mt5: 'MT5' };
+import { HistoricalDownloadDialog } from './HistoricalDownloadDialog';
 interface Props { provider: string; targets: SourceRecord[]; onClose: () => void; onStarted: () => void }
-export function HistoricalSourceDialog({ provider: initial, targets, onClose, onStarted }: Props) {
+export function HistoricalSourceDialog(props: Props) {
+  return props.targets.length ? <HistoricalDownloadDialog {...props}/> : <HistoricalAddDialog {...props}/>;
+}
+function HistoricalAddDialog({ provider: initial, targets, onClose, onStarted }: Props) {
   const [connectionId, setConnectionId] = useState(''); const [connectionDialog, setConnectionDialog] = useState(false);
   const [connections, setConnections] = useState<ProviderConnection[]>([]); const [connectionVersion,setConnectionVersion] = useState(0);
   const [agreed,setAgreed] = useState(false); const [catalog,setCatalog] = useState<string[]>([]); const [catalogQuery,setCatalogQuery] = useState('');

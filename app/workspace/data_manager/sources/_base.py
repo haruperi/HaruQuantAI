@@ -1,4 +1,19 @@
-"""Base classes and unified facade for Data Manager historical market data sources."""
+"""Authoritative registration and bounded historical source retrieval.
+
+Description:
+    Register historical datasets, fetch bounded broker observations and publish through
+    host-owned storage. Preserve provider no-data diagnostics when all chunks are empty.
+Purpose:
+    FEAT-DATA-MANAGER-HISTORICAL-SOURCES: authoritative historical source operations.
+Key Capabilities:
+    - FR-DATA-SOURCES-EMPTY-RANGE: retain provider diagnostics without publishing empty
+      history. Logging: WARNING records the symbol and requested range on empty jobs;
+      regression tests verify this log explicitly.
+Python API Usage:
+    Sources(gateway).download(dataset_id, date_from, date_to)
+CLI Usage:
+    uv run pytest tests/workspace/data_manager/test_sources.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -13,6 +28,7 @@ import pandas as pd  # type: ignore[import-untyped]
 
 from app.core.data.contracts import BridgeError
 from app.core.data.market_storage import price_columns, safe_component
+from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.data.coverage import (
     missing_ranges,
@@ -41,6 +57,7 @@ from ._helpers import (
 from .dukascopy import Dukascopy
 
 __all__ = ["BaseSource", "Sources"]
+logger = get_logger(__name__)
 
 
 def _fetch_frame(
@@ -65,10 +82,27 @@ def _fetch_frame(
     except BridgeError as error:
         if error.code != "NO_DATA":
             raise
-        return pd.DataFrame()
+        frame = pd.DataFrame()
+        frame.attrs["provider_no_data"] = str(error)
+        return frame
     if not isinstance(frame, pd.DataFrame):
         raise TypeError("Provider did not return a market DataFrame")
     return frame
+
+
+def _empty_range_error(
+    row: dict[str, Any], lower: datetime, upper: datetime, details: list[str]
+) -> ValueError:
+    """Build and log a bounded diagnostic for a wholly empty request."""
+    message = (
+        f"No historical observations for '{row['symbol']}' "
+        f"({row['source']}, {row['timeframe']}) from {lower.isoformat()} to "
+        f"{upper.isoformat()}."
+    )
+    if details:
+        message += " Provider details: " + " | ".join(details)
+    logger.warning("FR-DATA-SOURCES-EMPTY-RANGE: %s", message)
+    return ValueError(message)
 
 
 class BaseSource:
@@ -257,12 +291,16 @@ class BaseSource:
         client = self._get_client(source)
         published, received = 0, 0
         empty = []
+        no_data_details: list[str] = []
         try:
             for index, (start, stop) in enumerate(chunks):
                 if context is not None:
                     context.wait_if_paused()
                     context.raise_if_cancelled()
                 frame = _fetch_frame(client, row, start, stop)
+                detail = frame.attrs.get("provider_no_data")
+                if isinstance(detail, str) and detail not in no_data_details:
+                    no_data_details = [*no_data_details, detail][-2:]
                 count = self._publish(
                     row, frame, start, stop, overwrite=overwrite, context=context
                 )
@@ -279,7 +317,7 @@ class BaseSource:
             if source != "mt5":
                 client.disconnect()
         if not published and missing == [(lower, upper)]:
-            raise ValueError("No historical observations were returned for this range")
+            raise _empty_range_error(row, lower, upper, no_data_details)
         record_checked_ranges(self.gateway, dataset_id, empty)
         return {
             "success": True,
