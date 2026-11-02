@@ -9,10 +9,12 @@ Purpose:
     FEAT-EXTEND-ENGINE-CHARTS: Builder runtime telemetry engine charts.
 
 Key Capabilities:
+    - FR-engine-charts-catalog: Catalog and registry for all 14 engine charts.
     - FR-engine-charts-project: Project runtime telemetry onto engine chart series.
 
 Python API Usage:
     from app.extend.engine_charts.catalog import EngineChartsCatalog
+    chart = EngineChartsCatalog.create_chart("AcceptedStrategiesPerHour")
     points = EngineChartsCatalog.project("AcceptedStrategiesPerHour", telemetry)
 
 CLI Usage:
@@ -26,6 +28,27 @@ from typing import Any, Literal
 
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
+from app.extend.engine_charts.accepted_strategies_per_hour import (
+    AcceptedStrategiesPerHour,
+)
+from app.extend.engine_charts.average_strategies_per_hour_chart import (
+    AverageStrategiesPerHourChart,
+)
+from app.extend.engine_charts.base import EngineChart, MemoryBean, Project
+from app.extend.engine_charts.databank_fitness_is import DatabankFitnessIS
+from app.extend.engine_charts.databank_fitness_ist import DatabankFitnessIST
+from app.extend.engine_charts.databank_fitness_isv import DatabankFitnessISV
+from app.extend.engine_charts.databank_fitness_oos import DatabankFitnessOOS
+from app.extend.engine_charts.gen_evo_fitness_is import GenEvoFitnessIS
+from app.extend.engine_charts.gen_evo_fitness_ist import GenEvoFitnessIST
+from app.extend.engine_charts.gen_evo_fitness_isv import GenEvoFitnessISV
+from app.extend.engine_charts.gen_evo_fitness_oos import GenEvoFitnessOOS
+from app.extend.engine_charts.genetic_evolution_info import GeneticEvolutionInfo
+from app.extend.engine_charts.heap_memory_chart import HeapMemoryChart
+from app.extend.engine_charts.off_heap_memory_chart import OffHeapMemoryChart
+from app.extend.engine_charts.off_heap_memory_info_chart import (
+    OffHeapMemoryInfoChart,
+)
 
 logger = get_logger(__name__)
 
@@ -88,7 +111,7 @@ class JobRuntimeTelemetrySnapshot:
     metrics: dict[str, tuple[float, ...]] = field(default_factory=dict)
 
 
-# Register all 14 donor EngineCharts
+# Register all 14 donor EngineCharts metadata descriptors
 ENGINE_CHARTS: dict[str, EngineChartDescriptor] = {
     # Throughput (2)
     "AcceptedStrategiesPerHour": EngineChartDescriptor(
@@ -208,14 +231,37 @@ ENGINE_CHARTS: dict[str, EngineChartDescriptor] = {
     ),
 }
 
+# Mapping of chart ID to concrete implementation class
+CHART_CLASSES: dict[str, type[EngineChart]] = {
+    "AcceptedStrategiesPerHour": AcceptedStrategiesPerHour,
+    "AverageStrategiesPerHourChart": AverageStrategiesPerHourChart,
+    "DatabankFitnessIS": DatabankFitnessIS,
+    "DatabankFitnessIST": DatabankFitnessIST,
+    "DatabankFitnessISV": DatabankFitnessISV,
+    "DatabankFitnessOOS": DatabankFitnessOOS,
+    "GenEvoFitnessIS": GenEvoFitnessIS,
+    "GenEvoFitnessIST": GenEvoFitnessIST,
+    "GenEvoFitnessISV": GenEvoFitnessISV,
+    "GenEvoFitnessOOS": GenEvoFitnessOOS,
+    "GeneticEvolutionInfo": GeneticEvolutionInfo,
+    "HeapMemoryChart": HeapMemoryChart,
+    "OffHeapMemoryChart": OffHeapMemoryChart,
+    "OffHeapMemoryInfoChart": OffHeapMemoryInfoChart,
+}
+
 
 class EngineChartsCatalog:
-    """Catalog of runtime telemetry engine charts and series projector."""
+    """Catalog of runtime telemetry engine charts, series projector, and factory."""
 
     @classmethod
     def list_descriptors(cls) -> tuple[EngineChartDescriptor, ...]:
         """List all 14 registered EngineChart descriptors."""
         return tuple(ENGINE_CHARTS.values())
+
+    @classmethod
+    def list_classes(cls) -> dict[str, type[EngineChart]]:
+        """List all registered chart classes."""
+        return dict(CHART_CLASSES)
 
     @classmethod
     def get(cls, chart_id: str) -> EngineChartDescriptor:
@@ -227,6 +273,31 @@ class EngineChartsCatalog:
                 details={"chart_id": chart_id},
             )
         return ENGINE_CHARTS[chart_id]
+
+    @classmethod
+    def get_class(cls, chart_id: str) -> type[EngineChart]:
+        """Get EngineChart class by ID."""
+        if chart_id not in CHART_CLASSES:
+            raise DomainError(
+                code="ENGINE_CHART_NOT_FOUND",
+                message=f"Engine chart class '{chart_id}' not found",
+                details={"chart_id": chart_id},
+            )
+        return CHART_CLASSES[chart_id]
+
+    @classmethod
+    def create_chart(
+        cls,
+        chart_id: str,
+        project: Project | None = None,
+        memory_bean: MemoryBean | None = None,
+    ) -> EngineChart:
+        """Instantiate EngineChart by ID."""
+        chart_cls = cls.get_class(chart_id)
+        logger.info(
+            "FR-engine-charts-catalog: creating chart instance for '%s'", chart_id
+        )
+        return chart_cls(project=project, memory_bean=memory_bean)
 
     @classmethod
     def project(
