@@ -1,4 +1,24 @@
-"""Shared execution-history reconstruction for strategy state blocks."""
+"""Shared execution-history reconstruction for strategy state blocks.
+
+Description:
+    Provides deterministic reconstruction of closed trade lifecycles from raw
+    broker execution deals (IN, OUT, OUT_BY, INOUT), computing realized
+    profit/loss, volume, open/close prices, and elapsed bar timing.
+Purpose:
+    FEAT-STRATEGY-CONTROL-BLOCKS: StrategyQuant donor-faithful strategy control blocks.
+Key Capabilities:
+    - FR-STRATEGY-CONTROL-HISTORY: Execution history cycle matching and trade
+      reconstruction.
+Python API Usage:
+    from app.extend.blocks.strategy_control.history import (
+        ClosedTrade,
+        closed_trades,
+        last_trade,
+    )
+    trades = await closed_trades(context, scope)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_strategy_control.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -8,8 +28,11 @@ from datetime import datetime
 
 from app.core.data import contracts
 from app.core.enums import DealEntry, DealType
+from app.core.host.logging import get_logger
 from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.functions.order_functions import TradeFilter, aware_timestamp
+
+logger = get_logger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -139,8 +162,8 @@ def _validate_deal(deal: contracts.DealInfo) -> None:
 
 def _completed_trades(deals: list[contracts.DealInfo]) -> list[ClosedTrade]:
     cycles: dict[tuple[str, int], _Cycle] = {}
-    completed = []
-    seen = set()
+    completed: list[ClosedTrade] = []
+    seen: set[int] = set()
     for deal in sorted(deals, key=lambda item: (_deal_time(item), item.ticket)):
         if deal.deal_type not in (int(DealType.BUY), int(DealType.SELL)):
             continue
@@ -203,6 +226,7 @@ async def closed_trades(
     Partial closes accumulate in a lifecycle until the position is flat.
     Reversals end one lifecycle and start another. Missing entries fail explicitly.
     """
+    logger.debug("FR-STRATEGY-CONTROL-HISTORY: Reconstructing closed trades")
     limit = aware_timestamp(as_of) * 1000 if as_of is not None else None
     deals = [
         deal
@@ -218,7 +242,14 @@ async def last_trade(
     context: TradingRuntime, scope: TradeFilter, trades_ago: int, as_of: datetime | None
 ) -> ClosedTrade | None:
     """Select one completed lifecycle by reverse chronological offset."""
+    logger.debug(
+        "FR-STRATEGY-CONTROL-HISTORY: Fetching last trade offset=%d",
+        trades_ago,
+    )
     if type(trades_ago) is not int or trades_ago < 0:
         raise ValueError("trades_ago must be a nonnegative integer")
     trades = await closed_trades(context, scope, as_of=as_of)
     return trades[-1 - trades_ago] if trades_ago < len(trades) else None
+
+
+__all__ = ["ClosedTrade", "closed_trades", "last_trade"]
