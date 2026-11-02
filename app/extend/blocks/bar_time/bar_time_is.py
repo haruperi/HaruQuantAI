@@ -17,15 +17,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import (
-    HHMM_PACKED_SEC_THRESHOLD,
-    _log_cond,
-)
-from app.extend.blocks.bar_time.bar_hour import bar_hour
-from app.extend.blocks.bar_time.bar_minute import bar_minute
-from app.extend.blocks.bar_time.bar_time import bar_time
-from app.extend.blocks.base import block
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -33,6 +26,13 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
+from app.extend.blocks.bar_time._common import (
+    HHMM_PACKED_SEC_THRESHOLD,
+    _log_cond,
+)
+from app.extend.blocks.bar_time.bar_hour import bar_hour
+from app.extend.blocks.bar_time.bar_minute import bar_minute
+from app.extend.blocks.bar_time.bar_time import bar_time
 
 bar_time_is_spec = BlockSpec(
     id="condition.bar_time_is",

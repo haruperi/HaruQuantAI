@@ -14,15 +14,15 @@ CLI Usage:
 
 from __future__ import annotations
 
-from app.extend.blocks.bar_time._common import _log_cond
-from app.extend.blocks.base import block
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
     OutputPort,
     PortType,
 )
+from app.extend.blocks.bar_time._common import _log_cond
 
 always_true_spec = BlockSpec(
     id="condition.always_true",

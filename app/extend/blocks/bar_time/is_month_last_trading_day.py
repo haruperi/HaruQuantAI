@@ -20,19 +20,19 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import (
-    DateTime,
-    _log_cond,
-    resolve_time_ms,
-)
-from app.extend.blocks.base import block
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
+)
+from app.extend.blocks.bar_time._common import (
+    DateTime,
+    _log_cond,
+    resolve_time_ms,
 )
 
 is_month_last_trading_day_spec = BlockSpec(

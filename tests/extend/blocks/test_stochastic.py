@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from app.core.trading.blocks.registry import BlockRegistry, BlockRegistryError
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.momentum.stochastic import (
     MA_EMA,
     MA_LWMA,
@@ -13,8 +15,6 @@ from app.extend.blocks.indicators.momentum.stochastic import (
     PRICE_LOW_HIGH,
     Stochastic,
 )
-from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
-from app.extend.blocks.series import BarData
 from pydantic import ValidationError
 
 

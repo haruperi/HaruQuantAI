@@ -18,9 +18,8 @@ from __future__ import annotations
 from collections.abc import Callable
 from typing import Any
 
-from app.extend.blocks.base import block
-from app.extend.blocks.comparisons._common import _log_comparison
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -28,6 +27,7 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
+from app.extend.blocks.comparisons._common import _log_comparison
 
 condition_not_spec = BlockSpec(
     id="condition.condition_not",

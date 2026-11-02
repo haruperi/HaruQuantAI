@@ -21,6 +21,14 @@ from typing import Any, ClassVar, override
 import numpy as np
 
 from app.core.host.logging import get_logger
+from app.core.trading.blocks.metadata import (
+    BlockSpec,
+    ChartPane,
+    InputPort,
+    OutputPort,
+    PortType,
+)
+from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.comparisons import (
     crosses_above,
     crosses_below,
@@ -30,14 +38,6 @@ from app.extend.blocks.comparisons import (
 )
 from app.extend.blocks.comparisons.is_greater import is_greater
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.metadata import (
-    BlockSpec,
-    ChartPane,
-    InputPort,
-    OutputPort,
-    PortType,
-)
-from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.base import to_numpy
 
 logger = get_logger(__name__)

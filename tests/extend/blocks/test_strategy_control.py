@@ -47,9 +47,9 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 from app.core.data.contracts import PositionInfo, SymbolInfo, SymbolPrice
+from app.core.trading.blocks.registry import BlockRegistry
 from app.extend.blocks.order.open.enter_at_limit import enter_at_limit
 from app.extend.blocks.order.open.enter_at_market import enter_at_market
-from app.extend.blocks.registry import BlockRegistry
 from app.extend.blocks.strategy_control import (
     AccountBalance,
     AccountEquity,

@@ -101,7 +101,7 @@ class SnippetRegistry:
             base = _ExtendBaseWhatIf
         elif "metrics" in path.parts:
             base = _BaseMetric
-        elif "money_management" in path.parts:
+        elif "blocks" in path.parts and "money_management" in path.parts:
             base = _BasePositionSizer
 
         internal_block_files = {

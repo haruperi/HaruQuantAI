@@ -19,6 +19,9 @@ from typing import Any
 
 import numpy as np
 import pytest
+from app.core.trading.blocks.metadata import ChartPane
+from app.core.trading.blocks.registry import BlockRegistry, BlockRegistryError
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.indicators.momentum.macd import MACD
 from app.extend.blocks.indicators.momentum.rsi import RSI
@@ -28,10 +31,7 @@ from app.extend.blocks.indicators.trend.sma import SMA
 from app.extend.blocks.indicators.trend.smma import SMMA
 from app.extend.blocks.indicators.trend.tema import TEMA
 from app.extend.blocks.indicators.volatility.bollinger_bands import BollingerBands
-from app.extend.blocks.metadata import ChartPane
 from app.extend.blocks.price import BarPrice
-from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
-from app.extend.blocks.series import BarData
 from pydantic import ValidationError
 from tests.extend.blocks.test_blocks_phase1 import hash_array, make_dataset
 

@@ -22,6 +22,14 @@ import numpy as np
 from pydantic import Field, model_validator
 
 from app.core.host.logging import get_logger
+from app.core.trading.blocks.metadata import (
+    BlockSpec,
+    ChartPane,
+    InputPort,
+    OutputPort,
+    PortType,
+)
+from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.comparisons import (
     changes_down,
     changes_up,
@@ -31,14 +39,6 @@ from app.extend.blocks.comparisons import (
     is_rising,
 )
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.metadata import (
-    BlockSpec,
-    ChartPane,
-    InputPort,
-    OutputPort,
-    PortType,
-)
-from app.extend.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.base import to_numpy
 
 logger = get_logger(__name__)

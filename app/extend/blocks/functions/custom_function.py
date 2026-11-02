@@ -21,18 +21,18 @@ from __future__ import annotations
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.base import block
-from app.extend.blocks.functions._common import (
-    _CUSTOM_REGISTRY,
-    register_custom_function,
-)
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
+)
+from app.extend.blocks.functions._common import (
+    _CUSTOM_REGISTRY,
+    register_custom_function,
 )
 
 logger = get_logger(__name__)

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import numpy as np
 import pytest
+from app.core.trading.blocks.registry import BlockRegistry
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.momentum.cci import CCI
 from app.extend.blocks.indicators.momentum.macd import MACD
 from app.extend.blocks.indicators.momentum.rsi import RSI
@@ -12,8 +14,6 @@ from app.extend.blocks.indicators.trend.ema import EMA
 from app.extend.blocks.indicators.volatility.atr import ATR
 from app.extend.blocks.indicators.volatility.bollinger_bands import BollingerBands
 from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
-from app.extend.blocks.registry import BlockRegistry
-from app.extend.blocks.series import BarData
 
 
 @pytest.fixture(scope="module")
@@ -115,7 +115,7 @@ def test_shift_causality_matches_subsets(catalog):
 
 def test_composition_applies_six_digit_rounding_to_outputs(catalog):
     """Donor getRounded() rounds to 6 digits; micro-differences below 1e-6 do not trigger crosses."""
-    from app.extend.blocks.series import IndicatorSeries
+    from app.core.trading.blocks.series import IndicatorSeries
 
     recipe = catalog.require("signal.rsi.rsi_cross_up").target
     # 29.9999999 and 30.0000001 both round to 30.000000 at 6 digits

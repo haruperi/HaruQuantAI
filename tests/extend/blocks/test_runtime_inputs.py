@@ -7,16 +7,16 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 import pytest
-from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
-from app.extend.blocks.registry import BlockRegistry
-from app.extend.blocks.runtime_inputs import (
+from app.core.trading.blocks.registry import BlockRegistry
+from app.core.trading.blocks.runtime_inputs import (
     bind_profile_signals,
     bind_runtime_inputs,
     execute_bound_signal,
     resolve_decision_price,
     schedule_calendar_session,
 )
-from app.extend.blocks.series import BarData
+from app.core.trading.blocks.series import BarData
+from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
 from app.extend.calculators.profile_sessions import session_bounds
 
 

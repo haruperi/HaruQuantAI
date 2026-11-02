@@ -21,21 +21,21 @@ import math
 from typing import Any
 
 from app.core.enums import MAType
-from app.extend.blocks.base import block
-from app.extend.blocks.comparisons._common import (
-    DEFAULT_COMPARISON_PRECISION,
-    _log_comparison,
-    calculate_ma,
-    resolve_shift_value,
-    round_value,
-)
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
+)
+from app.extend.blocks.comparisons._common import (
+    DEFAULT_COMPARISON_PRECISION,
+    _log_comparison,
+    calculate_ma,
+    resolve_shift_value,
+    round_value,
 )
 
 indicator_above_ma_spec = BlockSpec(

@@ -24,17 +24,17 @@ from pydantic import Field
 
 from app.core.host.logging import get_logger
 from app.core.trading.blocks.base import BaseBlock
-from app.extend.blocks.functions.correlation_coefficient import (
-    correlation_kernel,
-)
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
 )
-from app.extend.blocks.series import IndicatorSeries
+from app.core.trading.blocks.series import IndicatorSeries
+from app.extend.blocks.functions.correlation_coefficient import (
+    correlation_kernel,
+)
 
 logger = get_logger(__name__)
 

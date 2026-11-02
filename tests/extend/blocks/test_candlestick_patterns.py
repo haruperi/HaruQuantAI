@@ -3,10 +3,10 @@
 from __future__ import annotations
 
 import pytest
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.price_action.candlestick_patterns import (
     CandlestickPatterns,
 )
-from app.extend.blocks.series import BarData
 
 
 def test_doji_tick_size_and_ratio_modes() -> None:

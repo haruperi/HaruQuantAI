@@ -25,6 +25,7 @@ import logging
 import numpy as np
 import pytest
 from app.core.trading.blocks.base import BaseBlock
+from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.functions.correlation_coefficient import CorrelationCoefficient
 from app.extend.blocks.functions.correlation_log import CorrelationLog
 from app.extend.blocks.indicators.base import BaseIndicator
@@ -102,7 +103,6 @@ from app.extend.blocks.indicators.volume.net_volume import NetVolume
 from app.extend.blocks.indicators.volume.price_volume_trend import PriceVolumeTrend
 from app.extend.blocks.indicators.volume.volume_oscillator import VolumeOscillator
 from app.extend.blocks.indicators.volume.vwma import VWMA
-from app.extend.blocks.series import BarData, IndicatorSeries
 from pydantic import ValidationError
 
 ALL_INDICATOR_CLASSES: list[type[BaseIndicator]] = [

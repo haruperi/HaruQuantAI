@@ -28,6 +28,8 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
+from app.core.trading.blocks.metadata import ExecutionKind
+from app.core.trading.blocks.registry import BlockRegistry
 from app.extend.blocks.actions import (
     ORDER_NOT_DEFINED,
     ActionRecord,
@@ -81,8 +83,6 @@ from app.extend.blocks.actions.logging import (
 from app.extend.blocks.actions.logging import (
     SendEmail as LoggingEmailAlias,
 )
-from app.extend.blocks.metadata import ExecutionKind
-from app.extend.blocks.registry import BlockRegistry
 from app.extend.blocks.types import Variable
 
 

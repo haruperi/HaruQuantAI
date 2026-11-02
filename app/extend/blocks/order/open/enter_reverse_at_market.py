@@ -27,15 +27,15 @@ from app.core.data.contracts import (
 )
 from app.core.enums import OrderType, TradeRetcode
 from app.core.host.logging import get_logger
-from app.core.trading.blocks.runtime import TradingRuntime
-from app.extend.blocks.base import block
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
 )
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.order._common import (
     close_positions,
     matching_positions,

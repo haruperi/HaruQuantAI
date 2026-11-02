@@ -22,6 +22,8 @@ import importlib
 from datetime import UTC, datetime
 
 import pytest
+from app.core.trading.blocks.metadata import BlockSpec, ExecutionKind, PortType
+from app.core.trading.blocks.registry import block_registry
 from app.extend.blocks.bar_time import (
     BarTime,
     DateTime,
@@ -100,8 +102,6 @@ from app.extend.blocks.bar_time import (
     last_week_of_month,
     last_week_of_month_spec,
 )
-from app.extend.blocks.metadata import BlockSpec, ExecutionKind, PortType
-from app.extend.blocks.registry import block_registry
 
 
 def _sample_timestamps() -> list[int]:

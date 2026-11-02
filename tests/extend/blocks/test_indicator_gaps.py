@@ -19,6 +19,7 @@ from __future__ import annotations
 import app.extend.blocks.indicators.volume.cot as cot_signals
 import numpy as np
 import pytest
+from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.comparisons.changes_down import changes_down
 from app.extend.blocks.comparisons.changes_up import changes_up
 from app.extend.blocks.comparisons.crosses_above import crosses_above
@@ -51,7 +52,6 @@ from app.extend.blocks.indicators.volatility.lowest_in_range import LowestInRang
 from app.extend.blocks.indicators.volume.cot import COT
 from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
 from app.extend.blocks.price import BarPrice
-from app.extend.blocks.series import BarData, IndicatorSeries
 
 
 def test_adx_calculate_and_all_conditions() -> None:

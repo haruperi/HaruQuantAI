@@ -10,14 +10,8 @@ from typing import Any, override
 
 import numpy as np
 import pytest
-from app.core.trading.statistics.base import BaseMetric
-from app.extend.blocks.actions.log_to_file import LogToFileAction
-from app.extend.blocks.base import BaseBlock
-from app.extend.blocks.comparisons.is_greater import is_greater
-from app.extend.blocks.functions.plus import plus
-from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.indicators.trend.sma import SMA
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import BaseBlock
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -25,14 +19,20 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.extend.blocks.money_management.base import BasePositionSizer
-from app.extend.blocks.price import BarPrice
-from app.extend.blocks.registry import (
+from app.core.trading.blocks.registry import (
     BlockRegistry,
     BlockRegistryError,
     block_registry,
 )
-from app.extend.blocks.series import BarData, IndicatorSeries
+from app.core.trading.blocks.series import BarData, IndicatorSeries
+from app.core.trading.statistics.base import BaseMetric
+from app.extend.blocks.actions.log_to_file import LogToFileAction
+from app.extend.blocks.comparisons.is_greater import is_greater
+from app.extend.blocks.functions.plus import plus
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.indicators.trend.sma import SMA
+from app.extend.blocks.money_management.base import BasePositionSizer
+from app.extend.blocks.price import BarPrice
 from pydantic import Field, ValidationError
 
 
@@ -206,7 +206,7 @@ def test_registry_registration_and_callable_schema_separation() -> None:
 
 
 def test_callable_descriptor_instantiate_validates_parameters() -> None:
-    from app.extend.blocks.base import block
+    from app.core.trading.blocks.base import block
 
     registry = BlockRegistry()
     desc = registry.register_block(plus)
@@ -516,7 +516,7 @@ def test_global_block_registry_registers_vertical_slice(
         isolated_registry,
     )
     monkeypatch.setattr(
-        "app.extend.blocks.registry.block_registry",
+        "app.core.trading.blocks.registry.block_registry",
         isolated_registry,
     )
     block_registry.register_block(SMA)

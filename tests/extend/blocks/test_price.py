@@ -52,6 +52,7 @@ import math
 from datetime import UTC, datetime
 
 import pytest
+from app.core.trading.blocks.registry import BlockRegistry
 from app.extend.blocks.price import (
     CLOSE,
     DEFAULT_PIP_SIZE,
@@ -155,7 +156,6 @@ from app.extend.blocks.price import (
     spread_spec,
     volume_spec,
 )
-from app.extend.blocks.registry import BlockRegistry
 
 
 def test_donor_class_aliases() -> None:

@@ -20,9 +20,8 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from app.extend.blocks.base import block
-from app.extend.blocks.functions._common import _log_func_eval, resolve_shift_value
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -30,6 +29,7 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
+from app.extend.blocks.functions._common import _log_func_eval, resolve_shift_value
 
 square_root_spec = BlockSpec(
     id="function.square_root",

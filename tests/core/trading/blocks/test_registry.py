@@ -4,7 +4,6 @@ from __future__ import annotations
 
 from pathlib import Path
 
-import app.extend.blocks.registry as legacy_registry
 import pytest
 from app.core.lib.errors import DomainError
 from app.core.trading.blocks.base import BaseBlock, block
@@ -19,7 +18,6 @@ from app.core.trading.blocks.registry import (
     BlockRegistry,
     BlockRegistryError,
     CatalogSnapshot,
-    block_registry,
 )
 
 
@@ -63,15 +61,6 @@ def add_five(x: float, amount: float = 5.0) -> float:
 # ---------------------------------------------------------------------------
 # 1. Identity & Backward Compatibility Bridges
 # ---------------------------------------------------------------------------
-
-
-def test_registry_bridge_identity() -> None:
-    """Verify legacy bridge re-exports identical classes and objects."""
-    assert legacy_registry.BlockRegistry is BlockRegistry
-    assert legacy_registry.BlockDescriptor is BlockDescriptor
-    assert legacy_registry.BlockRegistryError is BlockRegistryError
-    assert legacy_registry.CatalogSnapshot is CatalogSnapshot
-    assert legacy_registry.block_registry is block_registry
 
 
 def test_block_registry_error_is_domain_error() -> None:

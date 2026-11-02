@@ -22,18 +22,18 @@ import numpy as np
 from pydantic import Field
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.comparisons import is_falling, is_lower, is_rising
-from app.extend.blocks.comparisons.is_greater import is_greater
-from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.indicators.volatility.mt_atr import MTATR
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     InputPort,
     OutputPort,
     PortType,
 )
-from app.extend.blocks.series import BarData, IndicatorSeries
+from app.core.trading.blocks.series import BarData, IndicatorSeries
+from app.extend.blocks.comparisons import is_falling, is_lower, is_rising
+from app.extend.blocks.comparisons.is_greater import is_greater
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.indicators.volatility.mt_atr import MTATR
 
 ATR_MODE = 2
 

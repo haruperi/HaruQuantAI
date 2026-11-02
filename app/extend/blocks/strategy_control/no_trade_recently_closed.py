@@ -23,15 +23,15 @@ from __future__ import annotations
 from datetime import datetime
 
 from app.core.host.logging import get_logger
-from app.core.trading.blocks.runtime import TradingRuntime
-from app.extend.blocks.base import block
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
 )
+from app.core.trading.blocks.runtime import TradingRuntime
 from app.extend.blocks.strategy_control.trade_recently_closed import (
     trade_recently_closed,
 )

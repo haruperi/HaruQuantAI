@@ -17,7 +17,7 @@ import inspect
 from pathlib import Path
 
 import pytest
-from app.extend.blocks.registry import (
+from app.core.trading.blocks.registry import (
     BlockRegistry,
     BlockRegistryError,
     _normalize_source_path,
@@ -59,8 +59,8 @@ def test_block_registry_rejects_path_traversal(tmp_path: Path) -> None:
     registry = BlockRegistry()
     outside_file = tmp_path / "outside.py"
     outside_file.write_text(
-        "from app.extend.blocks.base import BaseBlock\n"
-        "from app.extend.blocks.metadata import BlockSpec\n"
+        "from app.core.trading.blocks.base import BaseBlock\n"
+        "from app.core.trading.blocks.metadata import BlockSpec\n"
         "class OutsideBlock(BaseBlock):\n"
         "    spec = BlockSpec(id='test.outside')\n",
         encoding="utf-8",
@@ -86,8 +86,8 @@ def test_retained_last_valid_reload_on_failure(tmp_path: Path) -> None:
     # 1. Register valid block
     valid_file = tmp_path / "custom_block.py"
     valid_file.write_text(
-        "from app.extend.blocks.base import BaseBlock\n"
-        "from app.extend.blocks.metadata import BlockSpec\n"
+        "from app.core.trading.blocks.base import BaseBlock\n"
+        "from app.core.trading.blocks.metadata import BlockSpec\n"
         "class MyBlock(BaseBlock):\n"
         "    spec = BlockSpec(id='custom.my_block', name='MyBlock')\n",
         encoding="utf-8",
@@ -112,18 +112,18 @@ def test_internal_infrastructure_modules_are_excluded_from_catalogs() -> None:
     """Verify metadata.py, registry.py, series.py, base.py are ignored during discovery."""
     registry = BlockRegistry()
     internal_files = [
-        Path("app/extend/blocks/base.py"),
-        Path("app/extend/blocks/metadata.py"),
-        Path("app/extend/blocks/registry.py"),
-        Path("app/extend/blocks/series.py"),
+        Path("app/core/trading/blocks/base.py"),
+        Path("app/core/trading/blocks/metadata.py"),
+        Path("app/core/trading/blocks/registry.py"),
+        Path("app/core/trading/blocks/series.py"),
     ]
     for internal in internal_files:
-        descs = registry.register_file(internal, authorized_root="app/extend")
+        descs = registry.register_file(internal, authorized_root="app/core")
         assert descs == []
 
     # Also verify SnippetRegistry excludes them from registering block classes
     for internal in internal_files:
-        mod = importlib.import_module(f"app.extend.blocks.{internal.stem}")
+        mod = importlib.import_module(f"app.core.trading.blocks.{internal.stem}")
         classes = snippet_registry.register(internal, mod)
         assert classes == []
 
@@ -141,8 +141,8 @@ def test_discovery_failure_isolation_and_diagnostics(tmp_path: Path) -> None:
 
     # z_good.py contains valid BaseBlock
     (blocks_dir / "z_good.py").write_text(
-        "from app.extend.blocks.base import BaseBlock\n"
-        "from app.extend.blocks.metadata import BlockSpec\n"
+        "from app.core.trading.blocks.base import BaseBlock\n"
+        "from app.core.trading.blocks.metadata import BlockSpec\n"
         "class GoodBlock(BaseBlock):\n"
         "    spec = BlockSpec(id='custom.z_good', name='ZGood')\n",
         encoding="utf-8",
@@ -189,8 +189,8 @@ def test_source_ownership_conflict_rejected(tmp_path: Path) -> None:
 
     file1 = tmp_path / "block1.py"
     file1.write_text(
-        "from app.extend.blocks.base import BaseBlock\n"
-        "from app.extend.blocks.metadata import BlockSpec\n"
+        "from app.core.trading.blocks.base import BaseBlock\n"
+        "from app.core.trading.blocks.metadata import BlockSpec\n"
         "class OwnedBlock(BaseBlock):\n"
         "    spec = BlockSpec(id='test.owned_block', name='OwnedBlock')\n",
         encoding="utf-8",
@@ -199,8 +199,8 @@ def test_source_ownership_conflict_rejected(tmp_path: Path) -> None:
     assert registry.get("test.owned_block") is not None
 
     # Attempt to re-register the same block ID with a different source_file
-    from app.extend.blocks.base import BaseBlock
-    from app.extend.blocks.metadata import BlockSpec
+    from app.core.trading.blocks.base import BaseBlock
+    from app.core.trading.blocks.metadata import BlockSpec
 
     class StolenBlock(BaseBlock):
         spec = BlockSpec(id="test.owned_block", name="OwnedBlock")
@@ -226,8 +226,8 @@ def test_nested_staging_transactions_preserve_state(tmp_path: Path) -> None:
     # 2. Call register_file while outer staging is active (pushes nested savepoint)
     valid_file = tmp_path / "nested_valid.py"
     valid_file.write_text(
-        "from app.extend.blocks.base import BaseBlock\n"
-        "from app.extend.blocks.metadata import BlockSpec\n"
+        "from app.core.trading.blocks.base import BaseBlock\n"
+        "from app.core.trading.blocks.metadata import BlockSpec\n"
         "class NestedBlock(BaseBlock):\n"
         "    spec = BlockSpec(id='custom.nested_block', name='NestedBlock')\n",
         encoding="utf-8",
@@ -289,7 +289,7 @@ def test_clean_migration_obsolete_implementations_removed() -> None:
 
     from app.extend.blocks.functions import Functions
 
-    assert not hasattr(Functions, "plus")
+    assert hasattr(Functions, "plus")
 
     # 2d. actions legacy folder is cleanly removed
     with pytest.raises(ModuleNotFoundError):

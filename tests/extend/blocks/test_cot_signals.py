@@ -7,8 +7,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
-from app.extend.blocks.registry import BlockRegistry
-from app.extend.blocks.series import IndicatorSeries
+from app.core.trading.blocks.registry import BlockRegistry
+from app.core.trading.blocks.series import IndicatorSeries
 
 
 @pytest.fixture(scope="module")

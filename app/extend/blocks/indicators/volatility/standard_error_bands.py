@@ -25,12 +25,7 @@ import numpy as np
 from pydantic import Field
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.indicators.trend.lin_reg import LinReg
-from app.extend.blocks.indicators.volatility.standard_error import (
-    standard_error_kernel,
-)
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -38,7 +33,12 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.extend.blocks.series import BarData, IndicatorSeries
+from app.core.trading.blocks.series import BarData, IndicatorSeries
+from app.extend.blocks.indicators.base import BaseIndicator
+from app.extend.blocks.indicators.trend.lin_reg import LinReg
+from app.extend.blocks.indicators.volatility.standard_error import (
+    standard_error_kernel,
+)
 
 logger = get_logger(__name__)
 

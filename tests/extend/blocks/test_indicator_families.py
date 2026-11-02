@@ -25,9 +25,9 @@ from typing import Any
 
 import numpy as np
 import pytest
+from app.core.trading.blocks.registry import BlockRegistry, BlockRegistryError
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
-from app.extend.blocks.series import BarData
 from app.workspace.code_editor._indicator_data import calculate_indicator, output_series
 from pydantic import ValidationError
 
@@ -279,8 +279,8 @@ def test_file_discovery_resolves_types_and_reads_same_size_edits(
     path = tmp_path / "typed_probe.py"
     source = """from __future__ import annotations
 from typing import ClassVar, Literal
-from app.extend.blocks.base import BaseBlock
-from app.extend.blocks.metadata import BlockSpec
+from app.core.trading.blocks.base import BaseBlock
+from app.core.trading.blocks.metadata import BlockSpec
 class Probe(BaseBlock):
     spec: ClassVar[BlockSpec] = BlockSpec(id='probe.typed')
     mode: Literal['a', 'b'] = 'a'

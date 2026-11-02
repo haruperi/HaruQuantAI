@@ -22,20 +22,20 @@ import numpy as np
 from pydantic import Field
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     InputPort,
     OutputPort,
     PortType,
 )
-from app.extend.blocks.series import (
+from app.core.trading.blocks.series import (
     COMPUTED_PRICE_INPUTS,
     BarData,
     IndicatorSeries,
     computed_price,
 )
+from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.calculators.average import AverageCalculator, AverageType
 from app.extend.calculators.std_dev import centered_deviation
 

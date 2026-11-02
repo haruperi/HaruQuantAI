@@ -9,9 +9,9 @@ from zoneinfo import ZoneInfo
 
 import numpy as np
 import pytest
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.volume.tpo_profile import TPOProfile
 from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
-from app.extend.blocks.series import BarData
 from app.extend.calculators.profile import TPO_OUTPUTS, VOLUME_OUTPUTS
 from app.extend.calculators.profile_sessions import session_bounds
 from pydantic import ValidationError

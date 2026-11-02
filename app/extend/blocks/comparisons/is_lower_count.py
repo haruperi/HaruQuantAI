@@ -18,19 +18,19 @@ from __future__ import annotations
 import math
 from typing import Any
 
-from app.extend.blocks.base import block
-from app.extend.blocks.comparisons._common import (
-    DEFAULT_COUNT_PRECISION,
-    _log_comparison,
-    _pair,
-)
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
+)
+from app.extend.blocks.comparisons._common import (
+    DEFAULT_COUNT_PRECISION,
+    _log_comparison,
+    _pair,
 )
 
 is_lower_count_spec = BlockSpec(

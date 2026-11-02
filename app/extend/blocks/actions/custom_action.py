@@ -25,9 +25,8 @@ from typing import Any, ClassVar
 from pydantic import Field
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.actions.base import ActionRecord
-from app.extend.blocks.base import BaseBlock
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import BaseBlock
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -35,6 +34,7 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
+from app.extend.blocks.actions.base import ActionRecord
 
 logger = get_logger(__name__)
 

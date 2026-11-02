@@ -19,8 +19,8 @@ from __future__ import annotations
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.base import block
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,

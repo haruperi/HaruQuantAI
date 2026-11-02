@@ -17,9 +17,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.extend.blocks.bar_time._common import _log_val, resolve_bar_count
-from app.extend.blocks.base import block
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.base import block
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -27,6 +26,7 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
+from app.extend.blocks.bar_time._common import _log_val, resolve_bar_count
 
 current_bar_spec = BlockSpec(
     id="bar_time.current_bar",

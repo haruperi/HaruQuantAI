@@ -25,8 +25,8 @@ from __future__ import annotations
 import logging
 
 import pytest
-from app.extend.blocks.metadata import PortType
-from app.extend.blocks.registry import BlockRegistry
+from app.core.trading.blocks.metadata import PortType
+from app.core.trading.blocks.registry import BlockRegistry
 from app.extend.blocks.types import (
     Boolean,
     BooleanConstant,

@@ -22,18 +22,18 @@ from typing import Any
 
 import numpy as np
 import pytest
-from app.extend.blocks.composition import (
+from app.core.trading.blocks.composition import (
     CompositionSpec,
     bind_composition,
     composition_manifest,
 )
-from app.extend.blocks.indicators.momentum.rsi import RSI
-from app.extend.blocks.registry import (
+from app.core.trading.blocks.registry import (
     BlockRegistry,
     BlockRegistryError,
     CatalogSnapshot,
 )
-from app.extend.blocks.series import BarData, IndicatorSeries
+from app.core.trading.blocks.series import BarData, IndicatorSeries
+from app.extend.blocks.indicators.momentum.rsi import RSI
 from pydantic import ValidationError
 
 
@@ -244,8 +244,8 @@ def test_snapshots_freeze_recipe_and_pin_indicator_implementations(
     template = """from typing import ClassVar
 from pydantic import Field
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.metadata import BlockSpec, OutputPort
-from app.extend.blocks.series import IndicatorSeries
+from app.core.trading.blocks.metadata import BlockSpec, OutputPort
+from app.core.trading.blocks.series import IndicatorSeries
 class TestRSI(BaseIndicator):
     spec: ClassVar[BlockSpec] = BlockSpec(id="indicator.momentum.rsi", outputs=(OutputPort("value"),))
     period: int = Field(default=14, ge=1)
@@ -323,7 +323,7 @@ def test_old_indicator_comparison_wrappers_are_removed() -> None:
 def test_specialized_signal_bindings_distinguish_maps_from_series(
     catalog: CatalogSnapshot,
 ) -> None:
-    from app.extend.blocks.metadata import PortType
+    from app.core.trading.blocks.metadata import PortType
 
     for row in composition_manifest()["mappings"]:
         if row["status"] != "specialized_signal":

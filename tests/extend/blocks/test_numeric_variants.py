@@ -7,6 +7,8 @@ from pathlib import Path
 
 import numpy as np
 import pytest
+from app.core.trading.blocks.registry import BlockRegistry, BlockRegistryError
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.price_action.highest_lowest import HighestLowest
 from app.extend.blocks.indicators.volatility.bar_range import BarRange
 from app.extend.blocks.indicators.volatility.bb_range import BBRange
@@ -15,8 +17,6 @@ from app.extend.blocks.indicators.volatility.biggest_range import BiggestRange
 from app.extend.blocks.indicators.volatility.highest_in_range import HighestInRange
 from app.extend.blocks.indicators.volatility.lowest_in_range import LowestInRange
 from app.extend.blocks.indicators.volatility.smallest_range import SmallestRange
-from app.extend.blocks.registry import BlockRegistry, BlockRegistryError
-from app.extend.blocks.series import BarData
 from pydantic import ValidationError
 
 REFERENCE = json.loads(
@@ -140,7 +140,7 @@ def test_strict_parameters_real_price_inputs_and_no_time_window_shims():
 
 
 def test_catalog_projection_routes_and_selector_dependencies():
-    from app.extend.blocks.composition import (
+    from app.core.trading.blocks.composition import (
         CompositionSpec,
         bind_composition,
         composition_manifest,

@@ -35,9 +35,9 @@ import numpy as np
 
 from app.core.host.persistence import HostPersistence
 from app.core.lib.errors import JSONValue, copy_json
+from app.core.trading.blocks.series import BarData
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.blocks.price import BarPrice
-from app.extend.blocks.series import BarData
 from app.workspace.code_editor._common import CodeEditorError
 from app.workspace.data_manager.data.review import DatasetReview
 from app.workspace.data_manager.data.storage import require_data

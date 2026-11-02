@@ -27,7 +27,7 @@ from collections.abc import Callable
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.series import resolve_shift_value
+from app.core.trading.blocks.series import resolve_shift_value
 
 logger = get_logger(__name__)
 

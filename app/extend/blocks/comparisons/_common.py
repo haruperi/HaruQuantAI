@@ -31,7 +31,7 @@ import numpy as np
 from app.core.data.contracts import DataframeSeries
 from app.core.enums import MAType
 from app.core.host.logging import get_logger
-from app.extend.blocks.series import round_value
+from app.core.trading.blocks.series import round_value
 
 __all__ = [
     "DEFAULT_COMPARISON_PRECISION",

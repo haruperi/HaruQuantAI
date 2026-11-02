@@ -22,8 +22,7 @@ from typing import ClassVar, override
 import numpy as np
 
 from app.core.host.logging import get_logger
-from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.metadata import (
+from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
     ExecutionKind,
@@ -31,7 +30,8 @@ from app.extend.blocks.metadata import (
     OutputPort,
     PortType,
 )
-from app.extend.blocks.series import BarData, IndicatorSeries
+from app.core.trading.blocks.series import BarData, IndicatorSeries
+from app.extend.blocks.indicators.base import BaseIndicator
 
 logger = get_logger(__name__)
 

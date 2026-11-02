@@ -40,8 +40,8 @@ def _gen_indicator(name: str) -> str:
 from typing import ClassVar, override
 from pydantic import Field
 from app.extend.blocks.indicators.base import BaseIndicator
-from app.extend.blocks.metadata import BlockSpec, InputPort, OutputPort
-from app.extend.blocks.series import BarData, IndicatorSeries
+from app.core.trading.blocks.metadata import BlockSpec, InputPort, OutputPort
+from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.calculators.average import sma_kernel
 
 
@@ -78,7 +78,7 @@ Evaluates entry or exit conditions across indicator and price series.
 
 from dataclasses import dataclass
 from app.extend.blocks.price import BarPrice
-from app.extend.blocks.series import IndicatorSeries
+from app.core.trading.blocks.series import IndicatorSeries
 
 
 @dataclass
