@@ -1,14 +1,15 @@
 import { useEffect, useRef, useState } from 'react';
 import { useStore } from 'zustand';
-import { X, Settings2 } from 'lucide-react';
+import { ChevronDown, X, Settings2 } from 'lucide-react';
 import { useChart } from '../hooks/useChartEngine';
 import { ChartEngine } from '../engine/ChartEngine';
 import { MockFeed } from '../feed/MockFeed';
 import { symbolInfo } from '../feed/symbols';
+import { intervals, type Interval } from '../types';
 import { formatPrice } from '../utils/format';
 import { pnl } from '../store/positions';
 import { ToolButton } from './Tooltip';
-export function ChartArea() {
+export function ChartArea({ paneIndex = 0, multiChart = false }: { paneIndex?: number; multiChart?: boolean }) {
   const { store, engine, root, onCrosshairTime, onViewport, onReady, onDispose } = useChart(),
     s = useStore(store),
     host = useRef<HTMLDivElement>(null),
@@ -75,8 +76,31 @@ export function ChartArea() {
   return (
     <div className="cq-chart" aria-label="Chart" role="region">
       <div className="cq-canvas-host" ref={host} data-testid="chart-canvas-host" />
-      <div className="cq-legend" ref={legend}>
-        {s.chart.showSymbolTitle && <h1>
+      <div className={'cq-legend' + (multiChart ? ' cq-legend-multi' : '')} ref={legend}>
+        {multiChart && (
+          <div className="cq-pane-controls" aria-label={'Chart ' + (paneIndex + 1) + ' controls'}>
+            <button
+              type="button"
+              className="cq-pane-symbol"
+              aria-label={'Chart ' + (paneIndex + 1) + ' symbol'}
+              title={'Change symbol · ' + symbol.name}
+              onClick={() => s.setUI({ dialog: 'symbol' })}
+            >
+              <span className="cq-symbol-logo" aria-hidden="true">{symbol.icon}</span>
+              <strong>{s.chart.symbol}</strong>
+              <ChevronDown size={12} aria-hidden="true" />
+            </button>
+            <select
+              aria-label={'Chart ' + (paneIndex + 1) + ' interval'}
+              title={'Chart ' + (paneIndex + 1) + ' timeframe'}
+              value={s.chart.interval}
+              onChange={(e) => s.settings({ interval: e.target.value as Interval })}
+            >
+              {intervals.map((interval) => <option key={interval} value={interval}>{interval}</option>)}
+            </select>
+          </div>
+        )}
+        {!multiChart && s.chart.showSymbolTitle && <h1>
           <span className="cq-symbol-logo">{symbol.icon}</span>
           {symbol.name}
           <span className="cq-legend-muted">

@@ -31,10 +31,11 @@ function Shortcuts() {
   useShortcuts();
   return null;
 }
-function ChartPane({ services, index, active, onSelect }: {
+function ChartPane({ services, index, active, multiChart, onSelect }: {
   services: ChartServices;
   index: number;
   active: boolean;
+  multiChart: boolean;
   onSelect: (index: number) => void;
 }) {
   const theme = useStore(services.store, state => state.chart.theme);
@@ -47,7 +48,7 @@ function ChartPane({ services, index, active, onSelect }: {
       onPointerDown={() => onSelect(index)}
       onFocusCapture={() => onSelect(index)}>
       <ChartContext.Provider value={services}>
-        <ChartArea />
+        <ChartArea paneIndex={index} multiChart={multiChart} />
       </ChartContext.Provider>
     </div>
   );
@@ -240,6 +241,7 @@ export function ChartWorkspace() {
         <div className="cq-chart-board" style={boardStyle} data-layout={layout.id}>
           {Array.from({ length: definition.count }, (_, index) => (
             <ChartPane key={index} index={index} active={active === index}
+              multiChart={definition.count > 1}
               services={paneServices[index]} onSelect={selectPane} />
           ))}
           {splits.map(split => {
