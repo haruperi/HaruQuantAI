@@ -114,3 +114,11 @@ def test_unknown_coverage_is_not_invented_or_provider_errors_hidden(
                 assert "availability could not be verified" in str(caught.value)
     finally:
         client.disconnect()
+
+
+def test_default_sq_folders_use_plain_asset_names():
+    from app.workspace.brokers.sq_equity import DEFAULT_DATA_DIR as EQUITY
+    from app.workspace.brokers.sq_futures import DEFAULT_DATA_DIR as FUTURES
+
+    assert EQUITY.name == "equity"
+    assert FUTURES.name == "futures"

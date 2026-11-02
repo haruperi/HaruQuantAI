@@ -1,7 +1,17 @@
-"""Canonical market frames: integer Parquet prices, UTC time, explicit units.
+"""Canonical market frames and provider storage folder names.
 
-Catalog owners select canonical yearly/monthly files. Legacy single files can
-supply tick_size from the catalog.
+Description:
+    Encode market observations and resolve provider storage directories without
+    changing provider identities or dataset keys.
+Purpose:
+    FEAT-MARKET-STORAGE: canonical market history serialization and folder ownership.
+Key Capabilities:
+    - FR-MARKET-STORAGE-provider-folders: map SQ provider IDs to equity/futures folders.
+      Logging: DEBUG records folder resolution; mapping regressions verify the log.
+Python API Usage:
+    provider_storage_name("sq_futures")  # futures
+CLI Usage:
+    uv run pytest tests/workspace/data_manager/test_sources.py --no-cov
 """
 
 from __future__ import annotations
@@ -15,6 +25,19 @@ from typing import Any
 import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
 import pyarrow as pa
+
+from app.core.host.logging import get_logger
+
+logger = get_logger(__name__)
+
+
+def provider_storage_name(provider: str) -> str:
+    """Resolve storage-only naming while preserving the provider identifier."""
+    safe_component(provider)
+    folder = {"sq_equity": "equity", "sq_futures": "futures"}.get(provider, provider)
+    logger.debug("FR-MARKET-STORAGE-provider-folders: %s -> %s", provider, folder)
+    return folder
+
 
 TICK_SCHEMA = pa.schema(
     [

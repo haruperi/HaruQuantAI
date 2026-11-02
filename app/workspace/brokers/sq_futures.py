@@ -53,9 +53,7 @@ from .sq_equity import SQEquityClient
 
 logger = get_logger(__name__)
 
-DEFAULT_DATA_DIR = (
-    Path(__file__).resolve().parents[3] / "data" / "market" / "sq_futures"
-)
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market" / "futures"
 DEFAULT_CATALOG_PATH = DEFAULT_DATA_DIR / "sq_futures.csv"
 CDN_BASE_URL = "https://cdn.strategyquantcdn.com/data/barchart_test/eod"
 USER_AGENT = "HaruQuantAI-SQFuturesConnector/1.0"

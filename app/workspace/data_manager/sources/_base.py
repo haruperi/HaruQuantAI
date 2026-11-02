@@ -27,7 +27,11 @@ from typing import Any, cast, override
 import pandas as pd  # type: ignore[import-untyped]
 
 from app.core.data.contracts import BridgeError
-from app.core.data.market_storage import price_columns, safe_component
+from app.core.data.market_storage import (
+    price_columns,
+    provider_storage_name,
+    safe_component,
+)
 from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.data.coverage import (
@@ -221,7 +225,11 @@ class BaseSource:
             "date_from": "",
             "date_to": "",
             "bars": 0,
-            "path": str(dataset_root(self.market_root / source, symbol, timeframe)),
+            "path": str(
+                dataset_root(
+                    self.market_root / provider_storage_name(source), symbol, timeframe
+                )
+            ),
             "data_kind": "ticks" if timeframe == "TICK" else "bars",
             "created_at": now,
             "updated_at": now,
@@ -354,7 +362,7 @@ class BaseSource:
             frame[column] = ((frame[column] / step).round() * step).round(digits)
         publish_frame(
             self.gateway,
-            self.market_root / row["source"],
+            self.market_root / provider_storage_name(row["source"]),
             row,
             frame,
             step,

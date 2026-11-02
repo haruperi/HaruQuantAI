@@ -73,7 +73,7 @@ logger = get_logger(__name__)
 
 SQDAT_FR = "FR-BROKER-CODECS-SQDAT"
 
-DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market" / "sq_equity"
+DEFAULT_DATA_DIR = Path(__file__).resolve().parents[3] / "data" / "market" / "equity"
 DEFAULT_CATALOG_PATH = DEFAULT_DATA_DIR / "sq_equity.csv"
 CDN_BASE_URL = "https://cdn.strategyquantcdn.com/data/barchart_test/eod"
 USER_AGENT = "HaruQuantAI-SQEquityConnector/1.0"

@@ -8,7 +8,7 @@ import pandas as pd
 import pyarrow.parquet as pq
 import pytest
 from app.core.data.contracts import BridgeError
-from app.core.data.market_storage import M1_SCHEMA, TICK_SCHEMA
+from app.core.data.market_storage import M1_SCHEMA, TICK_SCHEMA, provider_storage_name
 from app.core.enums import Timeframe
 from app.core.host.persistence import HostPersistence
 from app.workspace.data_manager.sources import (
@@ -94,7 +94,13 @@ def test_each_source_persists_real_bars_with_native_timeframe_and_catalog(
     )
     assert result["success"]
     row = result["data"]["record"]
-    path = service.market_root / source / tf.lower() / symbol.lower() / "2025.parquet"
+    path = (
+        service.market_root
+        / provider_storage_name(source)
+        / tf.lower()
+        / symbol.lower()
+        / "2025.parquet"
+    )
     assert json.loads(row["lineage_json"])["partitions"] == [str(path)]
     metadata = pq.read_metadata(path)
     assert metadata.num_rows == row["bars"] > 0
@@ -343,3 +349,11 @@ def test_empty_subinterval_does_not_discard_successful_observations(
     assert result["success"]
     assert result["data"]["received_rows"] > 0
     assert calls == 2 and provider.closed
+
+
+def test_storage_names_preserve_source_identity_and_log(caplog):
+    with caplog.at_level("DEBUG"):
+        assert provider_storage_name("sq_futures") == "futures"
+        assert provider_storage_name("sq_equity") == "equity"
+        assert provider_storage_name("yahoo") == "yahoo"
+    assert "FR-MARKET-STORAGE-provider-folders" in caplog.text
