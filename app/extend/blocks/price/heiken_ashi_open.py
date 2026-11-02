@@ -1,4 +1,21 @@
-"""Heiken Ashi Open price strategy block."""
+"""Heiken Ashi Open price strategy block.
+
+Description:
+    Returns smoothed Heiken Ashi Open price at the specified historical shift,
+    evaluating against BarPrice containers or OHLC arrays.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-HEIKEN-ASHI-OPEN: Smoothed Heiken Ashi Open price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.heiken_ashi_open import (
+        HeikenAshiOpen,
+        heiken_ashi_open,
+    )
+    price = heiken_ashi_open(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -52,6 +69,7 @@ def heiken_ashi_open(chart: Any, shift: int = 0) -> float:
     Returns:
         Heiken Ashi Open price as float, or NaN.
     """
+    logger.debug("FR-PRICE-HEIKEN-ASHI-OPEN: HeikenAshiOpen(shift=%d)", shift)
     res = compute_heiken_ashi(chart)
     if res is None:
         return float("nan")
@@ -59,4 +77,7 @@ def heiken_ashi_open(chart: Any, shift: int = 0) -> float:
     return resolve_shift_value(ha_open, shift)
 
 
-__all__ = ["heiken_ashi_open", "heiken_ashi_open_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.HeikenAshiOpen
+HeikenAshiOpen = heiken_ashi_open
+
+__all__ = ["HeikenAshiOpen", "heiken_ashi_open", "heiken_ashi_open_spec"]

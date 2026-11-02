@@ -1,4 +1,18 @@
-"""Weekly Open price strategy block (OpenW)."""
+"""Weekly Open price strategy block (OpenW).
+
+Description:
+    Returns Weekly Open price at the specified historical weekly shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-OPEN-W: Historical Weekly Open price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.open_w import OpenW, open_w
+    price = open_w(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def open_w(chart: Any, shift: int = 0) -> float:
     Returns:
         Weekly Open price as float, or NaN.
     """
+    logger.debug("FR-PRICE-OPEN-W: OpenW(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.weekly_open(shift)
     return resolve_chart_field(chart, "weekly_open", shift)
 
 
-__all__ = ["open_w", "open_w_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.OpenW
+OpenW = open_w
+
+__all__ = ["OpenW", "open_w", "open_w_spec"]

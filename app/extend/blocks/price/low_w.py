@@ -1,4 +1,18 @@
-"""Weekly Low price strategy block (LowW)."""
+"""Weekly Low price strategy block (LowW).
+
+Description:
+    Returns Weekly Low price at the specified historical weekly shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-LOW-W: Historical Weekly Low price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.low_w import LowW, low_w
+    price = low_w(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def low_w(chart: Any, shift: int = 0) -> float:
     Returns:
         Weekly Low price as float, or NaN.
     """
+    logger.debug("FR-PRICE-LOW-W: LowW(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.weekly_low(shift)
     return resolve_chart_field(chart, "weekly_low", shift)
 
 
-__all__ = ["low_w", "low_w_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.LowW
+LowW = low_w
+
+__all__ = ["LowW", "low_w", "low_w_spec"]

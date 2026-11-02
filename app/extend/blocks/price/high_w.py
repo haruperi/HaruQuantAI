@@ -1,4 +1,18 @@
-"""Weekly High price strategy block (HighW)."""
+"""Weekly High price strategy block (HighW).
+
+Description:
+    Returns Weekly High price at the specified historical weekly shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-HIGH-W: Historical Weekly High price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.high_w import HighW, high_w
+    price = high_w(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def high_w(chart: Any, shift: int = 0) -> float:
     Returns:
         Weekly High price as float, or NaN.
     """
+    logger.debug("FR-PRICE-HIGH-W: HighW(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.weekly_high(shift)
     return resolve_chart_field(chart, "weekly_high", shift)
 
 
-__all__ = ["high_w", "high_w_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.HighW
+HighW = high_w
+
+__all__ = ["HighW", "high_w", "high_w_spec"]

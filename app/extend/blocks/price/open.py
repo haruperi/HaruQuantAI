@@ -1,4 +1,18 @@
-"""Bar Open price strategy block."""
+"""Bar Open price strategy block.
+
+Description:
+    Returns bar Open price at the specified historical shift, evaluating
+    against BarPrice containers, series, or raw price arrays.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-OPEN: Historical bar Open price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.open import Open, bar_open
+    price = bar_open(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,12 @@ def bar_open(chart: Any, shift: int = 0) -> float:
     Returns:
         Open price as float, or NaN.
     """
+    logger.debug("FR-PRICE-OPEN: Open(shift=%d)", shift)
     return resolve_chart_field(chart, "open", shift)
 
 
 open_price = bar_open
+# Direct donor class alias matching SQ.Blocks.Price.Open
+Open = bar_open
 
-__all__ = ["bar_open", "open_price", "open_spec"]
+__all__ = ["Open", "bar_open", "open_price", "open_spec"]

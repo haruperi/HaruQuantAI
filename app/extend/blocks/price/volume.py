@@ -1,4 +1,18 @@
-"""Bar Volume strategy block."""
+"""Bar Volume price strategy block.
+
+Description:
+    Returns bar Volume at the specified historical shift, evaluating
+    against BarPrice containers, series, or raw volume arrays.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-VOLUME: Historical bar Volume retrieval.
+Python API Usage:
+    from app.extend.blocks.price.volume import Volume, bar_volume
+    vol = bar_volume(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -26,7 +40,7 @@ volume_spec = BlockSpec(
     category="price",
     tags=("price", "ohlcv", "volume"),
     execution_kind=ExecutionKind.EXPRESSION,
-    chart_pane=ChartPane.MAIN,
+    chart_pane=ChartPane.SUB,
     inputs=(
         InputPort("chart", PortType.ANY, "Chart data container or series"),
         InputPort("shift", PortType.NUMBER, "Historical bar offset", default=0),
@@ -49,9 +63,12 @@ def bar_volume(chart: Any, shift: int = 0) -> float:
     Returns:
         Volume as float, or NaN.
     """
+    logger.debug("FR-PRICE-VOLUME: Volume(shift=%d)", shift)
     return resolve_chart_field(chart, "volume", shift)
 
 
 volume_price = bar_volume
+# Direct donor class alias matching SQ.Blocks.Price.Volume
+Volume = bar_volume
 
-__all__ = ["bar_volume", "volume_price", "volume_spec"]
+__all__ = ["Volume", "bar_volume", "volume_price", "volume_spec"]

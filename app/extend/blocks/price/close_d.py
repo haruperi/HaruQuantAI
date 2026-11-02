@@ -1,4 +1,18 @@
-"""Daily Close price strategy block (CloseD)."""
+"""Daily Close price strategy block (CloseD).
+
+Description:
+    Returns Daily Close price at the specified historical daily shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-CLOSE-D: Historical Daily Close price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.close_d import CloseD, close_d
+    price = close_d(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def close_d(chart: Any, shift: int = 0) -> float:
     Returns:
         Daily Close price as float, or NaN.
     """
+    logger.debug("FR-PRICE-CLOSE-D: CloseD(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.daily_close(shift)
     return resolve_chart_field(chart, "daily_close", shift)
 
 
-__all__ = ["close_d", "close_d_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.CloseD
+CloseD = close_d
+
+__all__ = ["CloseD", "close_d", "close_d_spec"]

@@ -1,4 +1,18 @@
-"""Monthly High price strategy block (HighM)."""
+"""Monthly High price strategy block (HighM).
+
+Description:
+    Returns Monthly High price at the specified historical monthly shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-HIGH-M: Historical Monthly High price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.high_m import HighM, high_m
+    price = high_m(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def high_m(chart: Any, shift: int = 0) -> float:
     Returns:
         Monthly High price as float, or NaN.
     """
+    logger.debug("FR-PRICE-HIGH-M: HighM(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.monthly_high(shift)
     return resolve_chart_field(chart, "monthly_high", shift)
 
 
-__all__ = ["high_m", "high_m_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.HighM
+HighM = high_m
+
+__all__ = ["HighM", "high_m", "high_m_spec"]

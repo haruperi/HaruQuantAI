@@ -1,4 +1,21 @@
-"""Common internal utilities, data structures, and helpers for price blocks."""
+"""Common internal utilities, data structures, and helpers for price blocks.
+
+Description:
+    Provides foundational data structures (BarPrice, QuotePrice, MTFPrice,
+    SessionPrice) and normalization helpers supporting all StrategyQuant price
+    building blocks.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-COMMON-BAR-SERIES: Single-bar OHLCV array and series evaluation.
+    - FR-PRICE-COMMON-QUOTE-SPREAD: Quote bid/ask and spread evaluation.
+    - FR-PRICE-COMMON-MTF: Multi-timeframe daily, weekly, and monthly calculations.
+    - FR-PRICE-COMMON-SESSION: Intra-day trading session OHLC window aggregation.
+Python API Usage:
+    from app.extend.blocks.price._common import BarPrice, MTFPrice, QuotePrice
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -82,9 +99,7 @@ class BarPrice:
                     f"price bars ({n})."
                 )
 
-        logger.debug(
-            "FR-SERVICES-BAR-PRICE-SERIES: Initialized BarPrice with %d bars", n
-        )
+        logger.debug("FR-PRICE-COMMON-BAR-SERIES: Initialized BarPrice with %d bars", n)
 
     def __len__(self) -> int:
         """Return total number of bars."""
@@ -94,7 +109,7 @@ class BarPrice:
         """Retrieve historical bar value with shift where 0 is newest bar."""
         if shift < 0 or shift >= len(arr):
             logger.debug(
-                "FR-SERVICES-BAR-PRICE-SERIES: Shift %d out of bounds (len=%d)",
+                "FR-PRICE-COMMON-BAR-SERIES: Shift %d out of bounds (len=%d)",
                 shift,
                 len(arr),
             )
@@ -104,56 +119,56 @@ class BarPrice:
     def open(self, shift: int = 0) -> float:
         """Get Open price at historical shift."""
         val = self._get_value(self._open, shift)
-        logger.debug("FR-SERVICES-BAR-PRICE-SERIES: Open(shift=%d) = %f", shift, val)
+        logger.debug("FR-PRICE-COMMON-BAR-SERIES: Open(shift=%d) = %f", shift, val)
         return val
 
     def high(self, shift: int = 0) -> float:
         """Get High price at historical shift."""
         val = self._get_value(self._high, shift)
-        logger.debug("FR-SERVICES-BAR-PRICE-SERIES: High(shift=%d) = %f", shift, val)
+        logger.debug("FR-PRICE-COMMON-BAR-SERIES: High(shift=%d) = %f", shift, val)
         return val
 
     def low(self, shift: int = 0) -> float:
         """Get Low price at historical shift."""
         val = self._get_value(self._low, shift)
-        logger.debug("FR-SERVICES-BAR-PRICE-SERIES: Low(shift=%d) = %f", shift, val)
+        logger.debug("FR-PRICE-COMMON-BAR-SERIES: Low(shift=%d) = %f", shift, val)
         return val
 
     def close(self, shift: int = 0) -> float:
         """Get Close price at historical shift."""
         val = self._get_value(self._close, shift)
-        logger.debug("FR-SERVICES-BAR-PRICE-SERIES: Close(shift=%d) = %f", shift, val)
+        logger.debug("FR-PRICE-COMMON-BAR-SERIES: Close(shift=%d) = %f", shift, val)
         return val
 
     def volume(self, shift: int = 0) -> float:
         """Get Volume at historical shift."""
         val = self._get_value(self._volume, shift)
-        logger.debug("FR-SERVICES-BAR-PRICE-SERIES: Volume(shift=%d) = %f", shift, val)
+        logger.debug("FR-PRICE-COMMON-BAR-SERIES: Volume(shift=%d) = %f", shift, val)
         return val
 
     def open_series(self) -> DataframeSeries:
         """Return Open series wrapped as an IndicatorSeries."""
-        logger.info("FR-SERVICES-BAR-PRICE-SERIES: Exporting Open IndicatorSeries")
+        logger.info("FR-PRICE-COMMON-BAR-SERIES: Exporting Open IndicatorSeries")
         return DataframeSeries(self._open, name="Open")
 
     def high_series(self) -> DataframeSeries:
         """Return High series wrapped as an IndicatorSeries."""
-        logger.info("FR-SERVICES-BAR-PRICE-SERIES: Exporting High IndicatorSeries")
+        logger.info("FR-PRICE-COMMON-BAR-SERIES: Exporting High IndicatorSeries")
         return DataframeSeries(self._high, name="High")
 
     def low_series(self) -> DataframeSeries:
         """Return Low series wrapped as an IndicatorSeries."""
-        logger.info("FR-SERVICES-BAR-PRICE-SERIES: Exporting Low IndicatorSeries")
+        logger.info("FR-PRICE-COMMON-BAR-SERIES: Exporting Low IndicatorSeries")
         return DataframeSeries(self._low, name="Low")
 
     def close_series(self) -> DataframeSeries:
         """Return Close series wrapped as an IndicatorSeries."""
-        logger.info("FR-SERVICES-BAR-PRICE-SERIES: Exporting Close IndicatorSeries")
+        logger.info("FR-PRICE-COMMON-BAR-SERIES: Exporting Close IndicatorSeries")
         return DataframeSeries(self._close, name="Close")
 
     def volume_series(self) -> DataframeSeries:
         """Return Volume series wrapped as an IndicatorSeries."""
-        logger.info("FR-SERVICES-BAR-PRICE-SERIES: Exporting Volume IndicatorSeries")
+        logger.info("FR-PRICE-COMMON-BAR-SERIES: Exporting Volume IndicatorSeries")
         return DataframeSeries(self._volume, name="Volume")
 
     @property
@@ -217,7 +232,7 @@ class QuotePrice:
 
         self._pip_size = float(pip_size)
         logger.debug(
-            "FR-SERVICES-QUOTE-PRICE-SPREAD: Init QuotePrice (%d bars, pip=%f)",
+            "FR-PRICE-COMMON-QUOTE-SPREAD: Init QuotePrice (%d bars, pip=%f)",
             len(self._bid),
             self._pip_size,
         )
@@ -235,7 +250,7 @@ class QuotePrice:
         """Retrieve historical quote value with shift where 0 is newest."""
         if shift < 0 or shift >= len(arr):
             logger.debug(
-                "FR-SERVICES-QUOTE-PRICE-SPREAD: Shift %d out of bounds (len=%d)",
+                "FR-PRICE-COMMON-QUOTE-SPREAD: Shift %d out of bounds (len=%d)",
                 shift,
                 len(arr),
             )
@@ -245,13 +260,13 @@ class QuotePrice:
     def bid(self, shift: int = 0) -> float:
         """Get Bid price at historical shift."""
         val = self._get_val(self._bid, shift)
-        logger.debug("FR-SERVICES-QUOTE-PRICE-SPREAD: Bid(shift=%d) = %f", shift, val)
+        logger.debug("FR-PRICE-COMMON-QUOTE-SPREAD: Bid(shift=%d) = %f", shift, val)
         return val
 
     def ask(self, shift: int = 0) -> float:
         """Get Ask price at historical shift."""
         val = self._get_val(self._ask, shift)
-        logger.debug("FR-SERVICES-QUOTE-PRICE-SPREAD: Ask(shift=%d) = %f", shift, val)
+        logger.debug("FR-PRICE-COMMON-QUOTE-SPREAD: Ask(shift=%d) = %f", shift, val)
         return val
 
     def spread(self, shift: int = 0) -> float:
@@ -262,7 +277,7 @@ class QuotePrice:
             return float("nan")
         spread_val = float(abs(a - b))
         logger.debug(
-            "FR-SERVICES-QUOTE-PRICE-SPREAD: Spread(shift=%d) = %f", shift, spread_val
+            "FR-PRICE-COMMON-QUOTE-SPREAD: Spread(shift=%d) = %f", shift, spread_val
         )
         return spread_val
 
@@ -276,7 +291,7 @@ class QuotePrice:
             return float("nan")
         pips = float(pts / effective_pip_size)
         logger.debug(
-            "FR-SERVICES-QUOTE-PRICE-SPREAD: SpreadInPips(shift=%d) = %f pips",
+            "FR-PRICE-COMMON-QUOTE-SPREAD: SpreadInPips(shift=%d) = %f pips",
             shift,
             pips,
         )
@@ -292,14 +307,14 @@ class QuotePrice:
 
     def spread_series(self) -> DataframeSeries:
         """Return raw spread series as an IndicatorSeries."""
-        logger.info("FR-SERVICES-QUOTE-PRICE-SPREAD: Exporting Spread series")
+        logger.info("FR-PRICE-COMMON-QUOTE-SPREAD: Exporting Spread series")
         return DataframeSeries(np.abs(self._ask - self._bid), name="Spread")
 
     def spread_in_pips_series(self, pip_size: float | None = None) -> DataframeSeries:
         """Return spread-in-pips series as an IndicatorSeries."""
         effective_pip_size = self._pip_size if pip_size is None else pip_size
         logger.info(
-            "FR-SERVICES-QUOTE-PRICE-SPREAD: Exporting SpreadInPips (pip=%f)",
+            "FR-PRICE-COMMON-QUOTE-SPREAD: Exporting SpreadInPips (pip=%f)",
             effective_pip_size,
         )
         pips_arr = np.abs(self._ask - self._bid) / effective_pip_size
@@ -338,7 +353,7 @@ class MTFPrice:
 
         self._build_aggregates()
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-DAILY: Initialized MTFPrice (%d base bars -> "
+            "FR-PRICE-COMMON-MTF-DAILY: Initialized MTFPrice (%d base bars -> "
             "%d daily, %d weekly, %d monthly)",
             n,
             len(self._d_close),
@@ -400,32 +415,26 @@ class MTFPrice:
     def daily_open(self, shift: int = 0) -> float:
         """Get Daily Open price (OpenD) at historical shift."""
         val = self._lookup(self._d_open, shift)
-        logger.debug(
-            "FR-SERVICES-MTF-PRICE-DAILY: daily_open(shift=%d) = %f", shift, val
-        )
+        logger.debug("FR-PRICE-COMMON-MTF-DAILY: daily_open(shift=%d) = %f", shift, val)
         return val
 
     def daily_high(self, shift: int = 0) -> float:
         """Get Daily High price (HighD) at historical shift."""
         val = self._lookup(self._d_high, shift)
-        logger.debug(
-            "FR-SERVICES-MTF-PRICE-DAILY: daily_high(shift=%d) = %f", shift, val
-        )
+        logger.debug("FR-PRICE-COMMON-MTF-DAILY: daily_high(shift=%d) = %f", shift, val)
         return val
 
     def daily_low(self, shift: int = 0) -> float:
         """Get Daily Low price (LowD) at historical shift."""
         val = self._lookup(self._d_low, shift)
-        logger.debug(
-            "FR-SERVICES-MTF-PRICE-DAILY: daily_low(shift=%d) = %f", shift, val
-        )
+        logger.debug("FR-PRICE-COMMON-MTF-DAILY: daily_low(shift=%d) = %f", shift, val)
         return val
 
     def daily_close(self, shift: int = 0) -> float:
         """Get Daily Close price (CloseD) at historical shift."""
         val = self._lookup(self._d_close, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-DAILY: daily_close(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-DAILY: daily_close(shift=%d) = %f", shift, val
         )
         return val
 
@@ -433,7 +442,7 @@ class MTFPrice:
         """Get Weekly Open price (OpenW) at historical shift."""
         val = self._lookup(self._w_open, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-WEEKLY: weekly_open(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-WEEKLY: weekly_open(shift=%d) = %f", shift, val
         )
         return val
 
@@ -441,7 +450,7 @@ class MTFPrice:
         """Get Weekly High price (HighW) at historical shift."""
         val = self._lookup(self._w_high, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-WEEKLY: weekly_high(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-WEEKLY: weekly_high(shift=%d) = %f", shift, val
         )
         return val
 
@@ -449,7 +458,7 @@ class MTFPrice:
         """Get Weekly Low price (LowW) at historical shift."""
         val = self._lookup(self._w_low, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-WEEKLY: weekly_low(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-WEEKLY: weekly_low(shift=%d) = %f", shift, val
         )
         return val
 
@@ -457,7 +466,7 @@ class MTFPrice:
         """Get Weekly Close price (CloseW) at historical shift."""
         val = self._lookup(self._w_close, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-WEEKLY: weekly_close(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-WEEKLY: weekly_close(shift=%d) = %f", shift, val
         )
         return val
 
@@ -465,7 +474,7 @@ class MTFPrice:
         """Get Monthly Open price (OpenM) at historical shift."""
         val = self._lookup(self._m_open, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-MONTHLY: monthly_open(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-MONTHLY: monthly_open(shift=%d) = %f", shift, val
         )
         return val
 
@@ -473,7 +482,7 @@ class MTFPrice:
         """Get Monthly High price (HighM) at historical shift."""
         val = self._lookup(self._m_high, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-MONTHLY: monthly_high(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-MONTHLY: monthly_high(shift=%d) = %f", shift, val
         )
         return val
 
@@ -481,7 +490,7 @@ class MTFPrice:
         """Get Monthly Low price (LowM) at historical shift."""
         val = self._lookup(self._m_low, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-MONTHLY: monthly_low(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-MONTHLY: monthly_low(shift=%d) = %f", shift, val
         )
         return val
 
@@ -489,23 +498,23 @@ class MTFPrice:
         """Get Monthly Close price (CloseM) at historical shift."""
         val = self._lookup(self._m_close, shift)
         logger.debug(
-            "FR-SERVICES-MTF-PRICE-MONTHLY: monthly_close(shift=%d) = %f", shift, val
+            "FR-PRICE-COMMON-MTF-MONTHLY: monthly_close(shift=%d) = %f", shift, val
         )
         return val
 
     def daily_close_series(self) -> DataframeSeries:
         """Return Daily Close series as an IndicatorSeries."""
-        logger.info("FR-SERVICES-MTF-PRICE-DAILY: Exporting daily close series")
+        logger.info("FR-PRICE-COMMON-MTF-DAILY: Exporting daily close series")
         return DataframeSeries(self._d_close, name="CloseD")
 
     def weekly_close_series(self) -> DataframeSeries:
         """Return Weekly Close series as an IndicatorSeries."""
-        logger.info("FR-SERVICES-MTF-PRICE-WEEKLY: Exporting weekly close series")
+        logger.info("FR-PRICE-COMMON-MTF-WEEKLY: Exporting weekly close series")
         return DataframeSeries(self._w_close, name="CloseW")
 
     def monthly_close_series(self) -> DataframeSeries:
         """Return Monthly Close series as an IndicatorSeries."""
-        logger.info("FR-SERVICES-MTF-PRICE-MONTHLY: Exporting monthly close series")
+        logger.info("FR-PRICE-COMMON-MTF-MONTHLY: Exporting monthly close series")
         return DataframeSeries(self._m_close, name="CloseM")
 
 
@@ -559,7 +568,7 @@ class SessionPrice:
 
         self._build_sessions()
         logger.debug(
-            "FR-SERVICES-SESSION-PRICE-WINDOW: SessionPrice (%02d:%02d-%02d:%02d) "
+            "FR-PRICE-COMMON-SESSION: SessionPrice (%02d:%02d-%02d:%02d) "
             "%d sessions from %d bars",
             start_hour,
             start_minute,
@@ -627,7 +636,7 @@ class SessionPrice:
         """Lookup session price by days_shift (0=current session, 1=previous)."""
         if days_shift < 0 or days_shift >= len(arr):
             logger.debug(
-                "FR-SERVICES-SESSION-PRICE-WINDOW: shift %d out of bounds (%d)",
+                "FR-PRICE-COMMON-SESSION: shift %d out of bounds (%d)",
                 days_shift,
                 len(arr),
             )
@@ -638,7 +647,7 @@ class SessionPrice:
         """Get Session Open price at specified days shift."""
         val = self._get(self._session_open, days_shift)
         logger.debug(
-            "FR-SERVICES-SESSION-PRICE-WINDOW: SessionOpen(days_shift=%d) = %f",
+            "FR-PRICE-COMMON-SESSION: SessionOpen(days_shift=%d) = %f",
             days_shift,
             val,
         )
@@ -648,7 +657,7 @@ class SessionPrice:
         """Get Session High price at specified days shift."""
         val = self._get(self._session_high, days_shift)
         logger.debug(
-            "FR-SERVICES-SESSION-PRICE-WINDOW: SessionHigh(days_shift=%d) = %f",
+            "FR-PRICE-COMMON-SESSION: SessionHigh(days_shift=%d) = %f",
             days_shift,
             val,
         )
@@ -658,7 +667,7 @@ class SessionPrice:
         """Get Session Low price at specified days shift."""
         val = self._get(self._session_low, days_shift)
         logger.debug(
-            "FR-SERVICES-SESSION-PRICE-WINDOW: SessionLow(days_shift=%d) = %f",
+            "FR-PRICE-COMMON-SESSION: SessionLow(days_shift=%d) = %f",
             days_shift,
             val,
         )
@@ -668,7 +677,7 @@ class SessionPrice:
         """Get Session Close price at specified days shift."""
         val = self._get(self._session_close, days_shift)
         logger.debug(
-            "FR-SERVICES-SESSION-PRICE-WINDOW: SessionClose(days_shift=%d) = %f",
+            "FR-PRICE-COMMON-SESSION: SessionClose(days_shift=%d) = %f",
             days_shift,
             val,
         )

@@ -1,4 +1,21 @@
-"""Session Close price strategy block."""
+"""Session Close price strategy block.
+
+Description:
+    Returns Session Close price for defined session window at shift,
+    evaluating against SessionPrice or BarData containers.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-SESSION-CLOSE: Defined window Session Close price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.session_close import (
+        SessionClose,
+        session_close,
+    )
+    price = session_close(chart, end_hours=15, end_minutes=15, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -58,6 +75,12 @@ def session_close(
     Returns:
         Session Close price as float, or NaN.
     """
+    logger.debug(
+        "FR-PRICE-SESSION-CLOSE: SessionClose(end=%02d:%02d, shift=%d)",
+        end_hours,
+        end_minutes,
+        shift,
+    )
     if isinstance(chart, SessionPrice):
         return chart.close(shift)
 
@@ -76,4 +99,7 @@ def session_close(
     return float("nan")
 
 
-__all__ = ["session_close", "session_close_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.SessionClose
+SessionClose = session_close
+
+__all__ = ["SessionClose", "session_close", "session_close_spec"]

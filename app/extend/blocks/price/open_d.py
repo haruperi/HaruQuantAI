@@ -1,4 +1,18 @@
-"""Daily Open price strategy block (OpenD)."""
+"""Daily Open price strategy block (OpenD).
+
+Description:
+    Returns Daily Open price at the specified historical daily shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-OPEN-D: Historical Daily Open price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.open_d import OpenD, open_d
+    price = open_d(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def open_d(chart: Any, shift: int = 0) -> float:
     Returns:
         Daily Open price as float, or NaN.
     """
+    logger.debug("FR-PRICE-OPEN-D: OpenD(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.daily_open(shift)
     return resolve_chart_field(chart, "daily_open", shift)
 
 
-__all__ = ["open_d", "open_d_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.OpenD
+OpenD = open_d
+
+__all__ = ["OpenD", "open_d", "open_d_spec"]

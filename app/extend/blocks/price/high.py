@@ -1,4 +1,18 @@
-"""Bar High price strategy block."""
+"""Bar High price strategy block.
+
+Description:
+    Returns bar High price at the specified historical shift, evaluating
+    against BarPrice containers, series, or raw price arrays.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-HIGH: Historical bar High price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.high import High, bar_high
+    price = bar_high(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,12 @@ def bar_high(chart: Any, shift: int = 0) -> float:
     Returns:
         High price as float, or NaN.
     """
+    logger.debug("FR-PRICE-HIGH: High(shift=%d)", shift)
     return resolve_chart_field(chart, "high", shift)
 
 
 high_price = bar_high
+# Direct donor class alias matching SQ.Blocks.Price.High
+High = bar_high
 
-__all__ = ["bar_high", "high_price", "high_spec"]
+__all__ = ["High", "bar_high", "high_price", "high_spec"]

@@ -1,4 +1,21 @@
-"""Heiken Ashi Low price strategy block."""
+"""Heiken Ashi Low price strategy block.
+
+Description:
+    Returns smoothed Heiken Ashi Low price at the specified historical shift,
+    evaluating against BarPrice containers or OHLC arrays.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-HEIKEN-ASHI-LOW: Smoothed Heiken Ashi Low price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.heiken_ashi_low import (
+        HeikenAshiLow,
+        heiken_ashi_low,
+    )
+    price = heiken_ashi_low(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -52,6 +69,7 @@ def heiken_ashi_low(chart: Any, shift: int = 0) -> float:
     Returns:
         Heiken Ashi Low price as float, or NaN.
     """
+    logger.debug("FR-PRICE-HEIKEN-ASHI-LOW: HeikenAshiLow(shift=%d)", shift)
     res = compute_heiken_ashi(chart)
     if res is None:
         return float("nan")
@@ -59,4 +77,7 @@ def heiken_ashi_low(chart: Any, shift: int = 0) -> float:
     return resolve_shift_value(ha_low, shift)
 
 
-__all__ = ["heiken_ashi_low", "heiken_ashi_low_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.HeikenAshiLow
+HeikenAshiLow = heiken_ashi_low
+
+__all__ = ["HeikenAshiLow", "heiken_ashi_low", "heiken_ashi_low_spec"]

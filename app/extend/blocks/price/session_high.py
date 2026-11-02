@@ -1,4 +1,21 @@
-"""Session High price strategy block."""
+"""Session High price strategy block.
+
+Description:
+    Returns Session High price for defined session window at shift,
+    evaluating against SessionPrice or BarData containers.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-SESSION-HIGH: Defined window Session High price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.session_high import (
+        SessionHigh,
+        session_high,
+    )
+    price = session_high(chart, start_hours=8, end_hours=15, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -31,8 +48,8 @@ session_high_spec = BlockSpec(
         InputPort("chart", PortType.ANY, "SessionPrice or BarData container"),
         InputPort("start_hours", PortType.NUMBER, "Start hour 0..23", default=8),
         InputPort("start_minutes", PortType.NUMBER, "Start min 0..59", default=30),
-        InputPort("end_hours", PortType.NUMBER, "Session end hour 0..23", default=15),
-        InputPort("end_minutes", PortType.NUMBER, "Session end min 0..59", default=15),
+        InputPort("end_hours", PortType.NUMBER, "End hour 0..23", default=15),
+        InputPort("end_minutes", PortType.NUMBER, "End min 0..59", default=15),
         InputPort("shift", PortType.NUMBER, "Historical session shift", default=0),
     ),
     outputs=(OutputPort("value", PortType.NUMBER, "Session High price"),),
@@ -65,6 +82,14 @@ def session_high(
     Returns:
         Session High price as float, or NaN.
     """
+    logger.debug(
+        "FR-PRICE-SESSION-HIGH: SessionHigh(start=%02d:%02d, end=%02d:%02d, shift=%d)",
+        start_hours,
+        start_minutes,
+        end_hours,
+        end_minutes,
+        shift,
+    )
     if isinstance(chart, SessionPrice):
         return chart.high(shift)
 
@@ -85,4 +110,7 @@ def session_high(
     return float("nan")
 
 
-__all__ = ["session_high", "session_high_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.SessionHigh
+SessionHigh = session_high
+
+__all__ = ["SessionHigh", "session_high", "session_high_spec"]

@@ -1,4 +1,18 @@
-"""Bar Low price strategy block."""
+"""Bar Low price strategy block.
+
+Description:
+    Returns bar Low price at the specified historical shift, evaluating
+    against BarPrice containers, series, or raw price arrays.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-LOW: Historical bar Low price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.low import Low, bar_low
+    price = bar_low(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,12 @@ def bar_low(chart: Any, shift: int = 0) -> float:
     Returns:
         Low price as float, or NaN.
     """
+    logger.debug("FR-PRICE-LOW: Low(shift=%d)", shift)
     return resolve_chart_field(chart, "low", shift)
 
 
 low_price = bar_low
+# Direct donor class alias matching SQ.Blocks.Price.Low
+Low = bar_low
 
-__all__ = ["bar_low", "low_price", "low_spec"]
+__all__ = ["Low", "bar_low", "low_price", "low_spec"]

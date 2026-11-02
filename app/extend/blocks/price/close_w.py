@@ -1,4 +1,18 @@
-"""Weekly Close price strategy block (CloseW)."""
+"""Weekly Close price strategy block (CloseW).
+
+Description:
+    Returns Weekly Close price at the specified historical weekly shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-CLOSE-W: Historical Weekly Close price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.close_w import CloseW, close_w
+    price = close_w(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def close_w(chart: Any, shift: int = 0) -> float:
     Returns:
         Weekly Close price as float, or NaN.
     """
+    logger.debug("FR-PRICE-CLOSE-W: CloseW(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.weekly_close(shift)
     return resolve_chart_field(chart, "weekly_close", shift)
 
 
-__all__ = ["close_w", "close_w_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.CloseW
+CloseW = close_w
+
+__all__ = ["CloseW", "close_w", "close_w_spec"]

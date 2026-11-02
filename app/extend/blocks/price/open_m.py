@@ -1,4 +1,18 @@
-"""Monthly Open price strategy block (OpenM)."""
+"""Monthly Open price strategy block (OpenM).
+
+Description:
+    Returns Monthly Open price at the specified historical monthly shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-OPEN-M: Historical Monthly Open price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.open_m import OpenM, open_m
+    price = open_m(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def open_m(chart: Any, shift: int = 0) -> float:
     Returns:
         Monthly Open price as float, or NaN.
     """
+    logger.debug("FR-PRICE-OPEN-M: OpenM(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.monthly_open(shift)
     return resolve_chart_field(chart, "monthly_open", shift)
 
 
-__all__ = ["open_m", "open_m_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.OpenM
+OpenM = open_m
+
+__all__ = ["OpenM", "open_m", "open_m_spec"]

@@ -1,4 +1,18 @@
-"""Bar Close price strategy block."""
+"""Bar Close price strategy block.
+
+Description:
+    Returns bar Close price at the specified historical shift, evaluating
+    against BarPrice containers, series, or raw price arrays.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-CLOSE: Historical bar Close price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.close import Close, bar_close
+    price = bar_close(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,12 @@ def bar_close(chart: Any, shift: int = 0) -> float:
     Returns:
         Close price as float, or NaN.
     """
+    logger.debug("FR-PRICE-CLOSE: Close(shift=%d)", shift)
     return resolve_chart_field(chart, "close", shift)
 
 
 close_price = bar_close
+# Direct donor class alias matching SQ.Blocks.Price.Close
+Close = bar_close
 
-__all__ = ["bar_close", "close_price", "close_spec"]
+__all__ = ["Close", "bar_close", "close_price", "close_spec"]

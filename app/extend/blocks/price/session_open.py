@@ -1,4 +1,21 @@
-"""Session Open price strategy block."""
+"""Session Open price strategy block.
+
+Description:
+    Returns Session Open price for defined session window at shift,
+    evaluating against SessionPrice or BarData containers.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-SESSION-OPEN: Defined window Session Open price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.session_open import (
+        SessionOpen,
+        session_open,
+    )
+    price = session_open(chart, start_hours=8, start_minutes=30, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -58,6 +75,12 @@ def session_open(
     Returns:
         Session Open price as float, or NaN.
     """
+    logger.debug(
+        "FR-PRICE-SESSION-OPEN: SessionOpen(start=%02d:%02d, shift=%d)",
+        start_hours,
+        start_minutes,
+        shift,
+    )
     if isinstance(chart, SessionPrice):
         return chart.open(shift)
 
@@ -76,4 +99,7 @@ def session_open(
     return float("nan")
 
 
-__all__ = ["session_open", "session_open_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.SessionOpen
+SessionOpen = session_open
+
+__all__ = ["SessionOpen", "session_open", "session_open_spec"]

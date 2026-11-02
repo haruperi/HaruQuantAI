@@ -1,4 +1,18 @@
-"""Daily High price strategy block (HighD)."""
+"""Daily High price strategy block (HighD).
+
+Description:
+    Returns Daily High price at the specified historical daily shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-HIGH-D: Historical Daily High price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.high_d import HighD, high_d
+    price = high_d(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def high_d(chart: Any, shift: int = 0) -> float:
     Returns:
         Daily High price as float, or NaN.
     """
+    logger.debug("FR-PRICE-HIGH-D: HighD(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.daily_high(shift)
     return resolve_chart_field(chart, "daily_high", shift)
 
 
-__all__ = ["high_d", "high_d_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.HighD
+HighD = high_d
+
+__all__ = ["HighD", "high_d", "high_d_spec"]

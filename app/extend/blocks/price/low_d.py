@@ -1,4 +1,18 @@
-"""Daily Low price strategy block (LowD)."""
+"""Daily Low price strategy block (LowD).
+
+Description:
+    Returns Daily Low price at the specified historical daily shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-LOW-D: Historical Daily Low price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.low_d import LowD, low_d
+    price = low_d(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def low_d(chart: Any, shift: int = 0) -> float:
     Returns:
         Daily Low price as float, or NaN.
     """
+    logger.debug("FR-PRICE-LOW-D: LowD(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.daily_low(shift)
     return resolve_chart_field(chart, "daily_low", shift)
 
 
-__all__ = ["low_d", "low_d_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.LowD
+LowD = low_d
+
+__all__ = ["LowD", "low_d", "low_d_spec"]

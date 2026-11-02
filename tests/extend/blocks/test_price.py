@@ -1,4 +1,50 @@
-"""Unit tests for discrete price building blocks, containers, and Price facade."""
+"""Unit tests for discrete price building blocks, containers, and Price facade.
+
+Description:
+    Tests StrategyQuant donor-faithful price blocks for single-bar OHLCV,
+    bid/ask quotes, multi-timeframe daily/weekly/monthly aggregation, session
+    windows, Heiken Ashi smoothing, unified Price/Prices facade, and registry
+    discovery.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-OPEN: Bar open price tests.
+    - FR-PRICE-HIGH: Bar high price tests.
+    - FR-PRICE-LOW: Bar low price tests.
+    - FR-PRICE-CLOSE: Bar close price tests.
+    - FR-PRICE-VOLUME: Bar volume tests.
+    - FR-PRICE-ASK: Quote ask price tests.
+    - FR-PRICE-BID: Quote bid price tests.
+    - FR-PRICE-SPREAD: Quote spread tests.
+    - FR-PRICE-SPREAD-IN-PIPS: Pip-scaled spread tests.
+    - FR-PRICE-OPEN-D: Daily open tests.
+    - FR-PRICE-HIGH-D: Daily high tests.
+    - FR-PRICE-LOW-D: Daily low tests.
+    - FR-PRICE-CLOSE-D: Daily close tests.
+    - FR-PRICE-OPEN-W: Weekly open tests.
+    - FR-PRICE-HIGH-W: Weekly high tests.
+    - FR-PRICE-LOW-W: Weekly low tests.
+    - FR-PRICE-CLOSE-W: Weekly close tests.
+    - FR-PRICE-OPEN-M: Monthly open tests.
+    - FR-PRICE-HIGH-M: Monthly high tests.
+    - FR-PRICE-LOW-M: Monthly low tests.
+    - FR-PRICE-CLOSE-M: Monthly close tests.
+    - FR-PRICE-HEIKEN-ASHI-OPEN: Heiken Ashi open tests.
+    - FR-PRICE-HEIKEN-ASHI-HIGH: Heiken Ashi high tests.
+    - FR-PRICE-HEIKEN-ASHI-LOW: Heiken Ashi low tests.
+    - FR-PRICE-HEIKEN-ASHI-CLOSE: Heiken Ashi close tests.
+    - FR-PRICE-SESSION-OPEN: Session open tests.
+    - FR-PRICE-SESSION-HIGH: Session high tests.
+    - FR-PRICE-SESSION-LOW: Session low tests.
+    - FR-PRICE-SESSION-CLOSE: Session close tests.
+    - FR-PRICE-SESSION-CALCULATOR: Session calculator tests.
+    - FR-PRICE-FACADE: Price and Prices facade tests.
+    - FR-PRICE-EXPORTS: Package aliases and registry discovery tests.
+Python API Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -12,12 +58,42 @@ from app.extend.blocks.price import (
     HIGH,
     LOW,
     OPEN,
+    Ask,
     BarPrice,
+    Bid,
+    Close,
+    CloseD,
+    CloseM,
+    CloseW,
+    HeikenAshiClose,
+    HeikenAshiHigh,
+    HeikenAshiLow,
+    HeikenAshiOpen,
+    High,
+    HighD,
+    HighM,
+    HighW,
+    Low,
+    LowD,
+    LowM,
+    LowW,
     MTFPrice,
+    Open,
+    OpenD,
+    OpenM,
+    OpenW,
     Price,
+    Prices,
     QuotePrice,
+    SessionClose,
+    SessionHigh,
+    SessionLow,
     SessionOHLCCalculator,
+    SessionOpen,
     SessionPrice,
+    Spread,
+    SpreadInPips,
+    Volume,
     ask,
     ask_spec,
     bar_close,
@@ -79,6 +155,41 @@ from app.extend.blocks.price import (
     spread_spec,
     volume_spec,
 )
+from app.extend.blocks.registry import BlockRegistry
+
+
+def test_donor_class_aliases() -> None:
+    """Verify all 29 donor class aliases match the blocks and Prices is Price."""
+    assert Ask is ask
+    assert Bid is bid
+    assert Close is bar_close
+    assert CloseD is close_d
+    assert CloseM is close_m
+    assert CloseW is close_w
+    assert HeikenAshiClose is heiken_ashi_close
+    assert HeikenAshiHigh is heiken_ashi_high
+    assert HeikenAshiLow is heiken_ashi_low
+    assert HeikenAshiOpen is heiken_ashi_open
+    assert High is bar_high
+    assert HighD is high_d
+    assert HighM is high_m
+    assert HighW is high_w
+    assert Low is bar_low
+    assert LowD is low_d
+    assert LowM is low_m
+    assert LowW is low_w
+    assert Open is bar_open
+    assert OpenD is open_d
+    assert OpenM is open_m
+    assert OpenW is open_w
+    assert SessionClose is session_close
+    assert SessionHigh is session_high
+    assert SessionLow is session_low
+    assert SessionOpen is session_open
+    assert Spread is spread
+    assert SpreadInPips is spread_in_pips
+    assert Volume is bar_volume
+    assert Prices is Price
 
 
 def test_bar_price_container() -> None:
@@ -167,10 +278,6 @@ def test_quote_price_container() -> None:
 
 def test_mtf_price_aggregates() -> None:
     """Verify MTFPrice aggregation into daily, weekly, and monthly bars."""
-    # Create hourly timestamps for 3 consecutive days across two weeks
-    # Day 1: 2024-01-05 (Friday, week 1)
-    # Day 2: 2024-01-08 (Monday, week 2)
-    # Day 3: 2024-01-09 (Tuesday, week 2)
     t1 = int(datetime(2024, 1, 5, 10, 0, tzinfo=UTC).timestamp())
     t2 = int(datetime(2024, 1, 5, 14, 0, tzinfo=UTC).timestamp())
     t3 = int(datetime(2024, 1, 8, 10, 0, tzinfo=UTC).timestamp())
@@ -184,7 +291,6 @@ def test_mtf_price_aggregates() -> None:
 
     mtf = MTFPrice(ts, opens, highs, lows, closes)
 
-    # 3 days: Day 1 (index 0), Day 2 (index 1), Day 3 (index 2)
     # Shift 0 is Day 3
     assert mtf.daily_open(0) == 30.0
     assert mtf.daily_high(0) == 35.0
@@ -197,14 +303,12 @@ def test_mtf_price_aggregates() -> None:
     assert mtf.daily_low(2) == 8.0
     assert mtf.daily_close(2) == 14.0
 
-    # 2 weeks: Week 1 (Day 1), Week 2 (Day 2 + Day 3)
-    # Shift 0 is Week 2
+    # Weeks
     assert mtf.weekly_open(0) == 20.0
     assert mtf.weekly_high(0) == 35.0
     assert mtf.weekly_low(0) == 18.0
     assert mtf.weekly_close(0) == 32.0
 
-    # Shift 1 is Week 1
     assert mtf.weekly_open(1) == 10.0
     assert mtf.weekly_close(1) == 14.0
 
@@ -215,7 +319,6 @@ def test_mtf_price_aggregates() -> None:
 
 def test_session_price_and_calculator() -> None:
     """Verify SessionPrice windowing and SessionOHLCCalculator evaluations."""
-    # Bars at 08:00, 09:00, 12:00, 16:00
     t1 = int(datetime(2024, 1, 5, 8, 0, tzinfo=UTC).timestamp())
     t2 = int(datetime(2024, 1, 5, 9, 0, tzinfo=UTC).timestamp())
     t3 = int(datetime(2024, 1, 5, 12, 0, tzinfo=UTC).timestamp())
@@ -227,7 +330,6 @@ def test_session_price_and_calculator() -> None:
     lows = [9.0, 18.0, 28.0, 38.0]
     closes = [11.0, 22.0, 32.0, 41.0]
 
-    # Session 08:30 to 15:00: only t2 (09:00) and t3 (12:00) fall inside
     sp = SessionPrice(
         ts,
         opens,
@@ -259,100 +361,121 @@ def test_session_price_and_calculator() -> None:
     assert calc_close.get() == 32.0
 
 
-def test_discrete_bar_blocks() -> None:
+def test_discrete_bar_blocks(caplog: pytest.LogCaptureFixture) -> None:
     """Verify bar_open, bar_high, bar_low, bar_close, bar_volume discrete blocks."""
     bp = BarPrice([10.0, 20.0], [15.0, 25.0], [5.0, 15.0], [12.0, 22.0], [100.0, 200.0])
 
-    assert bar_open(bp, 0) == 20.0
-    assert open_price(bp, 1) == 10.0
-    assert bar_high(bp, 0) == 25.0
-    assert bar_low(bp, 0) == 15.0
-    assert low_price(bp, 1) == 5.0
-    assert bar_close(bp, 0) == 22.0
-    assert bar_volume(bp, 0) == 200.0
+    with caplog.at_level("DEBUG"):
+        assert bar_open(bp, 0) == 20.0
+        assert open_price(bp, 1) == 10.0
+        assert bar_high(bp, 0) == 25.0
+        assert bar_low(bp, 0) == 15.0
+        assert low_price(bp, 1) == 5.0
+        assert bar_close(bp, 0) == 22.0
+        assert bar_volume(bp, 0) == 200.0
+
+    assert any("FR-PRICE-OPEN" in r.message for r in caplog.records)
+    assert any("FR-PRICE-HIGH" in r.message for r in caplog.records)
+    assert any("FR-PRICE-LOW" in r.message for r in caplog.records)
+    assert any("FR-PRICE-CLOSE" in r.message for r in caplog.records)
+    assert any("FR-PRICE-VOLUME" in r.message for r in caplog.records)
 
 
-def test_discrete_quote_blocks() -> None:
+def test_discrete_quote_blocks(caplog: pytest.LogCaptureFixture) -> None:
     """Verify ask, bid, spread, spread_in_pips blocks."""
     qp = QuotePrice([1.2000, 1.2010], [1.2002, 1.2014], pip_size=0.0001)
 
-    assert math.isclose(ask(qp, 0), 1.2014)
-    assert math.isclose(bid(qp, 0), 1.2010)
-    assert math.isclose(spread(qp, 0), 0.0004)
-    assert math.isclose(spread_in_pips(qp, 0), 4.0)
+    with caplog.at_level("DEBUG"):
+        assert math.isclose(ask(qp, 0), 1.2014)
+        assert math.isclose(bid(qp, 0), 1.2010)
+        assert math.isclose(spread(qp, 0), 0.0004)
+        assert math.isclose(spread_in_pips(qp, 0), 4.0)
+
+    assert any("FR-PRICE-ASK" in r.message for r in caplog.records)
+    assert any("FR-PRICE-BID" in r.message for r in caplog.records)
+    assert any("FR-PRICE-SPREAD" in r.message for r in caplog.records)
+    assert any("FR-PRICE-SPREAD-IN-PIPS" in r.message for r in caplog.records)
 
 
-def test_discrete_mtf_blocks() -> None:
+def test_discrete_mtf_blocks(caplog: pytest.LogCaptureFixture) -> None:
     """Verify open_d, high_d, low_d, close_d, and W/M blocks."""
     t1 = int(datetime(2024, 1, 5, 10, 0, tzinfo=UTC).timestamp())
     t2 = int(datetime(2024, 1, 8, 10, 0, tzinfo=UTC).timestamp())
     mtf = MTFPrice([t1, t2], [10.0, 20.0], [15.0, 25.0], [8.0, 18.0], [12.0, 22.0])
 
-    assert open_d(mtf, 0) == 20.0
-    assert high_d(mtf, 0) == 25.0
-    assert low_d(mtf, 0) == 18.0
-    assert close_d(mtf, 0) == 22.0
+    with caplog.at_level("DEBUG"):
+        assert open_d(mtf, 0) == 20.0
+        assert high_d(mtf, 0) == 25.0
+        assert low_d(mtf, 0) == 18.0
+        assert close_d(mtf, 0) == 22.0
 
-    assert open_w(mtf, 0) == 20.0
-    assert high_w(mtf, 0) == 25.0
-    assert low_w(mtf, 0) == 18.0
-    assert close_w(mtf, 0) == 22.0
+        assert open_w(mtf, 0) == 20.0
+        assert high_w(mtf, 0) == 25.0
+        assert low_w(mtf, 0) == 18.0
+        assert close_w(mtf, 0) == 22.0
 
-    assert open_m(mtf, 0) == 10.0
-    assert high_m(mtf, 0) == 25.0
-    assert low_m(mtf, 0) == 8.0
-    assert close_m(mtf, 0) == 22.0
+        assert open_m(mtf, 0) == 10.0
+        assert high_m(mtf, 0) == 25.0
+        assert low_m(mtf, 0) == 8.0
+        assert close_m(mtf, 0) == 22.0
+
+    assert any("FR-PRICE-OPEN-D" in r.message for r in caplog.records)
+    assert any("FR-PRICE-CLOSE-W" in r.message for r in caplog.records)
+    assert any("FR-PRICE-HIGH-M" in r.message for r in caplog.records)
 
 
-def test_discrete_session_blocks() -> None:
+def test_discrete_session_blocks(caplog: pytest.LogCaptureFixture) -> None:
     """Verify session_open, session_high, session_low, session_close blocks."""
     t1 = int(datetime(2024, 1, 5, 9, 0, tzinfo=UTC).timestamp())
     t2 = int(datetime(2024, 1, 5, 12, 0, tzinfo=UTC).timestamp())
     sp = SessionPrice([t1, t2], [10.0, 20.0], [15.0, 25.0], [8.0, 18.0], [12.0, 22.0])
 
-    assert session_open(sp, shift=0) == 10.0
-    assert session_high(sp, shift=0) == 25.0
-    assert session_low(sp, shift=0) == 8.0
-    assert session_close(sp, shift=0) == 22.0
+    with caplog.at_level("DEBUG"):
+        assert session_open(sp, shift=0) == 10.0
+        assert session_high(sp, shift=0) == 25.0
+        assert session_low(sp, shift=0) == 8.0
+        assert session_close(sp, shift=0) == 22.0
+
+    assert any("FR-PRICE-SESSION-OPEN" in r.message for r in caplog.records)
+    assert any("FR-PRICE-SESSION-HIGH" in r.message for r in caplog.records)
+    assert any("FR-PRICE-SESSION-LOW" in r.message for r in caplog.records)
+    assert any("FR-PRICE-SESSION-CLOSE" in r.message for r in caplog.records)
 
 
-def test_heiken_ashi_blocks() -> None:
+def test_heiken_ashi_blocks(caplog: pytest.LogCaptureFixture) -> None:
     """Verify heiken_ashi_open, heiken_ashi_high, heiken_ashi_low, heiken_ashi_close."""
     bp = BarPrice([10.0, 20.0], [15.0, 25.0], [8.0, 18.0], [12.0, 22.0])
 
-    # Bar 0:
-    # ha_close[0] = (10 + 15 + 8 + 12)/4 = 11.25
-    # ha_open[0] = (10 + 12)/2 = 11.0
-    # ha_high[0] = max(15, 11, 11.25) = 15.0
-    # ha_low[0] = min(8, 11, 11.25) = 8.0
-    # Bar 1:
-    # ha_close[1] = (20 + 25 + 18 + 22)/4 = 21.25
-    # ha_open[1] = (11.0 + 11.25)/2 = 11.125
-    # ha_high[1] = max(25, 11.125, 21.25) = 25.0
-    # ha_low[1] = min(18, 11.125, 21.25) = 11.125
+    with caplog.at_level("DEBUG"):
+        # Shift 0 is Bar 1
+        assert heiken_ashi_close(bp, 0) == 21.25
+        assert heiken_ashi_open(bp, 0) == 11.125
+        assert heiken_ashi_high(bp, 0) == 25.0
+        assert heiken_ashi_low(bp, 0) == 11.125
 
-    # Shift 0 is Bar 1
-    assert heiken_ashi_close(bp, 0) == 21.25
-    assert heiken_ashi_open(bp, 0) == 11.125
-    assert heiken_ashi_high(bp, 0) == 25.0
-    assert heiken_ashi_low(bp, 0) == 11.125
+        # Shift 1 is Bar 0
+        assert heiken_ashi_close(bp, 1) == 11.25
+        assert heiken_ashi_open(bp, 1) == 11.0
+        assert heiken_ashi_high(bp, 1) == 15.0
+        assert heiken_ashi_low(bp, 1) == 8.0
 
-    # Shift 1 is Bar 0
-    assert heiken_ashi_close(bp, 1) == 11.25
-    assert heiken_ashi_open(bp, 1) == 11.0
-    assert heiken_ashi_high(bp, 1) == 15.0
-    assert heiken_ashi_low(bp, 1) == 8.0
+    assert any("FR-PRICE-HEIKEN-ASHI-CLOSE" in r.message for r in caplog.records)
+    assert any("FR-PRICE-HEIKEN-ASHI-OPEN" in r.message for r in caplog.records)
 
 
-def test_price_facade() -> None:
+def test_price_facade(caplog: pytest.LogCaptureFixture) -> None:
     """Verify Price facade methods routing."""
     bp = BarPrice([10.0, 20.0], [15.0, 25.0], [8.0, 18.0], [12.0, 22.0], [100.0, 200.0])
 
-    assert Price.open(bp, 0) == 20.0
-    assert Price.high(bp, 0) == 25.0
-    assert Price.low(bp, 0) == 18.0
-    assert Price.close(bp, 0) == 22.0
-    assert Price.volume(bp, 0) == 200.0
+    with caplog.at_level("DEBUG"):
+        assert Price.open(bp, 0) == 20.0
+        assert Price.high(bp, 0) == 25.0
+        assert Price.low(bp, 0) == 18.0
+        assert Price.close(bp, 0) == 22.0
+        assert Price.volume(bp, 0) == 200.0
+        assert Prices.close(bp, 0) == 22.0
+
+    assert any("FR-PRICE-FACADE" in r.message for r in caplog.records)
 
 
 def test_all_29_price_block_specs() -> None:
@@ -395,3 +518,44 @@ def test_all_29_price_block_specs() -> None:
         assert len(s.inputs) >= 1
         assert len(s.outputs) == 1
         assert s.is_causal is True
+
+
+def test_block_registry_discovers_all_price_blocks() -> None:
+    """Verify BlockRegistry discovers all 29 price blocks with 0 diagnostics."""
+    registry = BlockRegistry()
+    registry.discover("app/extend/blocks/price")
+
+    expected_ids = {
+        "price.ask",
+        "price.bid",
+        "price.close",
+        "price.close_d",
+        "price.close_m",
+        "price.close_w",
+        "price.heiken_ashi_close",
+        "price.heiken_ashi_high",
+        "price.heiken_ashi_low",
+        "price.heiken_ashi_open",
+        "price.high",
+        "price.high_d",
+        "price.high_m",
+        "price.high_w",
+        "price.low",
+        "price.low_d",
+        "price.low_m",
+        "price.low_w",
+        "price.open",
+        "price.open_d",
+        "price.open_m",
+        "price.open_w",
+        "price.session_close",
+        "price.session_high",
+        "price.session_low",
+        "price.session_open",
+        "price.spread",
+        "price.spread_in_pips",
+        "price.volume",
+    }
+    discovered = {b.spec.id for b in registry.snapshot().blocks.values()}
+    assert expected_ids.issubset(discovered)
+    assert not registry.diagnostics

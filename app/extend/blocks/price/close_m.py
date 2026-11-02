@@ -1,4 +1,18 @@
-"""Monthly Close price strategy block (CloseM)."""
+"""Monthly Close price strategy block (CloseM).
+
+Description:
+    Returns Monthly Close price at the specified historical monthly shift,
+    evaluating against MTFPrice or chart container contexts.
+Purpose:
+    FEAT-PRICE-BLOCKS: StrategyQuant donor-faithful price blocks.
+Key Capabilities:
+    - FR-PRICE-CLOSE-M: Historical Monthly Close price retrieval.
+Python API Usage:
+    from app.extend.blocks.price.close_m import CloseM, close_m
+    price = close_m(chart, shift=0)
+CLI Usage:
+    uv run pytest tests/extend/blocks/test_price.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -49,9 +63,13 @@ def close_m(chart: Any, shift: int = 0) -> float:
     Returns:
         Monthly Close price as float, or NaN.
     """
+    logger.debug("FR-PRICE-CLOSE-M: CloseM(shift=%d)", shift)
     if isinstance(chart, MTFPrice):
         return chart.monthly_close(shift)
     return resolve_chart_field(chart, "monthly_close", shift)
 
 
-__all__ = ["close_m", "close_m_spec"]
+# Direct donor class alias matching SQ.Blocks.Price.CloseM
+CloseM = close_m
+
+__all__ = ["CloseM", "close_m", "close_m_spec"]
