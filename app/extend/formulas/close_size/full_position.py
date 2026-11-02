@@ -5,37 +5,43 @@ Description:
     trade execution and Builder formulas. In the observed engine semantics,
     evaluating FullPosition returns numeric 0.0 as a close-size sentinel
     indicating that the entire open volume of the position should be closed.
-
 Purpose:
-    FEAT-FORMULAS-FULL-POSITION: Formula sentinel for closing the full position.
-
+    FEAT-FORMULAS: StrategyQuant donor-faithful formula models.
 Key Capabilities:
     - FR-formulas-full-position: Returns float 0.0 regardless of symbol, price,
       direction, or strategy state.
-
 Python API Usage:
     from app.extend.formulas.close_size.full_position import FullPosition
     evaluator = FullPosition()
     val = evaluator.evaluate_formula(None, "EURUSD", 1.1, 1)
-
 CLI Usage:
-    python -c "from app.extend.formulas.close_size.full_position import (
-        FullPosition,
-    ); print(FullPosition().evaluate_formula(None, 'EURUSD', 1.0, 1))"
+    uv run pytest tests/extend/formulas/test_formulas_catalog.py --no-cov
 """
 
 from __future__ import annotations
 
+from typing import Any, override
+
 from app.core.host.logging import get_logger
+from app.extend.formulas.base import FormulaBlock
 
 logger = get_logger(__name__)
 
 
-class FullPosition:
+class FullPosition(FormulaBlock):
     """Sentinel formula evaluator for closing full position volume."""
 
+    def __init__(self) -> None:
+        """Initialize FullPosition with group CloseSize and order 100."""
+        super().__init__(name="Full position", group="CloseSize", order=100)
+
+    @override
     def evaluate_formula(
-        self, strategy: object, symbol: str, price: float, direction: int
+        self,
+        strategy: Any,
+        symbol: str,
+        price: float,
+        direction: int,
     ) -> float:
         """Evaluate full position close size formula.
 
