@@ -90,11 +90,15 @@ class HostStrategyStorage:
             try:
                 key = json.loads(path.read_text(encoding="utf-8"))["key"]
             except (ValueError, KeyError, TypeError, OSError) as error:
+                logger.exception("FR-hsl-storage: cannot enumerate strategy storage")
                 raise DomainError(
                     code="HSL_STORAGE_CORRUPT",
                     message="Cannot enumerate strategy storage",
                 ) from error
             if not isinstance(key, str) or self._path(key) != path:
+                logger.error(
+                    "FR-hsl-storage: invalid strategy record key path=%s", path.name
+                )
                 raise DomainError(
                     code="HSL_STORAGE_CORRUPT", message="Invalid strategy record key"
                 )

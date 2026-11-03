@@ -1,3 +1,19 @@
+"""Isolated test suite for HostPersistence SQLite isolation, WAL mode, and schemas.
+
+Description:
+    Tests schema creation idempotency, transaction scopes, parameter binding,
+    foreign key enforcement, and bounded CRUD operations on temporary isolated stores.
+Purpose:
+    FEAT-HOST-PERSISTENCE: Maintain host schema and transaction authority.
+Key Capabilities:
+    - FR-test-host-persistence: Verify ACID transactions, SQLite isolation,
+      bounded CRUD, and host schema integrity.
+Python API Usage:
+    Run pytest against this module.
+CLI Usage:
+    uv run pytest tests/core/host/test_persistence.py --no-cov
+"""
+
 import ast
 import json
 import logging
@@ -390,3 +406,184 @@ def test_grouped_transaction_logs_commit_and_rollback(gateway, caplog):
     assert "Persistence transaction started" in caplog.text
     assert "Persistence transaction committed" in caplog.text
     assert "Persistence transaction rolled back" in caplog.text
+
+
+def test_code_editor_schema_isolated(tmp_path, caplog):
+    path = tmp_path / "ce.db"
+    path.touch()
+    gateway = HostPersistence(path)
+    with caplog.at_level(logging.INFO, logger="app.core.host.persistence"):
+        res = gateway.ensure_code_editor_schema()
+    assert res["success"]
+    assert "FR-host-code-editor-schema: verified" in caplog.text
+
+    created = gateway.create_records(
+        "code_editor_state", {"id": "session_1", "payload": '{"cursor": 10}'}
+    )
+    assert records(created)[0]["id"] == "session_1"
+
+
+def test_custom_data_schema_isolated(tmp_path, caplog):
+    path = tmp_path / "cd.db"
+    path.touch()
+    gateway = HostPersistence(path)
+    with caplog.at_level(logging.INFO, logger="app.core.host.persistence"):
+        res = gateway.ensure_custom_data_schema()
+    assert res["success"]
+    assert "FR-host-custom-data-schema: verified" in caplog.text
+
+    gateway.create_records(
+        "datamgr_custom",
+        {
+            "id": "ind_1",
+            "name": "CustomRSI",
+            "data_type": "indicator",
+            "timeframe": "M1",
+            "values_json": "[]",
+            "system": 0,
+            "updated_at": "2026-01-01T00:00:00Z",
+        },
+    )
+    val = gateway.create_records(
+        "datamgr_custom_values",
+        {
+            "indicator_id": "ind_1",
+            "timestamp": "2026-01-01T00:00:00Z",
+            "values_json": "[1.0, 2.0]",
+        },
+    )
+    assert records(val)[0]["indicator_id"] == "ind_1"
+
+
+def test_datasets_schema_and_migrations_isolated(tmp_path, caplog):
+    path = tmp_path / "datasets.db"
+    conn = sqlite3.connect(path)
+    conn.executescript("""
+        CREATE TABLE datamgr_datasets (
+            id TEXT PRIMARY KEY, source TEXT NOT NULL, symbol TEXT NOT NULL,
+            underlying TEXT NOT NULL, timeframe TEXT NOT NULL, broker TEXT NOT NULL,
+            timezone TEXT NOT NULL, category TEXT NOT NULL, date_from TEXT NOT NULL,
+            date_to TEXT NOT NULL, bars INTEGER NOT NULL DEFAULT 0,
+            created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+            path TEXT NOT NULL DEFAULT '', data_kind TEXT NOT NULL DEFAULT 'bars',
+            quality_score REAL NOT NULL DEFAULT 1.0, lineage_json TEXT NOT NULL DEFAULT '{}',
+            schema_version INTEGER NOT NULL DEFAULT 1,
+            instrument TEXT, broker_name TEXT
+        );
+        CREATE TABLE datamgr_broker (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+        INSERT INTO datamgr_broker (id, name) VALUES (1, '[[ Interactive Brokers ]]');
+        INSERT INTO datamgr_datasets (
+            id, source, symbol, underlying, timeframe, broker, timezone,
+            category, date_from, date_to, created_at, updated_at, instrument, broker_name
+        ) VALUES (
+            'ds_1', 'csv', 'EURUSD', 'EURUSD', 'H1', '1', 'UTC',
+            'Forex', '2026-01-01', '2026-01-02', '2026-01-01', '2026-01-02', 'legacy_inst', 'legacy_broker'
+        );
+    """)
+    conn.close()
+
+    gateway = HostPersistence(path)
+    with caplog.at_level(logging.INFO, logger="app.core.host.persistence"):
+        res = gateway.ensure_datasets_schema()
+    assert res["success"]
+    assert "FR-host-datasets-schema: verified" in caplog.text
+
+    # Verify column removal and broker migration
+    read = gateway.read_records("datamgr_datasets", filters={"id": "ds_1"})
+    row = records(read)[0]
+    assert row["broker"] == "Interactive Brokers"
+    assert "instrument" not in row
+    assert "broker_name" not in row
+    assert "symbol_definition_id" in row
+    assert "session_id" in row
+
+
+def test_broker_cost_schema_isolated(tmp_path, caplog):
+    path = tmp_path / "brokers.db"
+    conn = sqlite3.connect(path)
+    conn.executescript("""
+        CREATE TABLE datamgr_broker (
+            id INTEGER PRIMARY KEY,
+            name TEXT NOT NULL
+        );
+        INSERT INTO datamgr_broker (id, name) VALUES (1, 'TestBroker');
+    """)
+    conn.close()
+
+    gateway = HostPersistence(path)
+    with caplog.at_level(logging.INFO, logger="app.core.host.persistence"):
+        res = gateway.ensure_broker_cost_schema()
+    assert res["success"]
+    assert "FR-host-broker-cost-schema: verified" in caplog.text
+
+    row = records(gateway.read_records("datamgr_broker", filters={"id": 1}))[0]
+    assert row["spread_model_json"] == '{"model":"inherit"}'
+    assert row["commission_model_json"] == '{"model":"inherit"}'
+
+
+def test_databanks_schema_isolated(tmp_path, caplog):
+    path = tmp_path / "databanks.db"
+    path.touch()
+    gateway = HostPersistence(path)
+    with caplog.at_level(logging.INFO, logger="app.core.host.persistence"):
+        res = gateway.ensure_databanks_schema()
+    assert res["success"]
+    assert "FR-host-databanks-schema: verified" in caplog.text
+
+    gateway.create_records(
+        "databank_results",
+        {
+            "id": "res_1",
+            "databank_id": "db_main",
+            "strategy_id": "strat_1",
+            "strategy_name": "Strategy 1",
+            "net_profit": 1500.0,
+            "created_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+        },
+    )
+    gateway.create_records(
+        "databank_results",
+        {
+            "id": "res_2",
+            "databank_id": "db_main",
+            "strategy_id": "strat_2",
+            "strategy_name": "Strategy 2",
+            "net_profit": 2500.0,
+            "created_at": "2026-01-01T00:00:00Z",
+            "updated_at": "2026-01-01T00:00:00Z",
+        },
+    )
+    rows = records(
+        gateway.read_records(
+            "databank_results",
+            filters={"databank_id": "db_main"},
+            order_by=["net_profit"],
+            descending=True,
+        )
+    )
+    assert len(rows) == 2
+    assert rows[0]["id"] == "res_2"
+    assert rows[1]["id"] == "res_1"
+
+
+def test_timeout_and_transaction_edge_cases(tmp_path):
+    path = tmp_path / "timeout.db"
+    with pytest.raises(ValueError, match="timeout must be finite and positive"):
+        HostPersistence(path, timeout=0)
+    with pytest.raises(ValueError, match="timeout must be finite and positive"):
+        HostPersistence(path, timeout=-1.0)
+    with pytest.raises(ValueError, match="timeout must be finite and positive"):
+        HostPersistence(path, timeout=float("nan"))
+    with pytest.raises(ValueError, match="timeout must be finite and positive"):
+        HostPersistence(path, timeout=float("inf"))
+
+    path.touch()
+    gateway = HostPersistence(path)
+    with gateway.transaction() as tx:
+        # Re-entrant transaction on scoped transaction gateway should raise
+        with pytest.raises(
+            PersistenceTransactionError, match="Nested transactions are not supported"
+        ):
+            with tx.transaction():
+                pass

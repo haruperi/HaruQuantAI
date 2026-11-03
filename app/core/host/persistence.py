@@ -10,10 +10,22 @@ Description:
 Purpose:
     FEAT-HOST-PERSISTENCE: Keep schema and transaction authority in the host.
 Key Capabilities:
+    - FR-host-persistence-isolation: Enforce exclusive SQLite connection handling,
+      WAL mode, parameter binding, and bounded atomic transactions.
     - FR-host-job-schema: Install additive job tables and reject incompatible
       existing columns; isolated persistence tests verify explicit result logs.
     - FR-host-watchlist-schema: Install additive watchlists and watchlist items
       tables and reject incompatible existing definitions; isolated tests verify logs.
+    - FR-host-code-editor-schema: Install additive editor session and indicator
+      configuration storage atomically.
+    - FR-host-custom-data-schema: Install additive custom indicator, values, and
+      format tables atomically.
+    - FR-host-datasets-schema: Install additive dataset catalog tables with safe
+      migration of legacy columns.
+    - FR-host-databanks-schema: Install additive databank results tables and
+      ordering indexes atomically.
+    - FR-host-broker-cost-schema: Add inherited broker profile cost model columns
+      without replacing existing catalog tables.
 Python API Usage:
     response = HostPersistence(path).ensure_jobs_schema()
 CLI Usage:
@@ -169,6 +181,7 @@ class HostPersistence:
                 "CREATE TABLE IF NOT EXISTS code_editor_state ("
                 "id TEXT PRIMARY KEY, payload TEXT NOT NULL)"
             )
+            logger.info("FR-host-code-editor-schema: verified")
             return {"affected_rows": 0, "records": []}
 
         return self._run("code_editor.schema", write=True, action=action)
@@ -237,6 +250,7 @@ class HostPersistence:
         def action(connection: sqlite3.Connection) -> dict[str, Any]:
             for statement in statements:
                 connection.execute(statement)
+            logger.info("FR-host-custom-data-schema: verified")
             return {"affected_rows": 0, "records": []}
 
         return self._run("custom_data.schema", write=True, action=action)
@@ -305,6 +319,7 @@ class HostPersistence:
                         "UPDATE datamgr_datasets SET broker = ? WHERE broker = ?",
                         (clean, str(b_id)),
                     )
+            logger.info("FR-host-datasets-schema: verified")
             return {"affected_rows": 0, "records": []}
 
         return self._run("datasets.schema", write=True, action=action)
@@ -324,6 +339,7 @@ class HostPersistence:
                             f"ALTER TABLE datamgr_broker ADD COLUMN {column} "
                             'TEXT NOT NULL DEFAULT \'{"model":"inherit"}\''
                         )
+            logger.info("FR-host-broker-cost-schema: verified")
             return {"affected_rows": 0, "records": []}
 
         return self._run("brokers.cost_schema", write=True, action=action)
@@ -357,6 +373,7 @@ class HostPersistence:
         def action(connection: sqlite3.Connection) -> dict[str, Any]:
             for statement in statements:
                 connection.execute(statement)
+            logger.info("FR-host-databanks-schema: verified")
             return {"affected_rows": 0, "records": []}
 
         return self._run("databanks.schema", write=True, action=action)
