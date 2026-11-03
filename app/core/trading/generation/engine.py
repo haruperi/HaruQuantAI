@@ -19,8 +19,8 @@ from dataclasses import dataclass
 from itertools import count
 
 from app.core.enums import OrderType, Timeframe
-from app.core.generators import RandomGenerator
 from app.core.lib.errors import DomainError
+from app.core.lib.random import RandomGenerator
 from app.core.trading.blocks.registry import block_registry
 from app.core.trading.strategy.contracts import (
     ActionKind,
