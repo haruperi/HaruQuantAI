@@ -26,20 +26,10 @@ import pandas as pd  # type: ignore[import-untyped]
 
 from app.core.data.contracts import (
     TIMEFRAME_SECONDS,
-    AccountInfo,
     BookInfo,
-    BridgeError,
-    BridgeEvent,
-    DealInfo,
     MarketBar,
     MarketTick,
-    OrderInfo,
-    PositionInfo,
     SymbolInfo,
-    TerminalInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
 )
 from app.core.enums import (
     BookType,
@@ -58,6 +48,18 @@ from app.core.enums import (
 )
 from app.core.host.logging import get_logger
 from app.core.trading.connection.base import TradingClient, epoch_seconds, utc_now
+from app.core.trading.connection.contracts import (
+    AccountInfo,
+    BridgeError,
+    BridgeEvent,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
 from app.core.trading.simulation.validation import (
     label as _label,
 )

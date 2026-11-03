@@ -28,20 +28,9 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 from app.core.data.contracts import (
-    AccountInfo,
     BookInfo,
-    BridgeError,
-    BridgeEvent,
-    DealInfo,
     MarketTick,
-    OrderInfo,
-    PositionInfo,
-    Receipt,
     SymbolInfo,
-    TerminalInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
 )
 from app.core.enums import (
     OrderType,
@@ -49,6 +38,19 @@ from app.core.enums import (
     Timeframe,
 )
 from app.core.host.logging import get_logger
+from app.core.trading.connection.contracts import (
+    AccountInfo,
+    BridgeError,
+    BridgeEvent,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    Receipt,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
 from app.core.trading.connection.trading_dispatch import TradingDispatcher
 
 logger = get_logger(__name__)

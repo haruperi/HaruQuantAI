@@ -23,12 +23,6 @@ from __future__ import annotations
 import inspect
 from dataclasses import dataclass
 
-from app.core.data.contracts import (
-    OrderInfo,
-    PositionInfo,
-    TradeRequest,
-    TradeResult,
-)
 from app.core.enums import (
     OrderType,
     TradeAction,
@@ -36,6 +30,12 @@ from app.core.enums import (
 )
 from app.core.host.logging import get_logger
 from app.core.trading.connection.base import TradingClient
+from app.core.trading.connection.contracts import (
+    OrderInfo,
+    PositionInfo,
+    TradeRequest,
+    TradeResult,
+)
 from app.core.trading.strategy.contracts import OrderRequest
 
 logger = get_logger(__name__)

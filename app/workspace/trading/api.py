@@ -21,12 +21,12 @@ from __future__ import annotations
 from types import TracebackType
 from typing import Self
 
-from app.core.data.contracts import (
+from app.core.host.logging import get_logger
+from app.core.trading.connection.contracts import (
     BridgeEvent,
     Receipt,
     TradingBackend,
 )
-from app.core.host.logging import get_logger
 
 from .account import AccountProxy
 from .exits import ExitManager

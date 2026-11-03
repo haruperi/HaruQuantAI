@@ -21,17 +21,17 @@ import asyncio
 from datetime import datetime
 from typing import Any, Protocol
 
-from app.core.data.contracts import (
+from app.core.data.contracts import SymbolInfo
+from app.core.enums import OrderType
+from app.core.trading.connection.contracts import (
     AccountInfo,
     DealInfo,
     OrderInfo,
     PositionInfo,
-    SymbolInfo,
     TradeCheckResult,
     TradeRequest,
     TradeResult,
 )
-from app.core.enums import OrderType
 
 
 class PositionSource(Protocol):

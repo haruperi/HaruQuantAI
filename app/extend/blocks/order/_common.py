@@ -20,10 +20,10 @@ import math
 from collections.abc import Sequence
 from dataclasses import replace
 
-from app.core.data.contracts import OrderInfo, PositionInfo, TradeResult
 from app.core.enums import TradeRetcode
 from app.core.host.logging import get_logger
 from app.core.trading.blocks.runtime import TradingRuntime
+from app.core.trading.connection.contracts import OrderInfo, PositionInfo, TradeResult
 from app.extend.functions.order_functions import TradeFilter, normalize_price
 
 logger = get_logger(__name__)

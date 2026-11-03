@@ -26,7 +26,6 @@ from typing import Any, cast, override
 
 import pandas as pd  # type: ignore[import-untyped]
 
-from app.core.data.contracts import BridgeError
 from app.core.data.market_storage import (
     price_columns,
     provider_storage_name,
@@ -34,6 +33,7 @@ from app.core.data.market_storage import (
 )
 from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence
+from app.core.trading.connection.contracts import BridgeError
 from app.workspace.data_manager.data.coverage import (
     missing_ranges,
     record_checked_ranges,

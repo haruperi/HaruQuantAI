@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
-from app.core.data.contracts import MarketBar, MarketTick, OrderInfo, PositionInfo
+from app.core.data.contracts import MarketBar, MarketTick
 from app.core.enums import OrderType, Timeframe
+from app.core.trading.connection.contracts import OrderInfo, PositionInfo
 from app.core.trading.strategy import (
     ActionKind,
     BarUpdateEvent,

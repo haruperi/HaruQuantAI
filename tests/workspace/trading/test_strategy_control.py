@@ -6,8 +6,9 @@ from datetime import UTC, datetime, timedelta
 from unittest.mock import AsyncMock
 
 import pytest
-from app.core.data.contracts import BridgeError, DealInfo, SymbolInfo, SymbolPrice
+from app.core.data.contracts import SymbolInfo, SymbolPrice
 from app.core.enums import DealEntry, DealType, MarginMode
+from app.core.trading.connection.contracts import BridgeError, DealInfo
 from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,
 )

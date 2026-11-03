@@ -33,11 +33,7 @@ from datetime import UTC, datetime
 from typing import Literal
 
 from app.core.data.contracts import (
-    AccountInfo,
     MarketTick,
-    PositionInfo,
-    TradeRequest,
-    TradeResult,
 )
 from app.core.enums import (
     OrderTime,
@@ -49,6 +45,12 @@ from app.core.enums import (
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
 from app.core.trading.connection.base import TradingClient
+from app.core.trading.connection.contracts import (
+    AccountInfo,
+    PositionInfo,
+    TradeRequest,
+    TradeResult,
+)
 from app.core.trading.strategy.contracts import (
     CloseRequest,
     EvaluationEvent,

@@ -18,12 +18,14 @@ from typing import override
 
 from app.core.data.contracts import (
     MarketTick,
+)
+from app.core.enums import OrderType, TradeAction, TradeRetcode
+from app.core.trading.connection.base import TradingClient
+from app.core.trading.connection.contracts import (
     PositionInfo,
     TradeRequest,
     TradeResult,
 )
-from app.core.enums import OrderType, TradeAction, TradeRetcode
-from app.core.trading.connection.base import TradingClient
 from app.core.trading.strategy.contracts import (
     ActionKind,
     ConditionDefinition,

@@ -14,6 +14,7 @@ from typing import Any
 
 import app.core.data.contracts as _contracts
 import app.core.enums as _enums
+import app.core.trading.connection.contracts as _trading_contracts
 from app.core.trading.connection.base import (
     MAX_RESPONSE_BYTES,
     BridgeError,
@@ -109,7 +110,7 @@ def _resolve_broker_export(name: str) -> Any:
     if name in _CLASS_TO_MODULE:
         mod = importlib.import_module(f"app.workspace.brokers.{_CLASS_TO_MODULE[name]}")
         return getattr(mod, name)
-    for source in (_contracts, _enums):
+    for source in (_contracts, _trading_contracts, _enums):
         if hasattr(source, name):
             return getattr(source, name)
     raise AttributeError(f"module 'app.workspace.brokers' has no attribute {name!r}")

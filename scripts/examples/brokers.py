@@ -52,9 +52,6 @@ from app.core.data.contracts import (
     MarketBar,
     MarketTick,
     SymbolInfo,
-    TerminalInfo,
-    TradeRequest,
-    TradingBackend,
 )
 from app.core.enums import (
     MarginMode,
@@ -63,6 +60,11 @@ from app.core.enums import (
     ReceiptStatus,
     Timeframe,
     TradeAction,
+)
+from app.core.trading.connection.contracts import (
+    TerminalInfo,
+    TradeRequest,
+    TradingBackend,
 )
 from app.extend.blocks.bar_time import format_timestamp
 from app.workspace.brokers.base import BridgeError

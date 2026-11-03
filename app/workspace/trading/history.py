@@ -19,8 +19,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.core.data import contracts
 from app.core.host.logging import get_logger
+from app.core.trading.connection import contracts
 
 from .base import TradingClass
 

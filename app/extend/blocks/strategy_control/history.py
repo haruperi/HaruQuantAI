@@ -26,10 +26,10 @@ import math
 from dataclasses import dataclass, replace
 from datetime import datetime
 
-from app.core.data import contracts
 from app.core.enums import DealEntry, DealType
 from app.core.host.logging import get_logger
 from app.core.trading.blocks.runtime import TradingRuntime
+from app.core.trading.connection import contracts
 from app.extend.functions.order_functions import TradeFilter, aware_timestamp
 
 logger = get_logger(__name__)

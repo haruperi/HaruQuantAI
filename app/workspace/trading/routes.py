@@ -29,12 +29,6 @@ from typing import Any
 from fastapi import APIRouter, HTTPException, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel, Field
 
-from app.core.data.contracts import (
-    OrderInfo,
-    PositionInfo,
-    TradeRequest,
-    TradeResult,
-)
 from app.core.enums import (
     OrderType,
     Timeframe,
@@ -43,6 +37,12 @@ from app.core.enums import (
 )
 from app.core.host.logging import get_logger
 from app.core.trading.connection.base import TradingClient
+from app.core.trading.connection.contracts import (
+    OrderInfo,
+    PositionInfo,
+    TradeRequest,
+    TradeResult,
+)
 from app.core.trading.strategy.hsl.compiler import StrategyCompiler
 from app.core.trading.strategy.hsl.models import HSLStrategyDocument
 from app.workspace.trading.brokers.registry import default_broker_registry

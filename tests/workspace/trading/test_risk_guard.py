@@ -5,14 +5,14 @@ from __future__ import annotations
 import asyncio
 from typing import override
 
-from app.core.data.contracts import (
+from app.core.enums import OrderType, TradeAction, TradeRetcode
+from app.core.trading.connection.base import TradingClient
+from app.core.trading.connection.contracts import (
     OrderInfo,
     PositionInfo,
     TradeRequest,
     TradeResult,
 )
-from app.core.enums import OrderType, TradeAction, TradeRetcode
-from app.core.trading.connection.base import TradingClient
 from app.core.trading.strategy.contracts import OrderRequest
 from app.workspace.trading.risk_guard import RiskGuard, RiskLimits
 

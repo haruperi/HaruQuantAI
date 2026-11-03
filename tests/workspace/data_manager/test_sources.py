@@ -7,10 +7,10 @@ from datetime import UTC, datetime, timedelta
 import pandas as pd
 import pyarrow.parquet as pq
 import pytest
-from app.core.data.contracts import BridgeError
 from app.core.data.market_storage import M1_SCHEMA, TICK_SCHEMA, provider_storage_name
 from app.core.enums import Timeframe
 from app.core.host.persistence import HostPersistence
+from app.core.trading.connection.contracts import BridgeError
 from app.workspace.data_manager.sources import (
     CRYPTO,
     PROVIDERS,

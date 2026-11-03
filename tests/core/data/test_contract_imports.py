@@ -4,9 +4,10 @@ from __future__ import annotations
 
 import importlib
 
-import app.core.data.contracts as new_contracts
+import app.core.data.contracts as data_contracts
 import app.core.enums as new_enums
 import pytest
+from app.core.trading.connection.contracts import TradeRequest
 
 
 def test_canonical_type_identity() -> None:
@@ -16,13 +17,26 @@ def test_canonical_type_identity() -> None:
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module("app.include.enums")
 
-    assert new_contracts.MarketBar is not None
-    assert new_contracts.MarketTick is not None
-    assert new_contracts.ChartDef is not None
-    assert new_contracts.DataInfo is not None
-    assert new_contracts.SymbolInfo is not None
-    assert new_contracts.TradeRequest is not None
-    assert new_contracts.TradingSession is not None
+    # Pure data contracts present in app.core.data.contracts
+    assert data_contracts.MarketBar is not None
+    assert data_contracts.MarketTick is not None
+    assert data_contracts.ChartDef is not None
+    assert data_contracts.DataInfo is not None
+    assert data_contracts.SymbolInfo is not None
+    assert data_contracts.TradingSession is not None
+    assert data_contracts.BookInfo is not None
+    assert data_contracts.DataframeSeries is not None
+
+    # Trading connection contracts cleanly decoupled from app.core.data.contracts
+    assert not hasattr(data_contracts, "TradeRequest")
+    assert not hasattr(data_contracts, "OrderInfo")
+    assert not hasattr(data_contracts, "AccountInfo")
+    assert not hasattr(data_contracts, "PositionInfo")
+    assert not hasattr(data_contracts, "DealInfo")
+    assert not hasattr(data_contracts, "BridgeError")
+
+    # TradeRequest cleanly imported from app.core.trading.connection.contracts
+    assert TradeRequest is not None
 
     # Exact timeframe second values per WO-C06.01
     assert new_enums.Timeframe.PERIOD_M1.to_seconds() == 60

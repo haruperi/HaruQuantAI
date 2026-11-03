@@ -19,7 +19,7 @@ from dataclasses import dataclass
 from itertools import count
 from typing import TYPE_CHECKING
 
-from app.core.data.contracts import MarketBar, OrderInfo, PositionInfo
+from app.core.data.contracts import MarketBar
 from app.core.enums import (
     OrderState,
     OrderType,
@@ -34,6 +34,7 @@ from app.core.trading.backtest.contracts import (
     SameBarExecutionRule,
     TradeRecord,
 )
+from app.core.trading.connection.contracts import OrderInfo, PositionInfo
 
 if TYPE_CHECKING:
     from app.core.trading.strategy.contracts import (

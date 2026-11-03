@@ -22,9 +22,9 @@ from __future__ import annotations
 import math
 from collections.abc import Mapping
 
-from app.core.data import contracts
 from app.core.host.logging import get_logger
 from app.core.trading.blocks.runtime import TradingRuntime
+from app.core.trading.connection.contracts import PositionInfo
 from app.extend.blocks.order._common import (
     matching_orders,
     matching_positions,
@@ -36,9 +36,7 @@ from app.extend.functions.order_functions import (
 logger = get_logger(__name__)
 
 
-def valuation(
-    position: contracts.PositionInfo, prices: Mapping[str, float] | None
-) -> float:
+def valuation(position: PositionInfo, prices: Mapping[str, float] | None) -> float:
     """Return effective mark valuation price for position.
 
     Args:

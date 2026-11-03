@@ -17,15 +17,15 @@ from __future__ import annotations
 from typing import override
 
 import pytest
-from app.core.data.contracts import (
+from app.core.enums import AccountTradeMode, OrderType, TradeAction, TradeRetcode
+from app.core.trading.connection.base import TradingClient
+from app.core.trading.connection.contracts import (
     AccountInfo,
     OrderInfo,
     PositionInfo,
     TradeRequest,
     TradeResult,
 )
-from app.core.enums import AccountTradeMode, OrderType, TradeAction, TradeRetcode
-from app.core.trading.connection.base import TradingClient
 from app.main import create_app
 from app.workspace.trading.brokers.registry import default_broker_registry
 from fastapi.testclient import TestClient

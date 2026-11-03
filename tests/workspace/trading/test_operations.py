@@ -7,12 +7,14 @@ from unittest.mock import AsyncMock
 
 import pytest
 from app.core.data.contracts import (
-    BridgeError,
     SymbolInfo,
+)
+from app.core.enums import OrderTime, TradeAction, TradeRetcode
+from app.core.trading.connection.contracts import (
+    BridgeError,
     TradeCheckResult,
     TradeResult,
 )
-from app.core.enums import OrderTime, TradeAction, TradeRetcode
 from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,
 )
@@ -322,7 +324,7 @@ def test_native_zero_check_code_and_rejected_check(setup):
 
 
 def test_filter_exact_magic_zero_and_comment_direction():
-    from app.core.data.contracts import PositionInfo
+    from app.core.trading.connection.contracts import PositionInfo
 
     item = PositionInfo(
         symbol="EURUSD", magic=0, comment="strategy.entry", position_type=1

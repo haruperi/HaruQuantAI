@@ -7,8 +7,9 @@ from unittest.mock import AsyncMock
 
 import app.workspace.trading.exits as exit_runtime
 import pytest
-from app.core.data.contracts import SymbolInfo, TradeResult
+from app.core.data.contracts import SymbolInfo
 from app.core.enums import TradeRetcode
+from app.core.trading.connection.contracts import TradeResult
 from app.core.trading.simulation.client import SimulatorClient
 from app.extend.blocks.order.close.close_all_positions import close_all_positions
 from app.extend.blocks.order.open.enter_at_limit import enter_at_limit

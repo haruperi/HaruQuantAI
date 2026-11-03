@@ -31,8 +31,9 @@ from decimal import Decimal
 from itertools import pairwise
 from typing import Any
 
-from app.core.data.contracts import OrderInfo, PositionInfo, SymbolInfo
+from app.core.data.contracts import SymbolInfo
 from app.core.host.logging import get_logger
+from app.core.trading.connection.contracts import OrderInfo, PositionInfo
 
 logger = get_logger(__name__)
 

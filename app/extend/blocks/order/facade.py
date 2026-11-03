@@ -21,9 +21,10 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
-from app.core.data.contracts import SymbolInfo, TradeResult
+from app.core.data.contracts import SymbolInfo
 from app.core.host.logging import get_logger
 from app.core.trading.blocks.runtime import TradingRuntime
+from app.core.trading.connection.contracts import TradeResult
 from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,
 )

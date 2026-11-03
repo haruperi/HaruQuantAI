@@ -15,7 +15,6 @@ if TYPE_CHECKING:
     from .feature import Symbols
 
 from app.core.data.contracts import (
-    BridgeError,
     SymbolInfo,
     SymbolMargin,
     SymbolPrice,
@@ -34,6 +33,9 @@ from app.core.lib.responses import (
     ResponseMetadata,
     StandardError,
     StandardResponse,
+)
+from app.core.trading.connection.contracts import (
+    BridgeError,
 )
 from app.workspace.brokers.metatrader import create_mt5_client
 

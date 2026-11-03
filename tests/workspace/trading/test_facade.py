@@ -14,20 +14,8 @@ from typing import Any, override
 
 import pytest
 from app.core.data.contracts import (
-    AccountInfo,
     BookInfo,
-    BridgeError,
-    BridgeEvent,
-    DealInfo,
-    OrderInfo,
-    PositionInfo,
-    Receipt,
     SymbolInfo,
-    TerminalInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
-    TradingBackend,
 )
 from app.core.enums import (
     BookType,
@@ -36,6 +24,20 @@ from app.core.enums import (
     ReceiptStatus,
     TradeAction,
     TradeRetcode,
+)
+from app.core.trading.connection.contracts import (
+    AccountInfo,
+    BridgeError,
+    BridgeEvent,
+    DealInfo,
+    OrderInfo,
+    PositionInfo,
+    Receipt,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+    TradingBackend,
 )
 from app.workspace.trading import (
     AccountProxy,

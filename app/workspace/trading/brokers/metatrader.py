@@ -27,14 +27,7 @@ from datetime import UTC, datetime
 from typing import override
 
 from app.core.data.contracts import (
-    AccountInfo,
     MarketTick,
-    OrderInfo,
-    PositionInfo,
-    TerminalInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
 )
 from app.core.enums import (
     AccountTradeMode,
@@ -44,6 +37,15 @@ from app.core.enums import (
 )
 from app.core.host.logging import get_logger
 from app.core.trading.connection.base import BridgeError, TradingClient
+from app.core.trading.connection.contracts import (
+    AccountInfo,
+    OrderInfo,
+    PositionInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
 
 logger = get_logger(__name__)
 

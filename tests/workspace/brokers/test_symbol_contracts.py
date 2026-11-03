@@ -5,8 +5,9 @@ from dataclasses import asdict
 from unittest.mock import AsyncMock, Mock
 
 import pytest
-from app.core.data.contracts import SymbolInfo, SymbolMargin, SymbolPrice, TradeRequest
+from app.core.data.contracts import SymbolInfo, SymbolMargin, SymbolPrice
 from app.core.enums import OrderFilling, OrderType, TradeAction, TradeRetcode
+from app.core.trading.connection.contracts import TradeRequest
 from app.workspace.brokers import (
     BinanceClient,
     DarwinexClient,

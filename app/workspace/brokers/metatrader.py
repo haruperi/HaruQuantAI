@@ -90,18 +90,20 @@ except ImportError:
 
 
 from app.core.data.contracts import (
-    READ_TIMEOUT,
-    BridgeEvent,
     MarketBar,
     MarketTick,
-    Receipt,
     SymbolInfo,
     SymbolPrice,
-    TerminalInfo,
 )
 from app.core.enums import (
     ReceiptStatus,
     Timeframe,
+)
+from app.core.trading.connection.contracts import (
+    READ_TIMEOUT,
+    BridgeEvent,
+    Receipt,
+    TerminalInfo,
 )
 from app.workspace.trading import Trading
 

@@ -19,11 +19,12 @@ from typing import Any
 
 import numpy as np
 import pytest
-from app.core.data.contracts import MarketBar, PositionInfo
+from app.core.data.contracts import MarketBar
 from app.core.enums import Timeframe
 from app.core.lib.errors import DomainError
 from app.core.trading.backtest.contracts import BacktestSettings
 from app.core.trading.blocks.series import BarData
+from app.core.trading.connection.contracts import PositionInfo
 from app.core.trading.strategy.contracts import (
     BarUpdateEvent,
     InstrumentEconomics,

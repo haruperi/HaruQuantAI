@@ -12,16 +12,18 @@ from unittest.mock import AsyncMock
 
 import pytest
 from app.core.data.contracts import (
-    AccountInfo,
     SymbolInfo,
     SymbolPrice,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
 )
 from app.core.enums import OrderType, TradeRetcode
 from app.core.trading.blocks.metadata import ExecutionKind
 from app.core.trading.blocks.registry import BlockRegistry, BlockRegistryError
+from app.core.trading.connection.contracts import (
+    AccountInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
 from app.extend.functions.order_functions import TradeFilter
 from app.workspace.brokers.simulator import SimulatorClient
 from app.workspace.trading import (

@@ -17,10 +17,11 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-from app.core.data.contracts import BridgeError, SymbolInfo
+from app.core.data.contracts import SymbolInfo
 from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence, RecordFilter
 from app.core.lib.responses import ErrorCode
+from app.core.trading.connection.contracts import BridgeError
 
 from ._helpers import (
     _MT5_UPDATE_LOCK,

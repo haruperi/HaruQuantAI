@@ -7,13 +7,15 @@ from unittest.mock import AsyncMock
 
 import pytest
 from app.core.data.contracts import (
+    SymbolInfo,
+)
+from app.core.enums import OrderTime, TradeAction, TradeRetcode
+from app.core.trading.connection.contracts import (
     BridgeError,
     PositionInfo,
-    SymbolInfo,
     TradeCheckResult,
     TradeResult,
 )
-from app.core.enums import OrderTime, TradeAction, TradeRetcode
 from app.core.trading.simulation.client import SimulatorClient
 from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,

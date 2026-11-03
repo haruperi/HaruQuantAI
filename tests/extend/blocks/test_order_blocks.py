@@ -36,15 +36,17 @@ from unittest.mock import AsyncMock
 
 import pytest
 from app.core.data.contracts import (
-    OrderInfo,
-    PositionInfo,
     SymbolInfo,
     SymbolPrice,
+)
+from app.core.enums import OrderType, TradeRetcode
+from app.core.trading.connection.contracts import (
+    OrderInfo,
+    PositionInfo,
     TradeCheckResult,
     TradeRequest,
     TradeResult,
 )
-from app.core.enums import OrderType, TradeRetcode
 from app.extend.blocks.order import (
     Orders,
     close_all_pending_orders,

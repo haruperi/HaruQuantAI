@@ -14,10 +14,12 @@ from typing import Any
 
 import pytest
 from app.core.data.contracts import (
-    OrderInfo,
-    PositionInfo,
     SymbolInfo,
     SymbolPrice,
+)
+from app.core.trading.connection.contracts import (
+    OrderInfo,
+    PositionInfo,
 )
 from app.extend.functions import (
     PL_TYPE_MONEY,

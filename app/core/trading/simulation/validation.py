@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from app.core.data.contracts import MarketTick, SymbolInfo, TradeRequest, TradeResult
+from app.core.data.contracts import MarketTick, SymbolInfo
 from app.core.enums import OrderType, TradeAction, TradeRetcode
+from app.core.trading.connection.contracts import TradeRequest, TradeResult
 
 _A = TradeAction
 _OT = OrderType

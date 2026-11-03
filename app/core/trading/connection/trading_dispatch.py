@@ -8,7 +8,8 @@ from copy import deepcopy
 from dataclasses import asdict
 from typing import Any, ClassVar
 
-from app.core.data.contracts import (
+from app.core.enums import OrderFilling, OrderType
+from app.core.trading.connection.contracts import (
     BridgeError,
     DealInfo,
     OrderInfo,
@@ -16,9 +17,8 @@ from app.core.data.contracts import (
     TradeCheckResult,
     TradeRequest,
     TradeResult,
+    normalize_request,
 )
-from app.core.enums import OrderFilling, OrderType
-from app.workspace.trading.base import normalize_request
 
 
 class TradingDispatcher:

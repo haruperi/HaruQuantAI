@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 from types import SimpleNamespace
 
 import pytest
-from app.core.data.contracts import BridgeError
+from app.core.trading.connection.contracts import BridgeError
 from app.workspace.brokers.codecs import SQ_MAGIC_HEADER_V42
 from app.workspace.brokers.sq_equity import SQEquityClient
 from app.workspace.brokers.sq_futures import SQFuturesClient

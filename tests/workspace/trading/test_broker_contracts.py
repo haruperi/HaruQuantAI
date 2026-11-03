@@ -4,14 +4,7 @@ from __future__ import annotations
 
 import pytest
 from app.core.data.contracts import (
-    AccountInfo,
     MarketTick,
-    OrderInfo,
-    PositionInfo,
-    TerminalInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
 )
 from app.core.enums import (
     OrderType,
@@ -19,6 +12,15 @@ from app.core.enums import (
     TradeRetcode,
 )
 from app.core.trading.connection.base import BridgeError
+from app.core.trading.connection.contracts import (
+    AccountInfo,
+    OrderInfo,
+    PositionInfo,
+    TerminalInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+)
 from app.workspace.trading.brokers.crypto import CryptoBrokerClient
 from app.workspace.trading.brokers.ctrader import CTraderClient
 from app.workspace.trading.brokers.metatrader import MetaTraderClient

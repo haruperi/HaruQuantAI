@@ -28,14 +28,7 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.core.data.contracts import (
-    BridgeError,
-    OrderInfo,
-    PositionInfo,
     SymbolInfo,
-    TradeCheckResult,
-    TradeRequest,
-    TradeResult,
-    TradingBackend,
 )
 from app.core.enums import (
     OrderFilling,
@@ -45,6 +38,15 @@ from app.core.enums import (
     TradeRetcode,
 )
 from app.core.host.logging import get_logger
+from app.core.trading.connection.contracts import (
+    BridgeError,
+    OrderInfo,
+    PositionInfo,
+    TradeCheckResult,
+    TradeRequest,
+    TradeResult,
+    TradingBackend,
+)
 from app.extend.functions.order_functions import normalize_price
 
 from .base import (

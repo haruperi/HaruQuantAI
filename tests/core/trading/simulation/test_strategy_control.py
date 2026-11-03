@@ -7,13 +7,15 @@ from unittest.mock import AsyncMock
 
 import pytest
 from app.core.data.contracts import (
-    BridgeError,
-    DealInfo,
     SymbolInfo,
     SymbolPrice,
 )
 from app.core.enums import DealEntry, DealType, MarginMode
 from app.core.trading.connection.base import TradingClient
+from app.core.trading.connection.contracts import (
+    BridgeError,
+    DealInfo,
+)
 from app.core.trading.simulation.client import SimulatorClient
 from app.extend.blocks.order.close.close_all_pending_orders import (
     close_all_pending_orders,

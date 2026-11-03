@@ -19,9 +19,10 @@ from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
-from app.core.data.contracts import MarketBar, MarketTick, OrderInfo, PositionInfo
+from app.core.data.contracts import MarketBar, MarketTick
 from app.core.enums import OrderType, Timeframe
 from app.core.trading.blocks.series import BarData
+from app.core.trading.connection.contracts import OrderInfo, PositionInfo
 
 
 class SignalConflictPolicy(StrEnum):

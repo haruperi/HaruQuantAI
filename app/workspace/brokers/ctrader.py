@@ -54,6 +54,7 @@ from app.core import enums as _e
 from app.core.data import contracts as _c
 from app.core.host.logging import get_logger
 from app.core.host.settings import settings
+from app.core.trading.connection import contracts as _tc
 from app.workspace.data_manager.data.conversions import (
     bars_to_dataframe,
     ticks_to_dataframe,
@@ -165,9 +166,9 @@ class CTraderClient(TradingClient):
         return self._last_error
 
     @override
-    def get_terminal_info(self) -> _c.TerminalInfo:
+    def get_terminal_info(self) -> _tc.TerminalInfo:
         """Retrieve current cTrader terminal status."""
-        return _c.TerminalInfo(
+        return _tc.TerminalInfo(
             name=self.name,
             company="Spotware cTrader",
             connected=self.is_connected,
@@ -176,21 +177,21 @@ class CTraderClient(TradingClient):
         )
 
     @override
-    def get_account_info(self) -> _c.AccountInfo:
+    def get_account_info(self) -> _tc.AccountInfo:
         """Retrieve current trading account snapshot."""
         return self.account_info()
 
     @override
-    def get_positions(self) -> list[_c.PositionInfo]:
+    def get_positions(self) -> list[_tc.PositionInfo]:
         """Retrieve open positions from cTrader."""
         positions, _ = self.reconcile()
-        return [_c.PositionInfo(**p) for p in positions]
+        return [_tc.PositionInfo(**p) for p in positions]
 
     @override
-    def get_orders(self) -> list[_c.OrderInfo]:
+    def get_orders(self) -> list[_tc.OrderInfo]:
         """Retrieve pending orders from cTrader."""
         _, orders = self.reconcile()
-        return [_c.OrderInfo(**o) for o in orders]
+        return [_tc.OrderInfo(**o) for o in orders]
 
     def _ensure_module(self) -> None:
         if (
@@ -524,7 +525,7 @@ class CTraderClient(TradingClient):
                 "cTrader client is not authenticated", code="NOT_AUTHENTICATED"
             )
 
-    def account_info(self) -> _c.AccountInfo:
+    def account_info(self) -> _tc.AccountInfo:
         """Query account telemetry via ProtoOATraderReq."""
         logger.debug("FR-BROKER-CTRADER-FACADE-DISPATCH: querying account info")
         self._require_auth()
@@ -545,7 +546,7 @@ class CTraderClient(TradingClient):
             lev = int(tr.leverageInCents) // 100 if tr.leverageInCents else 30
             is_live = self.environment == "live"
             tm = _e.AccountTradeMode.REAL if is_live else _e.AccountTradeMode.DEMO
-            acc = _c.AccountInfo(
+            acc = _tc.AccountInfo(
                 login=tr.ctidTraderAccountId,
                 trade_mode=tm,
                 leverage=lev,
@@ -856,7 +857,7 @@ class CTraderClient(TradingClient):
             return positions, orders
 
     @override
-    def order_send(self, request: _c.TradeRequest) -> _c.TradeResult:
+    def order_send(self, request: _tc.TradeRequest) -> _tc.TradeResult:
         """Send trade request to cTrader via ProtoOANewOrderReq."""
         logger.info(
             "FR-BROKER-CTRADER-TRADE-EXECUTION: executing order %s", request.symbol
@@ -884,13 +885,13 @@ class CTraderClient(TradingClient):
                 oid = ev.order.orderId if ev.order else 0
                 did = ev.deal.dealId if ev.deal else 0
                 c = "Order executed successfully"
-                return _c.TradeResult(
+                return _tc.TradeResult(
                     int(_e.TradeRetcode.DONE), did, oid, request.volume, comment=c
                 )
             if p_type == pt.PROTO_OA_ERROR_RES:
                 err = oamsg.ProtoOAErrorRes()
                 err.ParseFromString(p_data)
-                return _c.TradeResult(
+                return _tc.TradeResult(
                     retcode=int(_e.TradeRetcode.ERROR),
                     comment=f"Order rejected: {err.description}",
                 )
@@ -947,11 +948,11 @@ class CTraderClient(TradingClient):
         return ticks_to_dataframe(out)
 
     @override
-    def order_check(self, request: _c.TradeRequest) -> _c.TradeCheckResult:
+    def order_check(self, request: _tc.TradeRequest) -> _tc.TradeCheckResult:
         """Pre-validate a trade request and calculate required margin."""
         del request
         self._require_auth()
-        return _c.TradeCheckResult(
+        return _tc.TradeCheckResult(
             retcode=int(_e.TradeRetcode.DONE), comment="Check passed"
         )
 

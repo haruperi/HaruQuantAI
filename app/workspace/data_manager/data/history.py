@@ -14,12 +14,14 @@ from app.core.data.contracts import (
     MAX_POSITION,
     MAX_RECORDS,
     TIMEFRAME_SECONDS,
-    BridgeError,
     MarketBar,
     MarketTick,
 )
 from app.core.enums import Timeframe
 from app.core.host.logging import get_logger
+from app.core.trading.connection.contracts import (
+    BridgeError,
+)
 
 from .conversions import bars_to_dataframe, ticks_to_dataframe
 
