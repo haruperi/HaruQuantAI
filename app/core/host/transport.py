@@ -60,14 +60,16 @@ from starlette.websockets import WebSocketDisconnect
 from app.core.host import resources as _res
 from app.core.host.events import CORE_EVENT_CHANNELS, EventBus, HostEvent
 from app.core.host.persistence import HostPersistence
-from app.core.host.session import Session, SessionManager, SessionPersistenceError
-from app.core.host.settings import RevisionConflictError, SettingsManager
-from app.core.host.vault import (
+from app.core.host.session import (
     ConnectionMetadata,
+    Session,
+    SessionManager,
+    SessionPersistenceError,
     Vault,
     _endpoint,
     prepare_credentials,
 )
+from app.core.host.settings import RevisionConflictError, SettingsManager
 from app.core.lib.responses import (
     ErrorCode,
     ResponseMetadata,
@@ -279,10 +281,9 @@ class ServletConnection:
             ):
                 status = resp.status_code
             lat = (time.perf_counter() - start) * 1000
-            healthy = status < HTTPStatus.BAD_REQUEST
             return {
                 "reachable": True,
-                "healthy": healthy,
+                "healthy": status < HTTPStatus.BAD_REQUEST,
                 "http_status": status,
                 "latency_ms": lat,
             }

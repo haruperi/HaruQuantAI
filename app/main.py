@@ -53,10 +53,9 @@ from app.core.host.logging import (
 )
 from app.core.host.persistence import HostPersistence
 from app.core.host.resources import ResourceMonitor, inspect_workspace_directories
-from app.core.host.session import SessionManager
+from app.core.host.session import SessionManager, Vault
 from app.core.host.settings import SettingsManager
 from app.core.host.transport import CredentialTester, install_transport
-from app.core.host.vault import Vault
 from app.core.jobs.manager import JobManager
 from app.workspace.data_manager.data.partition_files import (
     recover_catalog_publications,
@@ -326,7 +325,7 @@ def create_app(
         title="HaruQuantAI Backend",
         lifespan=_create_lifespan(persistence, projects_dir, scratch_root),
     )
-    from app.core.host.vault import WindowsCredentialVault
+    from app.core.host.session import WindowsCredentialVault
     from app.workspace.data_manager.sources.connections import build_provider_testers
 
     application.state.vault = vault if vault is not None else WindowsCredentialVault()

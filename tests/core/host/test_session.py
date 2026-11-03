@@ -184,3 +184,172 @@ def test_resolve_peer(authority):
     assert manager.resolve_peer("a" * 64) is None
     manager.revoke_session(token, "ui:browser123")
     assert manager.resolve_peer(token) is None
+
+
+def test_foreign_reference_cannot_be_resolved_or_revoked():
+    from app.core.host.session import WindowsCredentialVault
+
+    vault = WindowsCredentialVault()
+    with pytest.raises(OSError, match="unavailable"):
+        vault.resolve("another-application/credential")
+    with pytest.raises(OSError, match="unavailable"):
+        vault.revoke("another-application/credential")
+
+
+def test_unavailable_vault_never_falls_back_to_plaintext():
+    from app.core.host.session import WindowsCredentialVault
+
+    vault = WindowsCredentialVault()
+    vault._api = None
+    with pytest.raises(OSError, match="unavailable"):
+        vault.store("non-production-test-value")
+    with pytest.raises(OSError, match="unavailable"):
+        vault.resolve("HaruQuantAI/test")
+    with pytest.raises(OSError, match="unavailable"):
+        vault.revoke("HaruQuantAI/test")
+
+
+def test_windows_credential_vault_store_resolve_revoke():
+    from app.core.host.session import WindowsCredentialVault
+
+    vault = WindowsCredentialVault()
+    if not vault._api:
+        pytest.skip("Windows Credential API not available on this platform")
+
+    # Invalid secret values
+    with pytest.raises(ValueError, match="Supply a nonempty credential"):
+        vault.store("")
+    with pytest.raises(ValueError, match="Supply a nonempty credential"):
+        vault.store("x" * 2500)
+
+    # Valid secret lifecycle
+    ref = vault.store("unit_test_password_value")
+    try:
+        assert ref.startswith("HaruQuantAI/")
+        resolved = vault.resolve(ref)
+        assert resolved == "unit_test_password_value"
+    finally:
+        vault.revoke(ref)
+
+    # Idempotent revocation on already deleted reference
+    vault.revoke(ref)
+
+    # Resolving after revocation must raise
+    with pytest.raises(OSError, match="unavailable"):
+        vault.resolve(ref)
+
+
+def test_prepare_credentials_staging_and_rollback():
+    from app.core.host.session import prepare_credentials
+    from app.core.host.transport import TransportError
+
+    vault = Mock()
+    vault.store.side_effect = lambda s: f"HaruQuantAI/{s}"
+
+    # Normal staging
+    values = {
+        "name": "Live MT5",
+        "provider": "mt5",
+        "endpoint": "http://127.0.0.1:8000",
+        "credentials": {"password": "test_pass"},
+    }
+    record, staged = prepare_credentials(vault, values)
+    assert staged == ["HaruQuantAI/test_pass"]
+    assert record.vault_refs["password"] == "HaruQuantAI/test_pass"
+    vault.resolve.assert_called_once_with("HaruQuantAI/test_pass")
+
+    # Empty secret removes reference
+    values2 = {
+        "name": "Live MT5",
+        "provider": "mt5",
+        "endpoint": "http://127.0.0.1:8000",
+        "vault_refs": {"password": "old_ref"},
+        "credentials": {"password": ""},
+    }
+    record2, staged2 = prepare_credentials(vault, values2)
+    assert "password" not in record2.vault_refs
+
+    # Non-string credentials reject
+    with pytest.raises(ValueError, match=r"Credentials must contain string fields"):
+        prepare_credentials(vault, {"credentials": {"password": 12345}})
+
+    # Missing vault when credentials provided
+    with pytest.raises(TransportError):
+        prepare_credentials(
+            None,
+            {
+                "name": "Live MT5",
+                "provider": "mt5",
+                "endpoint": "http://127.0.0.1:8000",
+                "credentials": {"password": "pass"},
+            },
+        )
+
+    # Rollback on validation failure
+    vault_rb = Mock()
+    vault_rb.store.return_value = "HaruQuantAI/staged_to_revoke"
+    bad_values = {
+        "name": "Live MT5",
+        "provider": "mt5",
+        "endpoint": "ftp://bad-scheme.local",
+        "credentials": {"key": "secret"},
+    }
+    with pytest.raises(ValueError, match="Invalid endpoint URL"):
+        prepare_credentials(vault_rb, bad_values)
+    vault_rb.revoke.assert_called_once_with("HaruQuantAI/staged_to_revoke")
+
+
+def test_endpoint_url_validation():
+    from app.core.host.session import _endpoint
+
+    assert _endpoint("http://localhost:8000") == ("localhost", 8000)
+    assert _endpoint("https://example.com") == ("example.com", 443)
+    assert _endpoint("http://127.0.0.1") == ("127.0.0.1", 80)
+
+    for invalid in (
+        "ftp://example.com",
+        "http://user:pass@example.com",
+        "http://example.com?query=true",
+        "http://example.com#fragment",
+        "http://",
+        "not-a-url",
+    ):
+        with pytest.raises(ValueError, match="Invalid endpoint URL"):
+            _endpoint(invalid)
+
+
+def test_session_manager_edge_cases(authority):
+    from app.core.host.session import _identity
+
+    manager, clock = authority
+
+    with pytest.raises(ValueError, match="A non-empty identity is required"):
+        _identity("")
+    with pytest.raises(ValueError, match="A non-empty identity is required"):
+        _identity("   ")
+
+    assert not manager.verify_password(12345, "some_hash")
+    assert not manager.verify_password("password", 12345)
+    assert not manager.verify_password(
+        "password", "pbkdf2_sha256$not_an_int$salt$digest"
+    )
+
+    # Scope validation
+    assert not manager.has_scope(["settings:read"], "invalid-scope-no-colon")
+    assert not manager.has_scope("not-an-iterable-grants", "settings:read")
+    assert not manager.has_scope(["settings:read"], "settings:*")
+
+    # Naive clock raises
+    naive_manager = SessionManager(
+        manager.persistence,
+        clock=lambda: datetime(2026, 1, 1, tzinfo=None),  # noqa: DTZ001
+    )
+    with pytest.raises(
+        ValueError, match="Session clock must return an aware UTC timestamp"
+    ):
+        naive_manager.create_session("alice", "cli")
+
+    # Token and peer resolution
+    assert manager.resolve_peer("not-a-token") is None
+    assert not manager.revoke_session("not-a-token", "cli")
+    assert not manager.revoke_session("0" * 64, "")
