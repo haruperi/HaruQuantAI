@@ -14,7 +14,7 @@ CLI Usage:
 
 from __future__ import annotations
 
-from collections.abc import Callable, Sequence
+from collections.abc import Callable, Mapping, Sequence
 from dataclasses import dataclass
 from itertools import count
 
@@ -243,6 +243,11 @@ class GenerationEngine:
             and all(
                 name in ("open", "high", "low", "close", "volume")
                 for name in descriptor.spec.required_market_inputs
+            )
+            and not any(
+                p.get("required") and "default" not in p
+                for p in descriptor.composition.recipe.get("parameters", {}).values()
+                if isinstance(p, (dict, Mapping))
             )
         ]
 

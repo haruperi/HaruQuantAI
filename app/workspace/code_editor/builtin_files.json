@@ -1,4 +1,5 @@
 [
+  "app/extend/AGENTS.md",
   "app/extend/__init__.py",
   "app/extend/ai_tools/_templates/SKILL.md",
   "app/extend/ai_tools/_templates/agent.md",
@@ -164,6 +165,7 @@
   "app/extend/blocks/indicators/regime/hurst.py",
   "app/extend/blocks/indicators/regime/majority_rule.py",
   "app/extend/blocks/indicators/regime/regime_resolver.py",
+  "app/extend/blocks/indicators/template.py",
   "app/extend/blocks/indicators/trend/__init__.py",
   "app/extend/blocks/indicators/trend/accumulative_swing_index.py",
   "app/extend/blocks/indicators/trend/adx.py",
