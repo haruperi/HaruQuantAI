@@ -124,7 +124,9 @@ def test_routes_are_installed(client):
         "connections/{connection_id}/test",
     ):
         assert f"/api/v1/{path}" in schema["paths"]
-    assert client.get("/api/v1/status").status_code == 200
+    status_resp = client.get("/api/v1/status").json()
+    assert status_resp["data"]["status"] == "ok"
+    assert status_resp["data"]["product"] == "HaruQuantAI"
     assert client.get("/api/v1/readiness").json()["data"]["ready"]
     assert client.get("/api/v1/settings").status_code == 401
 
@@ -409,3 +411,25 @@ def test_connection_test_and_constants_classes():
     assert "cpu_cores" in specs
 
     assert TransportCLI.run(["--test-bus"]) == 0
+
+
+def test_port_probing_and_discovery():
+    from app.core.host.transport import find_available_port, is_port_in_use
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.bind(("127.0.0.1", 0))
+        sock.listen(1)
+        bound_port = sock.getsockname()[1]
+        assert is_port_in_use(bound_port)
+
+    assert not is_port_in_use(bound_port)
+
+    avail = find_available_port(bound_port, bound_port + 5)
+    assert bound_port <= avail <= bound_port + 5
+
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock2:
+        sock2.bind(("127.0.0.1", 0))
+        sock2.listen(1)
+        busy = sock2.getsockname()[1]
+        with pytest.raises(RuntimeError, match="Cannot start webserver on port"):
+            find_available_port(busy, busy)

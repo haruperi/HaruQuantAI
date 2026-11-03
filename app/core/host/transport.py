@@ -1,4 +1,33 @@
-"""Host gateway authorization, metadata safety, and network diagnostics."""
+"""Host gateway authorization, metadata safety, and network transport routes.
+
+Description:
+    Provides HTTP, SSE, and WebSocket transport for the host application.
+    Implements access middleware, error envelopes, session auth, settings
+    catalog, network diagnostics, streaming, and port availability probing.
+
+Purpose:
+    FEAT-HOST-TRANSPORT: Unified host transport, routing, and gateway security.
+
+Key Capabilities:
+    - FR-HOST-TRANSPORT-PORT-PROBING: Port check (find_available_port -> INFO).
+    - FR-HOST-TRANSPORT-MIDDLEWARE: Latency tracking (TransportMiddleware -> INFO).
+    - FR-HOST-TRANSPORT-SESSION-AUTH: Auth extraction (_require -> DEBUG).
+    - FR-HOST-TRANSPORT-ROUTING: REST gateway (create_transport_router -> INFO).
+    - FR-HOST-TRANSPORT-STREAMING: SSE and WebSocket (_sse, _ws -> DEBUG).
+    - FR-HOST-TRANSPORT-EXCEPTION-HANDLERS: Error mapping (_failure -> INFO).
+
+Python API Usage:
+    ```python
+    from app.core.host.transport import find_available_port, is_port_in_use
+
+    port = find_available_port(5050, 5060)
+    ```
+
+CLI Usage:
+    ```bash
+    uv run python -m app.core.host.transport --test-bus
+    ```
+"""
 
 from __future__ import annotations
 
@@ -16,7 +45,7 @@ from dataclasses import asdict
 from datetime import UTC, datetime
 from http import HTTPStatus
 from importlib.metadata import PackageNotFoundError, version
-from typing import Any
+from typing import Any, cast
 
 import httpx
 import psutil
@@ -57,6 +86,7 @@ _SECRET_WORDS = ("password", "secret", "token", "api_key", "private_key", "salt"
 _BUS_HOLDER: list[EventBus | None] = [None]
 
 type CredentialTester = Callable[[Mapping[str, Any]], Awaitable[bool | dict[str, Any]]]
+type _RouteHandler = Callable[[Request], Awaitable[Any]]
 
 
 def get_global_event_bus() -> EventBus:
@@ -66,6 +96,24 @@ def get_global_event_bus() -> EventBus:
         bus = EventBus()
         _BUS_HOLDER[0] = bus
     return bus
+
+
+def is_port_in_use(port: int, host: str = "127.0.0.1") -> bool:
+    """Check whether a TCP port is currently bound and listening on the host."""
+    with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
+        sock.settimeout(0.5)
+        return sock.connect_ex((host, port)) == 0
+
+
+def find_available_port(
+    port_from: int = 5050, port_to: int = 5060, host: str = "127.0.0.1"
+) -> int:
+    """Find first unbound port in range matching donor MainAppWebServer logic."""
+    for p in range(port_from, port_to + 1):
+        if not is_port_in_use(p, host):
+            logger.info("FR-HOST-TRANSPORT-PORT-PROBING: port=%d available", p)
+            return p
+    raise RuntimeError(f"Cannot start webserver on port {port_from} - {port_to}.")
 
 
 def _success(operation: str, data: Any) -> dict[str, Any]:
@@ -112,11 +160,8 @@ class TransportMiddleware:
         finally:
             path = scope.get("path", "")
             logger.info("FR-HOST-TRANSPORT-MIDDLEWARE: %s", path)
-            logger.debug(
-                "Request completed; path=%s duration=%.2fms",
-                path,
-                (time.perf_counter() - start) * 1000,
-            )
+            dur = (time.perf_counter() - start) * 1000
+            logger.debug("Request completed; path=%s duration=%.2fms", path, dur)
 
 
 def register_transport_exception_handlers(app: FastAPI) -> None:
@@ -128,9 +173,9 @@ def register_transport_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(HTTPException)
     async def _handle_http_error(_: Request, exc: HTTPException) -> JSONResponse:
-        code_map = {404: ErrorCode.NOT_FOUND, 422: ErrorCode.VALIDATION}
+        cmap = {404: ErrorCode.NOT_FOUND, 422: ErrorCode.VALIDATION}
         return _failure(
-            code_map.get(exc.status_code, ErrorCode.INTERNAL), exc.detail, "http"
+            cmap.get(exc.status_code, ErrorCode.INTERNAL), exc.detail, "http"
         )
 
     @app.exception_handler(Exception)
@@ -152,8 +197,7 @@ def _unwrap(response: dict[str, Any]) -> dict[str, Any]:
     if not response["success"]:
         code = response["error"]["code"]
         raise TransportError(ErrorCode(code), "Connection storage operation failed")
-    data: dict[str, Any] = response["data"]
-    return data
+    return cast("dict[str, Any]", response["data"])
 
 
 def _bounds(timeout: float, probes: int = 1) -> None:
@@ -186,12 +230,10 @@ class ServletConstants:
     @staticmethod
     def get_system_specs() -> dict[str, Any]:
         """Return hardware resource and host platform specifications."""
-        tot = psutil.virtual_memory().total
-        c1, c2 = psutil.cpu_count(True) or 1, psutil.cpu_count(False) or 1
         return {
-            "cpu_cores": c1,
-            "physical_cores": c2,
-            "memory_total_bytes": tot,
+            "cpu_cores": psutil.cpu_count(True) or 1,
+            "physical_cores": psutil.cpu_count(False) or 1,
+            "memory_total_bytes": psutil.virtual_memory().total,
             "platform": platform.platform(),
             "architecture": platform.machine(),
             "python_implementation": platform.python_implementation(),
@@ -263,9 +305,8 @@ class ServletConnection:
     ) -> dict[str, Any]:
         """Measure HTTP RTTs and failed-probe percentage (not ICMP packet loss)."""
         _bounds(timeout, probes)
-        results = [
-            await self.ping_endpoint(endpoint, timeout=timeout) for _ in range(probes)
-        ]
+        probe = self.ping_endpoint
+        results = [await probe(endpoint, timeout=timeout) for _ in range(probes)]
         samples = [r["latency_ms"] for r in results if r["reachable"]]
         lost = probes - len(samples)
         logger.info("Latency probes completed; probes=%d; failed=%d", probes, lost)
@@ -292,10 +333,9 @@ class ServletConnection:
         _bounds(timeout)
         start = time.perf_counter()
         try:
+            loop = asyncio.get_running_loop()
             async with asyncio.timeout(timeout):
-                addresses = await asyncio.get_running_loop().getaddrinfo(
-                    host, port, type=socket.SOCK_STREAM
-                )
+                addresses = await loop.getaddrinfo(host, port, type=socket.SOCK_STREAM)
         except OSError:
             logger.warning("Network diagnosis failed; stage=dns")
             return {"dns": "failed", "socket": "not_tested"}
@@ -322,11 +362,10 @@ class ServletConnection:
         items: list[dict[str, Any]] = []
         offset, filt = 0, {"entity_type": _ENTITY}
         while True:
-            page = _unwrap(
-                self.persistence.read_records(
-                    "host_entities", filters=filt, limit=1000, offset=offset
-                )
+            recs = self.persistence.read_records(
+                "host_entities", filters=filt, limit=1000, offset=offset
             )
+            page = _unwrap(recs)
             for r in page["records"]:
                 m = ConnectionMetadata.model_validate_json(r["payload"])
                 if provider is None or m.provider == provider:
@@ -340,12 +379,10 @@ class ServletConnection:
     def get(self, connection_id: str) -> ConnectionMetadata:
         """Read one saved connection using its host entity identity."""
         filt = {"entity_id": connection_id, "entity_type": _ENTITY}
-        rows = _unwrap(self.persistence.read_records("host_entities", filters=filt))[
-            "records"
-        ]
-        if not rows:
+        rec = _unwrap(self.persistence.read_records("host_entities", filters=filt))
+        if not rec["records"]:
             raise TransportError(ErrorCode.NOT_FOUND, "Connection not found")
-        return ConnectionMetadata.model_validate_json(rows[0]["payload"])
+        return ConnectionMetadata.model_validate_json(rec["records"][0]["payload"])
 
     def save_connection(
         self, metadata: Mapping[str, Any], *, connection_id: str | None = None
@@ -361,12 +398,8 @@ class ServletConnection:
             now = datetime.now(UTC).isoformat()
             with self.persistence.transaction() as tx:
                 items = ServletConnection(tx).list()
-                owned = {
-                    ref
-                    for item in items
-                    if item["connection_id"] != connection_id
-                    for ref in item["vault_refs"].values()
-                }
+                other = [it for it in items if it["connection_id"] != connection_id]
+                owned = {r for it in other for r in it["vault_refs"].values()}
                 if owned.intersection(record.vault_refs.values()):
                     raise TransportError(  # noqa: TRY301 - enclosing scope owns rollback
                         ErrorCode.CONFLICT, "Vault reference is already owned"
@@ -379,17 +412,10 @@ class ServletConnection:
                     "created_at_utc": now,
                     "updated_at_utc": now,
                 }
+                filt = {"entity_id": connection_id, "entity_type": _ENTITY}
                 if previous:
-                    _unwrap(
-                        tx.update_record(
-                            "host_entities",
-                            {"payload": row["payload"], "updated_at_utc": now},
-                            filters={
-                                "entity_id": connection_id,
-                                "entity_type": _ENTITY,
-                            },
-                        )
-                    )
+                    row_up = {"payload": row["payload"], "updated_at_utc": now}
+                    _unwrap(tx.update_record("host_entities", row_up, filters=filt))
                 else:
                     _unwrap(tx.create_records("host_entities", row))
         except BaseException:
@@ -398,10 +424,10 @@ class ServletConnection:
                     self.vault.revoke(reference)
             raise
         if previous and self.vault:
-            for reference in set(previous.vault_refs.values()) - set(
+            for ref in set(previous.vault_refs.values()) - set(
                 record.vault_refs.values()
             ):
-                self.vault.revoke(reference)
+                self.vault.revoke(ref)
         logger.info("Connection metadata saved")
         return record.model_dump()
 
@@ -435,8 +461,9 @@ class ServletConnection:
         """Test credentials with a real provider adapter without placing orders."""
         _bounds(timeout)
         if (connection_id is None) == (inline is None):
-            msg = "Provide exactly one saved connection ID or inline connection"
-            raise ValueError(msg)
+            raise ValueError(
+                "Provide exactly one saved connection ID or inline connection"
+            )
         raw = dict(inline or {})
         credentials = raw.pop("credentials", {})
         if not isinstance(credentials, dict):
@@ -465,8 +492,11 @@ class ServletConnection:
                 auth = await tester({**record.model_dump(), "credentials": credentials})
         except OSError, httpx.HTTPError:
             logger.warning("Provider credential test failed")
-            fail: dict[str, Any] = {"authenticated": False, "status": "network_failure"}
-            return {**fail, "latency_ms": None}
+            return {
+                "authenticated": False,
+                "status": "network_failure",
+                "latency_ms": None,
+            }
         lat = (time.perf_counter() - start) * 1000
         if isinstance(auth, dict):
             return {**auth, "latency_ms": lat}
@@ -564,18 +594,17 @@ def _catalogue(snapshot: dict[str, Any]) -> dict[str, Any]:
             type(value), "str"
         )
         val = bool(value) if hidden else _public(value)
-        fields.append(
-            {
-                "scope": scope,
-                "group": group,
-                "key": key,
-                "label": key,
-                "kind": k,
-                "readonly": group == "user_access",
-                "secret": hidden,
-                "configured" if hidden else "value": val,
-            }
-        )
+        entry = {
+            "scope": scope,
+            "group": group,
+            "key": key,
+            "label": key,
+            "kind": k,
+            "readonly": group == "user_access",
+            "secret": hidden,
+            "configured" if hidden else "value": val,
+        }
+        fields.append(entry)
 
     for group, value in snapshot["values"].get("application", {}).items():
         visit(group.replace("_", ".", 1), group, "", value)
@@ -589,25 +618,18 @@ def extract_bearer_token(
     if not request_or_header:
         return None
     if isinstance(request_or_header, str):
-        return (
-            h[7:].strip()
-            if (h := request_or_header.strip()).startswith("Bearer ")
-            else None
-        )
-    if (hdr := request_or_header.headers.get("authorization", "").strip()).startswith(
-        "Bearer "
-    ):
+        h = request_or_header.strip()
+        return h[7:].strip() if h.startswith("Bearer ") else None
+    hdr = request_or_header.headers.get("authorization", "").strip()
+    if hdr.startswith("Bearer "):
         return hdr[7:].strip()
     c = request_or_header.cookies.get(_SESSION_COOKIE)
     return c.strip() if c else None
 
 
 def _token(request: Request | WebSocket) -> str:
-    return (
-        extract_bearer_token(request)
-        or request.cookies.get(_SESSION_COOKIE, "")
-        or request.query_params.get("token", "")
-    )
+    c = request.cookies.get(_SESSION_COOKIE, "")
+    return extract_bearer_token(request) or c or request.query_params.get("token", "")
 
 
 def _peer(request: Request | WebSocket) -> str:
@@ -621,17 +643,15 @@ def _peer(request: Request | WebSocket) -> str:
 
 
 def _cookies(response: JSONResponse, request: Request, token: str, peer: str) -> None:
-    sec = request.url.scheme == "https"
+    kw: dict[str, Any] = {
+        "max_age": 86400,
+        "httponly": True,
+        "path": "/api/v1",
+        "samesite": "lax",
+    }
+    kw["secure"] = request.url.scheme == "https"
     for key, val in ((_PEER_COOKIE, peer), (_SESSION_COOKIE, token)):
-        response.set_cookie(
-            key,
-            val,
-            max_age=86400,
-            httponly=True,
-            secure=sec,
-            samesite="lax",
-            path="/api/v1",
-        )
+        response.set_cookie(key, val, **kw)
 
 
 def _require(request: Request | WebSocket, scope: str) -> Session:
@@ -670,13 +690,12 @@ async def _auth_route(request: Request) -> Any:
         return res
     access = await run_in_threadpool(settings.get_scope, "user_access")
     username = body.get("username", access["username"])
-    if not await run_in_threadpool(
-        sessions.verify_credentials,
-        username,
-        body.get("password", ""),
-        expected_username=access["username"],
-        password_hash=access["password_hash"],
-    ):
+    cred = (username, body.get("password", ""))
+    v_kw = {
+        "expected_username": access["username"],
+        "password_hash": access["password_hash"],
+    }
+    if not await run_in_threadpool(sessions.verify_credentials, *cred, **v_kw):
         raise TransportError(ErrorCode.UNAUTHORIZED, "Invalid credentials")
     peer = _peer(request) or "ui:" + secrets.token_hex(16)
     token = await run_in_threadpool(sessions.create_session, username, peer)
@@ -691,7 +710,7 @@ async def _auth_route(request: Request) -> Any:
 async def _meta(request: Request) -> Any:
     name = request.url.path.rsplit("/", 1)[-1]
     if name == "status":
-        return {"status": "ok"}
+        return {"status": "ok", "product": "HaruQuantAI"}
     if name == "readiness":
         await run_in_threadpool(request.app.state.settings.reload)
         return {"ready": True}
@@ -738,11 +757,9 @@ async def _cfg_route(request: Request) -> Any:
                 if not isinstance(u := body["username"], str) or not u.strip():
                     raise ValueError("Non-empty username required")
                 access["username"] = u
-            await run_in_threadpool(
-                settings.save_settings,
-                {"application": {"user_access": access}},
-                expected_revision=body["expected_revision"],
-            )
+            up = {"application": {"user_access": access}}
+            rev = body["expected_revision"]
+            await run_in_threadpool(settings.save_settings, up, expected_revision=rev)
         return {
             "username": access["username"],
             "revision": settings.revision,
@@ -751,37 +768,33 @@ async def _cfg_route(request: Request) -> Any:
     if request.method == "PUT":
         body = await _body(request)
         SettingsBatchUpdatePayload.model_validate(body)
+        sec = path.endswith("/secrets")
         return await run_in_threadpool(
-            _patch_settings, settings, body, secrets_allowed=path.endswith("/secrets")
+            _patch_settings, settings, body, secrets_allowed=sec
         )
     snapshot = await run_in_threadpool(settings.get_snapshot)
-    return (
-        _catalogue(snapshot)
-        if path.endswith("/catalogue")
-        else _settings_view(snapshot)
-    )
+    if path.endswith("/catalogue"):
+        return _catalogue(snapshot)
+    return _settings_view(snapshot)
 
 
 async def _conn_route(request: Request) -> Any:
-    action = (
-        "test"
-        if request.url.path.endswith("/test")
-        else {"GET": "read", "DELETE": "delete"}.get(request.method, "write")
-    )
-    await run_in_threadpool(_require, request, f"connections:{action}")
+    m_acts = {"GET": "read", "DELETE": "delete"}
+    is_test = request.url.path.endswith("/test")
+    act = "test" if is_test else m_acts.get(request.method, "write")
+    await run_in_threadpool(_require, request, f"connections:{act}")
     state = request.app.state
     v, t = getattr(state, "vault", None), getattr(state, "connection_testers", None)
     service = ServletConnection(state.persistence, vault=v, testers=t)
     cid = request.path_params.get("connection_id")
     if request.method == "GET":
-        return (
-            (await run_in_threadpool(service.get, str(cid))).model_dump()
-            if cid
-            else await run_in_threadpool(service.list)
-        )
+        if cid:
+            item = await run_in_threadpool(service.get, str(cid))
+            return item.model_dump()
+        return await run_in_threadpool(service.list)
     if request.method == "DELETE":
         return await run_in_threadpool(service.delete, str(cid))
-    if request.url.path.endswith("/test"):
+    if is_test:
         inline = None if cid else await _body(request)
         return await service.test_connection(connection_id=cid, inline=inline)
     return await run_in_threadpool(
@@ -793,19 +806,16 @@ async def _conn_route(request: Request) -> Any:
 
 async def _jobs_route(request: Request) -> Any:
     await run_in_threadpool(_require, request, "jobs:read")
-    sch, jid = (
-        getattr(request.app.state, "scheduler", None),
-        request.path_params.get("job_id"),
-    )
+    sch = getattr(request.app.state, "scheduler", None)
+    jid = request.path_params.get("job_id")
     if request.method == "POST" and request.url.path.endswith("/cancel"):
         await run_in_threadpool(_require, request, "jobs:cancel")
         if sch is None:
             raise TransportError(ErrorCode.UNAVAILABLE, "Scheduler is not running")
         return await run_in_threadpool(sch.cancel_job, str(jid))
     if jid:
-        if (
-            job := (await run_in_threadpool(sch.get_job, str(jid)) if sch else None)
-        ) is None:
+        job = await run_in_threadpool(sch.get_job, str(jid)) if sch else None
+        if job is None:
             raise TransportError(ErrorCode.NOT_FOUND, "Job not found")
         return job
     return await run_in_threadpool(sch.list_jobs) if sch else []
@@ -889,9 +899,7 @@ async def _ws(websocket: WebSocket) -> None:
         await websocket.close(code=1008)
 
 
-def _handler(
-    handler: Callable[[Request], Awaitable[Any]],
-) -> Callable[[Request], Awaitable[Any]]:
+def _handler(handler: _RouteHandler) -> _RouteHandler:
     op = handler.__name__
 
     async def dispatch(request: Request) -> Any:
@@ -935,11 +943,8 @@ def create_transport_router(*, prefix: str = "/api/v1") -> APIRouter:
     _add(_cfg_route, "PUT /settings/secrets", "GET /auth/account", "PUT /auth/account")
     _add(_conn_route, "GET /connections", "POST /connections")
     _add(_conn_route, "POST /connections/test", "DELETE /connections/{connection_id}")
-    _add(
-        _conn_route,
-        "POST /connections/{connection_id}/test",
-        "PUT /connections/{connection_id}",
-    )
+    _add(_conn_route, "POST /connections/{connection_id}/test")
+    _add(_conn_route, "PUT /connections/{connection_id}")
     _add(_jobs_route, "GET /jobs", "GET /jobs/{job_id}", "POST /jobs/{job_id}/cancel")
     _add(_event_route, "POST /events/publish", "GET /events/channels")
     _add(_event_route, "GET /events/snapshot")
