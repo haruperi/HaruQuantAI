@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_LowerHigh(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#ShortWindow#" />, <@printParam block "#LongWindow#" />)

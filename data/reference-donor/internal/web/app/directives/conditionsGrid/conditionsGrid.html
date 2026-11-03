@@ -1,0 +1,16 @@
+<div style="text-align: center;" data-testid="conditions-grid-{{::customId || gridId}}">
+    <div id="{{::gridId}}" class="conditions-grid gridbox_compressed" style="width: 100%; height: 300px;"></div>
+
+    <button id="buttonAddConditions-26a" ng-click="conditionsChooser.clearSelection(); conditionsChooser.show();" class="btn btn-default" style="margin-left: 67px; margin-top: 10px;"
+        tsq>Add conditions</button>
+
+    <div class="pull-right conditions-btns">
+        <button id="buttonLoad-26b" data-testid="conditions-load-btn" ng-click="loadConditions()" class="btn btn-default conditions-btn-load" tsq>Load</button>
+        <button id="buttonSave-26c" data-testid="conditions-save-btn" ng-click="saveConditions()" class="btn btn-default conditions-btn-save" tsq>Save</button>
+    </div>
+
+    <items-chooser-modal instance="conditionsChooser" on-add="onAddConditions(selectedItems)" recent-items="true" title="{{'Add conditions' | tsq}}"
+        placeholder="Select conditions" chooserLabel="{{'Choose conditions to add' | tsq}}" multi-select="true" after-init="afterItemsChooserModalInit"/>
+
+    <div ng-include="'../app/directives/conditionsGrid/editConditionModal.html'" />
+</div>

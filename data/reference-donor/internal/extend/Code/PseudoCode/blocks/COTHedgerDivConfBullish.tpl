@@ -1,0 +1,1 @@
+(COTHedgerDivConfBullish(<@printParam block "#CotSymbol#" />))

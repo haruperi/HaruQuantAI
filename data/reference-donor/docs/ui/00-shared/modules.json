@@ -1,0 +1,7 @@
+{
+  "builder":   { "task": "Build",                "frame": "#builder-frame",      "screen": "02-builder",                "nav": "shell.nav.builder" },
+  "retester":  { "task": "Retest",               "frame": "#retester-frame",     "screen": "03-retester",               "nav": "shell.nav.retester" },
+  "optimizer": { "task": "Optimize",             "frame": "#optimizer-frame",    "screen": "04-optimizer",              "nav": "shell.nav.optimizer" },
+  "nnt":       { "task": "NeuralNetworkTrainer", "frame": "#nnt-frame",          "screen": "07-neural-network-trainer", "nav": "shell.nav.nnt" },
+  "projects":  { "task": "*",                    "frame": "#task-manager-frame", "screen": "09-custom-projects",        "nav": ["shell.nav.projects", "projects.list.row.title"] }
+}

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <base href="/GRIDTEST">
+    <meta charset="utf-8">
+	<title>Angular app</title>
+	<meta name="description" content="Home">
+	<meta name="author" content="webmjkfm@gmail.com">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="common/Batch1/styles.css">
+    
+    <script src="common/Batch1/libs.js"></script>
+    <script src="GRIDTEST/build/layout.js"></script>
+    
+</head>
+
+<body ng-app="app" style="font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif; zoom: {{$root.zoom.css}};" class="{{$root.zoom.class}}">
+
+    <div ui-view="root" style="height:100%" />
+
+    <script>
+        window.appConfig = {
+            product: 'GRIDTEST',
+            productName: 'GRIDTEST',
+            defaultState: 'app',
+            defaultURL: '/',
+            gridSkin: 'dhx_web',
+            gridImagePath: '../img/dhtmlx/web/'
+        };
+    </script>
+    
+</body>
+
+</html>

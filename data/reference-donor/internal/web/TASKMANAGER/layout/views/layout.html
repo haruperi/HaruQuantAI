@@ -1,0 +1,21 @@
+<div class="sq4-load-screen" ng-show="!GUILoaded" tsq>The UI is loading, please wait...</div>
+
+<div class="sqn-container sqn-container-common split-pane horizontal-percent sq-app-taskmanager" id="sq-splitter-main" ng-class="{'br-edition': isBrazilianEdition}">
+
+    <div class="split-pane-component-dashboard">
+        <dashboard-header taskmanager="true" />
+        <card-panels instance="panels" class="sqn-dashboard-view" />
+    </div>
+
+    <div class="sqn-databanks" ng-show="activePanel=='dashboard' || activePanel=='results' || activePanel=='settings'">
+        <div ng-include="'../../../plugins/ProjectDatabanks/views/databanks.html'" ng-dynamic-controller="'DatabanksCtrl'" />
+    </div>
+
+</div>
+
+<div ng-include="'../app/layout/views/startBuildPopup.html'" />
+
+<sq-utils/>
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />

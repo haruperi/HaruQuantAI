@@ -1,0 +1,2 @@
+<#-- Opens below BB lower after the previous open was above it. -->
+(<@printSeriesAt block "1"><@printSeries block "Open" /></@printSeriesAt> > sqRound(<@printBollingerValueAt block "Lower" "1" />, 6) && <@printSeriesAt block shift><@printSeries block "Open" /></@printSeriesAt> < sqRound(<@printBollingerValueAt block "Lower" "1" />, 6))

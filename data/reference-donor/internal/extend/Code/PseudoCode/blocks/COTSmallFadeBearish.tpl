@@ -1,0 +1,1 @@
+(COTSmallFadeBearish(<@printParam block "#CotSymbol#" />, sm><@printParam block "#SmallThreshold#" />))

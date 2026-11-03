@@ -1,0 +1,279 @@
+<form name="editSetupForm" class="form-horizontal chart-setup" role="form">
+    <div class="row row-smaller">
+        <div class="col-sm-6 chart-setup-box-1">
+            <div class="setup-input-symbol-wrapper">
+                <label class="sqn-label" ng-bind="setup.subcharts.length > 0 ? 'Main chart' : 'Symbol'"></label>
+                <sq-data-box sq-model="setup.symbol" class="setup-input" engine="setup.engine"/>
+            </div>
+        </div>
+        <div class="col-sm-6 chart-setup-box-2 switch">
+            <label class="sqn-label">
+                <tsq>Timeframe</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomTF" ng-change="settingsChanged()"
+                        id="cc-config-tf-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-tf-{{::id}}"></label>
+                </div>
+            </label>
+            <timeframe-picker timeframe="setup.timeframe" class="timeframe" min-timeframe="setup.minTimeframe"
+                main-chart="true" ng-disabled="!setup.useCustomTF" />
+        </div>
+    </div>
+
+    <div class="row row-smaller" ng-show="detailedConfig">
+        <div class="col-sm-6 chart-setup-box-1 switch">
+            <label class="sqn-label">
+                <tsq>Start day</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomDates" ng-change="settingsChanged(setup.useCustomDates, 'date')"
+                        id="cc-config-startday-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-startday-{{::id}}"></label>
+                </div>
+            </label>
+            <date-picker label="" date="setup.dateFrom" min-date="symbolDateRangeFrom" max-date="symbolDateRangeTo"
+                format="yyyy.mm.dd" on-date-change="onDateFromChange(date)"
+                ng-disabled="ngDisabled || !setup.useCustomDates" force-date-change="forceDateChange" class="no-label"
+                ng-class="{'disabled': ngDisabled || !setup.useCustomDates}" />
+        </div>
+        <div class="col-sm-6 chart-setup-box-2">
+            <date-picker label="{{ 'End day' | tsq}}" date="setup.dateTo" min-date="symbolDateRangeFrom"
+                max-date="symbolDateRangeTo" format="yyyy.mm.dd" on-date-change="onDateToChange(date)"
+                ng-disabled="ngDisabled || !setup.useCustomDates" force-date-change="forceDateChange"
+                ng-class="{'disabled': ngDisabled || !setup.useCustomDates}" />
+        </div>
+    </div>
+
+    <div class="row row-smaller chart-setup-available-data" ng-show="detailedConfig">
+        <div class="col-sm-6 chart-setup-box-1">
+            <div class="sq-input">
+                <label tsq>Available from</label>
+                <label ng-bind="symbolDateRangeFrom"></label>
+            </div>
+        </div>
+        <div class="col-sm-6 chart-setup-box-2">
+            <div class="sq-input">
+                <label tsq>to</label>
+                <label ng-bind="symbolDateRangeTo"></label>
+            </div>
+        </div>
+    </div>
+
+    <div class="clearfix "></div>
+
+    <div class="row row-smaller chart-setup-available-data" ng-show="detailedConfig">
+        <div class="col-sm-6 chart-setup-box-1">
+        </div>
+        <div class="col-sm-6 chart-setup-box-2">
+            <label class="sqn-label"></label>
+            <button id="buttonResetDates-24a" class="btn btn-normal btn-default btn-thin" ng-click="resetDates()"
+                ng-disabled="ngDisabled || !setup.useCustomDates" tsq>Reset dates</button>
+        </div>
+    </div>
+
+    <div class="clearfix"></div>
+
+    <div ng-if="setup.subcharts.length > 0" style="display: flex;">
+        <div style="display: inline-block">
+            <legend style="margin-bottom: 0px" ng-show="detailedConfig">Sub Charts</legend>
+        </div>
+        <div style="display: inline-block; float: none;" class="sq-checkbox">
+            <input type="checkbox" ng-model="setup.useCustomSubCharts" ng-change="settingsChanged(setup.useCustomSubCharts, 'subcharts')"
+                id="cc-config-subchart-{{::id}}" />
+            <label class="sqn-label" for="cc-config-subchart-{{::id}}"></label>
+        </div>
+    </div>
+
+    <div class="subcharts " ng-if="setup.subcharts.length> 0">
+        <div class="row row-smaller" ng-repeat="subchart in setup.subcharts">
+            <div class="col-sm-6 chart-setup-box-1">
+                <div class="setup-input-symbol-wrapper">
+                    <label class="sqn-label">
+                        <tsq>Subchart</tsq> {{($index + 1)}}
+                    </label>
+                    <sq-data-box disabled="!setup.useCustomSubCharts" sq-model="subchart.symbol" class="setup-input" engine="'MetaTrader4'"/>
+                </div>
+            </div>
+            <div class="col-sm-6 chart-setup-box-2">
+                <label class="sqn-label" tsq>Timeframe</label>
+                <timeframe-picker ng-disabled="!setup.useCustomSubCharts" timeframe="subchart.timeframe" class="timeframe" min-timeframe="subchart.minTimeframe"
+                    main-data-option="true" />
+            </div>
+        </div>
+    </div>
+
+    <legend ng-show="detailedConfig">Test parameters</legend>
+
+    <div class="row row-smaller" ng-show="detailedConfig">
+        <div class="col-sm-6 chart-setup-box-1 switch">
+            <label class="sqn-label precision-label">
+                <tsq>Precision</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomPrecision" ng-change="settingsChanged(setup.useCustomPrecision)"
+                        id="cc-config-precision-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-precision-{{::id}}"></label>
+                </div>
+            </label>
+            <div class="sqn-input sqn-select precision-input" ng-class="{'disabled': !setup.useCustomPrecision}">
+                <span ng-bind="getPrecisionLabel()"></span>
+                <select ng-model="setup.precision" ng-options="item.value as (item.name | tsq) for item in precisions"
+                    onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"
+                    ng-disabled="!setup.useCustomPrecision"></select>
+            </div>
+        </div>
+
+        <div class="col-sm-6 chart-setup-box-2 switch"
+            ng-hide="setup.engine == 'Tradestation' || setup.engine == 'MultiCharts'">
+            <label class="sqn-label">
+                <tsq>Min. distance</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomDistance" ng-change="settingsChanged(setup.useCustomDistance)"
+                        id="cc-config-mindist-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-mindist-{{::id}}"></label>
+                </div>
+            </label>
+            <div class="sqn-spinner setup-input setup-input-small">
+                <input type="text" class="sqn-input" min="0" step="1" ng-model="setup.minDistance"
+                    onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                    ng-disabled="!setup.useCustomDistance" />
+                <div class="sqn-spinner-btns">
+                    <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                    <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row row-smaller" ng-show="detailedConfig">
+        <div class="col-sm-6 chart-setup-box-1 switch">
+            <label class="sqn-label" ng-show="setup.precision != 4">
+                <tsq>Spread</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomSpread" ng-change="settingsChanged(setup.useCustomSpread, 'spread')"
+                        id="cc-config-spread-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-spread-{{::id}}"></label>
+                </div>
+            </label>
+            <div class="sqn-spinner setup-input setup-input-small" ng-show="setup.precision != 4">
+                <input type="text" class="sqn-input" min="0" step="1" ng-model="setup.spread"
+                    onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                    ng-disabled="!setup.useCustomSpread" />
+                <div class="sqn-spinner-btns">
+                    <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                    <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6 chart-setup-box-2 switch">
+            <label class="sqn-label">
+                {{setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy' ? ('Slippage / Spread' | tsq) : ('Slippage' | tsq)}}
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomSlippage" ng-change="settingsChanged(setup.useCustomSlippage, 'slippage')"
+                        id="cc-config-slippage-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-slippage-{{::id}}"></label>
+                </div>
+            </label>
+            <div class="sqn-spinner setup-input setup-input-small"
+                ng-class="{'slippage-spinner-small':setup.engine == 'Tradestation' || setup.engine == 'MultiCharts'}">
+                <input type="text" class="sqn-input" min="0" step="1" ng-model="setup.slippage"
+                    onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                    ng-disabled="!setup.useCustomSlippage" />
+                <div class="sqn-spinner-btns">
+                    <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                    <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                </div>
+            </div>
+            <tsq ng-show="setup.engine == 'Tradestation' || setup.engine == 'MultiCharts'">$ per trade</tsq>
+        </div>
+    </div>
+
+    <div class="row row-smaller">
+        <div class="col-sm-6 chart-setup-box-1 switch">
+            <label class="sqn-label">
+                <tsq>Commission</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomCommission" ng-change="settingsChanged(setup.useCustomCommission)"
+                        id="cc-config-commission-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-commission-{{::id}}"></label>
+                </div>
+            </label>
+            <label class="sqn-label precision-label" ng-bind="getCommissionLabel()"></label>
+            <i class="fa fa-cog" ng-click="showCommissionsPopup()" ng-show="setup.useCustomCommission"></i>
+        </div>
+        <div class="col-sm-6 chart-setup-box-2 switch">
+            <label class="sqn-label">
+                <tsq>Swap</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomSwap" ng-change="settingsChanged(setup.useCustomSwap)"
+                        id="cc-config-swap-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-swap-{{::id}}"></label>
+                </div>
+            </label>
+            <label style="width:auto; margin-left: 0px; margin-right: 5px;" class="sqn-label precision-label" ng-bind="getSwapLabel()"></label>
+            <i class="fa fa-cog" ng-click="showSwapPopup()" ng-show="setup.useCustomSwap"></i>
+        </div>
+    </div>
+
+    
+    <div class="row row-smaller">
+        <div class="col-sm-6 chart-setup-box-1 switch" ng-show="setup.engine == 'Tradestation' || setup.engine == 'Multicharts'">
+            <label class="sqn-label">
+                <tsq>Session</tsq>
+                <div class="sq-checkbox">
+                    <input type="checkbox" ng-model="setup.useCustomSession" ng-change="settingsChanged()"
+                        id="cc-config-session-{{::id}}" />
+                    <label class="sqn-label" for="cc-config-session-{{::id}}"></label>
+                </div>
+            </label>
+            <div class="sqn-input sqn-select precision-input" ng-class="{'disabled': !setup.useCustomSession}">
+                <span ng-bind="setup.session"></span>
+                <select ng-model="setup.session" ng-options="session.name as session.name for session in constants.sessions"
+                    onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" ng-change="settingsChanged()"
+                    ng-disabled="!setup.useCustomSession"></select>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal window-->
+    <div class="modal centered other-params-popup" id="commissionsPopup-{{::id}}" tabindex="-1" role="dialog"
+        aria-labelledby="myModalLabel-commissionsPopup-{{::id}}">
+        <div class="modal-dialog modal-smaller" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="buttonTimes-24b" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel" tsq>Commission settings</h4>
+                </div>
+                <div class="modal-body">
+                    <multi-property-grid ng-if="commPGInstance" instance="commPGInstance" on-change="onCommPGChange" options="commissionMethods" after-init="afterPGInit()" title="Commission" ng-disabled="ngDisabled"/>
+                    <hr>
+                </div>
+                <div class="modal-footer">
+                    <a data-dismiss="modal" class="btn-only-close" tsq>Close</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal window-->
+    <div class="modal centered other-params-popup" id="swapPopup-{{::id}}" tabindex="-1" role="dialog"
+        aria-labelledby="myModalLabel-swapPopup-{{::id}}">
+        <div class="modal-dialog modal-smaller" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="buttonTimes-24c" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel" tsq>Swap settings</h4>
+                </div>
+                <div class="modal-body">
+                    <swap-settings sq-model="setup.swap">
+                    <hr>
+                </div>
+                <div class="modal-footer">
+                    <a data-dismiss="modal" class="btn-only-close" tsq>Close</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>

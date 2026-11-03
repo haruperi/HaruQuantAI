@@ -1,0 +1,1 @@
+(COTScoreZeroCrossDown(<@printParam block "#CotSymbol#" />))

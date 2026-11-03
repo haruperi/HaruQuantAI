@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_SpecExhaustionLong(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#SpecExtreme#" />, <@printParam block "#HedgerThreshold#" />)

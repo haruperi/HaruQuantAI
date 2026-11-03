@@ -1,0 +1,1 @@
+(COTExtremePersistence(<@printParam block "#CotSymbol#" />, dir=<@printParam block "#Direction#" />, weeks>=<@printParam block "#MinWeeks#" />))

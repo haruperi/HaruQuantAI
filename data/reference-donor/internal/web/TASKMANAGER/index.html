@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <base href="/TASKMANAGER">
+    <meta charset="utf-8">
+    <title>Custom Projects</title>
+    <meta name="description" content="Project Manager">
+    <meta name="author" content="webmjkfm@gmail.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="common/Batch1/styles.css">
+    <link rel="stylesheet" href="common/Batch2/styles.css">
+    <link rel="stylesheet" href="common/Batch3/styles.css">
+    <link rel="stylesheet" href="TASKMANAGER/layout/layout.css">
+
+    <script src="common/Batch1/libs.js"></script>
+    <script src="common/Batch2/libs.js"></script>
+    <script src="common/Batch3/libs.js"></script>
+    <script src="TASKMANAGER/build/layout.js"></script>
+</head>
+
+<body ng-app="app"
+    style="font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif;zoom: {{$root.zoom.css}};"
+    class="{{$root.zoom.class}} {{$root.brEdition}}">
+
+    <script>
+        window.appConfig = {
+            product: 'TASKMANAGER',
+            project: 'TaskManager',
+            task: {
+                type: null,
+                name: null,
+                title: null,
+                default: false
+            },
+            productName: 'Project Manager',
+            defaultState: 'app',
+            defaultURL: '/app',
+            gridSkin: 'dhx_web',
+            gridImagePath: '../img/dhtmlx/web/'
+        };
+    </script>
+
+    <div ui-view style="height:100%" />
+
+</body>
+
+</html>

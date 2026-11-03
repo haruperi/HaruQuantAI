@@ -1,0 +1,1 @@
+(COTNeutralZone(<@printParam block "#CotSymbol#" />, band<<@printParam block "#NeutralBand#" />))

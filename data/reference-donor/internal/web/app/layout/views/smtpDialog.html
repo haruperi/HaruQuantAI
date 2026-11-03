@@ -1,0 +1,99 @@
+<!-- Modal window-->
+<div class="modal centered" id="smtpDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" tsq>SMTP</h4>
+            </div>
+            <div class="modal-body smtp-dialog" style="height: auto;">
+                <fieldset class="sq-fieldset">
+                    <legend tsq>SMTP</legend>
+                    <div class="row row-smaller">
+                        <div class="col-sm-2">
+                            <label class="sqn-label">
+                                <tsq>SMTP Server</tsq>
+                            </label>
+                        </div>
+                        <div class="col-sm-10">
+                            <input type="text" class="sqn-input" ng-model="smtp.server" />
+                        </div>
+                    </div>
+
+                    <div class="row row-smaller">
+                        <div class="col-sm-2">
+                            <label class="sqn-label">
+                                <tsq>Port</tsq>
+                            </label>
+                        </div>
+                        <div class="col-sm-10">
+                            <sq-combo-input id="port" sq-model="smtp.port" options="smtp.ports" single="true" />
+                        </div>
+                    </div>
+
+                    <div class="sq-checkbox">
+                        <input type="checkbox" ng-model="smtp.ssl" id="smtp.ssl">
+                        <label for="smtp.ssl">
+                            <tsq>Use secure (SSL) connection</tsq>
+                        </label>
+                    </div>
+
+                    <div class="row row-smaller">
+                        <div class="col-sm-2">
+                            <label class="sqn-label">
+                                <tsq>Username</tsq>
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="text" class="sqn-input" ng-model="smtp.username" />
+                        </div>
+
+                        <div class="col-sm-2">
+                            <label class="sqn-label">
+                                <tsq>Password</tsq>
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="password" class="sqn-input" ng-model="smtp.password" />
+                        </div>
+                    </div>
+
+                    <div class="row row-smaller">
+                        <div class="col-sm-2">
+                            <label class="sqn-label">
+                                <tsq>Email from</tsq>
+                            </label>
+                        </div>
+                        <div class="col-sm-4">
+                            <input type="text" class="sqn-input" ng-model="smtp.emailFrom" />
+                        </div>
+
+                        <div class="col-sm-2">
+                        </div>
+                        <div class="col-sm-4">
+                            <button id="buttonSendTestEmail-57a" type="button" class="btn btn-default smtp-send-test-btn" ng-click="smtp.sendTestEmail=true"
+                                tsq>Send test email</button>
+                        </div>
+                    </div>
+
+                    <div ng-show="smtp.sendTestEmail" class="smtp-send-line row row-smaller">
+                        <div class="col-sm-2">
+                            <label class="sqn-label">
+                                <tsq>Email</tsq>
+                            </label>
+                        </div>
+                        <div class="col-sm-10">
+                            <input type="text" class="sqn-input" ng-model="smtp.recipient" />
+                            <button id="buttonSend-57b" type="button" class="btn btn-default" ng-click="testSMTP()" tsq>Send</button>
+                        </div>
+                    </div>
+
+                    <label ng-if="smtp.testResult" class="smtp-dialog-label" ng-bind="smtp.testResult"></label>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+                <button id="buttonSave-57c" type="button" class="btn btn-primary" ng-click="onSaveSMTPSettings()" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

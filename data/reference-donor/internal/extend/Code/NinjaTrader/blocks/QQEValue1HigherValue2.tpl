@@ -1,0 +1,2 @@
+<#-- QQE Value1 higher than Value2: Value1[Shift] > Value2[Shift]. Parity with QQEValue1HigherValue2.java. -->
+<@compress_single_line>(sqRound(<@printQQEValue1At block "0" />, 6) > sqRound(<@printQQEValue2At block "0" />, 6))</@compress_single_line>

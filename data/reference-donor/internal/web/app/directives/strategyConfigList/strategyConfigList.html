@@ -1,0 +1,26 @@
+<table ng-repeat="tab in settings track by $index" class="ss-settings-table" data-testid="strategy-config-list-group">
+    <thead>
+        <tr ng-click="tab.opened=!tab.opened">
+            <td class="key">{{tab.name | tsq}}<span ng-class="{'active':tab.diffs>0}">{{tab.diffs}} <tsq
+                        ng-if="tab.diffs==1">diff</tsq>
+                    <tsq ng-if="tab.diffs!=1">diffs</tsq>
+                </span></td>
+            <td class="value"></td>
+            <td class="value"><i class="fa" ng-class="{'fa-chevron-up': tab.opened, 'fa-chevron-down': !tab.opened}"
+                    aria-hidden="true"></i>
+            </td>
+        </tr>
+    </thead>
+
+    <tbody class="block" ng-show="tab.opened">
+        <tr ng-repeat="value in tab.settings track by $index" data-testid="strategy-config-list-row">
+            <td class="key" title="{{value.key}}">{{value.key | tsq}}</td>
+            <td>
+                <div ng-repeat="value_str in value.value_strs" ng-bind-html="value_str.html | html"></div>
+            </td>
+            <td>
+                <div ng-repeat="value_task in value.value_tasks" ng-bind-html="value_task.html | html"></div>
+            </td>
+        </tr>
+    </tbody>
+</table>

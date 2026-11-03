@@ -1,0 +1,3161 @@
+public class com.strategyquant.datalib.ChartDef implements com.strategyquant.lib.settings.IXMLAble, com.strategyquant.lib.utils.ISQCloneable<com.strategyquant.datalib.ChartDef>, java.io.Serializable {
+  protected static final int LIVETRADING = 1;
+  protected static final int BACKTEST = 2;
+  protected java.lang.String connectionName;
+  protected int connectionNameHash;
+  protected java.lang.String symbol;
+  protected int symbolHash;
+  protected java.lang.String instrument;
+  protected java.lang.String timeframe;
+  protected long historyFrom;
+  protected long historyTo;
+  protected double spread;
+  protected boolean registered;
+  protected java.lang.String session;
+  protected com.strategyquant.datalib.DataInfo dataInfo;
+  protected int type;
+  protected long loadedHistoryFrom;
+  private int backloadType;
+  private long backloadNumber;
+  private com.strategyquant.datalib.InstrumentInfo instrumentInfo;
+  private double minDistance;
+  private boolean realSpread;
+  public com.strategyquant.datalib.ChartDef();
+  public com.strategyquant.datalib.ChartDef(java.lang.String, java.lang.String, java.lang.String, int, long, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public com.strategyquant.datalib.ChartDef(java.lang.String, java.lang.String, java.lang.String, long, long, double, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public com.strategyquant.datalib.ChartDef(com.strategyquant.datalib.ChartDef) throws com.strategyquant.datalib.data.DataException;
+  public com.strategyquant.datalib.ChartDef(com.strategyquant.datalib.ChartDef, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public java.lang.String getConnectionName();
+  public boolean isSymbolRecognized();
+  public java.lang.String getTimeframe();
+  public long getHistoryFrom();
+  public void setHistoryFrom(long);
+  public long getHistoryTo();
+  public void setHistoryTo(long);
+  public double getSpread();
+  public void setSpread(double);
+  public int getConnectionHash();
+  public void setSymbol(java.lang.String);
+  public java.lang.String getSymbol();
+  public int getSymbolHash();
+  public boolean isRegistered();
+  public java.lang.String getSession();
+  public void setRegistered();
+  public com.strategyquant.datalib.InstrumentInfo getSymbolInfo();
+  public java.lang.String getInstrument();
+  public boolean isBacktestDataDef();
+  public void setLoadedHistoryFrom(long);
+  public long getLoadedHistoryFrom();
+  public boolean isSameConnectionSymbol(com.strategyquant.datalib.ChartDef);
+  public int getBackloadType();
+  public long getBackloadNumber();
+  public org.jdom2.Element getXML();
+  public void setFromXML(org.jdom2.Element);
+  public int getBarTimeType();
+  public com.strategyquant.datalib.InstrumentInfo getInstrumentInfo();
+  public void setMinDistance(double);
+  public double getMinDistance();
+  public com.strategyquant.datalib.ChartDef getClone();
+  public com.strategyquant.datalib.ChartDef getClone(long, long);
+  public com.strategyquant.datalib.ChartDef getClone(java.lang.String);
+  public java.lang.String getChartsHash();
+  private long getDataFileHash();
+  private java.lang.String getSessionStr(java.lang.String);
+  public boolean canBeComputedFrom(com.strategyquant.datalib.ChartDef) throws com.strategyquant.datalib.data.DataException;
+  public void modifySpread(double);
+  public void setRealSpread(boolean);
+  public boolean isSmallerThan(com.strategyquant.datalib.ChartDef) throws com.strategyquant.datalib.data.DataException;
+  public void setSession(java.lang.String);
+  public java.lang.Object getClone() throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.DataInfo implements com.strategyquant.lib.settings.IXMLAble,java.io.Serializable {
+  public int id;
+  public int sourceDataId;
+  public java.lang.String connection;
+  public java.lang.String symbol;
+  public java.lang.String originalSymbol;
+  public java.lang.String instrument;
+  public java.lang.String timeframe;
+  public java.lang.String filename;
+  public long dateFrom;
+  public long dateTo;
+  public int rows;
+  public long secondsRecords;
+  public int totalDays;
+  public int barTimeType;
+  public com.strategyquant.datalib.InstrumentInfo symbolInfo;
+  public int decimals;
+  public java.lang.String timezone;
+  public int source;
+  public java.lang.String uSymbol;
+  public java.lang.String uSymbolName;
+  public boolean removeWeekends;
+  public boolean show;
+  public java.lang.String dateFromStr;
+  public java.lang.String dateToStr;
+  public int basketId;
+  public int brokerId;
+  public long fileHash;
+  public com.strategyquant.datalib.DataInfo();
+  public org.jdom2.Element getXML();
+  public void setFromXML(org.jdom2.Element);
+  public com.strategyquant.datalib.DataInfo clone();
+  public java.lang.String toString();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+}
+public class com.strategyquant.datalib.DataSeries extends com.strategyquant.datalib.dataseries.DataSeriesBase {
+  private int hashCode;
+  static final double p6 = 1000000.0d;
+  static final double factor2 = 1.0E-10d;
+  public com.strategyquant.datalib.DataSeries();
+  public com.strategyquant.datalib.DataSeries(int);
+  public com.strategyquant.datalib.DataSeries(java.lang.String, int);
+  public com.strategyquant.datalib.DataSeries(java.lang.String, int, com.strategyquant.datalib.ChartDef);
+  public com.strategyquant.datalib.DataSeries(int, int);
+  public com.strategyquant.datalib.DataSeries(java.lang.String);
+  public int chartHashCode();
+  public double get(int) throws com.strategyquant.datalib.TradingException;
+  public double getRounded(int) throws com.strategyquant.datalib.TradingException;
+  public double getRounded(int, int) throws com.strategyquant.datalib.TradingException;
+  public void set(int, double) throws com.strategyquant.datalib.TradingException;
+  public void set(int, double, boolean) throws com.strategyquant.datalib.TradingException;
+  public void set(double) throws com.strategyquant.datalib.TradingException;
+  public void addValues(int) throws com.strategyquant.datalib.TradingException;
+  public void add(double) throws com.strategyquant.datalib.TradingException;
+}
+public class com.strategyquant.datalib.InstrumentInfo implements com.strategyquant.lib.settings.IXMLAble,java.io.Serializable {
+  public static final org.slf4j.Logger Log;
+  public java.lang.String connection;
+  public java.lang.String instrument;
+  public int broker;
+  public java.lang.String description;
+  public double tickSize;
+  public double tickStep;
+  public double tickValueInMoney;
+  public java.lang.String filename;
+  public long dateFrom;
+  public long dateTo;
+  public int rows;
+  public int totalDays;
+  public double defaultSpread;
+  public double defaultSlippage;
+  public double minDistance;
+  public int decimals;
+  public java.lang.String timeframe;
+  public double pointValue;
+  public int dataType;
+  public boolean recognizedFromOrders;
+  public java.lang.String alias;
+  public java.lang.String exchange;
+  public java.lang.String country;
+  public java.lang.String sector;
+  public java.lang.String commissions;
+  public java.lang.String swap;
+  public double orderSizeMultiplier;
+  public double orderSizeStep;
+  public com.strategyquant.datalib.InstrumentInfo();
+  public com.strategyquant.datalib.InstrumentInfo(org.jdom2.Element);
+  public org.jdom2.Element getXML();
+  public void setFromXML(org.jdom2.Element);
+  private java.lang.String internIfNotNull(java.lang.String);
+  public com.strategyquant.datalib.InstrumentInfo clone();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+  static {};
+}
+public class com.strategyquant.datalib.SymbolData {
+  public java.lang.String symbol;
+  public java.lang.String name;
+  public java.lang.String category;
+  public java.lang.String subcategory;
+  public long dateFrom;
+  public long dateFromM1;
+  public int decimals;
+  public double tickValue;
+  public double tickSize;
+  public double tickStep;
+  public double defaultSpread;
+  public double defaultSlippage;
+  public byte instrumentType;
+  public com.strategyquant.datalib.SymbolData();
+}
+public class com.strategyquant.datalib.TickEvent {
+  private boolean isSet;
+  private int symbolHash;
+  private int connectionHash;
+  private long time;
+  private double ask;
+  private double bid;
+  private double volume;
+  private long sessionStartTime;
+  private long sessionEndTime;
+  private boolean barOpen;
+  private boolean barClose;
+  public com.strategyquant.datalib.TickEvent();
+  public boolean isSet();
+  public void setIsSet(boolean);
+  public final int getSymbolHash();
+  public void setSymbolHash(int);
+  public long getSessionStartTime();
+  public void setSessionStartTime(long);
+  public long getSessionEndTime();
+  public void setSessionEndTime(long);
+  public final int getConnectionHash();
+  public void setConnectionHash(int);
+  public double getAsk();
+  public void setAsk(double);
+  public double getBid();
+  public void setBid(double);
+  public double getVolume();
+  public void copyValues(com.strategyquant.datalib.TickEvent);
+  public long getTime();
+  public void setTime(long);
+  public void setVolume(double);
+  public void set(long, int, int, double, double, double, long, long, boolean, boolean);
+  public void set(long, int, int, double, double, double, long, boolean, boolean);
+  public void set(com.strategyquant.datalib.TickEvent);
+  public boolean isBarOpen();
+  public boolean isBarClose();
+  public java.lang.String toString();
+}
+public class com.strategyquant.datalib.TimeframeManager {
+  public static final org.slf4j.Logger Log;
+  public static final java.lang.String TF_UNKNOWN = "unknown";
+  public static final java.lang.String TF_INTRADAY = "Intraday";
+  public static final int TF_INT_UNKNOWN = -2;
+  public static final java.lang.String TF_TICK = "TICK";
+  public static final java.lang.String TF_M1 = "M1";
+  public static final java.lang.String TF_M3 = "M3";
+  public static final java.lang.String TF_M5 = "M5";
+  public static final java.lang.String TF_M15 = "M15";
+  public static final java.lang.String TF_M30 = "M30";
+  public static final java.lang.String TF_H1 = "H1";
+  public static final java.lang.String TF_H2 = "H2";
+  public static final java.lang.String TF_H3 = "H3";
+  public static final java.lang.String TF_H4 = "H4";
+  public static final java.lang.String TF_H6 = "H6";
+  public static final java.lang.String TF_H8 = "H8";
+  public static final java.lang.String TF_H12 = "H12";
+  public static final java.lang.String TF_D1 = "D1";
+  public static final java.lang.String TF_WEEKLY = "Weekly";
+  public static final java.lang.String TF_MONTHLY = "Monthly";
+  private static final long MINUTE_MILLIS = 60000l;
+  private static final long HOUR_MILLIS = 3600000l;
+  private static final long DAY_MILLIS = 86400000l;
+  private static final long WEEK_MILLIS = 604800000l;
+  private static final long MONTH_MILLIS = 2419200000l;
+  public static final int PRECISION_SELECTED_TF = 1;
+  public static final int PRECISION_BASE_TF = 2;
+  public static java.lang.String filePath;
+  private static final java.lang.String delimiter = "\r\n";
+  private java.util.ArrayList<java.lang.String> defaultTimeframes;
+  private java.util.ArrayList<java.lang.String> customTimeframes;
+  private static com.strategyquant.datalib.TimeframeManager instance;
+  public static synchronized com.strategyquant.datalib.TimeframeManager getInstance();
+  private com.strategyquant.datalib.TimeframeManager();
+  private boolean isValid(java.lang.String);
+  public static java.util.ArrayList<java.lang.String> getTimeframes();
+  public static java.util.ArrayList<java.lang.String> getPredefinedTimeframes();
+  public static void addTimeframe(java.lang.String) throws java.lang.Exception;
+  public static java.lang.String translateSQ3TFToString(int);
+  public static int translateToMTConstant(java.lang.String);
+  public static java.lang.String M(int);
+  public static long getMillis(java.lang.String) throws com.strategyquant.datalib.TradingException;
+  public static boolean isTimeFrameLessThen(java.lang.String, java.lang.String) throws com.strategyquant.datalib.TradingException;
+  public static long getTFHash(java.lang.String) throws com.strategyquant.datalib.TradingException;
+  public static java.lang.String getTFName(long);
+  public static boolean TFExists(java.lang.String);
+  private java.util.ArrayList<java.lang.String> _getTimeframes();
+  private void _addTimeframe(java.lang.String) throws java.lang.Exception;
+  static {};
+}
+public class com.strategyquant.datalib.TradingException extends java.lang.Exception {
+  public static final int IndicatorCalculationFailed = 55;
+  private int errorCode;
+  public com.strategyquant.datalib.TradingException();
+  public com.strategyquant.datalib.TradingException(java.lang.String);
+  public com.strategyquant.datalib.TradingException(java.lang.String, int);
+  public int getErrorCode();
+  public com.strategyquant.datalib.TradingException(java.lang.Exception);
+  public com.strategyquant.datalib.TradingException(java.lang.String, java.lang.Exception);
+  public com.strategyquant.datalib.TradingException addCall(java.lang.String);
+}
+public class com.strategyquant.datalib.UpdateEventTypes {
+  public static final int Unknown = 0;
+  public static final int None = 1;
+  public static final int BarOpen = 2;
+  public static final int BarClose = 3;
+  public static final int BarTick = 4;
+  public static final int Multiple = 5;
+  public static final int BarTickWithCloseTick = 6;
+  public static final int OrderFilled = 7;
+  public com.strategyquant.datalib.UpdateEventTypes();
+}
+public abstract class com.strategyquant.datalib.bartype.BarType implements java.io.Serializable {
+  protected int barTimeType;
+  protected final java.lang.String timeframe;
+  public com.strategyquant.datalib.bartype.BarType(int, java.lang.String);
+  public java.lang.String getTimeframe();
+  public java.lang.String toString(java.lang.String);
+  public int getBarTimeType();
+  public void processTick(com.strategyquant.datalib.TickEvent, com.strategyquant.datalib.bartype.BarTypeStatus, int) throws com.strategyquant.datalib.data.DataException;
+  public abstract void processTickImplementation(com.strategyquant.datalib.TickEvent, com.strategyquant.datalib.bartype.BarTypeStatus, int) throws com.strategyquant.datalib.data.DataException;
+  public abstract com.strategyquant.datalib.bartype.BarType clone(java.lang.String);
+  public abstract com.strategyquant.datalib.bartype.BarType clone();
+  public abstract boolean isTickBar();
+  public abstract java.lang.String checkCanBeComputedFrom(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public abstract java.lang.String getBaseTF();
+  public abstract java.lang.String getTickTF();
+  public abstract long estimateStartDate(int, long);
+  public abstract boolean checkTimeframeIsSupported(java.lang.String);
+  public java.lang.String toStr();
+  public abstract int getPeriodInMS();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+}
+public class com.strategyquant.datalib.bartype.BarTypeFactory {
+  public static final org.slf4j.Logger Log;
+  private static final java.lang.String PREFIX_SEPARATOR = ":";
+  private static com.strategyquant.datalib.bartype.BarTypeFactory instance;
+  private java.util.ArrayList<com.strategyquant.datalib.bartype.BarType> registeredBarTypes;
+  private it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap<com.strategyquant.datalib.bartype.BarType> createdBarTypes;
+  private com.strategyquant.datalib.bartype.BarTypeFactory();
+  private void addBarType(com.strategyquant.datalib.bartype.BarType);
+  private static com.strategyquant.datalib.bartype.BarTypeFactory get();
+  public static com.strategyquant.datalib.bartype.BarType getBarType(java.lang.String, int) throws com.strategyquant.datalib.data.DataException;
+  private com.strategyquant.datalib.bartype.BarType _getBarType(java.lang.String, int) throws com.strategyquant.datalib.data.DataException;
+  private long getUniqueHash(java.lang.String, int) throws com.strategyquant.datalib.data.DataException;
+  private static boolean isTimePeriod(java.lang.String);
+  public static void checkTimeframeIsValid(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  static {};
+}
+public class com.strategyquant.datalib.bartype.BarTypeStatus implements java.io.Serializable {
+  public static final int NOT_IN_SESSION = 0;
+  public static final int NEW_BAR = 1;
+  public static final int EXISTING_BAR = 2;
+  public int status;
+  public long barTime;
+  public com.strategyquant.datalib.session.SessionStatus sessionStatus;
+  public boolean convertingToHigherTF;
+  public com.strategyquant.datalib.bartype.BarTypeStatus();
+}
+public class com.strategyquant.datalib.bartype.TimeframeNotSupportedException extends java.lang.Exception {
+  public com.strategyquant.datalib.bartype.TimeframeNotSupportedException(java.lang.String);
+}
+public class com.strategyquant.datalib.bartype.impl.FuturesIntradayBar extends com.strategyquant.datalib.bartype.BarType {
+  public static final org.slf4j.Logger Log;
+  public com.strategyquant.datalib.bartype.impl.FuturesIntradayBar();
+  public void processTickImplementation(com.strategyquant.datalib.TickEvent, com.strategyquant.datalib.bartype.BarTypeStatus, int) throws com.strategyquant.datalib.data.DataException;
+  public com.strategyquant.datalib.bartype.BarType clone(java.lang.String);
+  public com.strategyquant.datalib.bartype.BarType clone();
+  public boolean isTickBar();
+  public java.lang.String checkCanBeComputedFrom(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public java.lang.String getBaseTF();
+  public java.lang.String getTickTF();
+  public long estimateStartDate(int, long);
+  public boolean checkTimeframeIsSupported(java.lang.String);
+  public int getPeriodInMS();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+  static {};
+}
+public class com.strategyquant.datalib.bartype.impl.FuturesTimeBar extends com.strategyquant.datalib.bartype.impl.TimeBar {
+  private final long dayPeriod;
+  private final long weeklyPeriod;
+  private final long monthlyPeriod;
+  private long curWeekEnd;
+  private long nextWeekEnd;
+  private long curMonthEnd;
+  private long nextMonthEnd;
+  public boolean MetaTraderEngineUsed;
+  public boolean LoadAsIs;
+  public com.strategyquant.datalib.bartype.impl.FuturesTimeBar(java.lang.String) throws com.strategyquant.datalib.bartype.TimeframeNotSupportedException;
+  public void processTickImplementation(com.strategyquant.datalib.TickEvent, com.strategyquant.datalib.bartype.BarTypeStatus, int) throws com.strategyquant.datalib.data.DataException;
+  long getCorrectBarTime(long, long, long) throws com.strategyquant.datalib.data.DataException;
+  private long getCorrectBarTimeStandard(long, long, long) throws com.strategyquant.datalib.data.DataException;
+  private long getCorrectBarTimeMultiday(long, long, long) throws com.strategyquant.datalib.data.DataException;
+  private void updateWeekStartTimes(long, long, long);
+  private void updateMonthStartTimes(long, long, long);
+  public com.strategyquant.datalib.bartype.BarType clone(java.lang.String);
+  public com.strategyquant.datalib.bartype.BarType clone();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+}
+public class com.strategyquant.datalib.bartype.impl.FxIntradayBar extends com.strategyquant.datalib.bartype.BarType {
+  public static final org.slf4j.Logger Log;
+  public com.strategyquant.datalib.bartype.impl.FxIntradayBar();
+  public void processTickImplementation(com.strategyquant.datalib.TickEvent, com.strategyquant.datalib.bartype.BarTypeStatus, int) throws com.strategyquant.datalib.data.DataException;
+  public com.strategyquant.datalib.bartype.BarType clone(java.lang.String);
+  public com.strategyquant.datalib.bartype.BarType clone();
+  public boolean isTickBar();
+  public java.lang.String checkCanBeComputedFrom(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public java.lang.String getBaseTF();
+  public java.lang.String getTickTF();
+  public long estimateStartDate(int, long);
+  public boolean checkTimeframeIsSupported(java.lang.String);
+  public int getPeriodInMS();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+  static {};
+}
+public class com.strategyquant.datalib.bartype.impl.FxTimeBar extends com.strategyquant.datalib.bartype.impl.TimeBar {
+  private final long weeklyPeriod;
+  private final long monthlyPeriod;
+  private long curWeekStart;
+  private long nextWeekStart;
+  private long curMonthStart;
+  private long nextMonthStart;
+  public com.strategyquant.datalib.bartype.impl.FxTimeBar(java.lang.String) throws com.strategyquant.datalib.bartype.TimeframeNotSupportedException;
+  public void processTickImplementation(com.strategyquant.datalib.TickEvent, com.strategyquant.datalib.bartype.BarTypeStatus, int) throws com.strategyquant.datalib.data.DataException;
+  long getCorrectBarTime(long, long) throws com.strategyquant.datalib.data.DataException;
+  private void updateWeekStartTimes(long);
+  private void updateMonthStartTimes(long);
+  public com.strategyquant.datalib.bartype.BarType clone(java.lang.String);
+  public com.strategyquant.datalib.bartype.BarType clone();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+}
+public class com.strategyquant.datalib.bartype.impl.TimeBar extends com.strategyquant.datalib.bartype.BarType {
+  public static final org.slf4j.Logger Log;
+  protected final long period;
+  protected long periodInMs;
+  protected int basePeriodInMs;
+  protected long currentBarTime;
+  public com.strategyquant.datalib.bartype.impl.TimeBar(java.lang.String) throws com.strategyquant.datalib.bartype.TimeframeNotSupportedException;
+  com.strategyquant.datalib.bartype.impl.TimeBar(int, java.lang.String) throws com.strategyquant.datalib.bartype.TimeframeNotSupportedException;
+  public long getPeriodInSeconds(java.lang.String, boolean) throws com.strategyquant.datalib.bartype.TimeframeNotSupportedException;
+  public void processTickImplementation(com.strategyquant.datalib.TickEvent, com.strategyquant.datalib.bartype.BarTypeStatus, int) throws com.strategyquant.datalib.data.DataException;
+  public com.strategyquant.datalib.bartype.BarType clone(java.lang.String);
+  public com.strategyquant.datalib.bartype.BarType clone();
+  public boolean isTickBar();
+  public java.lang.String checkCanBeComputedFrom(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public long getPeriod();
+  public java.lang.String getBaseTF();
+  public java.lang.String getTickTF();
+  public long estimateStartDate(int, long);
+  public boolean checkTimeframeIsSupported(java.lang.String);
+  protected long getCorrectSessionStartTime(long);
+  public int getPeriodInMS();
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+  static {};
+}
+public class com.strategyquant.datalib.basket.BasketBrokerDev {
+  private static final org.slf4j.Logger Log;
+  private boolean dev;
+  private static com.strategyquant.datalib.basket.BasketBrokerDev instance;
+  public static com.strategyquant.datalib.basket.BasketBrokerDev getInstance();
+  private com.strategyquant.datalib.basket.BasketBrokerDev();
+  public boolean isDev();
+  static {};
+}
+public class com.strategyquant.datalib.basket.BasketDto {
+  private java.lang.String name;
+  private java.lang.String desc;
+  private int count;
+  private int total;
+  private java.lang.Integer id;
+  private boolean system;
+  public com.strategyquant.datalib.basket.BasketDto();
+  public java.lang.String getName();
+  public void setName(java.lang.String);
+  public java.lang.String getDesc();
+  public void setDesc(java.lang.String);
+  public int getCount();
+  public void setCount(int);
+  public java.lang.Integer getId();
+  public void setId(java.lang.Integer);
+  public boolean isSystem();
+  public void setSystem(boolean);
+  public int getTotal();
+  public void setTotal(int);
+  public boolean isDefault();
+}
+class com.strategyquant.datalib.basket.BasketOfStocksManager$1 implements java.lang.Runnable {
+  final java.lang.Runnable val$callback;
+  final com.strategyquant.datalib.basket.BasketOfStocksManager this$0;
+  com.strategyquant.datalib.basket.BasketOfStocksManager$1();
+  public void run();
+}
+class com.strategyquant.datalib.basket.BasketOfStocksManager$MinMax {
+  public long min;
+  public long max;
+  final com.strategyquant.datalib.basket.BasketOfStocksManager this$0;
+  private com.strategyquant.datalib.basket.BasketOfStocksManager$MinMax(com.strategyquant.datalib.basket.BasketOfStocksManager);
+  com.strategyquant.datalib.basket.BasketOfStocksManager$MinMax(com.strategyquant.datalib.basket.BasketOfStocksManager, com.strategyquant.datalib.basket.BasketOfStocksManager$1);
+}
+public class com.strategyquant.datalib.basket.BasketOfStocksManager extends com.strategyquant.datalib.data.DataDb {
+  private static final org.slf4j.Logger Log;
+  private static final java.lang.String GROUP_OF_STOCKS_VERSION = "group_of_stocks.version";
+  private static final java.lang.String version = "v2";
+  public static final java.lang.String LimitedGroupName = "[[S&P 100 limited]]";
+  private static com.strategyquant.datalib.basket.BasketOfStocksManager instance;
+  private static final java.lang.String insertBasketSQL = "INSERT INTO STOCK_GROUP (NAME, DESC, SYSTEM)values(?,?, ?)";
+  private static final java.lang.String updateBasketSQL = "UPDATE STOCK_GROUP set NAME=?, DESC=? where ID=?";
+  private static final java.lang.String insertStockSql = "INSERT INTO STOCK (BASKET_ID, TICKER, DATE_FROM, DATE_TO) values(?,?,?,?)";
+  private java.util.Map<java.lang.String, com.strategyquant.datalib.basket.StockDto> quickStockMap;
+  private java.util.Map<java.lang.String, java.util.Set<java.lang.Integer>> groupsForStocks;
+  private java.util.Map<java.lang.Integer, java.util.List<com.strategyquant.datalib.basket.StockDto>> stocksOfGroup;
+  private java.util.LinkedHashMap<java.lang.Integer, com.strategyquant.datalib.basket.BasketDto> groupsMap;
+  private java.util.Map<java.lang.Integer, java.util.List<com.strategyquant.datalib.basket.StockDto>> customStocksOfGroup;
+  private java.util.LinkedHashMap<java.lang.Integer, com.strategyquant.datalib.basket.BasketDto> customGroupsMap;
+  private java.lang.String url;
+  private java.lang.String version_url;
+  private boolean devel;
+  public static void init(java.lang.String) throws java.lang.Exception;
+  private void checkDevelMode();
+  public void synhronizeAsync(java.lang.Runnable);
+  private com.strategyquant.datalib.basket.BasketOfStocksManager(java.lang.String);
+  public static com.strategyquant.datalib.basket.BasketOfStocksManager getInstance();
+  public void sync(java.lang.Runnable) throws java.lang.Exception;
+  private void saveLatestVersion(java.lang.String) throws java.io.IOException;
+  private java.util.Map<java.lang.String, java.lang.String> unzip(byte[]) throws java.io.IOException;
+  private java.lang.String getCurrentDownloadedVersion() throws java.io.IOException;
+  private java.lang.String getNewAvailableVersion() throws java.io.IOException;
+  private byte[] download(java.lang.String) throws java.io.IOException;
+  public java.util.List<com.strategyquant.datalib.basket.StockDto> readStocksFromCsv(java.lang.String, java.lang.String) throws java.lang.Exception;
+  private long parseDate(java.lang.String);
+  public void importFromCsv(java.lang.String, java.lang.Integer, java.lang.String) throws java.lang.Exception;
+  public void importFromCsv(java.lang.String, java.lang.Integer, java.lang.String, java.lang.String) throws java.lang.Exception;
+  public java.util.List<com.strategyquant.datalib.basket.StockDto> updateStocksFromStr(java.lang.String, java.lang.Integer, java.lang.String) throws java.lang.Exception;
+  private void updateCount(com.strategyquant.datalib.basket.BasketDto);
+  public void initDatabase();
+  public synchronized void saveGroup(com.strategyquant.datalib.basket.BasketDto) throws java.lang.Exception;
+  public com.strategyquant.datalib.basket.BasketDto getBasket(java.lang.String);
+  public java.util.Set<java.lang.Integer> getGroupsForStock(java.lang.String);
+  public java.util.Set<java.lang.String> updateGroupsOfSymbols();
+  private java.util.Map<java.lang.String, com.strategyquant.datalib.DataInfo> getDataInfosMap();
+  private java.lang.String[] getAllSymbolsArray();
+  public void updateGroupRange(java.lang.Integer);
+  public void saveCustomStocks(int, java.util.List<com.strategyquant.datalib.basket.StockDto>);
+  public void saveStocks(int, java.util.List<com.strategyquant.datalib.basket.StockDto>);
+  public java.util.List<com.strategyquant.datalib.basket.StockDto> getStocks(int);
+  public java.util.List<com.strategyquant.datalib.basket.StockDto> getStocks(int, java.util.List<java.lang.String>);
+  public synchronized com.strategyquant.datalib.basket.BasketDto deleteGroup(int) throws java.lang.Exception;
+  private java.util.Map<java.lang.String, com.strategyquant.datalib.basket.BasketDto> getSystemGroupsByName();
+  private synchronized void performLoadGroups();
+  public synchronized java.util.List<com.strategyquant.datalib.basket.BasketDto> getGroups();
+  public com.strategyquant.datalib.basket.BasketDto getSystemBasket(java.lang.String);
+  public com.strategyquant.datalib.basket.BasketDto getBasket(java.lang.Integer);
+  private com.strategyquant.datalib.basket.BasketDto toGroupDto(java.sql.ResultSet) throws java.sql.SQLException;
+  private com.strategyquant.datalib.basket.StockDto toStockDto(java.sql.ResultSet) throws java.sql.SQLException;
+  private void checkDataAliases();
+  public com.strategyquant.datalib.basket.BasketDto createCustomGroup(java.lang.String, int, java.lang.String, boolean, java.lang.String) throws java.lang.Exception;
+  public static int getNumberOfSymbolsInGroup(java.util.Set<java.lang.String>, com.strategyquant.datalib.basket.BasketDto);
+  public static int getDownloaded(java.util.Map<java.lang.String, com.strategyquant.datalib.DataInfo>, java.lang.Integer);
+  public static boolean isReadyForUse(int, int);
+  private static com.strategyquant.datalib.basket.BasketDto lambda$getSystemGroupsByName$3(com.strategyquant.datalib.basket.BasketDto);
+  private static boolean lambda$getSystemGroupsByName$2(com.strategyquant.datalib.basket.BasketDto);
+  private static java.lang.String lambda$getAllSymbolsArray$1(com.strategyquant.datalib.DataInfo);
+  private static boolean lambda$updateCount$0(com.strategyquant.datalib.basket.StockDto);
+  static com.strategyquant.datalib.basket.BasketOfStocksManager access$000();
+  static org.slf4j.Logger access$100();
+  static {};
+}
+public class com.strategyquant.datalib.basket.StockDto {
+  private java.lang.Integer id;
+  private java.lang.String ticker;
+  private java.lang.Long dateFrom;
+  private java.lang.Long dateTo;
+  public static final long TimeNotDefined = -1l;
+  public com.strategyquant.datalib.basket.StockDto();
+  public boolean isActive();
+  public java.lang.Integer getId();
+  public void setId(java.lang.Integer);
+  public java.lang.String getTicker();
+  public void setTicker(java.lang.String);
+  public java.lang.Long getDateFrom();
+  public void setDateFrom(java.lang.Long);
+  public java.lang.Long getDateTo();
+  public void setDateTo(java.lang.Long);
+  public java.lang.String toString();
+}
+public class com.strategyquant.datalib.broker.BrokerDto {
+  private java.lang.String name;
+  private java.lang.String desc;
+  private int customizedStocks;
+  private int customizedInstruments;
+  private int customizedSessions;
+  private java.lang.Integer id;
+  private boolean system;
+  private boolean mtUse;
+  private java.lang.String mtTimezone;
+  private java.lang.String postfix;
+  private boolean stockPickerUse;
+  public com.strategyquant.datalib.broker.BrokerDto();
+  public int getCustomizedStocks();
+  public void setCustomizedStocks(int);
+  public int getCustomizedInstruments();
+  public void setCustomizedInstruments(int);
+  public boolean isMtUse();
+  public void setMtUse(boolean);
+  public java.lang.String getMtTimezone();
+  public void setMtTimezone(java.lang.String);
+  public java.lang.String getPostfix();
+  public void setPostfix(java.lang.String);
+  public boolean isStockPickerUse();
+  public void setStockPickerUse(boolean);
+  public java.lang.String getName();
+  public void setName(java.lang.String);
+  public java.lang.String getDesc();
+  public void setDesc(java.lang.String);
+  public java.lang.Integer getId();
+  public void setId(java.lang.Integer);
+  public boolean isSystem();
+  public void setSystem(boolean);
+  public int getCustomizedSessions();
+  public void setCustomizedSessions(int);
+}
+class com.strategyquant.datalib.broker.BrokerManager$1 implements java.lang.Runnable {
+  final java.lang.Runnable val$callback;
+  final com.strategyquant.datalib.broker.BrokerManager this$0;
+  com.strategyquant.datalib.broker.BrokerManager$1();
+  public void run();
+}
+public class com.strategyquant.datalib.broker.BrokerManager extends com.strategyquant.datalib.data.DataDb {
+  public static final java.lang.String DEFAULT_BROKER = "SQ default";
+  private static final org.slf4j.Logger Log;
+  public static final java.lang.String NO_BROKER = "No filter";
+  private static final java.lang.String BROKERS_VERSION = "brokers.version";
+  private static final java.lang.String version = "v2";
+  private static final java.lang.String insertBrokerSQL = "INSERT INTO BROKER (NAME, DESC, SYSTEM, MT_USE, MT_TIMEZONE, POSTFIX, STOCKPICKER_USE)values(?,?,?,?,?,?,?)";
+  private static final java.lang.String updateBrokerSQL = "UPDATE BROKER set NAME=?, DESC=?, MT_USE=?, MT_TIMEZONE=?, POSTFIX=?, STOCKPICKER_USE=? where ID=?";
+  private static final java.lang.String insertStockSql = "INSERT INTO BROKER_STOCK (BROKER_ID, TICKER) values(?,?)";
+  private java.util.LinkedHashMap<java.lang.Integer, com.strategyquant.datalib.broker.BrokerDto> brokerMap;
+  private java.util.Map<java.lang.Integer, java.util.List<java.lang.String>> stocksOfBroker;
+  private static com.strategyquant.datalib.broker.BrokerManager instance;
+  private static java.lang.String url;
+  private static java.lang.String version_url;
+  public static void init(java.lang.String) throws java.lang.Exception;
+  public void synhronizeAsync(java.lang.Runnable);
+  private com.strategyquant.datalib.broker.BrokerManager(java.lang.String);
+  public static com.strategyquant.datalib.broker.BrokerManager getInstance();
+  private void sync(java.lang.Runnable) throws java.lang.Exception;
+  private java.util.List<com.strategyquant.datalib.broker.BrokerDto> parse(java.lang.String);
+  private void saveLatestVersion(java.lang.String) throws java.io.IOException;
+  private com.strategyquant.lib.utils.Pair unzip(byte[]) throws java.io.IOException;
+  private java.lang.String getCurrentDownloadedVersion() throws java.io.IOException;
+  private java.lang.String getNewAvailableVersion() throws java.io.IOException;
+  private byte[] download(java.lang.String) throws java.io.IOException;
+  public java.util.List<com.strategyquant.datalib.broker.BrokerStockDto> readStocksFromCsv(java.lang.String, java.lang.String) throws java.lang.Exception;
+  private long parseDate(java.lang.String);
+  public void importFromCsv(java.lang.String, java.lang.Integer, java.lang.String) throws java.lang.Exception;
+  public java.util.List<com.strategyquant.datalib.broker.BrokerStockDto> updateStocksFromStr(java.lang.String, java.lang.Integer, java.lang.String) throws java.lang.Exception;
+  public void initDatabase();
+  public com.strategyquant.datalib.broker.BrokerDto getBroker(java.lang.String);
+  public synchronized void saveBroker(com.strategyquant.datalib.broker.BrokerDto) throws java.lang.Exception;
+  public void saveStocks(int, java.util.List<com.strategyquant.datalib.broker.BrokerStockDto>);
+  public java.util.List<java.lang.String> getStocks(int);
+  public synchronized com.strategyquant.datalib.broker.BrokerDto deleteBroker(int, boolean) throws java.lang.Exception;
+  public boolean isUsedByMt(int) throws java.sql.SQLException;
+  private java.util.Map<java.lang.String, com.strategyquant.datalib.broker.BrokerDto> getSystemBrokersByName();
+  public void refresh();
+  private synchronized void performLoadBrokers();
+  public synchronized java.util.List<com.strategyquant.datalib.broker.BrokerDto> getAllBrokers();
+  public com.strategyquant.datalib.broker.BrokerDto getSystemBroker(java.lang.String);
+  public synchronized com.strategyquant.datalib.broker.BrokerDto getBroker(java.lang.Integer);
+  public com.strategyquant.datalib.broker.BrokerDto getDefaultBroker();
+  public java.lang.String getBrokerName(int);
+  private com.strategyquant.datalib.broker.BrokerDto toBrokerDto(java.sql.ResultSet) throws java.sql.SQLException;
+  private com.strategyquant.datalib.broker.BrokerStockDto toStockDto(java.sql.ResultSet) throws java.sql.SQLException;
+  public java.lang.String getBrokerDependantName(java.lang.String, int);
+  public boolean checkBrokerExists(java.lang.String);
+  private static com.strategyquant.datalib.broker.BrokerDto lambda$getSystemBrokersByName$1(com.strategyquant.datalib.broker.BrokerDto);
+  private static boolean lambda$getSystemBrokersByName$0(com.strategyquant.datalib.broker.BrokerDto);
+  static com.strategyquant.datalib.broker.BrokerManager access$000();
+  static void access$100(com.strategyquant.datalib.broker.BrokerManager, java.lang.Runnable) throws java.lang.Exception;
+  static org.slf4j.Logger access$200();
+  static {};
+}
+public class com.strategyquant.datalib.broker.BrokerStockDto {
+  private java.lang.Integer id;
+  private java.lang.String ticker;
+  public com.strategyquant.datalib.broker.BrokerStockDto();
+  public java.lang.Integer getId();
+  public void setId(java.lang.Integer);
+  public java.lang.String getTicker();
+  public void setTicker(java.lang.String);
+  public java.lang.String toString();
+}
+public class com.strategyquant.datalib.consts.Backload {
+  public static final int BACKLOAD_DAYS = 1;
+  public static final int BACKLOAD_BARS = 2;
+  public static final int BACKLOAD_FROMDATE = 3;
+  public com.strategyquant.datalib.consts.Backload();
+}
+public class com.strategyquant.datalib.consts.BackloadType {
+  public static final int Days = 1;
+  public static final int Bars = 2;
+  public static final int FromDate = 3;
+  public com.strategyquant.datalib.consts.BackloadType();
+}
+public class com.strategyquant.datalib.consts.BarTimeTypes {
+  public static final int TimeIsStartOfBar = 1;
+  public static final int TimeIsEndOfBar = 2;
+  public com.strategyquant.datalib.consts.BarTimeTypes();
+}
+public class com.strategyquant.datalib.consts.DataTypes {
+  public static final byte Stock = 1;
+  public static final byte Futures = 2;
+  public static final byte Forex = 3;
+  public static final byte CFDs = 4;
+  public static final byte ETF = 5;
+  public static final byte Index = 6;
+  public static final byte Crypto = 7;
+  public static final byte Bond = 8;
+  public static final java.lang.String DATATYPE_STOCK = "Stock";
+  public static final java.lang.String DATATYPE_FUTURES = "Futures";
+  public static final java.lang.String DATATYPE_FOREX = "Forex";
+  public static final java.lang.String DATATYPE_CFDS = "CFDs";
+  public static final java.lang.String DATATYPE_ETF = "ETF";
+  public static final java.lang.String DATATYPE_INDEX = "Index";
+  public static final java.lang.String DATATYPE_CRYPTO = "Crypto";
+  public static final java.lang.String DATATYPE_BOND = "Bond";
+  public com.strategyquant.datalib.consts.DataTypes();
+  public static java.lang.String toString(int);
+  public static byte getDataType(java.lang.String) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.consts.Precisions {
+  private java.lang.String[] langs;
+  public static final int SelectedTF = 1;
+  public static final int BaseTF = 2;
+  public static final int TickCustomSpread = 3;
+  public static final int TickRealSpread = 4;
+  public static final int OpenPrices = 5;
+  public static final java.lang.String PRECISION_SELECTED_TF = "Selected timeframe only (fastest)";
+  public static final java.lang.String PRECISION_BASE_TF = "1 minute data tick simulation (slow)";
+  public static final java.lang.String PRECISION_TICK_CUSTOM_SPREADS = "Real Tick - custom spread (slowest)";
+  public static final java.lang.String PRECISION_TICK_REAL_SPREADS = "Real Tick - real spread (slowest)";
+  public static final java.lang.String PRECISION_OPEN_PRICES = "Trade On Bar Open";
+  public com.strategyquant.datalib.consts.Precisions();
+  public static java.lang.String toString(int);
+  public static int getPrecision(java.lang.String) throws java.lang.Exception;
+  public static int getPrecision(int) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.customData.AvailableCustomDataFormats {
+  public static final org.slf4j.Logger Log;
+  private static final java.lang.String filePath;
+  private static com.strategyquant.datalib.customData.AvailableCustomDataFormats instance;
+  protected java.util.ArrayList<com.strategyquant.datalib.data.imports.CustomDataFormat> availableFileFormats;
+  private com.strategyquant.datalib.customData.AvailableCustomDataFormats();
+  public java.util.ArrayList<com.strategyquant.datalib.data.imports.CustomDataFormat> getAvailableFileFormats();
+  public static com.strategyquant.datalib.customData.AvailableCustomDataFormats getInstance();
+  public void registerFileFormats();
+  public boolean formatExists(java.lang.String);
+  private void loadPredefinedFileFormats();
+  private void loadCustomFileFormats();
+  public void addDataFormat(com.strategyquant.datalib.data.imports.CustomDataFormat);
+  public void deleteDataFormat(java.lang.String);
+  private void remove(java.lang.String, boolean);
+  public void updateDataFormat(com.strategyquant.datalib.data.imports.CustomDataFormat);
+  private void saveFormats();
+  public com.strategyquant.datalib.data.imports.CustomDataFormat findFileFormatByName(java.lang.String);
+  static {};
+}
+public class com.strategyquant.datalib.customData.CustomData {
+  public long time;
+  public double[] values;
+  public com.strategyquant.datalib.customData.CustomData(int);
+  public void reset();
+  public java.lang.String toString();
+}
+public class com.strategyquant.datalib.customData.CustomDataBinReader {
+  java.io.DataInputStream reader;
+  private java.lang.String fileName;
+  public com.strategyquant.datalib.customData.CustomData loadedData;
+  public com.strategyquant.datalib.customData.CustomDataBinReader(com.strategyquant.datalib.customData.CustomDataInfo);
+  public void open() throws java.lang.Exception;
+  public void close() throws java.lang.Exception;
+  public boolean hasNextData() throws java.lang.Exception;
+  public void loadData() throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.customData.CustomDataBinWriter {
+  protected java.io.DataOutputStream writer;
+  private java.lang.String fileName;
+  public com.strategyquant.datalib.customData.CustomDataBinWriter();
+  public void setFileName(java.lang.String);
+  public java.lang.String getFileName();
+  public void open() throws java.lang.Exception;
+  public void close() throws java.lang.Exception;
+  public void writeData(com.strategyquant.datalib.customData.CustomData) throws java.lang.Exception;
+}
+public abstract class com.strategyquant.datalib.customData.CustomDataDb extends com.strategyquant.lib.db.DbBase {
+  public com.strategyquant.datalib.customData.CustomDataDb(java.lang.String);
+  public abstract void initDatabase();
+}
+public class com.strategyquant.datalib.customData.CustomDataInfo implements java.io.Serializable,com.strategyquant.lib.settings.IXMLAble {
+  public static final java.lang.String Name = "name";
+  public static final java.lang.String CodeMT4 = "mt4";
+  public static final java.lang.String CodeMT5 = "mt5";
+  public static final java.lang.String CodeEL = "el";
+  public int id;
+  public java.lang.String name;
+  public int dataType;
+  public int values;
+  public org.json.JSONArray valuesObject;
+  public java.lang.String timeframe;
+  public java.lang.String filename;
+  public long dateFrom;
+  public long dateTo;
+  public int rows;
+  public int totalDays;
+  public com.strategyquant.datalib.customData.CustomDataInfo();
+  public java.lang.String getValue(int, java.lang.String) throws java.lang.Exception;
+  public void setValues(java.lang.String);
+  public org.jdom2.Element getXML();
+  public void setFromXML(org.jdom2.Element) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.customData.CustomDataManager extends com.strategyquant.datalib.customData.CustomDataDb {
+  public static final org.slf4j.Logger Log;
+  private static com.strategyquant.datalib.customData.CustomDataManager instance;
+  private java.util.HashMap<java.lang.String, com.strategyquant.datalib.customData.CustomDataInfo> dataInfoCache;
+  public static void init(java.lang.String) throws java.lang.Exception;
+  private com.strategyquant.datalib.customData.CustomDataManager(java.lang.String);
+  static com.strategyquant.datalib.customData.CustomDataManager get();
+  public void initDatabase();
+  public static java.util.Collection<com.strategyquant.datalib.customData.CustomDataInfo> list() throws java.lang.Exception;
+  public static void add(com.strategyquant.datalib.customData.CustomDataInfo) throws java.lang.Exception;
+  public static void add(java.lang.String, java.lang.String, int) throws java.lang.Exception;
+  public static void update(com.strategyquant.datalib.customData.CustomDataInfo) throws java.lang.Exception;
+  public static void update(java.lang.String, java.lang.String, java.lang.String, int) throws java.lang.Exception;
+  public static void updateData(java.lang.String, long, long, int, java.lang.String) throws java.lang.Exception;
+  public static boolean checkDataExists(java.lang.String);
+  public static com.strategyquant.datalib.customData.CustomDataInfo getDataInfo(java.lang.String);
+  public static void delete(java.lang.String);
+  private void _delete(java.lang.String);
+  public static void clear(java.lang.String) throws java.lang.Exception;
+  public static void removeDataFile(java.lang.String);
+  private synchronized java.util.Collection<com.strategyquant.datalib.customData.CustomDataInfo> _list() throws java.lang.Exception;
+  public void _add(java.lang.String, java.lang.String, int) throws java.lang.Exception;
+  public static void updateConfigFile();
+  private void _updateConfigFileLock();
+  private void _updateConfigFile();
+  public static boolean configFileExists();
+  public static java.lang.String createCDataValues(int, com.strategyquant.datalib.customData.CustomDataInfo) throws java.lang.Exception;
+  public void _update(java.lang.String, java.lang.String, java.lang.String, int) throws java.lang.Exception;
+  public void _updateData(java.lang.String, long, long, int, java.lang.String) throws java.lang.Exception;
+  private boolean _checkDataExists(java.lang.String);
+  private boolean _checkDataExists(java.sql.Connection, java.lang.String);
+  private synchronized com.strategyquant.datalib.customData.CustomDataInfo _getDataInfo(java.lang.String);
+  private com.strategyquant.datalib.customData.CustomDataInfo getRecordFromCache(java.lang.String);
+  public static java.lang.String getDataFileName(java.lang.String);
+  private java.lang.String _getDataFileName(java.lang.String);
+  public static java.lang.String fixFilename(java.lang.String);
+  public static void addCDataIndySourceCodes(org.jdom2.Element) throws java.lang.Exception;
+  private void _addCDataIndySourceCodes(org.jdom2.Element, com.strategyquant.datalib.customData.ct.CTCustomIndicators) throws java.lang.Exception;
+  public static java.lang.String getCDataIndyId(java.lang.String);
+  private void _addSourceCodesToItem(org.jdom2.Element, java.lang.String);
+  public static void add(com.strategyquant.datalib.indicators.SCustomIndicator) throws java.lang.Exception;
+  public static void checkData();
+  static {};
+}
+public class com.strategyquant.datalib.customData.CustomDataTypes {
+  public static final byte IndicatorValuePrice = 1;
+  public static final byte IndicatorValueNumber = 2;
+  public static final byte IndicatorValuePriceRange = 3;
+  public static final byte SignalValueBoolean = 10;
+  public static final byte SignalValueAction = 11;
+  public static final java.lang.String IndicatorValuePriceKey = "IndicatorValuePrice";
+  public static final java.lang.String IndicatorValueNumberKey = "IndicatorValueNumber";
+  public static final java.lang.String IndicatorValuePriceRangeKey = "IndicatorValuePriceRange";
+  public static final java.lang.String SignalValueBooleanKey = "SignalValueBoolean";
+  public static final java.lang.String SignalValueActionKey = "SignalValueAction";
+  public static final java.lang.String IndicatorValuePriceName = "Indicator value - price";
+  public static final java.lang.String IndicatorValueNumberName = "Indicator value - number";
+  public static final java.lang.String IndicatorValuePriceRangeName = "Indicator value - price range";
+  public static final java.lang.String SignalValueBooleanName = "Signal - 0 means false, anything else means true";
+  public com.strategyquant.datalib.customData.CustomDataTypes();
+  public static java.lang.String toString(byte);
+  public static java.lang.String translateDataType(byte) throws java.lang.Exception;
+  public static java.util.List<java.lang.Byte> availableDataTypes();
+}
+public class com.strategyquant.datalib.customData.ct.CTCustomIndicator {
+  public java.lang.String fileName;
+  public java.lang.String shortName;
+  public java.lang.String longName;
+  public java.lang.String returnType;
+  public java.util.List<com.strategyquant.datalib.customData.ct.CTCustomIndicatorParam> params;
+  public java.util.Map<java.lang.String, com.strategyquant.datalib.customData.ct.CTCustomIndicatorOutput> outputs;
+  public com.strategyquant.datalib.customData.ct.CTCustomIndicator(org.jdom2.Element) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.customData.ct.CTCustomIndicatorOutput {
+  public java.lang.String name;
+  public java.lang.String el;
+  public java.lang.String jf;
+  public java.lang.String mt4;
+  public java.lang.String mt5;
+  public com.strategyquant.datalib.customData.ct.CTCustomIndicatorOutput(org.jdom2.Element) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.customData.ct.CTCustomIndicatorParam {
+  public java.lang.String name;
+  public java.lang.String type;
+  public java.lang.String value;
+  public com.strategyquant.datalib.customData.ct.CTCustomIndicatorParam(org.jdom2.Element) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.customData.ct.CTCustomIndicators extends java.util.HashMap<java.lang.String, com.strategyquant.datalib.customData.ct.CTCustomIndicator> {
+  public static final org.slf4j.Logger Log;
+  public com.strategyquant.datalib.customData.ct.CTCustomIndicators(org.jdom2.Element) throws java.lang.Exception;
+  public void addSourceCodesToItem(org.jdom2.Element, java.lang.String) throws java.lang.Exception;
+  static {};
+}
+public class com.strategyquant.datalib.darwinex.DarwinexUtils {
+  public static final org.slf4j.Logger Log;
+  public com.strategyquant.datalib.darwinex.DarwinexUtils();
+  public static void getTickData(java.io.File, it.unimi.dsi.fastutil.longs.Long2ObjectAVLTreeMap<com.strategyquant.datalib.data.io.VersatileData>, boolean) throws java.lang.Exception;
+  static {};
+}
+public interface com.strategyquant.datalib.data.BatchProgressController {
+  public abstract boolean isCancel();
+  public abstract void updateProgress(int, int, java.lang.String) throws java.lang.Exception;
+  public abstract void finished();
+}
+public class com.strategyquant.datalib.data.DataCloner {
+  private static final int REFRESH_RATE = 100;
+  public static final org.slf4j.Logger Log;
+  private volatile boolean canceled;
+  private boolean cloneRunning;
+  private volatile boolean paused;
+  private com.strategyquant.lib.utils.IProgressListener listener;
+  private com.strategyquant.datalib.historyData.dto.TickerDto ticker;
+  private com.strategyquant.datalib.DataInfo sourceSymbolInfo;
+  private com.strategyquant.datalib.DataInfo targetSymbolInfo;
+  private int shiftHours;
+  private boolean removeWeekends;
+  private long dateFrom;
+  private long dateTo;
+  private int rows;
+  private long secondsRecords;
+  private org.joda.time.DateTimeZone sourceTz;
+  private org.joda.time.DateTimeZone targetTz;
+  private com.strategyquant.datalib.data.io.IDataLoader loader;
+  private com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew writer;
+  public com.strategyquant.datalib.data.DataCloner();
+  public void cancel();
+  public void cloneToTimezone(java.lang.String, java.lang.String, java.lang.String, int, boolean, com.strategyquant.datalib.historyData.dto.TickerDto, com.strategyquant.lib.utils.IProgressListener);
+  private void cloneData() throws java.lang.Exception;
+  private void prepareClone(java.lang.String) throws com.strategyquant.datalib.data.DataException, java.lang.Exception;
+  private void performCloneFile() throws java.lang.Exception, java.lang.InterruptedException;
+  public void createSymbol(java.lang.String, com.strategyquant.datalib.DataInfo) throws java.lang.Exception;
+  public boolean isRunning();
+  public void pause();
+  public void restart();
+  private void checkPaused() throws java.lang.InterruptedException;
+  static {};
+}
+public class com.strategyquant.datalib.data.DataComparator implements java.util.Comparator<com.strategyquant.datalib.DataInfo> {
+  public com.strategyquant.datalib.data.DataComparator();
+  public int compare(com.strategyquant.datalib.DataInfo, com.strategyquant.datalib.DataInfo);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+public abstract class com.strategyquant.datalib.data.DataDb extends com.strategyquant.lib.db.DbBase {
+  public static final org.slf4j.Logger Log;
+  public com.strategyquant.datalib.data.DataDb(java.lang.String);
+  public abstract void initDatabase();
+  static {};
+}
+public class com.strategyquant.datalib.data.DataException extends java.lang.Exception {
+  public static final int CONNECTION = 1;
+  public static final int DATA = 2;
+  public static final int INSTRUMENT = 3;
+  public static final int BARTYPE = 4;
+  public static final int SERIES = 5;
+  public static final int TIMEFRAME = 6;
+  private int type;
+  public com.strategyquant.datalib.data.DataException(int, java.lang.String);
+}
+public class com.strategyquant.datalib.data.DataExporter {
+  private static final org.joda.time.format.DateTimeFormatter formaterDate;
+  private long fromDate;
+  private long toDate;
+  private com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew reader;
+  private java.lang.String folder;
+  private java.lang.String symbol;
+  private int dateType;
+  private com.strategyquant.datalib.DataInfo info;
+  private java.lang.String tmpFolder;
+  public com.strategyquant.datalib.data.DataExporter();
+  public void exportTick(java.lang.String, long, long, java.lang.String) throws java.lang.Exception;
+  public void exportM1(java.lang.String, long, long, java.lang.String) throws java.lang.Exception;
+  private void performExport() throws java.lang.Exception;
+  private void deleteFolder(java.io.File);
+  private void close(com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew) throws java.lang.Exception;
+  private com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew prepareWriter(java.lang.String, int) throws java.lang.Exception;
+  private void prepareReader(java.lang.String, java.lang.String) throws java.lang.Exception;
+  static {};
+}
+class com.strategyquant.datalib.data.DataFolderSweeper$1 implements java.lang.Runnable {
+  final com.strategyquant.datalib.data.DataFolderSweeper this$0;
+  com.strategyquant.datalib.data.DataFolderSweeper$1(com.strategyquant.datalib.data.DataFolderSweeper);
+  public void run();
+}
+class com.strategyquant.datalib.data.DataFolderSweeper$2 implements java.io.FileFilter {
+  final com.strategyquant.datalib.data.DataFolderSweeper this$0;
+  com.strategyquant.datalib.data.DataFolderSweeper$2(com.strategyquant.datalib.data.DataFolderSweeper);
+  public boolean accept(java.io.File);
+}
+public class com.strategyquant.datalib.data.DataFolderSweeper {
+  public static final org.slf4j.Logger Log;
+  protected static final long DELAY_TIME = 180000l;
+  private static com.strategyquant.datalib.data.DataFolderSweeper instance;
+  private java.lang.Thread cleanerThread;
+  private boolean skip;
+  public static com.strategyquant.datalib.data.DataFolderSweeper get();
+  private com.strategyquant.datalib.data.DataFolderSweeper();
+  public synchronized void init();
+  public void setSkip(boolean);
+  private void removeUnusedData(java.util.ArrayList<com.strategyquant.datalib.DataInfo>);
+  private void removeUnusedInFolder(java.io.File, java.util.Map<java.lang.String, com.strategyquant.datalib.DataInfo>, java.util.Map<java.lang.String, com.strategyquant.datalib.DataInfo>, java.util.Map<java.lang.String, com.strategyquant.datalib.DataInfo>);
+  private boolean removeUnusedInFolder(java.io.File, java.util.Map<java.lang.String, com.strategyquant.datalib.DataInfo>);
+  private void deleteFolder(java.io.File);
+  private void removeCopyFiles(java.lang.String, java.util.ArrayList<com.strategyquant.datalib.DataInfo>) throws java.io.IOException;
+  private static boolean lambda$removeUnusedData$6(com.strategyquant.datalib.DataInfo);
+  private static boolean lambda$removeUnusedData$3(com.strategyquant.datalib.DataInfo);
+  private static com.strategyquant.datalib.DataInfo lambda$removeUnusedData$2(com.strategyquant.datalib.DataInfo);
+  private static java.lang.String lambda$removeUnusedData$1(com.strategyquant.datalib.DataInfo);
+  private static boolean lambda$removeUnusedData$0(com.strategyquant.datalib.DataInfo);
+  static void access$000(com.strategyquant.datalib.data.DataFolderSweeper, java.util.ArrayList);
+  static void access$100(com.strategyquant.datalib.data.DataFolderSweeper, java.lang.String, java.util.ArrayList) throws java.io.IOException;
+  static {};
+}
+public class com.strategyquant.datalib.data.DataInfoCache extends java.util.HashMap<java.lang.String, com.strategyquant.datalib.DataInfo> {
+  public long lastTimeUpdated;
+  public com.strategyquant.datalib.data.DataInfoCache();
+}
+public class com.strategyquant.datalib.data.DataManager extends com.strategyquant.datalib.data.DataDb {
+  public static final java.lang.String SpreadTypePoints = "points";
+  public static final java.lang.String SpreadTypePips = "pips";
+  public static final java.lang.String SpreadTypeReal = "real";
+  private static final int BATCH_SIZE = 150;
+  public static final java.lang.String FUTURES_FOLDER = "sq_futures";
+  public static final java.lang.String EQUITY_FOLDER = "sq_equity";
+  public static final org.slf4j.Logger Log;
+  private static com.strategyquant.datalib.data.DataManager instance;
+  private java.util.ArrayList<com.strategyquant.datalib.DataInfo> cachedDataList;
+  private java.util.HashMap<java.lang.String, com.strategyquant.datalib.DataInfo> dataInfoCache;
+  private java.util.HashMap<java.lang.String, java.lang.Boolean> connectionCache;
+  private com.strategyquant.datalib.data.DataComparator dataComparator;
+  private com.strategyquant.datalib.data.DataInfoCache dataInfoCacheAll;
+  private long dataLastTimeUpdated;
+  private java.util.List<com.strategyquant.datalib.data.SymbolInfo> updatedInfos;
+  private java.util.HashMap<java.lang.String, com.strategyquant.datalib.DataInfo> customDataInfoCache;
+  public static void init(java.lang.String) throws java.lang.Exception;
+  private com.strategyquant.datalib.data.DataManager(java.lang.String);
+  public static com.strategyquant.datalib.data.DataManager get();
+  public void initDatabase();
+  private static void checkSymbolFiles();
+  private void moveDataFromBaseFolder(java.lang.String);
+  private void moveFileFromBaseFolder(java.lang.String, java.io.File) throws java.lang.Exception;
+  private static void deleteFolderExcept(java.io.File, java.io.File...);
+  public static java.util.ArrayList<com.strategyquant.datalib.DataInfo> list() throws java.lang.Exception;
+  public static java.util.ArrayList<com.strategyquant.datalib.DataInfo> listSafe() throws java.lang.Exception;
+  public static java.util.ArrayList<com.strategyquant.datalib.DataInfo> listForSource(int) throws java.lang.Exception;
+  public static java.util.ArrayList<com.strategyquant.datalib.DataInfo> listCloned(int) throws java.lang.Exception;
+  public static com.strategyquant.datalib.DataInfo getDataInfo(java.lang.String, java.lang.String);
+  public static com.strategyquant.datalib.DataInfo getDataInfo(java.lang.String, java.lang.String, boolean);
+  public static com.strategyquant.datalib.DataInfo getDataInfo(java.lang.String, int);
+  public static boolean checkDataExists(java.lang.String, java.lang.String);
+  public static void addData(java.lang.String, java.lang.String, java.lang.String, int, int) throws java.lang.Exception;
+  public static void addData(java.lang.String, java.lang.String, java.lang.String, int, int, int, int) throws java.lang.Exception;
+  public static void addData(java.lang.String, java.lang.String, java.lang.String, int, int, java.lang.String, java.lang.String, int, int) throws java.lang.Exception;
+  public static void addData(java.lang.String, java.lang.String, java.lang.String, int, int, java.lang.String, java.lang.String) throws java.lang.Exception;
+  public static void addDataInBatch(java.lang.String, java.util.List<com.strategyquant.datalib.DataInfo>, com.strategyquant.datalib.data.BatchProgressController) throws java.lang.Exception;
+  public static boolean checkConnectionExists(java.lang.String);
+  public static java.util.ArrayList<java.lang.String> getSymbolsForInstrument(java.lang.String) throws java.lang.Exception;
+  public static void clearData(java.lang.String, java.lang.String);
+  public static void clearDataInBatch(java.lang.String, java.lang.String);
+  public static void deleteData(java.lang.String, java.lang.String);
+  public static void deleteForGroup(java.lang.String, java.lang.String, int);
+  private void _deleteForGroup(java.lang.String, java.lang.String, int);
+  public static void deleteDataInBatch(java.lang.String[], java.lang.String[], com.strategyquant.datalib.data.BatchProgressController) throws java.lang.ClassNotFoundException;
+  public static void updateInstrument(java.lang.String, java.lang.String, java.lang.String);
+  public static void updateInstrumentSwap(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  public static void updateSecondsRecords(java.lang.String, java.lang.String, long);
+  public static void updateData(java.lang.String, java.lang.String, long, long, int, long, int, java.lang.String, java.lang.String);
+  public static void updateDataInBatch(java.lang.String, java.lang.String, long, long, int, long, int, java.lang.String, java.lang.String);
+  public static void updateData(java.lang.String, java.lang.String, long, long, int, long, int, java.lang.String, java.lang.String, int, boolean);
+  public static void updateDataInBatch(java.lang.String, java.lang.String, long, long, int, long, int, java.lang.String, java.lang.String, int, boolean);
+  public static void flushUpdatedData();
+  public static void updateTimeframe(java.lang.String, java.lang.String, java.lang.String);
+  public static void updateBroker(java.lang.String, java.lang.String, int);
+  public static void renameData(java.lang.String, java.lang.String, java.lang.String);
+  public static java.lang.String renameUnderlayingData(java.lang.String, java.lang.String, java.lang.String);
+  public static void showData(java.lang.String, java.lang.String, boolean);
+  public static void updateUnderlyingSymbolName(java.lang.String, java.lang.String, java.lang.String);
+  public static java.lang.String getDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  public static java.lang.String getUnadjustedDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  public static java.lang.String getDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.strategyquant.datalib.DataInfo);
+  public static java.lang.String getUnadjustedDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.strategyquant.datalib.DataInfo);
+  public static synchronized com.strategyquant.datalib.data.io.IDataLoader getDataLoader(com.strategyquant.datalib.ChartDef, int, com.strategyquant.lib.IStopPauseStatus) throws java.lang.Exception;
+  public static synchronized com.strategyquant.datalib.data.io.IDataLoader getDataLoader(com.strategyquant.datalib.ChartDef, int) throws java.lang.Exception;
+  private synchronized java.util.ArrayList<com.strategyquant.datalib.DataInfo> _listSafe() throws java.lang.Exception;
+  private synchronized java.util.ArrayList<com.strategyquant.datalib.DataInfo> _list() throws java.lang.Exception;
+  private synchronized java.util.ArrayList<com.strategyquant.datalib.DataInfo> _listForSource(int) throws java.lang.Exception;
+  private synchronized java.util.ArrayList<com.strategyquant.datalib.DataInfo> _listCloned(int) throws java.lang.Exception;
+  private java.lang.String _getDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  private java.lang.String _getUnadjustedDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  private java.lang.String _getDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.strategyquant.datalib.DataInfo);
+  private java.lang.String _getUnadjustedDataFileName(java.lang.String, java.lang.String, java.lang.String, java.lang.String, com.strategyquant.datalib.DataInfo);
+  public static java.lang.String fixFilename(java.lang.String);
+  public boolean _isFilenameValid(java.lang.String);
+  public void _updateInstrumentSwap(java.lang.String, java.lang.String, java.lang.String, java.lang.String);
+  public void _updateInstrument(java.lang.String, java.lang.String, java.lang.String);
+  public void _updateSecondsRecords(java.lang.String, java.lang.String, long);
+  private com.strategyquant.datalib.DataInfo getRecordFromCache(java.lang.String, java.lang.String);
+  private void updateCachedDataList(com.strategyquant.datalib.DataInfo);
+  private void updateCachedDataList(com.strategyquant.datalib.DataInfo, java.lang.String);
+  public void removeRecordFromCacheForInstrument(java.lang.String);
+  private synchronized void _updateDataInBatch(java.lang.String, java.lang.String, long, long, int, long, int, java.lang.String, java.lang.String, int, boolean);
+  private synchronized void _flushUpdatedData();
+  public void _updateData(java.lang.String, java.lang.String, long, long, int, long, int, java.lang.String, java.lang.String, int, boolean);
+  private void _updateBroker(java.lang.String, java.lang.String, int);
+  private void _updateTimeframe(java.lang.String, java.lang.String, java.lang.String);
+  private void _updateTimezone(java.lang.String, java.lang.String, java.lang.String);
+  private void _clearHistoryFolder(java.lang.String, java.lang.String);
+  public synchronized void _renameData(java.lang.String, java.lang.String, java.lang.String);
+  public synchronized java.lang.String _renameUnderlayingData(java.lang.String, java.lang.String, java.lang.String);
+  private java.lang.String getCacheKey(java.lang.String, java.lang.String);
+  private synchronized void _deleteData(java.lang.String, java.lang.String);
+  private synchronized void _deleteDataInBatch(java.lang.String[], java.lang.String[], com.strategyquant.datalib.data.BatchProgressController) throws java.lang.ClassNotFoundException;
+  public static boolean isLimited(java.lang.String);
+  private synchronized boolean _checkConnectionExists(java.lang.String);
+  private synchronized com.strategyquant.datalib.DataInfo _getDataInfo(java.lang.String, java.lang.String);
+  private com.strategyquant.datalib.DataInfo _dbResultSetToDataInfo(java.sql.ResultSet) throws java.lang.Exception;
+  private long getFileHash(com.strategyquant.datalib.DataInfo);
+  public synchronized void refreshDataInfoCache() throws java.lang.Exception;
+  private synchronized com.strategyquant.datalib.DataInfo _getDataInfo(java.lang.String, int);
+  private synchronized boolean _checkDataExists(java.lang.String, java.lang.String);
+  private boolean _checkDataExists(java.sql.Connection, java.lang.String, java.lang.String);
+  public void _addDataInBatch(java.lang.String, java.util.List<com.strategyquant.datalib.DataInfo>, com.strategyquant.datalib.data.BatchProgressController) throws java.lang.Exception;
+  private void checkSymbolValid(java.lang.String, int) throws java.lang.Exception;
+  public void _addData(java.lang.String, java.lang.String, java.lang.String, int, int, java.lang.String, java.lang.String, int, int) throws java.lang.Exception;
+  public java.util.ArrayList<java.lang.String> _getSymbolsForInstrument(java.lang.String) throws java.lang.Exception;
+  public com.strategyquant.datalib.data.io.IDataLoader _getDataLoader(com.strategyquant.datalib.ChartDef, int, com.strategyquant.lib.IStopPauseStatus) throws java.lang.Exception;
+  public static void renameDataFiles(java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception;
+  public static void removeDataFiles(java.lang.String, java.lang.String);
+  public static void removeDataFilesWithFolder(java.lang.String, java.lang.String);
+  public static java.lang.String getSymbolFolderName(java.lang.String, java.lang.String, java.lang.String);
+  public static java.lang.String getSymbolFolderName(java.lang.String, java.lang.String, java.lang.String, com.strategyquant.datalib.DataInfo);
+  private boolean _dataFileExists(java.lang.String);
+  java.lang.String _getTimeframeToLoad(java.lang.String, java.lang.String, int) throws java.lang.Exception;
+  private com.strategyquant.datalib.data.io.IDataLoader _getSimpleDataLoader(java.lang.String);
+  void _computeData(java.lang.String, com.strategyquant.datalib.DataInfo, java.lang.String) throws java.lang.Exception;
+  void _computeData(java.lang.String, com.strategyquant.datalib.DataInfo, java.lang.String, com.strategyquant.lib.IStopPauseStatus) throws java.lang.Exception;
+  private boolean processOHLCDataTarget(com.strategyquant.datalib.data.io.BinaryDataLoader, com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew, com.strategyquant.datalib.bartype.BarType, com.strategyquant.datalib.session.Session, com.strategyquant.lib.IStopPauseStatus) throws java.lang.Exception;
+  private void writeData(com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  private void updateBarData(com.strategyquant.datalib.data.io.VersatileData, double, double);
+  private void initBarData(com.strategyquant.datalib.data.io.VersatileData, long, double, double);
+  private boolean processTickDataTarget(com.strategyquant.datalib.data.io.BinaryDataLoader, com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew, com.strategyquant.datalib.bartype.BarType, com.strategyquant.datalib.session.Session, com.strategyquant.lib.IStopPauseStatus) throws java.io.IOException, java.lang.Exception;
+  private com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew _getTargetWriter(com.strategyquant.datalib.bartype.BarType, java.lang.String, com.strategyquant.datalib.DataInfo, java.lang.String, boolean);
+  private com.strategyquant.datalib.data.io.BinaryDataLoader _getSourceLoader(com.strategyquant.datalib.DataInfo, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static void exportTick(java.lang.String, long, long, java.lang.String) throws java.lang.Exception;
+  public static void exportM1(java.lang.String, long, long, java.lang.String) throws java.lang.Exception;
+  private void updateUnderlyingSymbol(java.lang.String, java.lang.String, java.lang.String);
+  private void _updateUnderlyingSymbolName(java.lang.String, java.lang.String, java.lang.String);
+  private void _showData(java.lang.String, java.lang.String, boolean);
+  public static void checkData();
+  public static void updateSecondsRecords(com.strategyquant.datalib.DataInfo) throws java.lang.Exception;
+  public static void checkDataExport(com.strategyquant.lib.historyData.ICryptable, int) throws java.lang.Exception;
+  public static java.lang.String generateName(java.lang.String);
+  public static java.lang.String getTempFileName(java.lang.String);
+  public static boolean createGroupAlias(java.lang.String, int) throws java.lang.Exception;
+  public static boolean isGroupAlias(java.lang.String);
+  public static void deleteGroupAlias(int, java.lang.String);
+  public static com.strategyquant.lib.HistoryOHLCData getHistoryData(java.lang.String, java.lang.String, long, long, java.lang.String) throws com.strategyquant.lib.HistoryDataNotAvailableExeption;
+  private synchronized com.strategyquant.lib.HistoryOHLCData _getHistoryData(java.lang.String, java.lang.String, long, long, java.lang.String) throws com.strategyquant.lib.HistoryDataNotAvailableExeption;
+  private void _fillHistoryData(com.strategyquant.lib.HistoryOHLCData, java.util.List<com.strategyquant.datalib.data.io.VersatileData>);
+  private java.util.List<com.strategyquant.datalib.data.io.VersatileData> _loadHistoryData(com.strategyquant.datalib.data.io.IDataLoader, long, long) throws java.lang.Exception;
+  public static com.strategyquant.datalib.DataInfo addCustomData(java.lang.String, java.lang.String, int, java.lang.String) throws java.lang.Exception;
+  public static void cleanHigherTFFiles(java.lang.String);
+  static {};
+}
+public class com.strategyquant.datalib.data.DateShifter {
+  private final org.joda.time.DateTimeZone sourceTz;
+  private final org.joda.time.DateTimeZone targetTz;
+  private int shiftHours;
+  public com.strategyquant.datalib.data.DateShifter(java.lang.String, java.lang.String);
+  public void transformToTimeZone(com.strategyquant.datalib.data.io.VersatileData);
+}
+public class com.strategyquant.datalib.data.DownloadSemaphore {
+  private static final org.slf4j.Logger Log;
+  private java.util.concurrent.Semaphore semaphore;
+  private static final com.strategyquant.datalib.data.DownloadSemaphore instance;
+  public com.strategyquant.datalib.data.DownloadSemaphore();
+  public static com.strategyquant.datalib.data.DownloadSemaphore getInstance();
+  public boolean startDownloadData(int) throws java.lang.InterruptedException;
+  public void downloadFinished();
+  static {};
+}
+public class com.strategyquant.datalib.data.DukasDataManager {
+  public static final org.slf4j.Logger Log;
+  public static java.util.Set<java.lang.String> FREE_M1_SYMBOLS;
+  private static final java.lang.String dataListPath;
+  private static final java.lang.String dataListLineDelimiter = "\n";
+  private static final java.lang.String dataListValueDelimiter = ";";
+  private static final java.lang.String dataListDateFormat = "dd.MM.yyyy";
+  private java.util.ArrayList<com.strategyquant.datalib.SymbolData> availableData;
+  private java.util.Map<java.lang.String, com.strategyquant.datalib.SymbolData> availableDataMap;
+  private static java.util.concurrent.locks.ReentrantLock lock;
+  private static com.strategyquant.datalib.data.DukasDataManager instance;
+  public static synchronized com.strategyquant.datalib.data.DukasDataManager get();
+  private com.strategyquant.datalib.data.DukasDataManager();
+  public boolean canFreeDownloadFromCdn(com.strategyquant.datalib.DataInfo);
+  private void loadSettings();
+  private void loadAvailableData();
+  public java.util.ArrayList<com.strategyquant.datalib.SymbolData> getAvailableDataList();
+  public com.strategyquant.datalib.SymbolData getAvailableDataInfo(java.lang.String);
+  public java.lang.String addData(com.strategyquant.datalib.historyData.dto.TickerDto, java.lang.String, java.lang.String, com.strategyquant.datalib.historyData.dto.TickerKind, java.lang.String, byte, double, double, double, int) throws java.lang.Exception;
+  private double getTickerValue(java.math.BigDecimal);
+  public java.lang.String addData(java.lang.String, java.lang.String, int, java.lang.String) throws java.lang.Exception;
+  public void addBatch(java.util.List<com.strategyquant.datalib.DataInfo>, java.util.Map<java.lang.String, com.strategyquant.datalib.historyData.dto.TickerDto>, com.strategyquant.datalib.data.InstrumentValueEvaluator, com.strategyquant.datalib.data.BatchProgressController) throws java.lang.Exception;
+  private boolean matchInstrument(com.strategyquant.datalib.InstrumentInfo, double, double, double, double, int);
+  private static java.lang.String lambda$addBatch$2(com.strategyquant.datalib.DataInfo);
+  private static com.strategyquant.datalib.InstrumentInfo lambda$addBatch$1(com.strategyquant.datalib.InstrumentInfo);
+  private static java.lang.String lambda$addBatch$0(com.strategyquant.datalib.InstrumentInfo);
+  static {};
+}
+public class com.strategyquant.datalib.data.ExchangeTimezone {
+  private static final java.lang.String DEFAULT = "America/New_York";
+  private static com.strategyquant.datalib.data.ExchangeTimezone instance;
+  private java.util.Map<java.lang.String, java.lang.String> map;
+  public static com.strategyquant.datalib.data.ExchangeTimezone get();
+  private com.strategyquant.datalib.data.ExchangeTimezone();
+  public java.lang.String getTimezone(java.lang.String);
+  static {};
+}
+public interface com.strategyquant.datalib.data.IDataBuffer {
+  public abstract void put(com.strategyquant.datalib.TickEvent);
+  public abstract void printRing();
+  public abstract long get(long, com.strategyquant.datalib.TickEvent[]);
+  public abstract long getOne(long, com.strategyquant.datalib.TickEvent);
+}
+public interface com.strategyquant.datalib.data.InstrumentValueEvaluator {
+  public abstract double getPointValue(com.strategyquant.datalib.historyData.dto.TickerDto);
+  public abstract double getTickStep(com.strategyquant.datalib.historyData.dto.TickerDto);
+  public abstract double getTickSize(com.strategyquant.datalib.historyData.dto.TickerDto);
+  public abstract byte getInstrumentType(com.strategyquant.datalib.historyData.dto.TickerDto);
+  public abstract java.lang.String getDescriptions(com.strategyquant.datalib.historyData.dto.TickerDto);
+  public abstract double getOrderSizeMultiplier(com.strategyquant.datalib.historyData.dto.TickerDto);
+  public abstract double getOrderSizeStep(com.strategyquant.datalib.historyData.dto.TickerDto);
+}
+public class com.strategyquant.datalib.data.StockGroupUpdateErrorManager {
+  private static final com.strategyquant.datalib.data.StockGroupUpdateErrorManager instance;
+  private java.util.Map<java.lang.String, java.lang.String> errors;
+  public com.strategyquant.datalib.data.StockGroupUpdateErrorManager();
+  public static com.strategyquant.datalib.data.StockGroupUpdateErrorManager getInstance();
+  public synchronized void start();
+  public synchronized void logError(java.lang.String, java.lang.String);
+  public synchronized java.util.Map<java.lang.String, java.lang.String> finished();
+  static {};
+}
+public class com.strategyquant.datalib.data.SymbolInfo {
+  public java.lang.String connection;
+  public java.lang.String symbol;
+  public long dateFrom;
+  public long dateTo;
+  public int rows;
+  public long secondsRecords;
+  public int barType;
+  public java.lang.String timeframe;
+  public java.lang.String timezone;
+  public int sourceDataId;
+  public boolean removeWeekends;
+  public com.strategyquant.datalib.data.SymbolInfo();
+}
+public class com.strategyquant.datalib.data.impl.ConcurrentDataBuffer implements com.strategyquant.datalib.data.IDataBuffer {
+  private com.strategyquant.datalib.TickEvent[] ring;
+  private int capacity;
+  private long index;
+  java.util.concurrent.locks.StampedLock stampedLock;
+  public com.strategyquant.datalib.data.impl.ConcurrentDataBuffer(int);
+  public void put(com.strategyquant.datalib.TickEvent);
+  public void printRing();
+  public long get(long, com.strategyquant.datalib.TickEvent[]);
+  private long _get(long, com.strategyquant.datalib.TickEvent[]);
+  public long getOne(long, com.strategyquant.datalib.TickEvent);
+  private long _getOne(long, com.strategyquant.datalib.TickEvent);
+}
+public class com.strategyquant.datalib.data.impl.SimpleDataBuffer implements com.strategyquant.datalib.data.IDataBuffer {
+  private com.strategyquant.datalib.TickEvent oneEvent;
+  private long index;
+  public com.strategyquant.datalib.data.impl.SimpleDataBuffer();
+  public void put(com.strategyquant.datalib.TickEvent);
+  public void printRing();
+  public long get(long, com.strategyquant.datalib.TickEvent[]);
+  public long getOne(long, com.strategyquant.datalib.TickEvent);
+}
+class com.strategyquant.datalib.data.imports.AvailableDataFormats$1 implements java.util.Comparator<com.strategyquant.datalib.data.imports.CustomDataFormat> {
+  final com.strategyquant.datalib.data.imports.AvailableDataFormats this$0;
+  com.strategyquant.datalib.data.imports.AvailableDataFormats$1(com.strategyquant.datalib.data.imports.AvailableDataFormats);
+  public int compare(com.strategyquant.datalib.data.imports.CustomDataFormat, com.strategyquant.datalib.data.imports.CustomDataFormat);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+public class com.strategyquant.datalib.data.imports.AvailableDataFormats {
+  public static final org.slf4j.Logger Log;
+  private static final java.lang.String filePath;
+  public static final java.lang.String MT5TickData = "MetaTrader5 Tick Data";
+  private static com.strategyquant.datalib.data.imports.AvailableDataFormats instance;
+  protected java.util.ArrayList<com.strategyquant.datalib.data.imports.CustomDataFormat> availableFileFormats;
+  private com.strategyquant.datalib.data.imports.AvailableDataFormats();
+  public java.util.ArrayList<com.strategyquant.datalib.data.imports.CustomDataFormat> getAvailableFileFormats();
+  public static com.strategyquant.datalib.data.imports.AvailableDataFormats getInstance();
+  public void registerFileFormats();
+  public boolean formatExists(java.lang.String);
+  private void loadPredefinedFileFormats();
+  private void loadCustomFileFormats();
+  private void sortByOrderAndName(java.util.List<com.strategyquant.datalib.data.imports.CustomDataFormat>);
+  public void addDataFormat(com.strategyquant.datalib.data.imports.CustomDataFormat);
+  public void deleteDataFormat(java.lang.String);
+  private void remove(java.lang.String, boolean);
+  public void updateDataFormat(com.strategyquant.datalib.data.imports.CustomDataFormat);
+  private void saveFormats();
+  public com.strategyquant.datalib.data.imports.CustomDataFormat findFileFormatByName(java.lang.String);
+  static {};
+}
+public class com.strategyquant.datalib.data.imports.CsvFileReader {
+  private com.strategyquant.datalib.data.io.ImportDataInfo importInfo;
+  public com.strategyquant.datalib.data.imports.CsvFileReader(com.strategyquant.datalib.data.io.ImportDataInfo);
+  public int getDigitsCount(java.lang.String);
+  public int getAlphabeticsCount(java.lang.String);
+  public java.lang.String[][] read(java.lang.Boolean) throws java.lang.Exception;
+  public static java.lang.String findSeparator(java.lang.String[], int) throws java.lang.Exception;
+  public java.lang.String getSeparator();
+  public java.lang.String getDateFormat();
+}
+public class com.strategyquant.datalib.data.imports.CustomDataFormat {
+  private java.lang.String name;
+  private java.lang.String separator;
+  private java.lang.String dateFormat;
+  private java.lang.String timeFormat;
+  private int skipRows;
+  private int skipColumns;
+  private boolean predefined;
+  private java.util.HashMap<java.lang.Integer, com.strategyquant.datalib.data.io.columns.DefaultCol> columns;
+  private int order;
+  public com.strategyquant.datalib.data.imports.CustomDataFormat();
+  public com.strategyquant.datalib.data.imports.CustomDataFormat(java.lang.String);
+  public com.strategyquant.datalib.data.imports.CustomDataFormat(java.lang.String, java.lang.String, java.lang.String, int, int);
+  public com.strategyquant.datalib.data.imports.CustomDataFormat(java.lang.String, java.lang.String, java.lang.String, int, int, java.util.HashMap<java.lang.Integer, com.strategyquant.datalib.data.io.columns.DefaultCol>);
+  public java.lang.String getName();
+  public void setName(java.lang.String);
+  public java.lang.String getSeparator();
+  public void setSeparator(java.lang.String);
+  public java.lang.String getDateFormat();
+  public void setDateFormat(java.lang.String);
+  public java.lang.String getTimeFormat();
+  public void setTimeFormat(java.lang.String);
+  public int getSkipRows();
+  public void setSkipRows(int);
+  public int getSkipColumns();
+  public void setSkipColumns(int);
+  public java.util.HashMap<java.lang.Integer, com.strategyquant.datalib.data.io.columns.DefaultCol> getColumns();
+  public void setColumns(java.util.HashMap<java.lang.Integer, com.strategyquant.datalib.data.io.columns.DefaultCol>);
+  public boolean isPredefined();
+  public void setPredefined(boolean);
+  public int getOrder();
+  public void setOrder(int);
+  public java.lang.String toString();
+  public java.lang.String columTypesToString();
+}
+public class com.strategyquant.datalib.data.imports.DataColumns {
+  private static com.strategyquant.datalib.data.imports.DataColumns instance;
+  private java.util.ArrayList<com.strategyquant.datalib.data.io.columns.DefaultCol> availableColTypes;
+  private com.strategyquant.datalib.data.imports.DataColumns();
+  public java.util.ArrayList<com.strategyquant.datalib.data.io.columns.DefaultCol> getAvailableColTypes();
+  public static com.strategyquant.datalib.data.imports.DataColumns getInstance();
+  private void initAvailableColTypes();
+  public com.strategyquant.datalib.data.io.columns.DefaultCol findColTypeByName(java.lang.String);
+  static {};
+}
+class com.strategyquant.datalib.data.imports.DataImportEngine$1 extends java.lang.Thread {
+  final com.strategyquant.datalib.data.imports.DataImportEngine this$0;
+  com.strategyquant.datalib.data.imports.DataImportEngine$1(com.strategyquant.datalib.data.imports.DataImportEngine);
+  public void run();
+}
+class com.strategyquant.datalib.data.imports.DataImportEngine$2 implements java.util.Comparator<com.strategyquant.datalib.data.imports.CustomDataFormat> {
+  com.strategyquant.datalib.data.imports.DataImportEngine$2();
+  public int compare(com.strategyquant.datalib.data.imports.CustomDataFormat, com.strategyquant.datalib.data.imports.CustomDataFormat);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+public class com.strategyquant.datalib.data.imports.DataImportEngine {
+  public static final org.slf4j.Logger Log;
+  private com.strategyquant.datalib.data.io.ImportDataInfo importInfo;
+  private com.strategyquant.datalib.DataInfo dataInfo;
+  private org.joda.time.DateTimeZone timeZone;
+  private com.strategyquant.datalib.data.io.DataCsvLoader csvLoader;
+  private static com.strategyquant.datalib.data.imports.DataImportEngine instance;
+  private boolean confirmed;
+  private boolean canceled;
+  private volatile boolean importRunning;
+  private int rows;
+  private java.lang.Thread importThread;
+  private com.strategyquant.lib.utils.IProgressListener listener;
+  public com.strategyquant.datalib.data.imports.DataImportEngine();
+  public static void importData(java.lang.String, java.lang.String, java.lang.String, com.strategyquant.datalib.data.io.ImportDataInfo, com.strategyquant.lib.utils.IProgressListener) throws java.lang.Exception;
+  public static void continueImport();
+  public static void cancelImport();
+  private void importDataFile() throws java.lang.Exception;
+  private void cancel(com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew, java.lang.String) throws java.lang.Exception;
+  private void checkDataFile() throws java.lang.Exception;
+  protected void checkGaps() throws java.lang.Exception;
+  private void checkTimeframe() throws java.lang.Exception;
+  private boolean importFormatContainsBid();
+  public static com.strategyquant.datalib.data.imports.CustomDataFormat getFileFormat(java.lang.String, java.util.ArrayList<com.strategyquant.datalib.data.imports.CustomDataFormat>, com.strategyquant.datalib.data.imports.CustomDataFormat) throws java.lang.Exception;
+  public static void waitUntilFinished() throws java.lang.InterruptedException;
+  public static int getRowsCount();
+  private void convertToOriginalTimezone(com.strategyquant.datalib.data.io.VersatileData);
+  static boolean access$002(com.strategyquant.datalib.data.imports.DataImportEngine, boolean);
+  static com.strategyquant.lib.utils.IProgressListener access$100(com.strategyquant.datalib.data.imports.DataImportEngine);
+  static com.strategyquant.datalib.data.imports.DataImportEngine access$200();
+  static void access$300(com.strategyquant.datalib.data.imports.DataImportEngine) throws java.lang.Exception;
+  static com.strategyquant.datalib.data.io.ImportDataInfo access$400(com.strategyquant.datalib.data.imports.DataImportEngine);
+  static com.strategyquant.datalib.DataInfo access$500(com.strategyquant.datalib.data.imports.DataImportEngine);
+  static boolean access$600(com.strategyquant.datalib.data.imports.DataImportEngine);
+  static void access$700(com.strategyquant.datalib.data.imports.DataImportEngine, com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew, java.lang.String) throws java.lang.Exception;
+  static com.strategyquant.datalib.data.io.DataCsvLoader access$802(com.strategyquant.datalib.data.imports.DataImportEngine, com.strategyquant.datalib.data.io.DataCsvLoader);
+  static com.strategyquant.datalib.data.io.DataCsvLoader access$800(com.strategyquant.datalib.data.imports.DataImportEngine);
+  static void access$900(com.strategyquant.datalib.data.imports.DataImportEngine, com.strategyquant.datalib.data.io.VersatileData);
+  static int access$1008(com.strategyquant.datalib.data.imports.DataImportEngine);
+  static {};
+}
+public class com.strategyquant.datalib.data.imports.Separators {
+  public static final java.lang.String TYPE_COMMA = "COMMA";
+  public static final java.lang.String VALUE_COMMA = ",";
+  public static final java.lang.String TYPE_SEMICOLON = "SEMICOLON";
+  public static final java.lang.String VALUE_SEMICOLON = ";";
+  public static final java.lang.String TYPE_TAB = "TAB";
+  public static final java.lang.String VALUE_TAB = "\t";
+  public static final java.lang.String TYPE_SPACE = "SPACE";
+  public static final java.lang.String VALUE_SPACE = " ";
+  private static final java.lang.String[] types;
+  private static final java.lang.String[] values;
+  public com.strategyquant.datalib.data.imports.Separators();
+  public static java.lang.String[] listTypes();
+  public static java.lang.String[] listValues();
+  public static java.lang.String getValue(java.lang.String);
+  public static java.lang.String getType(java.lang.String);
+  public static org.json.JSONArray toJSON();
+  static {};
+}
+public abstract class com.strategyquant.datalib.data.io.AbstractDataCsvLoader {
+  public static final org.slf4j.Logger Log;
+  public static final java.lang.String InvalidTimeConsecution = "Invalid time consecution. Each row must have same or latter time than the previous one";
+  protected com.strategyquant.datalib.data.io.ImportDataInfo importInfo;
+  protected javax.swing.JProgressBar progressBar;
+  protected com.strategyquant.datalib.DataInfo dataInfo;
+  protected java.lang.String fileName;
+  protected java.text.SimpleDateFormat df;
+  protected int timeColumn;
+  protected boolean isTimeCol;
+  protected volatile boolean cancel;
+  protected volatile boolean paused;
+  protected com.strategyquant.lib.utils.IProgressListener listener;
+  protected java.io.BufferedReader reader;
+  protected int rows;
+  public int loadedRows;
+  protected com.strategyquant.datalib.data.io.TimeframeRecognizer tfRecognizer;
+  protected long previousTime;
+  protected double progressPercent;
+  public com.strategyquant.datalib.data.io.AbstractDataCsvLoader();
+  public abstract boolean readData() throws java.lang.Exception;
+  public java.lang.Object[] parseLine(java.lang.String[], com.strategyquant.datalib.data.io.ImportDataInfo) throws java.lang.Exception;
+  public static int intValueOf(java.lang.String);
+  private static double parseDoubleSpecial(java.lang.String) throws java.lang.Exception;
+  private long parseTime(java.lang.String, java.lang.String[], com.strategyquant.datalib.data.io.ImportDataInfo) throws java.lang.Exception;
+  private long parseLongTime(java.lang.String, java.lang.String) throws java.lang.Exception;
+  private void initializeDateFormat(com.strategyquant.datalib.data.io.ImportDataInfo);
+  public int countRows(java.lang.String);
+  public void openFile() throws java.lang.Exception;
+  public void close() throws java.lang.Exception;
+  protected java.lang.String readLine() throws java.lang.Exception;
+  public void cancel();
+  public java.lang.String recognizeTimeframe();
+  public void pause();
+  public void restart();
+  protected void checkPaused() throws java.lang.InterruptedException;
+  static {};
+}
+public class com.strategyquant.datalib.data.io.BinaryDataLoader implements com.strategyquant.datalib.data.io.IDataLoader {
+  public static final org.slf4j.Logger Log;
+  private java.lang.String filePath;
+  private com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew reader;
+  private boolean eof;
+  private int dataType;
+  private int connectionHash;
+  private int symbolHash;
+  private com.strategyquant.datalib.ChartDef chartDef;
+  private boolean dataInBuffer;
+  private int specialId;
+  private long dateFrom;
+  private com.strategyquant.datalib.DataInfo dataInfo;
+  public com.strategyquant.datalib.data.io.BinaryDataLoader(java.lang.String, com.strategyquant.datalib.ChartDef, int, com.strategyquant.datalib.DataInfo);
+  public void open() throws java.lang.Exception;
+  private void loadLinesUntilFromDate() throws java.lang.Exception;
+  public void close() throws java.lang.Exception;
+  public boolean hasNextTick() throws java.lang.Exception;
+  public long nextTickTime() throws java.lang.Exception;
+  public void getNextTick(com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public boolean isOHLCData();
+  public long getDateFrom();
+  public int getDecimalPlaces();
+  public void seek(int) throws java.lang.Exception;
+  public long getTotalRecords() throws java.lang.Exception;
+  public java.lang.String getDataFilePath();
+  public boolean isCrypted();
+  static {};
+}
+public abstract class com.strategyquant.datalib.data.io.DataBinReader {
+  protected com.strategyquant.datalib.data.io.ImportDataInfo importInfo;
+  protected javax.swing.JProgressBar progressBar;
+  protected com.strategyquant.datalib.DataInfo dataInfo;
+  protected java.lang.String fileName;
+  protected java.io.DataInputStream reader;
+  public final com.strategyquant.datalib.data.io.VersatileData tickData;
+  public com.strategyquant.datalib.data.io.DataBinReader();
+  public static com.strategyquant.datalib.data.io.DataBinReader getInstance(int, int);
+  public void setParams(com.strategyquant.datalib.data.io.ImportDataInfo, com.strategyquant.datalib.DataInfo, javax.swing.JProgressBar);
+  public void setFileName(java.lang.String);
+  public void openFile() throws java.lang.Exception;
+  public void closeFile() throws java.lang.Exception;
+  public boolean isDataCorrect();
+  public abstract void readHeader() throws java.lang.Exception;
+  public abstract int getColumnsCount();
+  public abstract boolean readData() throws java.lang.Exception;
+}
+public abstract class com.strategyquant.datalib.data.io.DataBinWriter {
+  public static final org.slf4j.Logger Log;
+  private com.strategyquant.datalib.data.io.ImportDataInfo importInfo;
+  private javax.swing.JProgressBar progressBar;
+  private com.strategyquant.datalib.InstrumentInfo symbolInfo;
+  private java.lang.String fileName;
+  protected java.io.DataOutputStream writer;
+  private java.lang.String dataPath;
+  public com.strategyquant.datalib.data.io.DataBinWriter(java.lang.String);
+  public void setParams(com.strategyquant.datalib.data.io.ImportDataInfo, com.strategyquant.datalib.InstrumentInfo, javax.swing.JProgressBar);
+  public void setFileName(java.lang.String);
+  public void open() throws java.lang.Exception;
+  public void close() throws java.lang.Exception;
+  public static com.strategyquant.datalib.data.io.DataBinWriter getInstance(int, java.lang.String, com.strategyquant.datalib.InstrumentInfo);
+  public void renameTempFile(java.lang.String) throws java.lang.Exception;
+  protected abstract void writeHeader() throws java.lang.Exception;
+  public abstract void writeData(com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public abstract int getColumnsCount();
+  static {};
+}
+public class com.strategyquant.datalib.data.io.DataCsvLoader extends com.strategyquant.datalib.data.io.AbstractDataCsvLoader {
+  public static final org.slf4j.Logger Log;
+  public long beginTimeNewFile;
+  public long endTimeNewFile;
+  private double averagePriceValue;
+  public final com.strategyquant.datalib.data.io.VersatileData tickData;
+  private java.lang.String currentLine;
+  public com.strategyquant.datalib.data.io.DataCsvLoader();
+  public void setParams(com.strategyquant.datalib.data.io.ImportDataInfo, com.strategyquant.datalib.DataInfo, javax.swing.JProgressBar);
+  public com.strategyquant.datalib.data.io.ImportDataInfo checkFile(com.strategyquant.lib.utils.IProgressListener) throws java.lang.Exception;
+  private com.strategyquant.datalib.data.io.ImportDataInfo reverseFile(com.strategyquant.datalib.data.io.ImportDataInfo) throws java.lang.Exception;
+  public int getLoadedRows();
+  protected void parseTickData(java.lang.Object[]) throws java.lang.Exception;
+  public boolean readData() throws java.lang.Exception;
+  public void openFile() throws java.lang.Exception;
+  private void computeAveragePriceValue();
+  public boolean isDataCorrect();
+  public int getIndicatorsCount();
+  public static void reset();
+  public java.lang.String getCurrentLine();
+  public double getAveragePriceValue();
+  static {};
+}
+public class com.strategyquant.datalib.data.io.DataCsvWriter {
+  protected java.io.PrintWriter writer;
+  protected java.lang.String fileName;
+  protected java.lang.String timeframe;
+  public com.strategyquant.datalib.data.io.DataCsvWriter(java.lang.String, java.lang.String);
+  public void openFile() throws java.lang.Exception;
+  public void closeFile();
+  public void write(com.strategyquant.datalib.data.io.VersatileData) throws java.io.IOException;
+  private void writeOHLCData(com.strategyquant.datalib.data.io.VersatileData);
+  private void writeTickData(com.strategyquant.datalib.data.io.VersatileData);
+}
+public class com.strategyquant.datalib.data.io.FileChannelReader {
+  private static final int BUFFER_SIZE = 65536;
+  private java.nio.ByteBuffer readerBuffer;
+  private java.nio.channels.FileChannel readerFileChannel;
+  private int dataSize;
+  public com.strategyquant.datalib.data.io.FileChannelReader(java.nio.channels.FileChannel, int);
+  public static int getDataSize();
+  private void ensureData(int) throws java.io.IOException;
+  public long position() throws java.io.IOException;
+  public void position(long) throws java.io.IOException;
+  public com.strategyquant.datalib.data.io.VersatileData getData(com.strategyquant.datalib.data.io.VersatileData) throws java.io.IOException;
+}
+public class com.strategyquant.datalib.data.io.FuturesVersatileData extends com.strategyquant.datalib.data.io.VersatileData {
+  public double openInterest;
+  public com.strategyquant.datalib.data.io.FuturesVersatileData();
+  public void reset();
+  public void set(int, long, int, int, double, double, double, double, double, double);
+  public void copyFrom(com.strategyquant.datalib.data.io.FuturesVersatileData);
+  public int getCheckSum();
+  public java.lang.String print();
+  public java.lang.String toString();
+}
+public interface com.strategyquant.datalib.data.io.ICanSeek {
+  public abstract void seek(int) throws java.lang.Exception;
+}
+public interface com.strategyquant.datalib.data.io.IDataLoader extends com.strategyquant.datalib.data.io.ICanSeek,com.strategyquant.lib.historyData.ICryptable {
+  public abstract boolean hasNextTick() throws java.lang.Exception;
+  public abstract long nextTickTime() throws java.lang.Exception;
+  public abstract void getNextTick(com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public abstract void open() throws java.lang.Exception;
+  public abstract void close() throws java.lang.Exception;
+  public abstract boolean isOHLCData();
+  public abstract int getDecimalPlaces();
+  public abstract long getDateFrom();
+  public abstract long getTotalRecords() throws java.lang.Exception;
+  public abstract java.lang.String getDataFilePath();
+  public abstract boolean isCrypted();
+}
+public class com.strategyquant.datalib.data.io.ImportDataInfo {
+  public static final int DT_OHLC = 1;
+  public static final int DT_TICK = 2;
+  public java.lang.String name;
+  public java.lang.String filePath;
+  public java.lang.String separator;
+  public int skipRows;
+  public int skipCols;
+  public java.lang.String dateFormat;
+  public java.lang.String timeFormat;
+  public int rowCount;
+  public java.lang.String uniqImportString;
+  public java.util.ArrayList<com.strategyquant.datalib.data.io.columns.DefaultCol> columnTypes;
+  public int dataType;
+  public java.lang.String timeframe;
+  public int importFileRows;
+  public long beginTimeNewFile;
+  public long endTimeNewFile;
+  public boolean reversedFile;
+  public boolean hasTwoVolumes;
+  public int errorHandling;
+  public java.lang.String timezone;
+  private java.lang.String lastAsk;
+  private java.lang.String lastBid;
+  public com.strategyquant.datalib.data.io.ImportDataInfo();
+  public boolean isMT5TickImport();
+  public void resetLastAskBid();
+  public java.lang.String[] correctMT5TickData(java.lang.String[]);
+}
+public final class com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy extends java.lang.Enum<com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy> {
+  public static final com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy overwrite;
+  public static final com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy skip;
+  public static final com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy create;
+  private static final com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy[] $VALUES;
+  public static com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy[] values();
+  public static com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy valueOf(java.lang.String);
+  private com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy();
+  private static com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy[] $values();
+  static {};
+}
+public class com.strategyquant.datalib.data.io.MassImportDataInfo {
+  private java.lang.String timezone;
+  private int barType;
+  private java.lang.String path;
+  private java.lang.String format;
+  private com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy overwriteStrategy;
+  private java.lang.String instrument;
+  private java.lang.String connection;
+  private java.lang.String postfix;
+  private java.lang.String dateFormat;
+  private boolean createStockGroup;
+  private java.lang.String timeframe;
+  public com.strategyquant.datalib.data.io.MassImportDataInfo();
+  public java.lang.String getPath();
+  public void setPath(java.lang.String);
+  public java.lang.String getFormat();
+  public void setFormat(java.lang.String);
+  public com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy getOverwriteStrategy();
+  public void setOverwriteStrategy(com.strategyquant.datalib.data.io.MassImportDataInfo$OverwriteStrategy);
+  public int getBarType();
+  public void setBarType(int);
+  public java.lang.String getInstrument();
+  public void setInstrument(java.lang.String);
+  public java.lang.String getTimezone();
+  public void setTimezone(java.lang.String);
+  public java.lang.String getConnection();
+  public void setConnection(java.lang.String);
+  public java.lang.String getPostfix();
+  public void setPostfix(java.lang.String);
+  public boolean isCreateStockGroup();
+  public void setCreateStockGroup(boolean);
+  public java.lang.String getDateFormat();
+  public void setDateFormat(java.lang.String);
+  public java.lang.String getTimeframe();
+  public void setTimeframe(java.lang.String);
+}
+public class com.strategyquant.datalib.data.io.OhlcDataBinReader extends com.strategyquant.datalib.data.io.DataBinReader {
+  private boolean version4Format;
+  private int headerByteLength;
+  private int dataByteLength;
+  public com.strategyquant.datalib.data.io.OhlcDataBinReader();
+  public int getColumnsCount();
+  public boolean readData() throws java.lang.Exception;
+  public void readHeader() throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.data.io.OhlcDataBinWriter extends com.strategyquant.datalib.data.io.DataBinWriter {
+  public com.strategyquant.datalib.data.io.OhlcDataBinWriter(java.lang.String);
+  public com.strategyquant.datalib.data.io.OhlcDataBinWriter(java.lang.String, com.strategyquant.datalib.InstrumentInfo, java.lang.String);
+  public int getColumnsCount();
+  protected void writeHeader() throws java.lang.Exception;
+  public void writeData(com.strategyquant.datalib.data.io.VersatileData) throws java.io.IOException;
+  private void write(long, double, double, double, double, double) throws java.io.IOException;
+}
+public class com.strategyquant.datalib.data.io.TickDataBinReader extends com.strategyquant.datalib.data.io.DataBinReader {
+  private java.nio.channels.FileChannel inChannel;
+  private com.strategyquant.datalib.data.io.FileChannelReader reader;
+  private long totalRecords;
+  private long currentRecord;
+  public com.strategyquant.datalib.data.io.TickDataBinReader();
+  public void openFile() throws java.lang.Exception;
+  public void closeFile() throws java.lang.Exception;
+  public int getColumnsCount();
+  public boolean readData() throws java.lang.Exception;
+  public void readHeader() throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.data.io.TickDataBinWriter extends com.strategyquant.datalib.data.io.DataBinWriter {
+  public com.strategyquant.datalib.data.io.TickDataBinWriter(java.lang.String);
+  public int getColumnsCount();
+  public void writeHeader() throws java.lang.Exception;
+  public void writeData(com.strategyquant.datalib.data.io.VersatileData) throws java.io.IOException;
+}
+public class com.strategyquant.datalib.data.io.TimeframeRecognizer {
+  public static final org.slf4j.Logger Log;
+  private long previousTime;
+  private java.util.HashMap<java.lang.Long, java.lang.Integer> gapCounts;
+  public com.strategyquant.datalib.data.io.TimeframeRecognizer();
+  public void reset();
+  public void processTime(long);
+  public java.lang.String getTimeframe();
+  private long getAverageGapBetweenLines();
+  static {};
+}
+public class com.strategyquant.datalib.data.io.VersatileData {
+  public static final int UNKNOWN_DATA = 0;
+  public static final int TICK_DATA = 1;
+  public static final int MINUTE_DATA = 2;
+  public static final int DT_VOLUME = 1;
+  public static final int DT_ASK = 2;
+  public static final int DT_BID = 3;
+  public static final int DT_OPEN = 4;
+  public static final int DT_HIGH = 5;
+  public static final int DT_LOW = 6;
+  public static final int DT_CLOSE = 7;
+  public static final int DT_INDICATOR_VALUE = 8;
+  public static final int DT_TIME = 9;
+  public static final int DT_UNUSED = 10;
+  public static final int DT_CUSTOM_VALUE = 9999;
+  public static final int ASK = 0;
+  public static final int BID = 1;
+  public static final long TimeNotDefined = -9223372036854775808l;
+  public long time;
+  public double ask;
+  public double bid;
+  public double open;
+  public double high;
+  public double low;
+  public double close;
+  public double volume;
+  public double spread;
+  public int type;
+  public int symbolHash;
+  public int connectionHash;
+  public long sessionStartTime;
+  public com.strategyquant.datalib.data.io.VersatileData();
+  public void reset();
+  public void set(int, long, int, int, double, double, double, double, double);
+  public void set(int, long, int, int, double, double, double);
+  public void copyFrom(com.strategyquant.datalib.data.io.VersatileData);
+  public int getCheckSum();
+  public java.lang.String print();
+}
+public class com.strategyquant.datalib.data.io.columns.AskCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.AskCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.BidCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.BidCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.CloseCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public static final java.lang.String NAME = "Close";
+  public com.strategyquant.datalib.data.io.columns.CloseCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.CustomValue extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.CustomValue(int);
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.DateCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public static final java.lang.String NAME = "Date";
+  public com.strategyquant.datalib.data.io.columns.DateCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.DateTimeCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.DateTimeCol();
+  public int getType();
+  public int getDataType();
+}
+public abstract class com.strategyquant.datalib.data.io.columns.DefaultCol {
+  private java.lang.String name;
+  private java.lang.String code;
+  public com.strategyquant.datalib.data.io.columns.DefaultCol(java.lang.String, java.lang.String);
+  public java.lang.String getName();
+  public java.lang.String getCode();
+  public java.lang.String getClassName();
+  public abstract int getType();
+  public abstract int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.FileFormat {
+  public static final int FF_INT = 1;
+  public static final int FF_LONG = 2;
+  public static final int FF_STRING = 4;
+  public static final int FF_DOUBLE = 5;
+  public static final int FF_DATE = 6;
+  public static final int FF_TIME = 7;
+  public static final int FF_UNUSED = 8;
+  public static final int FF_INT_OR_DOUBLE = 9;
+  public static final int FF_DATETIME = 10;
+  public com.strategyquant.datalib.data.io.columns.FileFormat();
+}
+public class com.strategyquant.datalib.data.io.columns.HighCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.HighCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.LowCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.LowCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.OpenCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.OpenCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.TimeCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public static final java.lang.String NAME = "Time";
+  public com.strategyquant.datalib.data.io.columns.TimeCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.UnusedCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.UnusedCol();
+  public int getType();
+  public int getDataType();
+}
+public class com.strategyquant.datalib.data.io.columns.VolumeCol extends com.strategyquant.datalib.data.io.columns.DefaultCol {
+  public com.strategyquant.datalib.data.io.columns.VolumeCol();
+  public int getType();
+  public int getDataType();
+}
+public abstract class com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew extends com.strategyquant.datalib.data.io.newDataFormat.DataManipulatorNew {
+  protected com.strategyquant.datalib.data.io.ImportDataInfo importInfo;
+  protected javax.swing.JProgressBar progressBar;
+  protected com.strategyquant.datalib.DataInfo dataInfo;
+  protected java.lang.String fileName;
+  protected com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader reader;
+  public final com.strategyquant.datalib.data.io.VersatileData tickData;
+  private byte[] modificators;
+  private int timeModificator;
+  public com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew();
+  public static com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew getInstance(int, com.strategyquant.datalib.InstrumentInfo);
+  public void setParams(com.strategyquant.datalib.data.io.ImportDataInfo, com.strategyquant.datalib.DataInfo, javax.swing.JProgressBar);
+  public void setFileName(java.lang.String);
+  public void openFile() throws java.lang.Exception;
+  public void setData(byte[]) throws java.lang.Exception;
+  protected int readModificators() throws java.lang.Exception;
+  protected void fixData(com.strategyquant.datalib.data.io.VersatileData, boolean);
+  public void closeFile() throws java.lang.Exception;
+  public boolean isDataCorrect();
+  public boolean dataRemaining();
+  public abstract void readHeader() throws java.lang.Exception;
+  public abstract int getColumnsCount();
+  public abstract boolean readData() throws java.lang.Exception;
+  public abstract void seek(int) throws java.lang.Exception;
+  public abstract long getTotalRecords() throws java.lang.Exception;
+}
+public abstract class com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew extends com.strategyquant.datalib.data.io.newDataFormat.DataManipulatorNew {
+  public static final org.slf4j.Logger Log;
+  private java.lang.String fileName;
+  protected java.io.DataOutputStream writer;
+  private java.lang.String dataPath;
+  protected byte[] modificators;
+  private com.strategyquant.datalib.data.io.VersatileData modifiedVersatileData;
+  protected int timeModificator;
+  public com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew(java.lang.String);
+  protected void writeModificatorsToHeader() throws java.lang.Exception;
+  protected com.strategyquant.datalib.data.io.VersatileData modifyDataBeforeSave(com.strategyquant.datalib.data.io.VersatileData, boolean);
+  protected void writeHeader() throws java.lang.Exception;
+  protected byte[] generateModificators();
+  public static com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew getInstance(int, java.lang.String, com.strategyquant.datalib.InstrumentInfo);
+  public static com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew getCryptedInstance(int, java.lang.String, com.strategyquant.datalib.InstrumentInfo);
+  public void setFileName(java.lang.String);
+  public java.lang.String getFileName();
+  public void open() throws java.lang.Exception;
+  public void close() throws java.lang.Exception;
+  public void renameTempFile(java.lang.String) throws java.lang.Exception;
+  public abstract void writeData(com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public abstract int getColumnsCount();
+  public abstract void reset();
+  static {};
+}
+public abstract class com.strategyquant.datalib.data.io.newDataFormat.DataManipulatorNew implements com.strategyquant.lib.historyData.ICryptable {
+  public static final java.lang.String HEADER_PREFIX = "ABCDEFGH";
+  public static final java.lang.String HEADER_SUFFIX = "SnRbTs";
+  public static final java.lang.String CRYPTED_DATA_TYPE = "C";
+  public static final java.lang.String DATA_TYPE = "D";
+  public static final java.lang.String SUPPORTED_OLD_VERSION = "4.1";
+  public static final java.lang.String VERSION = "4.2";
+  private com.strategyquant.lib.crypting.AESCrypterDecrypter crypterDecrypter;
+  private boolean crypted;
+  private java.lang.String password;
+  public com.strategyquant.datalib.data.io.newDataFormat.DataManipulatorNew();
+  protected byte[] encryptModificators(byte[]) throws java.lang.Exception;
+  protected byte[] decryptModificators(byte[]) throws java.lang.Exception;
+  public boolean isCrypted();
+  protected void setCrypted(boolean);
+  public static void setDecimals(com.strategyquant.datalib.InstrumentInfo, com.strategyquant.datalib.data.io.newDataFormat.DataManipulatorNew);
+  private void ensureCrypterDecrypter() throws java.security.InvalidKeyException, java.security.NoSuchAlgorithmException, java.io.UnsupportedEncodingException, java.security.spec.InvalidKeySpecException, javax.crypto.NoSuchPaddingException, java.security.spec.InvalidParameterSpecException, java.security.InvalidAlgorithmParameterException;
+  private java.lang.String getPassword();
+  public void setPassword(java.lang.String);
+  public abstract void overrideDecimals(int);
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.FuturesDataBinReaderNew extends com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew implements com.strategyquant.datalib.data.io.ICanSeek {
+  private int headerByteLength;
+  private long totalRecords;
+  public final com.strategyquant.datalib.data.io.FuturesVersatileData tickData;
+  private com.strategyquant.datalib.data.io.newDataFormat.FuturesDataReader futuresReader;
+  public com.strategyquant.datalib.data.io.newDataFormat.FuturesDataBinReaderNew();
+  public int getColumnsCount();
+  public boolean readData() throws java.lang.Exception;
+  public void readHeader() throws java.lang.Exception;
+  public void seek(int) throws java.lang.Exception;
+  public long getTotalRecords() throws java.lang.Exception;
+  private void countTotalRecords() throws java.lang.Exception;
+  public void overrideDecimals(int);
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.FuturesDataBinWriterNew extends com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew {
+  private com.strategyquant.datalib.data.io.newDataFormat.FuturesDataWriter futuresWriter;
+  private com.strategyquant.datalib.data.io.FuturesVersatileData modifiedVersatileData;
+  public com.strategyquant.datalib.data.io.newDataFormat.FuturesDataBinWriterNew(java.lang.String);
+  public int getColumnsCount();
+  public void writeData(com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  protected com.strategyquant.datalib.data.io.FuturesVersatileData modifyDataBeforeSave(com.strategyquant.datalib.data.io.FuturesVersatileData, boolean);
+  protected void writeModificatorsToHeader() throws java.lang.Exception;
+  public void reset();
+  public void close() throws java.lang.Exception;
+  private void updateCountInHeader() throws java.io.IOException;
+  public void overrideDecimals(int);
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.FuturesDataReader extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatReader {
+  private long prevTime;
+  private long prevOpen;
+  private long prevHigh;
+  private long prevLow;
+  private long prevClose;
+  private long prevVolume;
+  private long prevOpenInterest;
+  private byte[] configBytes;
+  public com.strategyquant.datalib.data.io.newDataFormat.FuturesDataReader();
+  public com.strategyquant.datalib.data.io.newDataFormat.FuturesDataReader(boolean);
+  protected int getMinimalRecordSize();
+  protected int getMaximalRecordSize();
+  protected void readAndTrashNRecords(long, com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader) throws java.lang.Exception;
+  public void readData(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, com.strategyquant.datalib.data.io.FuturesVersatileData) throws java.lang.Exception;
+  private long getTime(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getOpen(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getHigh(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getLow(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getClose(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getVolume(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getOpenInterest(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.FuturesDataWriter extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatWritter {
+  private long prevTime;
+  private long prevOpen;
+  private long prevHigh;
+  private long prevLow;
+  private long prevClose;
+  private long prevVolume;
+  private long prevOpenInterest;
+  public com.strategyquant.datalib.data.io.newDataFormat.FuturesDataWriter();
+  public com.strategyquant.datalib.data.io.newDataFormat.FuturesDataWriter(boolean);
+  public void writeData(java.io.DataOutputStream, com.strategyquant.datalib.data.io.FuturesVersatileData) throws java.lang.Exception;
+}
+public interface com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader {
+  public abstract boolean dataRemaining();
+  public abstract byte readByte() throws java.io.IOException;
+  public abstract void readBytes(byte[]) throws java.io.IOException;
+  public abstract short readShort() throws java.io.IOException;
+  public abstract int readInt() throws java.io.IOException;
+  public abstract long readLong() throws java.io.IOException;
+  public abstract java.lang.String readUTF() throws java.io.IOException;
+  public abstract double readDouble() throws java.io.IOException;
+  public abstract float readFloat() throws java.io.IOException;
+  public abstract void seek(long) throws java.io.IOException;
+  public abstract long getPosition() throws java.io.IOException;
+  public abstract long getLength() throws java.io.IOException;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.NewDataFormat {
+  public static final double OLD_VOLUME_CONSTANT = 100.0d;
+  public static final double VOLUME_CONSTANT = 100000.0d;
+  public static final int BLOCK_LENGTH = 1000;
+  protected static final int MAGIC_SIZE = 15;
+  public static final int BYTE = 0;
+  public static final int SHORT = 1;
+  public static final int INT = 2;
+  public static final int LONG = 3;
+  public static final int MINUS = 0;
+  public static final int PLUS = 1;
+  public static final int ASIS = 2;
+  protected boolean start;
+  protected double decimalsConstant;
+  protected double volumeConstant;
+  private int decimals;
+  private boolean forceOldFormat;
+  public com.strategyquant.datalib.data.io.newDataFormat.NewDataFormat(boolean);
+  public void overrideDecimals(int);
+  public void setVolumeConstant(double);
+  protected boolean isForceOldFormat();
+  public void reset();
+  public static int getDataType(long);
+  public static int getLogicType(long);
+  public static void printBits(byte);
+  protected byte[] getConfigBytes(int[], int[]) throws java.lang.Exception;
+  protected void writeValue(java.io.DataOutputStream, long, int) throws java.lang.Exception;
+  protected final long getValue(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int) throws java.lang.Exception;
+  protected int getBitValue(byte[], int);
+  public int getDecimals();
+}
+public abstract class com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatReader extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormat {
+  private byte[] loadStartChainTmp;
+  private long loadedCnt;
+  private long dataStartPosition;
+  private boolean newFormat;
+  public com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatReader(boolean);
+  public void setDataStartPosition(long);
+  protected void checkFormat(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader) throws java.io.IOException;
+  protected void setNewFormat(boolean);
+  protected boolean isNewFormat();
+  public void seek(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, long) throws java.lang.Exception;
+  protected boolean shouldLoadStartChain();
+  protected void nextLoaded();
+  protected int readMagicChain(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, boolean) throws java.io.IOException;
+  private long gotoChain(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int) throws java.io.IOException;
+  private int getMinimalChainSize();
+  private int getMaximalChainSize();
+  protected int getMinimalRecordSize();
+  protected int getMaximalRecordSize();
+  private long findNextChain(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, long, long) throws java.io.IOException;
+  private int getBlockIndex(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, long) throws java.io.IOException;
+  protected void readAndTrashNRecords(long, com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader) throws java.lang.Exception;
+}
+public abstract class com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatWritter extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormat {
+  private long savedCnt;
+  public static final byte[] BLOCK_START_MAGIC;
+  public com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatWritter(boolean);
+  protected void writeMagicChain(java.io.DataOutputStream) throws java.io.IOException;
+  protected void writeMagicChain(java.nio.ByteBuffer);
+  protected void writeMagicChain(com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderOffheap);
+  protected boolean shouldSaveStartChain();
+  protected void nextSaved();
+  protected boolean shouldWriteFullData();
+  public long getSavedCount();
+  static {};
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.OhlcDataBinReaderNew extends com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew implements com.strategyquant.datalib.data.io.ICanSeek {
+  private int headerByteLength;
+  private long totalRecords;
+  private com.strategyquant.datalib.data.io.newDataFormat.OhlcDataReader ohlcReader;
+  com.strategyquant.datalib.data.io.newDataFormat.OhlcDataBinReaderNew();
+  public int getColumnsCount();
+  public boolean readData() throws java.lang.Exception;
+  public void readHeader() throws java.lang.Exception;
+  public void seek(int) throws java.lang.Exception;
+  public long getTotalRecords() throws java.lang.Exception;
+  private void countTotalRecords() throws java.lang.Exception;
+  public void overrideDecimals(int);
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.OhlcDataBinWriterNew extends com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew {
+  private com.strategyquant.datalib.data.io.newDataFormat.OhlcDataWriter ohlcWriter;
+  com.strategyquant.datalib.data.io.newDataFormat.OhlcDataBinWriterNew(java.lang.String);
+  public int getColumnsCount();
+  public void writeData(com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public void reset();
+  public void close() throws java.lang.Exception;
+  private void updateCountInHeader() throws java.io.IOException;
+  public void overrideDecimals(int);
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.OhlcDataReader extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatReader {
+  private long prevTime;
+  private long prevOpen;
+  private long prevHigh;
+  private long prevLow;
+  private long prevClose;
+  private long prevVolume;
+  private byte[] configBytes;
+  public com.strategyquant.datalib.data.io.newDataFormat.OhlcDataReader();
+  public com.strategyquant.datalib.data.io.newDataFormat.OhlcDataReader(boolean);
+  protected int getMinimalRecordSize();
+  protected int getMaximalRecordSize();
+  protected void readAndTrashNRecords(long, com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader) throws java.lang.Exception;
+  public void readData(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  private long getTime(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getOpen(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getHigh(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getLow(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getClose(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getVolume(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.OhlcDataWriter extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatWritter {
+  private long prevTime;
+  private long prevOpen;
+  private long prevHigh;
+  private long prevLow;
+  private long prevClose;
+  private long prevVolume;
+  public com.strategyquant.datalib.data.io.newDataFormat.OhlcDataWriter();
+  public com.strategyquant.datalib.data.io.newDataFormat.OhlcDataWriter(boolean);
+  public void writeData(java.io.DataOutputStream, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public void putData(java.nio.ByteBuffer, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public void putData(com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderOffheap, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  private void putValue(com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderOffheap, long, int) throws java.lang.Exception;
+  private void putValue(java.nio.ByteBuffer, long, int) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderArray implements com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader {
+  private long size;
+  private java.nio.ByteBuffer buffer;
+  public com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderArray(byte[]);
+  public boolean dataRemaining();
+  public byte readByte() throws java.io.IOException;
+  public void readBytes(byte[]) throws java.io.IOException;
+  public short readShort() throws java.io.IOException;
+  public int readInt() throws java.io.IOException;
+  public long readLong() throws java.io.IOException;
+  public java.lang.String readUTF() throws java.io.IOException;
+  public double readDouble() throws java.io.IOException;
+  public float readFloat() throws java.io.IOException;
+  public void seek(long) throws java.io.IOException;
+  public long getPosition() throws java.io.IOException;
+  public long getLength() throws java.io.IOException;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderFile implements com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader {
+  private int bufferSize;
+  private java.nio.ByteBuffer buffer;
+  private java.nio.channels.FileChannel fileChannel;
+  private java.io.RandomAccessFile file;
+  private java.lang.String filePath;
+  private long index;
+  public com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderFile(java.lang.String) throws java.lang.Exception;
+  public void openFile() throws java.io.IOException;
+  public void closeFile() throws java.io.IOException;
+  private void ensureData(int, boolean) throws java.io.IOException;
+  public boolean dataRemaining();
+  public byte readByte() throws java.io.IOException;
+  public void readBytes(byte[]) throws java.io.IOException;
+  public short readShort() throws java.io.IOException;
+  public int readInt() throws java.io.IOException;
+  public long readLong() throws java.io.IOException;
+  public double readDouble() throws java.io.IOException;
+  public java.lang.String readUTF() throws java.io.IOException;
+  public float readFloat() throws java.io.IOException;
+  public void seek(long) throws java.io.IOException;
+  public long getLength() throws java.io.IOException;
+  public long getPosition() throws java.io.IOException;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderOffheap implements com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader {
+  private long address;
+  private long index;
+  private long size;
+  public com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderOffheap(long, long) throws java.lang.Exception;
+  public final boolean dataRemaining();
+  public final byte readByte() throws java.io.IOException;
+  public final void readBytes(byte[]) throws java.io.IOException;
+  public final short readShort() throws java.io.IOException;
+  public final int readInt() throws java.io.IOException;
+  public final long readLong() throws java.io.IOException;
+  public final java.lang.String readUTF() throws java.io.IOException;
+  public final void put(byte);
+  public final void putLong(long);
+  public final void put(byte[]);
+  public final void putInt(int);
+  public final void putShort(short);
+  public void checkOffHeap();
+  public double readDouble() throws java.io.IOException;
+  public float readFloat() throws java.io.IOException;
+  public void seek(long) throws java.io.IOException;
+  public long getLength() throws java.io.IOException;
+  public long getPosition() throws java.io.IOException;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.TickDataBinReaderNew extends com.strategyquant.datalib.data.io.newDataFormat.DataBinReaderNew {
+  private com.strategyquant.datalib.data.io.newDataFormat.TickDataReader tickReader;
+  private long totalRecords;
+  private int headerByteLength;
+  com.strategyquant.datalib.data.io.newDataFormat.TickDataBinReaderNew();
+  public int getColumnsCount();
+  public boolean readData() throws java.lang.Exception;
+  public void readHeader() throws java.lang.Exception;
+  public long getTotalRecords() throws java.lang.Exception;
+  public void seek(int) throws java.lang.Exception;
+  public void overrideDecimals(int);
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.TickDataBinWriterNew extends com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew {
+  com.strategyquant.datalib.data.io.newDataFormat.TickDataWriter tickWriter;
+  com.strategyquant.datalib.data.io.newDataFormat.TickDataBinWriterNew(java.lang.String);
+  public int getColumnsCount();
+  public void writeData(com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public void reset();
+  public void overrideDecimals(int);
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.TickDataReader extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatReader {
+  private long prevTime;
+  private long prevAsk;
+  private long prevBid;
+  private long prevVolume;
+  private byte[] configBytes;
+  public com.strategyquant.datalib.data.io.newDataFormat.TickDataReader();
+  public com.strategyquant.datalib.data.io.newDataFormat.TickDataReader(boolean);
+  protected int getMinimalRecordSize();
+  protected int getMaximalRecordSize();
+  protected void readAndTrashNRecords(long, com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader) throws java.lang.Exception;
+  public void readData(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  private long getTime(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getAsk(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getBid(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+  private double getVolume(com.strategyquant.datalib.data.io.newDataFormat.IRandomAccessReader, int, int) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.data.io.newDataFormat.TickDataWriter extends com.strategyquant.datalib.data.io.newDataFormat.NewDataFormatWritter {
+  private long prevTime;
+  private long prevAsk;
+  private long prevBid;
+  private long prevVolume;
+  int[] logicTypes;
+  int[] dataTypes;
+  public com.strategyquant.datalib.data.io.newDataFormat.TickDataWriter(boolean);
+  public com.strategyquant.datalib.data.io.newDataFormat.TickDataWriter();
+  public void writeData(java.io.DataOutputStream, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  private void fillDataTypes(int, int, int, int);
+  private void fillLogicTypes(int, int, int, int);
+  public void putData(java.nio.ByteBuffer, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  public void putData(com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderOffheap, com.strategyquant.datalib.data.io.VersatileData) throws java.lang.Exception;
+  private void putValue(com.strategyquant.datalib.data.io.newDataFormat.RandomAccessReaderOffheap, long, int) throws java.lang.Exception;
+  private void putValue(java.nio.ByteBuffer, long, int) throws java.lang.Exception;
+}
+public abstract class com.strategyquant.datalib.dataseries.ComputedDataSeries extends com.strategyquant.datalib.DataSeries {
+  public com.strategyquant.datalib.DataSeries Open;
+  public com.strategyquant.datalib.DataSeries High;
+  public com.strategyquant.datalib.DataSeries Low;
+  public com.strategyquant.datalib.DataSeries Close;
+  public com.strategyquant.datalib.DataSeries Volume;
+  public com.strategyquant.datalib.dataseries.ComputedDataSeries(com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries);
+  public double get(int) throws com.strategyquant.datalib.TradingException;
+  public abstract double computeValue(int) throws com.strategyquant.datalib.TradingException;
+  public int size();
+  public void destroy();
+}
+public abstract class com.strategyquant.datalib.dataseries.DataSeriesBase {
+  public static final org.slf4j.Logger Log;
+  protected static final int DEFAULT_ALLOCATION_COUNT = 10000;
+  protected static final int DEFAULT_GROW = 10000;
+  protected com.strategyquant.datalib.dataseries.IDoubleValuesList doubleValues;
+  protected com.strategyquant.datalib.dataseries.IDataSeriesChangeListener[] onTickChangeListeners;
+  protected com.strategyquant.datalib.dataseries.IDataSeriesChangeListener[] onBarChangeListeners;
+  protected java.lang.String dataSeriesName;
+  protected int shift;
+  protected com.strategyquant.datalib.dataseries.IDataSeriesComputer linkedDataComputer;
+  protected int computedUntil;
+  private java.lang.String lineName;
+  protected int allocationSize;
+  protected int growStep;
+  protected java.lang.String lineColor;
+  private com.strategyquant.datalib.ChartDef chartDef;
+  private int indyStartingBar;
+  private boolean showInChart;
+  private boolean showZeroValues;
+  private java.lang.String chartType;
+  public com.strategyquant.datalib.dataseries.DataSeriesBase();
+  public com.strategyquant.datalib.dataseries.DataSeriesBase(int);
+  public com.strategyquant.datalib.dataseries.DataSeriesBase(int, java.lang.String);
+  public com.strategyquant.datalib.dataseries.DataSeriesBase(int, java.lang.String, com.strategyquant.datalib.ChartDef);
+  public com.strategyquant.datalib.dataseries.DataSeriesBase(int, int);
+  private com.strategyquant.datalib.dataseries.DataSeriesBase(int, int, int);
+  public int size();
+  public int specialSize();
+  protected int getRealIndex(int) throws com.strategyquant.datalib.TradingException;
+  public double _getDouble(int) throws com.strategyquant.datalib.TradingException;
+  protected void computePotentialMissingValues(int) throws com.strategyquant.datalib.TradingException;
+  protected void computePotentialMissingValuesOldVersion(int) throws com.strategyquant.datalib.TradingException;
+  protected boolean hasLinkedDataComputer();
+  protected void _setDouble(int, double, boolean) throws com.strategyquant.datalib.TradingException;
+  protected void _writeDoubleToOffheap(int, double);
+  public void _writeDoubleToOffheapRealIndex(int, double);
+  public void addDoubleValues(int, double) throws com.strategyquant.datalib.TradingException;
+  public void addLongValues(int, long) throws com.strategyquant.datalib.TradingException;
+  protected void _addDouble(double) throws com.strategyquant.datalib.TradingException;
+  protected void _addLong(long) throws com.strategyquant.datalib.TradingException;
+  public void addChangeListener(int, com.strategyquant.datalib.dataseries.IDataSeriesChangeListener);
+  protected void callOnTickChangeListeners(int, int) throws com.strategyquant.datalib.TradingException;
+  protected void callOnBarChangeListeners(int, int) throws com.strategyquant.datalib.TradingException;
+  public void setShift(int);
+  public int getShift();
+  public void setDataComputer(com.strategyquant.datalib.dataseries.IDataSeriesComputer);
+  public void setComputedUntil(int);
+  public void updateComputedUntil(int);
+  public int getComputedUntilIndex();
+  public void setName(java.lang.String);
+  public void setName(java.lang.String, com.strategyquant.datalib.ChartDef);
+  public java.lang.String getName();
+  public void callDataChangeListeners() throws com.strategyquant.datalib.TradingException;
+  public void destroy();
+  public void setLineName(java.lang.String);
+  public java.lang.String getLineName();
+  public void setColor(java.lang.String);
+  public java.lang.String getColor();
+  public com.strategyquant.datalib.InstrumentInfo getInstrumentInfo();
+  public java.lang.String Symbol();
+  public int getIndyStartingBar();
+  public void setIndyStartingBar(int);
+  public boolean isShowInChart();
+  public void setShowInChart(boolean);
+  public boolean isShowZeroValues();
+  public void setShowZeroValues(boolean);
+  public java.lang.String getChartType();
+  public void setChartType(java.lang.String);
+  static {};
+}
+public class com.strategyquant.datalib.dataseries.DataSeriesTypes extends com.strategyquant.datalib.dataseries.DataSeriesBase {
+  public static final int Close = 0;
+  public static final int Open = 1;
+  public static final int High = 2;
+  public static final int Low = 3;
+  public static final int Median = 4;
+  public static final int Typical = 5;
+  public static final int Weighted = 6;
+  public static final int Volume = 7;
+  public com.strategyquant.datalib.dataseries.DataSeriesTypes();
+  public static java.lang.String toString(int);
+}
+class com.strategyquant.datalib.dataseries.DoubleListCache$1 extends java.util.TimerTask {
+  final com.strategyquant.datalib.dataseries.DoubleListCache this$0;
+  com.strategyquant.datalib.dataseries.DoubleListCache$1(com.strategyquant.datalib.dataseries.DoubleListCache);
+  public void run();
+}
+public class com.strategyquant.datalib.dataseries.DoubleListCache {
+  public static final org.slf4j.Logger Log;
+  private static final it.unimi.dsi.fastutil.objects.ObjectArrayList<com.strategyquant.datalib.dataseries.IDoubleValuesList> cache;
+  protected static final java.lang.management.MemoryMXBean memoryBean;
+  protected static final int MEGABYTE = 1048576;
+  private static boolean tooBigCacheMemory;
+  private static boolean tooMuchMemoryUsed;
+  private static long lastUsedTime;
+  private static long lastClearedTime;
+  private static int maxCacheSize;
+  private static long totalGet;
+  private static long totalClear;
+  private static long totalAllocated;
+  private static long totalDeallocated;
+  private static long totalGetFromCache;
+  private static long totalReturnedToCache;
+  private static long maxElementsInCache;
+  private static int totalObjectsCreated;
+  private static final java.util.concurrent.atomic.AtomicInteger objectsWaitingForAllocation;
+  private static final com.strategyquant.lib.random.MersenneTwisterRng rng;
+  private static long maxJavaMemory;
+  private static int timerCount;
+  public com.strategyquant.datalib.dataseries.DoubleListCache();
+  protected static void printStats();
+  public static void resetStats();
+  public static void clear(com.strategyquant.datalib.dataseries.IDoubleValuesList);
+  public static com.strategyquant.datalib.dataseries.IDoubleValuesList get(int);
+  private static com.strategyquant.datalib.dataseries.IDoubleValuesList getFromCache();
+  public static int getWaitingForAllocationObjects();
+  static {};
+}
+public class com.strategyquant.datalib.dataseries.HeapDoubleValuesList implements com.strategyquant.datalib.dataseries.IDoubleValuesList {
+  private com.strategyquant.datalib.dataseries.SQDoubleArrayList values;
+  public com.strategyquant.datalib.dataseries.HeapDoubleValuesList(int);
+  public double getDouble(int);
+  public int size();
+  public void setDouble(int, double);
+  public void addDouble(double);
+  public void clear();
+  public long getCapacity();
+  public void release();
+  public void addDoubleValues(int, double);
+}
+public class com.strategyquant.datalib.dataseries.HeapLongValuesList implements com.strategyquant.datalib.dataseries.ILongValuesList {
+  private it.unimi.dsi.fastutil.longs.LongArrayList values;
+  public com.strategyquant.datalib.dataseries.HeapLongValuesList(int);
+  public long getLong(int);
+  public int size();
+  public void setLong(int, long);
+  public void addLong(long);
+  public void clear();
+}
+public interface com.strategyquant.datalib.dataseries.IDataSeriesChangeListener {
+  public abstract void changed(int, int) throws com.strategyquant.datalib.TradingException;
+}
+public interface com.strategyquant.datalib.dataseries.IDataSeriesComputer {
+  public abstract void compute(int, int) throws com.strategyquant.datalib.TradingException;
+}
+public interface com.strategyquant.datalib.dataseries.IDoubleValuesList {
+  public abstract double getDouble(int);
+  public abstract int size();
+  public abstract void setDouble(int, double);
+  public abstract void addDouble(double);
+  public abstract void clear();
+  public abstract long getCapacity();
+  public abstract void release();
+  public abstract void addDoubleValues(int, double);
+}
+public interface com.strategyquant.datalib.dataseries.ILongValuesList {
+  public abstract long getLong(int);
+  public abstract int size();
+  public abstract void setLong(int, long);
+  public abstract void addLong(long);
+  public abstract void clear();
+}
+class com.strategyquant.datalib.dataseries.LongListCache$1 extends java.util.TimerTask {
+  final com.strategyquant.datalib.dataseries.LongListCache this$0;
+  com.strategyquant.datalib.dataseries.LongListCache$1(com.strategyquant.datalib.dataseries.LongListCache);
+  public void run();
+}
+public class com.strategyquant.datalib.dataseries.LongListCache {
+  public static final org.slf4j.Logger Log;
+  private static final com.strategyquant.datalib.dataseries.ILongValuesList[] cache;
+  private static int initedTotal;
+  private static int fromCache;
+  private static int clearedTotal;
+  private static int clearedToCache;
+  private static int maxInCache;
+  private static int notSavedToCache;
+  public com.strategyquant.datalib.dataseries.LongListCache();
+  protected static void printStats();
+  private static int computeInCache();
+  public static void resetStats();
+  public static void clear(com.strategyquant.datalib.dataseries.ILongValuesList);
+  public static com.strategyquant.datalib.dataseries.ILongValuesList get(int);
+  static {};
+}
+public class com.strategyquant.datalib.dataseries.MedianDataSeries extends com.strategyquant.datalib.dataseries.ComputedDataSeries {
+  public com.strategyquant.datalib.dataseries.MedianDataSeries(com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries);
+  public double computeValue(int) throws com.strategyquant.datalib.TradingException;
+}
+public class com.strategyquant.datalib.dataseries.PreparedDataSeries extends com.strategyquant.datalib.DataSeries {
+  public static final org.slf4j.Logger Log;
+  private int currentRealIndex;
+  private double currentValue;
+  public com.strategyquant.datalib.dataseries.PreparedDataSeries(com.strategyquant.datalib.DataSeries, int);
+  public void addChangeListener(int, com.strategyquant.datalib.dataseries.IDataSeriesChangeListener);
+  public double get(int) throws com.strategyquant.datalib.TradingException;
+  public void set(int, double) throws com.strategyquant.datalib.TradingException;
+  public void set(int, double, boolean) throws com.strategyquant.datalib.TradingException;
+  protected void computePotentialMissingValues(int) throws com.strategyquant.datalib.TradingException;
+  public void set(double) throws com.strategyquant.datalib.TradingException;
+  public void callDataChangeListeners() throws com.strategyquant.datalib.TradingException;
+  public void addValues(int) throws com.strategyquant.datalib.TradingException;
+  public void add(double) throws com.strategyquant.datalib.TradingException;
+  public void addValuesBefore(int) throws java.lang.Exception;
+  public void addValuesBefore(int, double) throws java.lang.Exception;
+  public void destroy();
+  static {};
+}
+public class com.strategyquant.datalib.dataseries.PreparedTimeDataSeries extends com.strategyquant.datalib.dataseries.TimeDataSeries {
+  private int currentRealIndex;
+  private long currentValue;
+  public com.strategyquant.datalib.dataseries.PreparedTimeDataSeries(com.strategyquant.datalib.dataseries.TimeDataSeries, int);
+  public void addChangeListener(int, com.strategyquant.datalib.dataseries.IDataSeriesChangeListener);
+  public long get(int) throws com.strategyquant.datalib.TradingException;
+  public void set(int, long) throws com.strategyquant.datalib.TradingException;
+  public void set(int, long, boolean) throws com.strategyquant.datalib.TradingException;
+  public void set(long) throws com.strategyquant.datalib.TradingException;
+  public void addValues(int) throws com.strategyquant.datalib.TradingException;
+  public void add(long) throws com.strategyquant.datalib.TradingException;
+  public void addValuesBefore(int) throws java.lang.Exception;
+  public void addValuesBefore(int, long) throws java.lang.Exception;
+  public void destroy();
+}
+public class com.strategyquant.datalib.dataseries.SQDoubleArrayList {
+  public static final org.slf4j.Logger Log;
+  public static final int DEFAULT_CAPACITY = 5000;
+  private static final java.lang.Object EMPTY;
+  public double[] buffer;
+  public int elementsCount;
+  static final boolean $assertionsDisabled;
+  public com.strategyquant.datalib.dataseries.SQDoubleArrayList();
+  public com.strategyquant.datalib.dataseries.SQDoubleArrayList(int);
+  public void add(double);
+  public double getDouble(int);
+  public double set(int, double);
+  public void ensureCapacity(int);
+  protected void ensureBufferSpace(int);
+  public void clear();
+  public void release();
+  public long getCapacity();
+  public void addValues(int, double);
+  static {};
+}
+public class com.strategyquant.datalib.dataseries.TimeDataSeries extends com.strategyquant.datalib.dataseries.TimeDataSeriesBase {
+  public com.strategyquant.datalib.dataseries.TimeDataSeries();
+  public com.strategyquant.datalib.dataseries.TimeDataSeries(int);
+  public com.strategyquant.datalib.dataseries.TimeDataSeries(java.lang.String, int);
+  public com.strategyquant.datalib.dataseries.TimeDataSeries(java.lang.String, int, com.strategyquant.datalib.ChartDef);
+  public com.strategyquant.datalib.dataseries.TimeDataSeries(int, int);
+  public com.strategyquant.datalib.dataseries.TimeDataSeries(java.lang.String);
+  public long get(int) throws com.strategyquant.datalib.TradingException;
+  public void set(int, long) throws com.strategyquant.datalib.TradingException;
+  public void addValues(int) throws com.strategyquant.datalib.TradingException;
+  public void add(long) throws com.strategyquant.datalib.TradingException;
+}
+public abstract class com.strategyquant.datalib.dataseries.TimeDataSeriesBase extends com.strategyquant.datalib.dataseries.DataSeriesBase {
+  protected com.strategyquant.datalib.dataseries.ILongValuesList longValues;
+  public com.strategyquant.datalib.dataseries.TimeDataSeriesBase();
+  public com.strategyquant.datalib.dataseries.TimeDataSeriesBase(int);
+  public com.strategyquant.datalib.dataseries.TimeDataSeriesBase(int, java.lang.String);
+  public com.strategyquant.datalib.dataseries.TimeDataSeriesBase(int, java.lang.String, com.strategyquant.datalib.ChartDef);
+  public com.strategyquant.datalib.dataseries.TimeDataSeriesBase(int, int);
+  public com.strategyquant.datalib.dataseries.TimeDataSeriesBase(int, int, java.lang.String);
+  protected synchronized void checkValuesInitialized();
+  protected long _getLong(int) throws com.strategyquant.datalib.TradingException;
+  protected void _setLong(int, long) throws com.strategyquant.datalib.TradingException;
+  public void addLongValues(int, long) throws com.strategyquant.datalib.TradingException;
+  protected void _addLong(long) throws com.strategyquant.datalib.TradingException;
+  public void destroy();
+  public int size();
+  public int specialSize();
+  public long getDateBarsFromDate(long, int);
+  protected int getDFIndexEffective(long);
+  protected int getDFIndexSlow(long);
+}
+public class com.strategyquant.datalib.dataseries.TypicalDataSeries extends com.strategyquant.datalib.dataseries.ComputedDataSeries {
+  public com.strategyquant.datalib.dataseries.TypicalDataSeries(com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries);
+  public double computeValue(int) throws com.strategyquant.datalib.TradingException;
+}
+public class com.strategyquant.datalib.dataseries.WeightedDataSeries extends com.strategyquant.datalib.dataseries.ComputedDataSeries {
+  public com.strategyquant.datalib.dataseries.WeightedDataSeries(com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries, com.strategyquant.datalib.DataSeries);
+  public double computeValue(int) throws com.strategyquant.datalib.TradingException;
+}
+public abstract class com.strategyquant.datalib.historyData.AbstractHistoryDataDao {
+  public static final org.slf4j.Logger Log;
+  private static final java.lang.String SQL_GET_ALL_MARKETS = "select id, code from market order by code";
+  private static final java.lang.String SQL_GET_ALL_TICKERS = "select t.timeframe,t.id,t.ticker,t.name,t.market_id,m.code,t.date_from,t.date_to,t.date_from,t.date_to,t.name,commodity_id tickerName,type.name typeName,alias_ticker_id from ticker as t left outer join market as m on m.id=t.market_id left outer join ticker_type as type on type.id=t.type_id";
+  private org.h2.jdbcx.JdbcConnectionPool pool;
+  private java.util.Map<java.lang.String, java.lang.String> tickersExchnageMap;
+  public com.strategyquant.datalib.historyData.AbstractHistoryDataDao(java.lang.String, java.lang.String, java.lang.String);
+  public void createIndexes() throws java.sql.SQLException;
+  public java.util.List<com.strategyquant.datalib.historyData.dto.AliasDto> getAliasesForAlias(java.util.Collection<java.lang.String>) throws java.sql.SQLException;
+  public java.util.Map<java.lang.String, java.lang.String> getAliasesMapForAlias(java.util.Collection<java.lang.String>) throws java.sql.SQLException;
+  public java.sql.Date getChangeDate(java.lang.String);
+  public java.util.Map<java.lang.String, java.sql.Date> getChangeDate();
+  public void dispose();
+  protected void createForeignKey(java.lang.String) throws java.sql.SQLException;
+  protected void createIndex(java.lang.String) throws java.sql.SQLException;
+  private void sqlCommand(java.lang.String) throws java.sql.SQLException;
+  protected java.sql.Connection getConnection() throws java.sql.SQLException;
+  public java.util.List<com.strategyquant.model.IdName> getAllMarkets() throws java.sql.SQLException;
+  protected java.lang.String getTickerSql(java.lang.String, com.strategyquant.datalib.historyData.TickerFilterDto, java.util.Set<java.lang.String>) throws java.sql.SQLException;
+  protected void appendTickersSql(java.lang.StringBuilder, com.strategyquant.datalib.historyData.TickerFilterDto);
+  protected java.lang.String getInStatement(java.lang.String, java.lang.String[], boolean);
+  protected java.lang.String getInStatement(java.lang.String, java.util.Collection<java.lang.String>, boolean);
+  private com.strategyquant.datalib.historyData.dto.TickerDto getTicker(java.sql.ResultSet) throws java.sql.SQLException;
+  public com.strategyquant.datalib.historyData.dto.TickerDto getTicker(java.lang.String, java.lang.String) throws java.sql.SQLException;
+  public com.strategyquant.datalib.historyData.dto.TickerDto getTicker(java.lang.String) throws java.sql.SQLException;
+  public com.strategyquant.datalib.historyData.dto.TickerDto getTicker(java.lang.String, java.lang.Long) throws java.sql.SQLException;
+  public com.strategyquant.datalib.historyData.dto.TickerDto getTicker(java.lang.Long) throws java.sql.SQLException;
+  public final java.util.List<com.strategyquant.datalib.historyData.dto.TickerDto> getTickers(java.lang.String, com.strategyquant.datalib.historyData.TickerFilterDto) throws java.sql.SQLException;
+  public java.util.List<com.strategyquant.datalib.historyData.dto.TickerDto> getTickers(com.strategyquant.datalib.historyData.TickerFilterDto) throws java.sql.SQLException;
+  protected void updateNameByTimeframe(com.strategyquant.datalib.historyData.dto.TickerDto);
+  protected void modifyTickers(java.util.List<com.strategyquant.datalib.historyData.dto.TickerDto>, java.util.Map<java.lang.String, java.lang.String>) throws java.sql.SQLException;
+  public synchronized java.lang.String getExchangeForTicker(java.lang.String) throws java.sql.SQLException;
+  private void lambda$getExchangeForTicker$0(com.strategyquant.datalib.historyData.dto.TickerDto);
+  static {};
+}
+public class com.strategyquant.datalib.historyData.FuturesHistoryDataDao extends com.strategyquant.datalib.historyData.AbstractHistoryDataDao {
+  public static final java.lang.Long BMF_ID;
+  private static final java.lang.String SQL_GET_ALL_BR_TICKERS = "select t.timeframe,t.id,t.ticker,t.name,100000 as market_id,'BMF' as code,t.date_from,t.date_to,t.date_from,t.date_to,t.name,commodity_id tickerName,type.name typeName,alias_ticker_id from br_ticker as t left outer join ticker_type as type on type.id=t.type_id ";
+  private static final java.util.Map<java.lang.String, java.lang.String> MONTH_LETTERS;
+  private static final java.util.Set<java.lang.String> BR_SYMBOLS;
+  public com.strategyquant.datalib.historyData.FuturesHistoryDataDao(java.lang.String);
+  public java.util.List<com.strategyquant.model.IdName> getAllMarkets() throws java.sql.SQLException;
+  public void createIndexes() throws java.sql.SQLException;
+  public com.strategyquant.datalib.historyData.dto.CommodityDto getCommodity(java.lang.Long) throws java.sql.SQLException;
+  public java.util.List<com.strategyquant.datalib.historyData.dto.TickerDto> getTickers(com.strategyquant.datalib.historyData.TickerFilterDto) throws java.sql.SQLException;
+  private java.util.List<com.strategyquant.datalib.historyData.dto.TickerDto> filterMainBr(java.util.List<com.strategyquant.datalib.historyData.dto.TickerDto>);
+  public com.strategyquant.datalib.historyData.dto.TickerDto getTicker(java.lang.Long) throws java.sql.SQLException;
+  public com.strategyquant.datalib.historyData.dto.TickerDto getTicker(java.lang.String) throws java.sql.SQLException;
+  protected void modifyTickers(java.util.List<com.strategyquant.datalib.historyData.dto.TickerDto>, java.util.Map<java.lang.String, java.lang.String>) throws java.sql.SQLException;
+  private void updateAliases(com.strategyquant.datalib.historyData.dto.TickerDto, java.util.Map<java.lang.String, java.lang.String>, java.util.Map<java.lang.Long, java.lang.String>);
+  protected void appendTickersSql(java.lang.StringBuilder, com.strategyquant.datalib.historyData.TickerFilterDto);
+  private void updateFundamentalName(com.strategyquant.datalib.historyData.dto.TickerDto);
+  public com.strategyquant.datalib.historyData.dto.CommodityDto getCommodityForFuture(java.lang.String) throws java.sql.SQLException;
+  private com.strategyquant.datalib.historyData.dto.CommodityDto getCommodity(java.sql.ResultSet) throws java.sql.SQLException;
+  public java.util.List<com.strategyquant.datalib.historyData.dto.CommodityDto> getCommoditiesForFutures(java.lang.String[]) throws java.sql.SQLException;
+  public java.util.List<com.strategyquant.datalib.historyData.dto.CommodityDto> getCommodities(java.util.Set<java.lang.Long>) throws java.sql.SQLException;
+  private java.lang.String getCommodityStatement(java.util.Set<java.lang.Long>) throws java.sql.SQLException;
+  private java.lang.String getCommodityStatement(java.lang.String, java.lang.String[]) throws java.sql.SQLException;
+  static {};
+}
+class com.strategyquant.datalib.historyData.StockHistoryDataDao$1 implements java.util.Comparator<com.strategyquant.datalib.historyData.TickerRenameInfo> {
+  final com.strategyquant.datalib.historyData.StockHistoryDataDao this$0;
+  com.strategyquant.datalib.historyData.StockHistoryDataDao$1(com.strategyquant.datalib.historyData.StockHistoryDataDao);
+  public int compare(com.strategyquant.datalib.historyData.TickerRenameInfo, com.strategyquant.datalib.historyData.TickerRenameInfo);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+public class com.strategyquant.datalib.historyData.StockHistoryDataDao extends com.strategyquant.datalib.historyData.AbstractHistoryDataDao {
+  public com.strategyquant.datalib.historyData.StockHistoryDataDao(java.lang.String);
+  public java.util.Map<java.lang.String, java.util.List<com.strategyquant.datalib.historyData.TickerRenameInfo>> getTickerRenamed();
+  private void lambda$getTickerRenamed$0(java.util.List);
+}
+public class com.strategyquant.datalib.historyData.TickerFilterDto {
+  private java.lang.String[] names;
+  private java.lang.Long marketId;
+  private boolean searchInTicker;
+  private boolean searchInName;
+  private boolean exactMatch;
+  private boolean onlyContFutures;
+  public com.strategyquant.datalib.historyData.TickerFilterDto();
+  public java.lang.Long getMarketId();
+  public void setMarketId(java.lang.Long);
+  public java.lang.String[] getNames();
+  public void setNames(java.lang.String[]);
+  public boolean isSearchInTicker();
+  public void setSearchInTicker(boolean);
+  public boolean isSearchInName();
+  public void setSearchInName(boolean);
+  public boolean isOnlyContFutures();
+  public void setOnlyContFutures(boolean);
+  public boolean isExactMatch();
+  public void setExactMatch(boolean);
+}
+public class com.strategyquant.datalib.historyData.TickerRenameInfo {
+  private java.lang.String tickerFrom;
+  private java.lang.String tickerTo;
+  private java.lang.Long date;
+  public com.strategyquant.datalib.historyData.TickerRenameInfo();
+  public java.lang.String getTickerFrom();
+  public void setTickerFrom(java.lang.String);
+  public java.lang.String getTickerTo();
+  public void setTickerTo(java.lang.String);
+  public java.lang.Long getDate();
+  public void setDate(java.lang.Long);
+  public java.lang.String toString();
+}
+public class com.strategyquant.datalib.historyData.dto.AliasDto {
+  private java.lang.String alias;
+  private java.lang.String original;
+  public com.strategyquant.datalib.historyData.dto.AliasDto();
+  public java.lang.String getAlias();
+  public void setAlias(java.lang.String);
+  public java.lang.String getOriginal();
+  public void setOriginal(java.lang.String);
+}
+public class com.strategyquant.datalib.historyData.dto.CommodityDto {
+  private java.lang.Long id;
+  private java.lang.String code;
+  private java.lang.String name;
+  private java.math.BigDecimal commision;
+  private java.math.BigDecimal defaultSpread;
+  private java.math.BigDecimal pointValue;
+  private java.math.BigDecimal tickStep;
+  private java.math.BigDecimal tickSize;
+  private java.math.BigDecimal orderSizeMulti;
+  private java.math.BigDecimal orderSizeStep;
+  public com.strategyquant.datalib.historyData.dto.CommodityDto();
+  public java.lang.Long getId();
+  public void setId(java.lang.Long);
+  public java.lang.String getCode();
+  public void setCode(java.lang.String);
+  public java.math.BigDecimal getCommision();
+  public void setCommision(java.math.BigDecimal);
+  public java.math.BigDecimal getDefaultSpread();
+  public void setDefaultSpread(java.math.BigDecimal);
+  public java.math.BigDecimal getPointValue();
+  public void setPointValue(java.math.BigDecimal);
+  public java.math.BigDecimal getTickStep();
+  public void setTickStep(java.math.BigDecimal);
+  public java.math.BigDecimal getTickSize();
+  public void setTickSize(java.math.BigDecimal);
+  public java.lang.String getName();
+  public void setName(java.lang.String);
+  public java.math.BigDecimal getOrderSizeMulti();
+  public void setOrderSizeMulti(java.math.BigDecimal);
+  public java.math.BigDecimal getOrderSizeStep();
+  public void setOrderSizeStep(java.math.BigDecimal);
+}
+public class com.strategyquant.datalib.historyData.dto.TickerDto {
+  private boolean eod;
+  private java.lang.Long id;
+  private java.lang.String name;
+  private java.lang.String ticker;
+  private java.lang.Long marketId;
+  private java.lang.String marketName;
+  private java.sql.Date dateFrom;
+  private java.sql.Date dateTo;
+  private java.lang.String type;
+  private java.lang.Long commodityId;
+  private java.lang.Long aliasTickerId;
+  public com.strategyquant.datalib.historyData.dto.TickerDto();
+  public java.lang.Long getId();
+  public void setId(java.lang.Long);
+  public java.lang.String getName();
+  public void setName(java.lang.String);
+  public java.lang.String getTicker();
+  public void setTicker(java.lang.String);
+  public java.lang.Long getMarketId();
+  public void setMarketId(java.lang.Long);
+  public java.lang.String getMarketName();
+  public void setMarketName(java.lang.String);
+  public boolean isEod();
+  public void setEod(boolean);
+  public java.sql.Date getDateFrom();
+  public void setDateFrom(java.sql.Date);
+  public java.sql.Date getDateTo();
+  public void setDateTo(java.sql.Date);
+  public java.lang.String getType();
+  public void setType(java.lang.String);
+  public java.lang.Long getCommodityId();
+  public void setCommodityId(java.lang.Long);
+  public java.lang.Long getAliasTickerId();
+  public void setAliasTickerId(java.lang.Long);
+}
+public final class com.strategyquant.datalib.historyData.dto.TickerKind extends java.lang.Enum<com.strategyquant.datalib.historyData.dto.TickerKind> {
+  public static final com.strategyquant.datalib.historyData.dto.TickerKind FUTURES;
+  public static final com.strategyquant.datalib.historyData.dto.TickerKind STOCK;
+  private java.lang.Long id;
+  private java.lang.String forDownload;
+  private static final com.strategyquant.datalib.historyData.dto.TickerKind[] $VALUES;
+  public static com.strategyquant.datalib.historyData.dto.TickerKind[] values();
+  public static com.strategyquant.datalib.historyData.dto.TickerKind valueOf(java.lang.String);
+  private com.strategyquant.datalib.historyData.dto.TickerKind(java.lang.Long, java.lang.String);
+  public java.lang.Long getId();
+  public static com.strategyquant.datalib.historyData.dto.TickerKind tryEvalTickerFromName(java.lang.String);
+  public static com.strategyquant.datalib.historyData.dto.TickerKind forId(java.lang.Long);
+  public java.lang.String forDownload();
+  private static com.strategyquant.datalib.historyData.dto.TickerKind[] $values();
+  static {};
+}
+public class com.strategyquant.datalib.indicators.CustomIndicatorFileImporter {
+  private java.awt.Component parent;
+  public com.strategyquant.datalib.indicators.CustomIndicatorFileImporter(java.awt.Component);
+  public java.lang.String load(java.io.File);
+  private org.jdom2.Element getCustomIndicatorNode(com.strategyquant.datalib.indicators.SCustomIndicator) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.indicators.SCustomIndicator {
+  public java.lang.String fileName;
+  public java.lang.String shortName;
+  public java.lang.String longName;
+  public int returnType;
+  public java.util.ArrayList<com.strategyquant.datalib.indicators.SParameter> parameterList;
+  public java.util.ArrayList<java.lang.String> outputList;
+  public com.strategyquant.datalib.indicators.SCustomIndicator();
+  public java.lang.String toString();
+}
+public class com.strategyquant.datalib.indicators.SCustomIndicatorFileParser {
+  public com.strategyquant.datalib.indicators.SCustomIndicatorFileParser();
+  public static com.strategyquant.datalib.indicators.SCustomIndicator parse(java.io.File) throws java.lang.Exception;
+}
+public class com.strategyquant.datalib.indicators.SParameter {
+  public java.lang.String name;
+  public java.lang.String type;
+  public java.lang.String value;
+  public int index;
+  public com.strategyquant.datalib.indicators.SParameter(java.lang.String, java.lang.String, java.lang.String, int);
+  private void adjustParameterData();
+  public java.lang.String toString();
+}
+public class com.strategyquant.datalib.indicators.SParametersParser$InputParameter {
+  public java.lang.String name;
+  public java.lang.String value;
+  final com.strategyquant.datalib.indicators.SParametersParser this$0;
+  public com.strategyquant.datalib.indicators.SParametersParser$InputParameter(com.strategyquant.datalib.indicators.SParametersParser, java.lang.String, java.lang.String);
+}
+public class com.strategyquant.datalib.indicators.SParametersParser {
+  private java.lang.String input;
+  public java.lang.String type;
+  public java.util.ArrayList<com.strategyquant.datalib.indicators.SParametersParser$InputParameter> list;
+  private static final int STATE_READ_NAME = 1;
+  private static final int STATE_WAIT_READ_NEW_VALUE = 2;
+  private static final int STATE_READ_VALUE = 3;
+  private static final int STATE_READ_STRING_VALUE = 4;
+  public com.strategyquant.datalib.indicators.SParametersParser(java.lang.String);
+  public void parse() throws java.lang.Exception;
+  private void parseValues(java.lang.String);
+}
+public class com.strategyquant.datalib.instrument.AliasManager {
+  private static final org.slf4j.Logger Log;
+  private static final java.lang.String filePath;
+  private static final java.lang.String lineDelimiter = "\n";
+  private static final java.lang.String valueDelimiter = "#";
+  private static com.strategyquant.datalib.instrument.AliasManager instance;
+  private java.util.ArrayList<com.strategyquant.datalib.instrument.InstrumentAlias> aliases;
+  private com.strategyquant.datalib.instrument.AliasManager();
+  private static synchronized com.strategyquant.datalib.instrument.AliasManager get();
+  public static java.util.ArrayList<com.strategyquant.datalib.instrument.InstrumentAlias> getAliases();
+  public static com.strategyquant.datalib.instrument.InstrumentAlias getAlias(java.lang.String);
+  public static boolean checkAliasExists(java.lang.String);
+  public static java.lang.String getAliasInstrument(java.lang.String);
+  public static java.util.ArrayList<com.strategyquant.datalib.instrument.InstrumentAlias> listInstrumentAliases(java.lang.String);
+  public static void removeInstrumentAliases(java.lang.String);
+  public static void addAlias(java.lang.String, java.lang.String, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static void updateAlias(java.lang.String, java.lang.String, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static void removeAlias(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  private void load();
+  private static void save();
+  private static void tryCreateFile(java.io.File);
+  static {};
+}
+public class com.strategyquant.datalib.instrument.InstrumentAlias {
+  public java.lang.String alias;
+  public java.lang.String instrument;
+  public java.lang.String description;
+  public com.strategyquant.datalib.instrument.InstrumentAlias();
+  public com.strategyquant.datalib.instrument.InstrumentAlias(java.lang.String, java.lang.String, java.lang.String);
+}
+class com.strategyquant.datalib.instrument.InstrumentManager$1 {
+}
+class com.strategyquant.datalib.instrument.InstrumentManager$InstrumentCache {
+  private java.util.HashMap<java.lang.String, com.strategyquant.datalib.InstrumentInfo> instrumentInfoCache;
+  private boolean cacheReady;
+  final com.strategyquant.datalib.instrument.InstrumentManager this$0;
+  private com.strategyquant.datalib.instrument.InstrumentManager$InstrumentCache(com.strategyquant.datalib.instrument.InstrumentManager);
+  private synchronized void ensureCache() throws com.strategyquant.datalib.data.DataException;
+  public synchronized com.strategyquant.datalib.InstrumentInfo get(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public boolean contains(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public synchronized com.strategyquant.datalib.InstrumentInfo remove(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public synchronized void store(java.lang.String, java.lang.Integer, java.lang.String, double, double, double, double, double, double, java.lang.String, byte, java.lang.String, java.lang.String, java.lang.String, java.lang.String, double, double) throws com.strategyquant.datalib.data.DataException;
+  public synchronized com.strategyquant.datalib.InstrumentInfo store(com.strategyquant.datalib.InstrumentInfo) throws com.strategyquant.datalib.data.DataException;
+  public synchronized java.util.ArrayList<com.strategyquant.datalib.InstrumentInfo> list() throws com.strategyquant.datalib.data.DataException;
+  private static int lambda$list$0(com.strategyquant.datalib.InstrumentInfo, com.strategyquant.datalib.InstrumentInfo);
+  com.strategyquant.datalib.instrument.InstrumentManager$InstrumentCache(com.strategyquant.datalib.instrument.InstrumentManager, com.strategyquant.datalib.instrument.InstrumentManager$1);
+}
+public class com.strategyquant.datalib.instrument.InstrumentManager extends com.strategyquant.datalib.data.DataDb {
+  private static com.strategyquant.datalib.instrument.InstrumentManager instance;
+  private static final java.lang.String exchangesFilePath;
+  private static final java.lang.String countriesFilePath;
+  private static final java.lang.String sectorsFilePath;
+  private static final java.lang.String delimiter = "\r\n";
+  public static final java.lang.String defaultCommissionsMethod = "<Method type=\"None\" use=\"true\"><Params/></Method>";
+  private java.util.ArrayList<java.lang.String> exchanges;
+  private java.util.ArrayList<java.lang.String> countries;
+  private java.util.ArrayList<java.lang.String> sectors;
+  private com.strategyquant.datalib.instrument.InstrumentManager$InstrumentCache instrumentCache;
+  public static void init(java.lang.String) throws java.lang.Exception;
+  private com.strategyquant.datalib.instrument.InstrumentManager(java.lang.String);
+  private static com.strategyquant.datalib.instrument.InstrumentManager get();
+  public void initDatabase();
+  public static com.strategyquant.datalib.InstrumentInfo getInstrumentInfo(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static boolean checkInstrumentExists(java.lang.String);
+  public static boolean checkInstrumentExists(java.lang.String, boolean);
+  public static boolean checkAliasExists(java.lang.String);
+  public static void addInstrumentInBatch(java.util.List<com.strategyquant.datalib.InstrumentInfo>) throws java.lang.Exception;
+  public static void addInstrument(java.lang.String, java.lang.String, double, double, double, double, double, java.lang.String, byte) throws java.lang.Exception;
+  public static void addInstrument(java.lang.String, java.lang.String, double, double, double, double, double, java.lang.String, byte, java.lang.String, java.lang.String, java.lang.String, java.lang.String, double, double) throws java.lang.Exception;
+  public static void addInstrument(java.lang.String, int, java.lang.String, double, double, double, double, double, double, java.lang.String, byte, java.lang.String, java.lang.String, java.lang.String, java.lang.String, double, double) throws java.lang.Exception;
+  public static void addInstrument(com.strategyquant.datalib.InstrumentInfo) throws java.lang.Exception;
+  public static void updateInstrument(com.strategyquant.datalib.InstrumentInfo) throws java.lang.Exception;
+  public static void updateInstrument(java.lang.String, java.lang.String, double, double, double, double, double, double, java.lang.String, byte, java.lang.String, java.lang.String, java.lang.String, java.lang.String, double, double) throws java.lang.Exception;
+  public static void removeInstrument(java.lang.String) throws java.lang.Exception;
+  public static void addAlias(java.lang.String, java.lang.String, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static void updateAlias(java.lang.String, java.lang.String, java.lang.String) throws java.lang.Exception;
+  public static void updateDataType(java.lang.String, byte) throws java.lang.Exception;
+  private void _updateDataType(java.lang.String, byte) throws java.lang.Exception;
+  public static void removeAlias(java.lang.String) throws java.lang.Exception;
+  public static java.util.ArrayList<com.strategyquant.datalib.InstrumentInfo> list() throws com.strategyquant.datalib.data.DataException;
+  public static java.util.ArrayList<com.strategyquant.datalib.instrument.InstrumentAlias> listAliases() throws com.strategyquant.datalib.data.DataException;
+  public static java.util.ArrayList<com.strategyquant.datalib.instrument.InstrumentAlias> listInstrumentAliases(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static void removeInstrumentAliases(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static boolean trySaveExchange(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static boolean trySaveCountry(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static boolean trySaveSector(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  public static java.util.ArrayList<java.lang.String> getExchanges();
+  public static java.util.ArrayList<java.lang.String> getCountries();
+  public static java.util.ArrayList<java.lang.String> getSectors();
+  private java.util.ArrayList<com.strategyquant.datalib.InstrumentInfo> _list() throws com.strategyquant.datalib.data.DataException;
+  private void _addInstrumentInBatch(java.util.List<com.strategyquant.datalib.InstrumentInfo>) throws java.lang.Exception;
+  private void _addInstrument(java.lang.String, int, java.lang.String, double, double, double, double, double, double, java.lang.String, byte, java.lang.String, java.lang.String, java.lang.String, java.lang.String, double, double) throws java.lang.Exception;
+  private void _updateInstrument(java.lang.String, java.lang.String, double, double, double, double, double, double, java.lang.String, byte, java.lang.String, java.lang.String, java.lang.String, java.lang.String, double, double) throws java.lang.Exception;
+  private void _removeInstrument(java.lang.String) throws java.lang.Exception;
+  public com.strategyquant.datalib.InstrumentInfo _getInstrumentInfo(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  private boolean _checkInstrumentExists(java.lang.String, boolean);
+  private boolean _checkInstrumentExists(java.sql.Connection, java.lang.String);
+  private void _addAlias(java.lang.String, java.lang.String, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  private void _updateAlias(java.lang.String, java.lang.String, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  private boolean _trySaveExchange(java.lang.String);
+  private boolean _trySaveCountry(java.lang.String);
+  private boolean _trySaveSector(java.lang.String);
+  public static com.strategyquant.datalib.InstrumentInfo findClosestInstrument(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  private com.strategyquant.datalib.InstrumentInfo _findClosestInstrument(java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  static {};
+}
+public class com.strategyquant.datalib.instrument.imports.YahooInstruments {
+  public static final org.slf4j.Logger Log;
+  public com.strategyquant.datalib.instrument.imports.YahooInstruments();
+  public void checkData(java.lang.String) throws java.lang.Exception;
+  public void importData(byte, java.lang.String) throws java.lang.Exception;
+  static {};
+}
+class com.strategyquant.datalib.metatrader4.MT4Utils$1 implements java.io.FilenameFilter {
+  com.strategyquant.datalib.metatrader4.MT4Utils$1();
+  public boolean accept(java.io.File, java.lang.String);
+}
+public class com.strategyquant.datalib.metatrader4.MT4Utils$MetaTraderLocation {
+  private java.lang.String dataFolder;
+  private java.lang.String[] serverNames;
+  public com.strategyquant.datalib.metatrader4.MT4Utils$MetaTraderLocation(java.lang.String, java.lang.String[]);
+  public java.lang.String getDataFolder();
+  public java.lang.String[] getServerNames();
+}
+public class com.strategyquant.datalib.metatrader4.MT4Utils {
+  private static final org.slf4j.Logger Log;
+  private static final java.util.Set<java.lang.String> IGNORE_FOLDER_SET;
+  public com.strategyquant.datalib.metatrader4.MT4Utils();
+  public static final com.strategyquant.datalib.metatrader4.MT4Utils$MetaTraderLocation getDataFolder(java.lang.String);
+  public static java.lang.String getTerminalHash(java.lang.String);
+  public static java.io.File getDataFolderFile();
+  public static java.lang.String[] getServerNames(java.lang.String);
+  private static java.lang.String readOriginFile(java.io.File);
+  public static void main(java.lang.String[]);
+  static {};
+}
+public class com.strategyquant.datalib.metatrader4.Mt4Properties {
+  private java.util.Map<java.lang.String, com.strategyquant.datalib.metatrader4.Mt4SymbolProperties> values;
+  private static final java.lang.String PropertiesPath;
+  public com.strategyquant.datalib.metatrader4.Mt4Properties() throws java.io.IOException;
+  public com.strategyquant.datalib.metatrader4.Mt4Properties(java.lang.String) throws java.io.IOException;
+  private void readPropetiesFileCommon(java.lang.String) throws java.io.IOException;
+  private void readPropertiesFileIgnoreInvalidCharacters(java.lang.String) throws java.io.IOException;
+  private void storeLine(java.lang.String);
+  public org.json.JSONArray toJSON();
+  public java.lang.String findBySymbol(java.lang.String) throws java.lang.Exception;
+  private void lambda$readPropetiesFileCommon$0(java.lang.String);
+  static {};
+}
+public class com.strategyquant.datalib.metatrader4.Mt4SymbolProperties {
+  private java.util.Map<java.lang.String, java.lang.String> values;
+  public com.strategyquant.datalib.metatrader4.Mt4SymbolProperties();
+  public java.lang.String getStrValue(java.lang.String);
+  public boolean exists(java.lang.String);
+  public int getIntValue(java.lang.String);
+  public double getDoubleValue(java.lang.String);
+  public void put(java.lang.String, java.lang.String);
+  public void parse(java.lang.String);
+  private void checkParams();
+  public org.json.JSONArray toJSON();
+  public java.lang.String toString();
+}
+Compiled from "package-info.java"
+interface com.strategyquant.datalib.package-info {
+}
+public class com.strategyquant.datalib.session.MonthlyRangeCalculator {
+  public com.strategyquant.datalib.session.MonthlyRangeCalculator();
+  public static long getSessionStartTime(long, long, long);
+  public static long getSessionEndTime(long, long, long);
+  private static long findFirstUsableDay(long, int, int);
+  private static long findLastUsableDay(long, int, int);
+  private static boolean dayIsInSession(int, int, int);
+}
+public class com.strategyquant.datalib.session.Session implements java.io.Serializable,com.strategyquant.lib.settings.IXMLAble {
+  public static final org.slf4j.Logger Log;
+  public static final long WEEK_MILLIS = 604800000l;
+  public static final java.lang.String NoSession = "No Session";
+  public static final java.lang.String Forex_247 = "Forex_247";
+  public static final java.lang.String Forex_245 = "Forex_245";
+  public static final java.lang.String US_Index_Futures = "US_Index_Futures";
+  public static final java.lang.String US_Stocks = "US_Stocks";
+  private java.lang.String sessionName;
+  private int broker;
+  private java.util.ArrayList<com.strategyquant.datalib.session.SessionElement> sessionElements;
+  private long lastTimeChecked;
+  private com.strategyquant.datalib.session.SessionStatus lastSessionStatus;
+  public com.strategyquant.datalib.session.Session();
+  public com.strategyquant.datalib.session.Session(java.lang.String, java.util.ArrayList<com.strategyquant.datalib.session.SessionElement>);
+  public java.lang.String getSessionName();
+  public java.util.ArrayList<com.strategyquant.datalib.session.SessionElement> getElements();
+  public void checkTimeIsInSession(long, com.strategyquant.datalib.session.SessionStatus, java.lang.String);
+  private com.strategyquant.datalib.session.SessionElement findStartElement(int);
+  private com.strategyquant.datalib.session.SessionElement findEndElement(int);
+  public com.strategyquant.datalib.session.Session clone();
+  public void clearSessionTempData();
+  public java.util.ArrayList<com.strategyquant.datalib.session.SessionElement> cloneElements();
+  public void fixD1DataTime(com.strategyquant.datalib.data.io.VersatileData);
+  public void fixD1DataTime(com.strategyquant.datalib.TickEvent);
+  public org.jdom2.Element getXML();
+  public void setFromXML(org.jdom2.Element) throws java.lang.Exception;
+  public java.lang.String toText();
+  public int getBroker();
+  public void setBroker(int);
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+  static {};
+}
+public class com.strategyquant.datalib.session.SessionComparator implements java.util.Comparator<com.strategyquant.datalib.session.Session> {
+  public com.strategyquant.datalib.session.SessionComparator();
+  public int compare(com.strategyquant.datalib.session.Session, com.strategyquant.datalib.session.Session);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+public class com.strategyquant.datalib.session.SessionElement implements java.io.Serializable {
+  private int dayFrom;
+  private int timeFrom;
+  private int dayTo;
+  private int timeTo;
+  private int hourFrom;
+  private int minuteFrom;
+  private boolean eod;
+  private int hourTo;
+  private int minuteTo;
+  private long computedRangeFrom;
+  private long computedRangeTo;
+  public com.strategyquant.datalib.session.SessionElement(int, int, int, int, boolean);
+  public com.strategyquant.datalib.session.SessionElement(java.lang.String, java.lang.String, java.lang.String, java.lang.String, boolean) throws java.lang.Exception;
+  public int getDayFrom();
+  public java.lang.String getDayFromStr() throws java.lang.Exception;
+  public int getDayTo();
+  public java.lang.String getDayToStr() throws java.lang.Exception;
+  public int getTimeFrom();
+  public java.lang.String getTimeFromStr();
+  public int getTimeTo();
+  public java.lang.String getTimeToStr();
+  public boolean isEOD();
+  public void setEod(boolean);
+  public boolean includesDay(int);
+  public boolean includesTime(long);
+  private void computeRangesForNextPeriod(long);
+  public long getStartTime();
+  public long getEndTime();
+  public void clearSessionTempData();
+  private static int getDayInt(java.lang.String) throws java.lang.Exception;
+  public static int getTimeInt(java.lang.String) throws java.text.ParseException;
+  private static java.lang.String getDayStr(int) throws java.lang.Exception;
+  private static java.lang.String getTimeStr(int);
+  public com.strategyquant.datalib.session.SessionElement clone();
+  public void fixD1DataTime(com.strategyquant.datalib.data.io.VersatileData);
+  public void fixD1DataTime(com.strategyquant.datalib.TickEvent);
+  public java.lang.Object clone() throws java.lang.CloneNotSupportedException;
+}
+public class com.strategyquant.datalib.session.SessionException extends java.lang.Exception {
+  public com.strategyquant.datalib.session.SessionException(java.lang.String);
+}
+public class com.strategyquant.datalib.session.SessionManager extends com.strategyquant.datalib.data.DataDb {
+  private static com.strategyquant.datalib.session.SessionManager instance;
+  private java.util.HashMap<java.lang.String, com.strategyquant.datalib.session.Session> sessionCache;
+  private java.util.ArrayList<com.strategyquant.datalib.session.Session> sessionList;
+  private boolean cacheEmpty;
+  private com.strategyquant.datalib.session.Session sessionNoSession;
+  private com.strategyquant.datalib.session.SessionComparator sessionComparator;
+  public static void init(java.lang.String) throws java.lang.Exception;
+  private com.strategyquant.datalib.session.SessionManager(java.lang.String);
+  private static com.strategyquant.datalib.session.SessionManager get();
+  public void initDatabase();
+  private void addInitialRecords();
+  public static synchronized java.util.ArrayList<com.strategyquant.datalib.session.Session> getSessions();
+  public static void addSession(com.strategyquant.datalib.session.Session) throws com.strategyquant.datalib.session.SessionException;
+  public static com.strategyquant.datalib.session.Session getSession(java.lang.String);
+  public static boolean checkSessionExists(java.lang.String);
+  public static void removeSession(java.lang.String) throws com.strategyquant.datalib.session.SessionException;
+  public static void updateSession(com.strategyquant.datalib.session.Session) throws com.strategyquant.datalib.session.SessionException;
+  public static void updateSession(java.lang.String, java.util.ArrayList<com.strategyquant.datalib.session.SessionElement>) throws com.strategyquant.datalib.session.SessionException;
+  private static void deleteOldDataFiles(java.lang.String, java.io.File);
+  private static void tryDeleteFile(java.io.File, java.lang.String);
+  private java.util.ArrayList<com.strategyquant.datalib.session.Session> _getSessions();
+  private void _addSession(com.strategyquant.datalib.session.Session) throws com.strategyquant.datalib.session.SessionException;
+  private void createElements(java.lang.String, java.util.ArrayList<com.strategyquant.datalib.session.SessionElement>, java.sql.Statement) throws java.sql.SQLException;
+  private boolean _checkSessionExists(java.lang.String);
+  private boolean _checkSessionExists(java.sql.Connection, java.lang.String);
+  private com.strategyquant.datalib.session.Session _getSession(java.lang.String);
+  private java.util.ArrayList<com.strategyquant.datalib.session.SessionElement> _getSessionElements(java.sql.Connection, java.lang.String) throws com.strategyquant.datalib.session.SessionException;
+  private void _clearCache();
+  private void _removeSession(java.lang.String) throws com.strategyquant.datalib.session.SessionException;
+  private void _updateSession(java.lang.String, java.util.ArrayList<com.strategyquant.datalib.session.SessionElement>) throws com.strategyquant.datalib.session.SessionException;
+  static {};
+}
+public class com.strategyquant.datalib.session.SessionNoSession extends com.strategyquant.datalib.session.Session {
+  com.strategyquant.datalib.session.SessionNoSession();
+  public void checkTimeIsInSession(long, com.strategyquant.datalib.session.SessionStatus);
+}
+public class com.strategyquant.datalib.session.SessionStatus implements java.io.Serializable {
+  public boolean isInSession;
+  public long sessionStartTime;
+  public long sessionEndTime;
+  public com.strategyquant.datalib.session.SessionStatus();
+}
+public class com.strategyquant.datalib.ticksimulator.DefaultTickSimulator implements com.strategyquant.datalib.ticksimulator.ITickSimulator {
+  private com.strategyquant.datalib.data.io.VersatileData data;
+  private int step;
+  private com.strategyquant.datalib.ticksimulator.SpreadsMap spreadsMap;
+  private int lastSpreadHash;
+  private double lastSpread;
+  private double avgTickVolume;
+  private double volume;
+  private boolean growingCandle;
+  private double spread;
+  public com.strategyquant.datalib.ticksimulator.DefaultTickSimulator();
+  public void init(com.strategyquant.datalib.data.io.VersatileData);
+  public boolean getNextTick(com.strategyquant.datalib.TickEvent);
+  private double getSpread(int, int);
+  public void setSymbolsSpread(com.strategyquant.datalib.ticksimulator.SpreadsMap);
+  private boolean isLastTick();
+}
+public interface com.strategyquant.datalib.ticksimulator.ITickSimulator {
+  public abstract void init(com.strategyquant.datalib.data.io.VersatileData);
+  public abstract boolean getNextTick(com.strategyquant.datalib.TickEvent);
+  public abstract void setSymbolsSpread(com.strategyquant.datalib.ticksimulator.SpreadsMap);
+}
+public class com.strategyquant.datalib.ticksimulator.SpreadsMap {
+  it.unimi.dsi.fastutil.ints.Int2DoubleOpenHashMap map;
+  private int lastUsedSpreadHashKey;
+  private double lastUsedSpread;
+  public com.strategyquant.datalib.ticksimulator.SpreadsMap(java.util.ArrayList<com.strategyquant.datalib.ChartDef>);
+  public double getSpread(int);
+  public boolean containsKey(int);
+}
+public class com.strategyquant.datalib.ticksimulator.TSTickSimulator implements com.strategyquant.datalib.ticksimulator.ITickSimulator {
+  private com.strategyquant.datalib.data.io.VersatileData data;
+  private int step;
+  private com.strategyquant.datalib.ticksimulator.SpreadsMap spreadsMap;
+  private int lastSpreadHash;
+  private double lastSpread;
+  private double avgTickVolume;
+  private double volume;
+  private boolean lowFirst;
+  private double spread;
+  public com.strategyquant.datalib.ticksimulator.TSTickSimulator();
+  public void init(com.strategyquant.datalib.data.io.VersatileData);
+  public boolean getNextTick(com.strategyquant.datalib.TickEvent);
+  private double getSpread(int, int);
+  public void setSymbolsSpread(com.strategyquant.datalib.ticksimulator.SpreadsMap);
+}
+public class com.strategyquant.datalib.timeframe.TimeframesComparator implements java.util.Comparator<java.lang.String> {
+  public com.strategyquant.datalib.timeframe.TimeframesComparator();
+  public int compare(java.lang.String, java.lang.String);
+  public static int getSecondsCount(java.lang.String);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+public class com.strategyquant.datalib.timezone.Timezone {
+  public static final java.lang.String DEFAULT = "Etc/UCT";
+  private java.lang.String name;
+  private java.lang.String id;
+  public boolean dst;
+  public com.strategyquant.datalib.timezone.Timezone(java.lang.String, java.lang.String);
+  public java.lang.String toString();
+  public java.lang.String getId();
+  public java.lang.String getName();
+  public static java.lang.String print(java.lang.String, int, boolean);
+  public java.lang.String printShortName();
+  public static java.lang.String shiftHours(java.lang.String, int);
+  public static java.lang.String parseId(java.lang.String);
+}
+public class com.strategyquant.datalib.timezone.Timezones {
+  public static final org.slf4j.Logger Log;
+  private static final java.lang.String path;
+  private static com.strategyquant.datalib.timezone.Timezones instance;
+  private java.util.ArrayList<com.strategyquant.datalib.timezone.Timezone> timezones;
+  private com.strategyquant.datalib.timezone.Timezones();
+  private static com.strategyquant.datalib.timezone.Timezones get();
+  public static java.util.ArrayList<com.strategyquant.datalib.timezone.Timezone> getTimezones();
+  private void loadTimezones();
+  public static com.strategyquant.datalib.timezone.Timezone findByKey(java.lang.String);
+  static {};
+}

@@ -1,0 +1,2 @@
+<#-- Upper excess wick beyond VAH with the close back inside the VA. The installed SqVPSignal indicator computes the Java _evaluateSignal. -->
+<#global sqUsesIndicatorPackage = true>((<@printSeriesAt block "0">SqVPSignal(<@printInput block />, 4, -1, <@printParam block "#SessionType#" />, <@printParam block "#ProfileRows#" />, <@printParam block "#ValueAreaPct#" />, <@printParam block "#MinimumWick#" />, <@printParam block "#WickRatio#" />, 0, SqPip).Values[0]</@printSeriesAt> > 0.5))

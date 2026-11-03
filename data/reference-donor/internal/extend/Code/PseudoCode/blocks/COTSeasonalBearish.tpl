@@ -1,0 +1,1 @@
+(COTSeasonalBearish(<@printParam block "#CotSymbol#" />))

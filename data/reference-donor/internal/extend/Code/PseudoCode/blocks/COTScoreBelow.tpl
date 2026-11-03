@@ -1,0 +1,1 @@
+(COTScore(<@printParam block "#CotSymbol#" />) < <@printParam block "#Level#" />)

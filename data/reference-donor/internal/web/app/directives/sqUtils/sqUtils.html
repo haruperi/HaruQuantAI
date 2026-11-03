@@ -1,0 +1,48 @@
+<div ng-repeat="popup in popups track by $index">
+    <div ng-if="popup.templateUrl" ng-include="popup.templateUrl" ng-dynamic-controller="popup.controller"/>
+    <div ng-if="popup.template" ng-dynamic-controller="popup.controller" ng-bind="popup.template"></div>
+</div>
+
+<span ng-if="isMainApp">
+    <directory-picker-modal 
+        id='defaultFilePickerModal' 
+        instance='filePicker' 
+        title='{{filePicker.title}}'
+        multiselection='{{filePicker.multiselection}}'
+        on-select='filePicker.onSelect' 
+        show-files='{{filePicker.showFiles}}' 
+        action-type='{{filePicker.actionType}}'
+        current-dir='{{filePicker.currentDir}}'
+        extension='filePicker.extension'
+        file-name='{{filePicker.fileName}}'
+    />
+    
+    <save-file-dialog popup-id="saveFileDialog" title="{{saveFile.title}}" file-extension='{{saveFile.extension.name}}' path-key="{{saveFile.pathKey}}" on-save="saveFile.callback(path)" file-name="saveFile.fileName">
+        <fieldset ng-if="saveFile.extensions.length > 0" class="sq-fieldset">
+            <div class="input-line">
+                <label class="sqn-label input-elem" tsq>Format</label>
+                <div class="radio" ng-click="saveFile.extension.name = extension.name" style="margin-left: 20px; margin-bottom: 10px; margin-top: -2px;" ng-repeat="extension in saveFile.extensions">
+                    <input type="radio" name="SCExtensionRadios" ng-model="saveFile.extension.name" value="{{::extension.name}}" />
+                    <span class="sq-mark"></span>
+                    <span ng-bind="extension.description" tsq></span>
+                </div>
+            </div>
+        </fieldset>
+    </save-file-dialog>
+
+    <div ng-include="'../app/layout/views/confirmDialog.html'"/>
+    <div ng-include="'../app/layout/views/optionsDialog.html'"/>
+    <div ng-include="'../app/layout/views/progressModal.html'"/>
+    <div ng-include="'../app/layout/views/saveStrategiesProgressModal.html'"/>
+    <div ng-include="'../app/layout/views/errorDialog.html'"/>
+    <div ng-include="'../app/layout/views/performanceDialog.html'"/>
+    <div ng-include="'../app/layout/views/remoteAccessDialog.html'"/>
+    <div ng-include="'../app/layout/views/smtpDialog.html'"/>
+	<div ng-include="'../app/layout/views/noNewVersionDialog.html'"/>
+	<div ng-include="'../app/layout/views/newVersionDialog.html'"/>
+	<div ng-include="'../app/layout/views/CSVXLSXExportDialog.html'"/>
+	<div ng-include="'../app/layout/views/moveDatabankDialog.html'"/>
+    <div ng-include="'../app/layout/views/awExamplesDialog.html'"/>
+
+    <benchmark-dialog instance="benchmark"></benchmark-dialog>
+</span>

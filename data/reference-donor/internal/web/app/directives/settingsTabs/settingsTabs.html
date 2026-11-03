@@ -1,0 +1,41 @@
+<div>
+    <div class="advanced-settings-window-title">
+        <tsq>Advanced settings</tsq>
+        <span ng-show="isTaskManager">
+            <tsq>for</tsq> '{{taskName}}'</span>
+    </div>
+
+    <div ng-show="instance.tabs.length==0" tsq>Create some tasks first</div>
+
+    <div class="quant-tabs tabs-settings-tabs">
+        <div class="tabs-header">
+            <div ng-repeat="tab in instance.tabs | orderBy: '+position'" ng-class="{'active' : tab.active, 'error' : tab.hasErrors}"
+                ng-click="onSelectTab(tab)" title="{{tab.currentText | tsq}}" ng-show="tab.display === undefined || tab.display" id="tab-{{::tab.dataItem}}" ng-attr-data-testid="{{::tab.dataTestid}}">{{tab.translatedTitle}}
+            </div>
+        </div>
+        <div class="tabs-body">
+            <div ng-repeat="tab in instance.tabs" ng-class="{'active':tab.active}" ng-show="tab.display === undefined || tab.display">
+                <div class="sqn-settings-body-header" ng-class="tab.dataItem">
+                    <div class="sqn-settings-tab-desc" title="" ng-bind-html="(tab.help | tsq)"></div>
+                    <button id="buttonHelp-41a" ng-attr-data-testid="settings-help-{{::tab.dataItem}}" type="button" class="btn btn-default sqn-btn-help" ng-click="onHelp(tab)">
+                        <span tsq>Help</span>
+                    </button>
+                </div>
+                <div class="sqn-settings-body-inner" ng-class="[{'disabled-panel': $root.project.state == projectStates.running || $root.project.state == projectStates.paused},tab.dataItem]">
+                    <div class="disabled-area-placeholder">
+                        <i class="fa fa-lock" title="Setting changes locked, they will be applied next time you start the project."></i>
+                    </div>
+
+                    <div ng-if="tab.templateUrl" ng-include="tab.templateUrl" ng-dynamic-controller="tab.controller" />
+                    <div ng-if="tab.template" ng-dynamic-controller="tab.controller">{{::tab.template}}</div>
+                </div>
+            </div>
+            <div class="sqn-settings-nextbtns clearfix">
+                <button id="buttonSwitchToPrevTab-41b" data-testid="settings-prev" type="button" class="btn btn-primary pull-left" ng-show="prevButtonLabel" ng-click="instance.switchToPrevTab()" ng-bind="prevButtonLabel"></button>
+                <button id="buttonClose-41c" data-testid="settings-close" type="button" class="btn btn-default sqn-settings-closebtn-bottom" ng-click="onClose()" tsq>Close</button>
+                <button id="buttonSwitchToNextTab-41d" data-testid="settings-next" type="button" class="btn btn-primary pull-right" ng-show="nextButtonLabel" ng-click="instance.switchToNextTab()"
+                    ng-bind="nextButtonLabel"></button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,46 @@
+<!-- Modal window-->
+<div class="modal" id="configure" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog type-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-66a" type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="configure.onClose()">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">Configure</h4>
+            </div>
+            <div class="modal-body">
+                <fieldset class="sq-fieldset">
+                    <legend>Organize trades into sub-results according to one or more of the following</legend>
+
+                    <div class="sq-checkbox">
+                        <input type="checkbox" ng-model="configure.tradesBySymbols" id="recogTradesBySymbols" />
+                        <label for="recogTradesBySymbols">Symbols</label>
+                    </div>
+
+                    <div class="sq-checkbox">
+                        <input type="checkbox" ng-model="configure.tradesByMagicNumbers" id="recogTradesByMagicNumbers" />
+                        <label for="recogTradesByMagicNumbers">Magic numbers</label>
+                    </div>
+
+                    <div class="sq-checkbox">
+                        <input type="checkbox" ng-model="configure.tradesByComments" id="recogTradesByComments" />
+                        <label for="recogTradesByComments">Comments</label>
+                    </div>
+                </fieldset>
+
+                <fieldset class="sq-fieldset">
+                    <legend>Equity chart</legend>
+
+                    <div class="sq-checkbox">
+                        <input type="checkbox" ng-model="configure.filterBalanceOrders" id="filterBalanceOrders" />
+                        <label for="filterBalanceOrders">Filter out balance orders</label>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+                <button id="buttonSave-66b" type="button" class="btn btn-primary" ng-click="saveSettings()" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

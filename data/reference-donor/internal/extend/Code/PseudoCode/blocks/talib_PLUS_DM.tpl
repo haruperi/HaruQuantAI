@@ -1,0 +1,1 @@
+(PLUS_DM) Plus Directional Movement(<@printInput block true />, <@printParam block "#TimePeriod#" />)[<@printShift block shift />]

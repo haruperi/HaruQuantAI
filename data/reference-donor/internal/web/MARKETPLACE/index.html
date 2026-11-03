@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <base href="/MARKETPLACE">
+    <meta charset="utf-8">
+    <title>SQX Marketplace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="pragma" content="no-cache" />
+
+    <link rel="stylesheet" href="common/Batch1/styles.css">
+    <link rel="stylesheet" href="MARKETPLACE/layout/layout.css">
+    <link rel="stylesheet" href="MARKETPLACE/layout/views/styles.css">
+
+    <script src="common/Batch1/libs.js"></script>
+    <!-- TipTap - rich HTML editor for the share form (see libs/tiptap/README.txt) -->
+    <script src="libs/tiptap/tiptap.min.js"></script>
+    <script src="MARKETPLACE/build/layout.js"></script>
+</head>
+
+<body ng-app="app" style="font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif; zoom: {{$root.zoom.css}};" class="{{$root.zoom.class}} {{$root.brEdition}}">
+    <preload-templates></preload-templates>
+
+    <div ui-view="root" style="height:100%" />
+
+    <script>
+        window.appConfig = {
+            product: 'MARKETPLACE',
+            productName: 'Marketplace',
+            defaultState: 'app',
+            defaultURL: '/',
+            gridSkin: 'dhx_web',
+            gridImagePath: '../img/dhtmlx/web/'
+        };
+    </script>
+
+</body>
+
+</html>

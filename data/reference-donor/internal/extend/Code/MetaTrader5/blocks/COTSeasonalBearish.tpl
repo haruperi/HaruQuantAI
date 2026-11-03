@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_SeasonalBearish(COT_${cs}_52W_0, <@printShift block "0" />, <@printParam block "#SeasonalLookback#" />, <@printParam block "#SeasonalThreshold#" />)

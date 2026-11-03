@@ -1,0 +1,451 @@
+<#--########################################################################
+  Warning! Do not delete this header, it is used by StrategyQuant to get
+  information about this code generator.
+
+  <name>NinjaTrader8 (*.cs)</name>
+  <id>nt8</id>
+  <extensionName>NinjaTrader8 Strategy</extensionName>
+  <extension>cs</extension>
+  <description>Saves strategy as NinjaScript code for NinjaTrader8</description>
+#########################################################################-->
+<#--
+  ============================================================================
+  Main.tpl - entry template for the NinjaTrader 8 (NinjaScript / C#) generator.
+  ============================================================================
+  Renders a complete NinjaScript strategy class from the strategy XML:
+  using block -> class -> OnStateChange (defaults) -> OnBarUpdate (trading rules).
+
+  The header comment above is mandatory: SourceCodeGenerator.parseTags reads the
+  first ~20 lines as plain text to register this generator (<name>/<extension>/...).
+  The <id> tag is decorative (not parsed).
+
+  Shape modelled on JForex/Main.tpl (the C#-closest existing generator).
+  Indicators are emitted as native NinjaTrader calls where NinjaTrader has one.
+  Includes:
+    globalFunctions.inc  - cross-platform helpers (getOptions, compress, ...)
+    Functions.inc        - NinjaTrader helper macros (csIdentifier)
+    Parameters.inc       - parameter printers (printParam/printInput/printShift)
+    Blocks.inc           - rule traversal + block dispatch (printRulesForEvent)
+  Include lines are directive-only, so FreeMarker strips them from the output.
+-->
+<#include "/global/globalFunctions.inc">
+<#include "/global/cotSymbols.inc">
+<#include "/NinjaTrader/Functions.inc">
+<#-- The indicator package this export is built against. It lives beside the templates because
+     the two ship together; NinjaTraderIndicatorPackageTest keeps it equal to SqPackage.Version
+     in the package itself, so the two cannot drift apart unnoticed. -->
+<#assign sqIndicatorPackageVersion = "4">
+
+<#include "/NinjaTrader/Parameters.inc">
+<#include "/NinjaTrader/Blocks.inc">
+<#include "/NinjaTrader/MoneyManagement.inc">
+<#include "/NinjaTrader/TradingOptions.inc">
+<#include "/NinjaTrader/ExitMethods.inc">
+
+<#--
+  Refuse a strategy that carries an ON-TICK rule.
+
+  A rule's everyTick attribute decides WHEN it is evaluated - on every tick, or once when a bar opens.
+  The StrategyQuant engine honours it (Signal.evaluateRule skips the rule when everyTick is false and
+  the event is not a bar event), and MetaTrader 4, MetaTrader 5 and JForex all emit it: their EA runs
+  per tick and each bar-open rule adds its own _sqIsBarOpen gate.
+
+  This generator cannot express it. Main.tpl hardcodes Calculate.OnBarClose, under which OnBarUpdate
+  fires only when a bar closes - there is no intrabar evaluation to gate. Ignoring the attribute would
+  hand the user a bar-close program from an on-tick strategy with nothing to indicate it, so the
+  export refuses instead.
+
+  Per-tick support is not a switch:
+    * Calculate.OnPriceChange alone changes nothing - OnBarUpdate still fires once per bar.
+      Intrabar evaluation needs Tick Replay, and IsTickReplay only takes effect when the STRATEGY
+      sets it inside State.Configure; assigned from outside beforehand it silently stays false.
+    * And then the SQ indicator cache breaks, as SQ.inc warns: the cache stores the FORMING bar's
+      value on the first tick, serves it for the rest of the bar, and - because the helpers are
+      recursive - writes that wrong value into the history every later bar is computed from. It is
+      not a lag inside the bar, it corrupts the series.
+  So per-tick support means reworking SqIndyState to distinguish a forming bar from a closed one,
+  which is core runtime work - not a condition to sneak into this template.
+-->
+<#list doc.StrategyFile.Strategy.Rules.Events.* as event>
+	<#list event.* as rule>
+		<#if rule.@everyTick[0]?? && rule.@everyTick == "true">
+			<#stop "This strategy has an on-tick rule (" + rule.@name + "), which the NinjaTrader export cannot represent: the generated NinjaScript runs on Calculate.OnBarClose, so every rule is evaluated once per bar. Exporting it would silently produce a bar-close strategy that trades differently from the backtest. Set the rule to evaluate on bar open, or use MetaTrader 4/5 or JForex, which support per-tick rules.">
+		</#if>
+	</#list>
+</#list>
+
+
+#region Using declarations
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using NinjaTrader.Cbi;
+using NinjaTrader.Data;
+using NinjaTrader.NinjaScript;
+using NinjaTrader.NinjaScript.Indicators;
+#endregion
+
+//------------------------------------------------------------------
+//   NinjaScript for NinjaTrader 8 of ${sqStrategyName(getOptions("StrategyName"))}
+//
+//   Generated by StrategyQuant ${getOptions("Version")}
+//   at ${getOptions("Date")}
+//------------------------------------------------------------------
+
+<#-- Early COT detection so we can reference usesCOT in Description.
+     The full helper methods are emitted later by SqCOTBlocks.inc,
+     which runs the same scan; #global ensures the value is shared. -->
+<#macro _scanCOT_early node><#list node?children as c><#if c?node_type == 'element'><#if (c.@mI[0]!"")=="COT" || (c.@cdataIndyName[0]!"")?contains("_52W") || (c.@cdataIndyName[0]!"")?contains("_156W")><#global usesCOT = true><#else><@_scanCOT_early c /></#if></#if></#list></#macro>
+<#global usesCOT = false>
+<@_scanCOT_early doc.StrategyFile.Strategy />
+<#-- COTSymbol inputs; NinjaTrader exports no COT custom-data values, only the COT blocks -->
+<@cotCollectSymbols doc.StrategyFile.Strategy "" />
+
+namespace NinjaTrader.NinjaScript.Strategies
+{
+	<#-- Class name is sanitized to a valid C# identifier (the strategy name may contain spaces). -->
+	public class <@csIdentifier sqStrategyName(getOptions("StrategyName")) /> : Strategy
+	{
+		<#-- Class layout: methods first, FIELD DECLARATIONS AT THE END of the class - see the
+		     "Strategy fields" region before the closing brace. -->
+		<#-- OnStateChange: NinjaScript lifecycle hook. SetDefaults declares strategy
+		     metadata and defaults; Configure adds the secondary data series; DataLoaded
+		     derives the pip units and the contract size from the loaded instrument. -->
+		protected override void OnStateChange()
+		{
+			if (State == State.SetDefaults)
+			{
+				Name						= "${sqStrategyName(getOptions("StrategyName"))?j_string}";
+				Description					= @"Generated by StrategyQuant X<#if usesCOT>. COT data provided by SpreadCharts.com</#if>";
+				Calculate					= Calculate.OnBarClose;
+				EntriesPerDirection			= 1;
+				<#-- UniqueEntries, NOT AllEntries: with AllEntries a working pending entry order blocks
+				     EVERY other entry submission - the already-crossed market fallback of
+				     EnterAtStop/EnterAtLimit would be silently ignored (no order events at all) while
+				     the previous bar's limit still works, entering one bar after SQX. UniqueEntries
+				     counts per signal name, so the fallback's F-suffixed
+				     market entry is accepted alongside the parked pending. Single-position semantics
+				     are enforced by the explicit Position.MarketPosition == Flat guard on every entry
+				     rule (printNoDuplicateGuard), not by the entry handling mode. -->
+				EntryHandling				= EntryHandling.UniqueEntries;
+				<#-- Derived from the trading options, not hardcoded - see printSessionCloseSettings. -->
+				<@printSessionCloseSettings />
+				<#-- true: StrategyQuant fills a limit the moment price TOUCHES the level (a profit
+				     target fills on the bar whose High is exactly the level), while NinjaTrader's
+				     default (false) waits for the price to trade THROUGH the level. Touch-fill is
+				     also how SQX fills pending entry limits. -->
+				IsFillLimitOnTouch			= true;
+				<#-- The SQX "Reserved bars" trading option, defaulting to NinjaTrader's own 20
+				     when the strategy carries no such option. See printBarsRequiredToTrade. -->
+				BarsRequiredToTrade			= <@printBarsRequiredToTrade />;
+				<#-- The sq* runtime helpers (SQIndicators.inc) index series all the way back to bar 0;
+				     NT8's default lookback of 256 bars would throw "index out-of-range" past bar 256. -->
+				MaximumBarsLookBack			= MaximumBarsLookBack.Infinite;
+				<#-- Defaults of the external [NinjaScriptProperty] variables, taken from their <value>.
+				     Emitted only when the strategy carries makeExternal=true variables. -->
+<@printExternalVariableDefaults /><@printCotSymbolDefaults /><@printSubchartSymbolDefaults />			}
+			else if (State == State.Configure)
+			{
+				SqCheckIndicatorPackage();
+<@printSubchartSymbolCheck /><@printMultiTfDataSeries /><@printSecondaryDataSeries /><@printDayCompanionSeries />			}
+			else if (State == State.DataLoaded)
+			{
+<#if cotCheckedSymbols?has_content>
+				SqCOTStartDownloader();
+
+</#if>
+				<#-- Pip units. Mirror MT5 calculatePointCoef: on a decimal-priced
+				     instrument with an odd number of price decimals (e.g. 5-decimal or 3-decimal forex)
+				     the pip is 10x the tick, so SqPipFactor = 10; on 2/4-decimal it is 1. A non-decimal
+				     tick (e.g. 0.25 futures) keeps pip = tick (SqPipFactor = 1). -->
+				double sqLog = Math.Log10(1.0 / TickSize);
+				int sqPipDigits = (int)Math.Round(sqLog);
+				bool sqDecimalTick = Math.Abs(sqLog - sqPipDigits) < 1e-9;
+				if (sqDecimalTick && sqPipDigits != 2 && sqPipDigits != 4) sqPipDigits -= 1;
+				SqPip = sqDecimalTick ? Math.Pow(10, -sqPipDigits) : TickSize;
+				SqPipFactor = (int)Math.Round(SqPip / TickSize);
+
+<#if (pointValue??) && pointValue?number gt 0>
+				<#-- Lots -> NinjaTrader quantity units. Both point values are known here, so the
+				     factor is their ratio. Emitted only when the instrument resolved; without one neither
+				     SqPointValue nor SqContractSize is declared and the size carries no factor.
+				     A future counts contracts on both platforms: no factor, and money management uses the point
+				     value of the contract traded. -->
+				double sqNtPointValue = Instrument.MasterInstrument.PointValue;
+				if (Instrument.MasterInstrument.InstrumentType == InstrumentType.Future)
+				{
+					SqContractSize = 1;
+					if (sqNtPointValue > 0)
+						SqPointValue = sqNtPointValue;
+				}
+				else if (SqPointValue > 0 && sqNtPointValue > 0)
+					SqContractSize = SqPointValue / sqNtPointValue;
+</#if>			}
+<#if cotCheckedSymbols?has_content>
+			<#-- Not in DataLoaded: the SqCOTDownloader started there reaches its own DataLoaded, where it
+			     downloads, only after the strategy's DataLoaded returns. -->
+			else if (State == State.Historical)
+			{
+				SqCOTCheckSymbols();
+			}
+</#if>
+		}
+
+		<#-- OnBarUpdate: called once per bar. Restrict to the primary series, guard against
+		     insufficient history, then emit the strategy's OnBarUpdate rules (conditions + actions). -->
+		protected override void OnBarUpdate()
+		{
+<#-- NinjaScript calls OnBarUpdate once per bar of EVERY series added in State.Configure, and the
+     scalar accessors (Open/High/Low/Close/Volume/Time/CurrentBar) resolve against BarsArray[BarsInProgress].
+     Without this guard the rules would be evaluated again on each secondary-series bar close, reading that
+     series' prices through the very same "Open[3]" that means the primary chart on the primary call.
+     Emitted UNCONDITIONALLY (not only for multi-chart strategies): on a single-series strategy
+     BarsInProgress is always 0, so it costs nothing, and the generated file stays correct if a series is
+     added to it by hand. It must precede the OnInit rules as well - those are a once-per-strategy
+     initialization, not a once-per-series one. -->
+			// Rules are evaluated on the primary series only - the secondary series just
+			// supply data (scalar Open/Close/CurrentBar follow BarsArray[BarsInProgress]).
+			if (BarsInProgress != 0)
+				return;
+<#if cotCheckedSymbols?has_content>
+
+			SqCOTCheckForUpdate();
+</#if>
+
+<#-- OnInit rules: SQX OnInit = "evaluated before the EA starts, initialize some values".
+     NinjaScript has no exact pre-first-bar-with-data hook, so run them once on the first bar (CurrentBar == 0),
+     BEFORE the BarsRequiredToTrade guard. Emitted only when the strategy actually has OnInit rules. -->
+<#if getRulesCountForEvent("OnInit") gt 0>
+<#-- On bar 0 every non-zero offset is past the first bar: sqReadsOnInit makes the read macros guard it. -->
+<#global sqReadsOnInit = true>
+			if (CurrentBar == 0)
+			{
+<@printRulesForEvent "OnInit" />			}
+<#global sqReadsOnInit = false>
+</#if>
+<#-- On a multi-chart strategy the scalar CurrentBar only covers the primary series, so the
+     guard must check EVERY series - otherwise an indicator over the (still short) secondary series
+     reads out of range on the first bars. -->
+<@printBarsGuard />
+
+<#-- Trading options: reset the entry gate, then run each option's per-bar code
+     (may set openingOrdersAllowed = false and/or close positions) BEFORE the rules. -->
+			openingOrdersAllowed = true;
+<@printTradingOptionsCode />
+<#-- Manage-based exit methods: per-bar management of the open position
+     (ExitAfterBars / MoveSL2BE), emitted before the entry rules. -->
+<@printExitMethodsCode />
+<#-- Render the trading rules only when the OnBarUpdate event has any. -->
+<#if getRulesCountForEvent("OnBarUpdate") gt 0>
+<@printRulesForEvent "OnBarUpdate" />
+</#if>
+			<#-- Pending entries are submitted here, after every rule, so that a market fallback
+			     in one rule never runs while a pending from another is Working - see sqLongPendQueued. -->
+			sqFlushPendingEntries();
+		}
+<#-- OnExecutionUpdate: records which entry signal opened the live position, for the per-bar stop
+     management in printTrailStopManage. SetStopLoss binds to a signal NAME, and a pending entry
+     block owns two of them - the resting order and the market fallback it submits when its level is
+     already through the close - so managing the stop by a literal name manages the wrong position
+     half the time. Which one FILLED is knowable only here: submission-side state is written bars
+     before the fill and can be overwritten in between (see printTrailStopManage).
+
+     Emitted only when the strategy trails, has a timed exit, or needs the order register (needsOrderRegister) - all
+     address the stop by holder name and so need the field maintained - or when a market entry records a
+     price-level stop (sqUsesWrongSideLevelSL), which the fill checks against its price. Every other strategy
+     generates source without it. -->
+<#if (emTrailResetDone!false) || ((emSeenExitAfterBars![])?size > 0) || needsOrderRegister() || (sqUsesWrongSideLevelSL!false)>
+
+		protected override void OnExecutionUpdate(Execution execution, string executionId, double price, int quantity,
+			MarketPosition marketPosition, string orderId, DateTime time)
+		{
+			if (execution.Order == null)
+			return;
+
+			// A partial fill already opens the position, so it has to count.
+			if (execution.Order.OrderState != OrderState.Filled && execution.Order.OrderState != OrderState.PartFilled)
+			return;
+<#if (sqUsesMoveSetStops!false) || (sqUsesSetEveryStop!false) || (sqLendsStopLoss!false)>
+
+			sqNoteEntryExecution(execution.Order, quantity);
+</#if>
+<#if sqUsesWrongSideLevelSL!false>
+
+<#-- A market entry's price-level stop on the wrong side of the fill is already through the market, and
+     StrategyQuant fills it at once at the entry price. The target moves onto the fill price, which closes
+     the trade there on this bar, and the stop out of reach. A level of 0 is no level; one below 0 is a real
+     level, on the wrong side of a short. -->
+			// A price-level stop on the wrong side of the fill closes the trade at the fill price.
+			if (execution.Order.OrderAction == OrderAction.Buy && !double.IsNaN(sqLongLevelSL))
+			{
+				if (sqLongLevelSL != 0 && sqRoundPrice(sqLongLevelSL) > price)
+				{
+					SetStopLoss(execution.Order.Name, CalculationMode.Price, TickSize, false);
+					SetProfitTarget(execution.Order.Name, CalculationMode.Price, price);
+				}
+				sqLongLevelSL = double.NaN;
+			}
+			else if (execution.Order.OrderAction == OrderAction.SellShort && !double.IsNaN(sqShortLevelSL))
+			{
+				if (sqShortLevelSL != 0 && sqRoundPrice(sqShortLevelSL) < price)
+				{
+					SetStopLoss(execution.Order.Name, CalculationMode.Price, 1e9, false);
+					SetProfitTarget(execution.Order.Name, CalculationMode.Price, price);
+				}
+				sqShortLevelSL = double.NaN;
+			}
+</#if>
+<#if (emTrailResetDone!false) || ((emSeenExitAfterBars![])?size > 0) || needsOrderRegister()>
+
+			// Managed-approach entries are Buy (long) and SellShort (short); Sell and BuyToCover are
+			// exits and must not overwrite the name the position was opened under.
+			if (execution.Order.OrderAction == OrderAction.Buy)
+			sqLongEntrySignal = execution.Order.Name;
+			else if (execution.Order.OrderAction == OrderAction.SellShort)
+			sqShortEntrySignal = execution.Order.Name;
+</#if>
+<#if (emTrailResetDone!false) || ((emSeenExitAfterBars![])?size > 0)>
+
+			if (execution.Order.OrderAction == OrderAction.Sell && Position.MarketPosition != MarketPosition.Long)
+			sqReleaseExitLevels(true);
+			else if (execution.Order.OrderAction == OrderAction.BuyToCover && Position.MarketPosition != MarketPosition.Short)
+			sqReleaseExitLevels(false);
+</#if>
+		}
+<#if sqUsesWrongSideLevelSL!false>
+
+<#--
+  <summary>The price-level stop loss of the last LONG market entry, recorded at the entry and read at its
+  fill: a level on the wrong side of the fill closes the trade at the fill price. NaN when there is none.</summary>
+-->
+<#-- The price-level stop loss of the last LONG market entry, recorded at the entry and read at its fill. -->
+		private double sqLongLevelSL = double.NaN;
+
+<#-- Short-side twin of sqLongLevelSL. -->
+		private double sqShortLevelSL = double.NaN;
+</#if>
+<#if sqUsesDeferredLevelSL!false>
+
+<#-- The price-level stop of a LONG reversing entry on the decision close, set from the bar after its fill
+     (printDeferredLevelSLArm); NaN when there is none. The name is the entry's signal name. -->
+		private double sqLongDeferSL = double.NaN;
+		private string sqLongDeferSLName = "";
+
+<#-- Short-side twins of sqLongDeferSL / sqLongDeferSLName. -->
+		private double sqShortDeferSL = double.NaN;
+		private string sqShortDeferSLName = "";
+</#if>
+</#if>
+<#-- OnOrderUpdate: keeps the register of live stop and target orders (sqTrackStopOrder in SQ.inc) that
+     the break-even move, the Move SL action and the OrderSL/OrderPT blocks read. The Managed approach has no getter for the level
+     SetStopLoss configured, and the strategy's Orders collection is empty in a backtest, so the order
+     objects are collected here; NinjaTrader raises the update inside the SetStopLoss call, which keeps
+     the register current within the same OnBarUpdate.
+
+     Emitted only when the strategy needs the register (needsOrderRegister: a break-even move, a Move
+     SL/PT action, or an OrderSL/OrderPT block). -->
+<#if needsOrderRegister()>
+
+		protected override void OnOrderUpdate(Order order, double limitPrice, double stopPrice, int quantity,
+			int filled, double averageFillPrice, OrderState orderState, DateTime time, ErrorCode error, string comment)
+		{
+			sqTrackStopOrder(order);
+		}
+</#if>
+
+<#-- Runtime helpers (sqAtrTicks, ...) rendered as private members of the class. -->
+<#include "/NinjaTrader/SQ.inc">
+<#-- Custom indicators (VWAP, ...) NinjaTrader has no native method for. -->
+<#include "/NinjaTrader/SQIndicators.inc">
+<#-- COT helper methods (conditionally emitted when COT blocks are used). -->
+<#include "/NinjaTrader/SqCOTBlocks.inc">
+
+		<#-- The version guard. Its BODY is emitted here, at the end of the class, because only by now
+		     has every block rendered and set sqUsesIndicatorPackage - a strategy that calls no shipped
+		     indicator must not reference the package at all, or it would stop compiling for a user who
+		     never installed it. -->
+<#--
+  <summary>
+  Refuses to run against an indicator package other than the one this strategy was exported
+  with. An indicator whose math changed later would otherwise make this strategy compute
+  something its backtest never produced, without a word.
+  </summary>
+-->
+		/// <summary>Refuses to run against an indicator package other than the one this strategy was exported with.</summary>
+		private void SqCheckIndicatorPackage()
+		{
+<#if sqUsesIndicatorPackage??>			if (NinjaTrader.NinjaScript.Indicators.StrategyQuant.SqPackage.Version != "${sqIndicatorPackageVersion}")
+			{
+				throw new Exception("This strategy was exported against StrategyQuant indicator package "
+					+ "${sqIndicatorPackageVersion}, and the installed package is "
+					+ NinjaTrader.NinjaScript.Indicators.StrategyQuant.SqPackage.Version
+					+ ". Import the indicators shipped with this StrategyQuant build before running it.");
+			}
+</#if>		}
+
+		#region Strategy fields
+		<#-- Field declarations live at the END of the class: the generated file reads top-down
+		     as behaviour (lifecycle -> rules -> runtime) with the state it uses gathered here.
+		     C# has no forward-declaration requirement, so the placement is purely a readability
+		     choice. -->
+		<#-- Strategy variables declared as private double fields.
+		     Emitted only when the strategy defines variables; AssignVariable writes to them. -->
+<@printVariableDeclarations />
+<@printSubchartSymbolProperties />
+		<#-- Money management fields: the selected MM type's variables (e.g. mmLots),
+		     used by EnterLong/Short quantity when the Size formula is UseGlobalMM. -->
+<@printMoneyManagementVariables />
+		<#-- Trading options: entry gate + per-option fields. openingOrdersAllowed is
+		     declared unconditionally (true by default) so the EnterAtMarket gate compiles even
+		     when the strategy has no trading options. -->
+
+<#-- Entry gate reset every bar; trading options may close it. -->
+		private bool openingOrdersAllowed = true;
+
+		<#-- Pip units: SQX defines a "pip" as InstrumentInfo.tickSize (the traditional
+		     pip, e.g. 0.0001 on a 5-decimal forex), which is NOT NinjaScript's TickSize (the real minimum
+		     tick = SQX tickStep, e.g. 0.00001). Both are set in State.DataLoaded once TickSize is known. -->
+
+<#-- The SQX pip as a price distance (InstrumentInfo.tickSize, e.g. 0.0001 on 5-decimal forex). -->
+		private double SqPip = 0;
+
+<#-- Converts a pip count to a tick count for CalculationMode.Ticks (SqPip / TickSize). -->
+		private int SqPipFactor = 1;
+
+		<#-- Emitted unconditionally: SQIndicators.inc is, and the helper reading this lives there. -->
+
+<#-- True when the source data stamped bars with their CLOSE, as NinjaScript does. sourceBarTimeType is the data's
+     own stamp (1 start, 2 end); 0 means the strategy's symbol is not in the data database, and then NinjaTrader's
+     own convention applies - the end of the bar - instead of silently shifting every time block by one bar. -->
+		private const bool SqSourceEndOfBar = <#if (sourceBarTimeType??) && sourceBarTimeType?number == 1>false<#else>true</#if>;
+
+		<#-- Order size is a LOT count in StrategyQuant and a UNIT count in NinjaTrader - its
+		     documentation puts a full forex lot at a quantity of 100,000 and its own PointValue at the
+		     value of a point for ONE unit. The factor between the two is the ratio of the point values,
+		     which is also right where no lot notion exists (E-mini: 50 / 50 = 1). SqPointValue carries
+		     StrategyQuant's side, emitted from InstrumentInfo.pointValue, and is declared only when the
+		     instrument resolved. -->
+
+<#if (pointValue??) && pointValue?number gt 0>
+		/// <summary>Money value of a full price point for one lot; for a future, of one contract traded.</summary>
+		private double SqPointValue = ${pointValue};
+
+<#-- Lots to NinjaTrader quantity units; 1 when both count the same way. -->
+		private double SqContractSize = 1;
+</#if>
+
+		<#-- The running trailing-stop level. NaN means "not trailing yet" - reset whenever the side of the
+		     position changes, so a new position starts from its own stop loss rather than the previous trade's. -->
+
+<#-- Running trailing-stop level; NaN = not trailing yet, reset. -->
+		private double sqTrailStop = double.NaN;
+
+<#-- The side of the position sqTrailStop belongs to. -->
+		private MarketPosition sqTrailSide = MarketPosition.Flat;
+
+<#-- True when the trailing stop moved the stop on the current bar. -->
+		private bool sqTrailMovedThisBar = false;
+<@printTradingOptionsVariables />
+		#endregion
+	}
+}

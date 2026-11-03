@@ -1,0 +1,1 @@
+COTFieldValue(<@printParam block "#CotSymbol#" />, <@printParam block "#Period#" />, <@printParam block "#FieldIndex#" />)[<@printShift block shift />]

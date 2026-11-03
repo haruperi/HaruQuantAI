@@ -1,0 +1,17 @@
+<div class="sq-input {{::inputtype=='select' ? 'sq-input-select' : ''}}" ng-class="{'sq-input-disabled':ngDisabled}">
+	<div class="sq-tooltip" ng-if="::(!hideTooltip && tooltip)" ng-bind="::tooltip"></div>
+	<label ng-if="::label" ng-bind="::label"></label>
+	<input ng-if="::(inputtype!='select' && req)" type="{{::inputtype}}" ng-model="modelSQ.val" ng-attr-min="{{::min}}" ng-attr-max="{{::max}}" ng-attr-step="{{::step}}"  ng-model-options="::ngModelOptions" name="{{::name}}" required ng-readonly="currentAction == 'Edit'" ng-disabled="ngDisabled"/>
+	<input ng-if="::(inputtype!='select' && !req)" type="{{::inputtype}}" ng-model="modelSQ.val" ng-attr-min="{{::min}}" ng-attr-max="{{::max}}" ng-attr-step="{{::step}}"  ng-model-options="::ngModelOptions" name="{{::name}}" ng-readonly="currentAction == 'Edit' || readonly" ng-disabled="ngDisabled" />
+	<div class="sq-input-spinner-btns" ng-if="((inputtype=='number' || numbertype=='time')) && !ngDisabled"><span class="sq-input-spinner-minus" ng-click="changeValue('-')"></span><span class="sq-input-spinner-plus" ng-click="changeValue('+')"></span></div>
+	<div ng-if="::(inputtype=='select' && req)" class="sq-input-select-overlay">
+		<span ng-bind="modelSQ.selectSpan"></span>
+		<select ng-if="::(optionsValue && optionsDisplay)" ng-options="o.{{::optionsValue}} as o.{{::optionsDisplay}} for o in options" name="{{::name}}" ng-model="modelSQ.val" ng-change="onSelect()" ng-disabled="ngDisabled" required ></select>
+		<select ng-if="::(!optionsValue || !optionsDisplay)" ng-options="o as o for o in options" name="{{::name}}" ng-model="modelSQ.val" ng-change="onSelect()" ng-disabled="ngDisabled" required ></select> 
+	</div>
+	<div ng-if="::(inputtype=='select' && !req)" class="sq-input-select-overlay">
+		<span ng-bind="modelSQ.selectSpan"></span>
+		<select ng-if="::(optionsValue && optionsDisplay)" ng-options="o.{{::optionsValue}} as o.{{::optionsDisplay}} for o in options" name="{{::name}}" ng-model="modelSQ.val" ng-change="onSelect()" ng-disabled="ngDisabled" ></select>
+		<select ng-if="::(!optionsValue || !optionsDisplay)" ng-options="o as o for o in options" name="{{::name}}" ng-model="modelSQ.val" ng-change="onSelect()" ng-disabled="ngDisabled" ></select> 
+	</div>
+</div>

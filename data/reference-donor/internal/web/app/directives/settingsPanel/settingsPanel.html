@@ -1,0 +1,14 @@
+<div id="settings-panel">
+    <div class="settings-group" ng-click="showAdvancedSettings($event)">
+        <div ng-repeat="settingsGroup in settingsGroups" ng-click="openSettings()">
+            <label class="settings-title" ng-if="settingsGroup.title">{{settingsGroup.title | tsq}}</label>
+            <table>
+                <tr ng-repeat="setting in settingsGroup.settings" ng-show="setting.name != 'Trading options' || (dataConfig.setups[0].engine != 'Stockpicker' && dataConfig.setups[0].engine != 'Single-asset cloud strategy')">
+                    <td ng-bind="setting.name | tsq" />
+                    <td ng-bind-html="setting.value | tsq" />
+                </tr>
+            </table>
+            <br/>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,8 @@
+<ul class="dropdown-menu lang-menu">
+    <li ng-repeat="language in languages" ng-click="downloadLanguage(language);">
+        <a ng-class="{ 'dropdown-item-checked': language.title == $root.selectedLanguage.title }">
+            {{::language.title}}
+            <i class="fa fa-check" aria-hidden="true"></i>
+        </a>
+    </li>
+</ul>

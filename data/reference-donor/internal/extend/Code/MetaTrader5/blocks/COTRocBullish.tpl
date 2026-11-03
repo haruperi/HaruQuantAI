@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_RocBullish(COT_${cs}_52W_0, COT_${cs}_156W_0, COT_${cs}_52W_2, COT_${cs}_156W_2, <@printShift block "0" />, <@printParam block "#RocPeriod#" />, <@printParam block "#ROCThreshold#" />)

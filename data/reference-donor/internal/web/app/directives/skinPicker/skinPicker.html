@@ -1,0 +1,8 @@
+<ul class="dropdown-menu lang-menu">
+    <li ng-repeat="skin in skins | orderBy: '+position' track by $index" ng-click="changeSkin(skin)">
+        <a ng-class="{ 'dropdown-item-checked': skin.name == selectedSkin.name }">
+            {{::skin.name}}
+            <i class="fa fa-check" aria-hidden="true"></i>
+        </a>
+    </li>
+</ul>

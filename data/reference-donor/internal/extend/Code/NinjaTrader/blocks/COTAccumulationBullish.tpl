@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTAccumBull(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#MinWeeks#" />)

@@ -1,0 +1,31 @@
+<span class="simple-cross-check">
+    <label class="settings-title">
+        <tsq>Cross checks (strategy robustness tests)</tsq>
+        <span ng-show="!$root.license.isProVersion" class="only-pro" ng-bind="onlyInProTitle"></span>
+        <div ng-show="$root.license.isProVersion" class="sq-checkbox disable-all-checkbox" data-testid="crosscheck-disable-all">
+            <label class="sqn-label" ng-click="config.disabled = !config.disabled; onDisableAll()" tsq>Disable all</label>
+            <input type="checkbox" ng-model="config.disabled" ng-change="onDisableAll()" id="cc-config-disabled-all" ng-disabled="!$root.license.isProVersion" />
+            <label class="sqn-label disable-all-switch" for="cc-config-disabled-all"></label>
+        </div>
+    </label>
+            
+    <br><br>
+
+    <div class="settings-table-cross-check">
+        <div ng-repeat="category in categories | orderBy: '+position'" ng-show="!config.useRecommended" class="simple-cs-section">
+            <div class="simple-cs-line category">
+                <label class="categoryName" id="cc-category-open-{{::$index}}"><span class="categoryNameBold">{{category.name | tsq}}</span></label>
+            </div>
+
+            <div ng-repeat="crossCheck in category.crossChecks | orderBy: '+position'" class="simple-cs-line items">
+                <label ng-click="crossCheck.use = config.disabled ? crossCheck.use : !crossCheck.use; onCrossCheckChecked(crossCheck)" data-testid="crosscheck-toggle-{{::kebab(crossCheck.name)}}">{{crossCheck.title | tsq}}</label>
+                <div class="sq-checkbox pull-right">
+                    <input type="checkbox" ng-model="crossCheck.use" ng-change="onCrossCheckChecked(crossCheck)"
+                        ng-disabled="config.disabled || !$root.license.isProVersion || crossCheck.disabled"
+                        id="cc-ccrossCheck-{{::$parent.$index}}-{{::$index}}" />
+                    <label class="sqn-label" for="cc-ccrossCheck-{{::$parent.$index}}-{{::$index}}"></label>
+                </div>
+            </div>
+        </div>
+    </div>
+</span>

@@ -1,0 +1,10 @@
+<div style="display: inline;">
+    <label class="sqn-label" ng-bind="label | tsq"></label>
+    <div class="input-group date sqn-input">
+        <input id="{{::datePickerId}}" class="{{::sqclass}}" ng-model="picker.date" ng-blur="onDateChanged(picker.date)"
+            ng-disabled="ngDisabled">
+        <span class="input-group-addon" ng-show="!ngDisabled" ng-click="clickInput()">
+            <span class="glyphicon glyphicon-calendar"></span>
+        </span>
+    </div>
+</div>

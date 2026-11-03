@@ -1,0 +1,1 @@
+(COTScoreMomentumBelow(<@printParam block "#CotSymbol#" />, mom<-<@printParam block "#MomentumThreshold#" />))

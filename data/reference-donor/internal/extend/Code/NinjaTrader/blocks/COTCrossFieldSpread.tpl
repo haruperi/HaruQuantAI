@@ -1,0 +1,1 @@
+SqCOTCrossFieldSpread(<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign>${cotIdentifier(cs, p?upper_case)}, <@printParam block "#Field1Index#" />, <@printParam block "#Field2Index#" />, <#if cotCacheFolder??>cotCacheFolder<#else>""</#if>)<@printShift block shift />

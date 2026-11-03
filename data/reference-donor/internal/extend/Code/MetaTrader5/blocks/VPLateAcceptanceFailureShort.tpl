@@ -1,0 +1,4 @@
+(sqClose(<@printInput block true />, <@printShift block "0" />) >= sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 2, <@printShift block "0" />) && sqClose(<@printInput block true />, <@printShift block "0" />) <= sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 1, <@printShift block "0" />)
+&& sqClose(<@printInput block true />, <@printShift block "0" />+1) > sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 1, <@printShift block "0" />+1) + sqConvertToRealPips("Current", 1) / 10.0
+&& sqClose(<@printInput block true />, <@printShift block "0" />+2) > sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 1, <@printShift block "0" />+2) + sqConvertToRealPips("Current", 1) / 10.0
+&& sqClose(<@printInput block true />, <@printShift block "0" />+3) > sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 1, <@printShift block "0" />+3) + sqConvertToRealPips("Current", 1) / 10.0)

@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title tsq>StrategyQuant</title>
+    <meta name="description" content="StrategyQuant">
+    <link rel="stylesheet" href="../libs/Batch1/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="../libs/Batch1/styles/sqstyle.css">
+    <link rel="stylesheet" href="../libs/Batch1/styles/open-sans.css">
+
+    <script src="../libs/Batch1/js/jquery-3.1.1.min.js"></script>
+    <script src="../libs/Batch1/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#license-verify-prog").hide();
+
+            if (!window.SQLicense) {
+                window.SQLicense = {
+                    perform: async (request, callback) => {
+                        const response = await window.electron.http('license/'+request);
+                        console.log("ICP response: ", response); 
+
+                        if(callback) {
+                            callback(response);
+                        }
+                    }
+                }
+            }
+
+            printDetails();
+        });
+
+        $(document).on("click", "a.help-link", function () {
+            window.SQLicense.perform("help");
+        });
+
+        $(document).on("click", "a.btn1", function () {
+            window.SQLicense.perform("btn1");
+        });
+
+        $(document).on("click", "a.btn2", function () {
+            window.SQLicense.perform("btn2");
+        });
+
+        $(document).on("click", "a.licproblem", function () {
+            window.SQLicense.perform("licproblem");
+        });
+
+        $(document).on("click", "a.upgrade", function () {
+            window.SQLicense.perform("upgrade");
+        });
+
+        $(document).on("click", "a.downgrade", function () {
+            window.SQLicense.perform("downgrade");
+        });
+
+        $(document).on("click", "a.btn3", function () {
+            window.SQLicense.perform("btn3");
+        });
+
+        $(document).on("click", "a.btnLST", function () {
+            window.SQLicense.perform("showLicenseTerms");
+        });
+
+        /*
+                    //help
+                    $("a.help-link").click(function(event) {
+                        window.SQLicense.perform("help");
+                    });
+                    
+                    //btn1
+                    $("a.btn1").click(function(event) {
+                        window.SQLicense.perform("btn1");
+                    });
+                    
+                    //btn2
+                    $("a.btn2").click(function(event) {
+                         window.SQLicense.perform("btn2");           
+                    });
+                    
+                    //btn3
+                    $("a.btn3").click(function(event) {
+                        window.SQLicense.perform("btn3");               
+                    });
+                    */
+        //print license details
+        function printDetails() {
+            window.SQLicense.perform("getdetails", function (response) {
+                afterRequest(response);
+            });           
+        }
+
+        //verify license online ------------------------------------------        
+        $(document).on('submit', 'form', function (e) {
+            e.preventDefault();
+
+            if ($('#checkboxLST').not(':checked').length) {
+                window.SQLicense.perform("showAlert:Verificar a licença:O senhor precisa concordar com os termos de licenciamento.");
+
+                return;
+            }
+
+            verifyLicense();
+        });
+
+        function verifyLicense() {
+            $("#license-verify-prog").show();
+
+            setTimeout(verifyLicenseTimeout, 1000);
+        }
+
+        function verifyLicenseTimeout() {
+            $("body").removeClass("failed");
+            $("#license-panel-info").html("Verificando...");
+
+            var license = $("input#license").val();
+
+            window.SQLicense.perform('verify:' + license, function (response) {
+                afterRequest(response);
+            });            
+        }
+
+        function afterRequest(response) {
+            $("#license-verify-prog").hide();
+
+            $("#help-link").css("display", "none");
+            $("#upgrade-link").css("display", "none");
+            $("#downgrade-link").css("display", "none");
+
+            var data = JSON.parse(response);
+
+            if (data.success) {
+                $("body").removeClass("failed");
+            } else {
+                if (data.license_support_expired) {
+                    $("#upgrade-link").css("display", "block");
+                    $("#downgrade-link").css("display", "block");
+                } else {
+                    $("#help-link").css("display", "block");
+                }
+
+                $("body").addClass("failed");
+            }
+
+            if (typeof data.appversion !== 'undefined') $("#app-version").html(data.appversion);
+            if (typeof data.hardwareid !== 'undefined') $("#hardware-id").html(data.hardwareid);
+            if (typeof data.license_info !== 'undefined') $("#license-info").html(data.license_info);
+            if (typeof data.license_panel_info !== 'undefined') $("#license-panel-info").html(data.license_panel_info);
+            if (typeof data.btn3 !== 'undefined') $("a.btn3").html(data.btn3);
+
+            if (typeof data.license !== 'undefined' && data.license != '') {
+                $("input#license").val(data.license);
+
+                verifyLicense();
+            }
+        }
+    </script>
+</head>
+
+<body class="licence-dialog br-edition">
+    <div class="licence-header"></div>
+    <div id="license-panel-info"></div>
+    <div id="license-info"></div>
+    <div id="help-link-panel">
+        <a id="help-link" class="licproblem" style="display: none;" tsq>Problema com a licença? Cliquar aqui</a>
+
+        <a id="upgrade-link" class="upgrade" style="display: none;" tsq>Suporte de Vendas &amp; Atualizações por mais um ano
+            year</a>
+        <a id="downgrade-link" class="downgrade" style="display: none;" tsq>Como regressar a uma versão anterior do aplicativo</a>
+    </div>
+    <div class="license-panel">
+        <form role="form" id="license-form" autocomplete="off">
+            <div class="form-group">
+                <label for="license" tsq>Insira o número de licença:</label>
+                <input type="text" class="form-control" id="license" autocomplete="off">
+                <img src="../img/sq-license-progress.gif" id="license-verify-prog" />
+
+                <div class="sq-checkbox license-terms">
+                    <input type="checkbox" id="checkboxLST" name="checkboxLST"/>
+                    <label>
+                        <tsq>Concordo com a</tsq><a class="btnLST" tsq>Cença e os termos do serviço</a>
+                    </label>
+                </div>    
+
+                <button id="buttonVerifyLicense-15a" type="submit" class="verify-btn" tsq>Verificar licença</button>
+            </div>
+        </form>
+        <div class="licence-or">
+            <div tsq>ou</div>
+        </div>
+        <div class="licence-buttons">
+            <a class="btn1" tsq>Comprar licença</a>
+            <a class="btn2" tsq>SQ página inicial</a>
+            <a class="btn3" tsq>Saída</a>
+        </div>
+    </div>
+    <div class="license-flex-panel"></div>
+    <div class="license-disclaimer">
+        Aviso sobre Bónus:<br/>
+        Quaisquer estratégias incluídas ou fornecidas em conjunto com o StrategyQuant X são apenas para fins educacionais. Não se tratam de aconselhamento de investimentos e o seu desempenho futuro não é garantido.
+        <br/><br/>            
+        Aviso sobre risco:<br/>
+        Negociação em Forex, futuros, ações ou crypto significa risco substancial e por isso não são adequadas a todos os investidores. O investidor neste tipo de ativos pode perder potencialmente todo ou mesmo mais do que o investimento inicial. Capital de risco deve ser apenas restrito aquele que pode ser perdido sem prejudicar a segurança financeira ou estilo de vida do investidor. Apenas capital de risco deve ser usado para negociação em ativos financeiros e apenas os investidores com níveis suficientes de capital de risco devem considerar entrar na atividade de negociação em ativos financeiros. Desempenho passado não é necessariamente indicativo de resultados futuros.
+        <br/><br/>            
+        Aviso sobre desempenho hipotético:<br/>
+        Os resultados do desempenho hipotético têm várias limitações inerentes, algumas das quais encontram-se descritas em baixo. Não existe qualquer suposição que alguma conta irá ou será provável de atingir os lucros similares aqueles que são apresentados; de fato existem mesmo diferenças substanciais entre os resultados de desempenho hipotético e os resultados atuais que podem ser atingidos por qualquer programa de negociação em ativos financeiros. Uma das limitações dos resultados de desempenho hipotético é que estes resultados surgem com o benefício que o investidor tem sobre o conhecimento do passado histórico de comportamento dos mercados financeiros. Adicionalmente, um desempenho hipotético não contabiliza o risco financeiro real e nenhuma atividade de negociação hipotética pode contabilizar o impacto do risco financeiro de uma negociação em ambiente real, como por exempo a capacidade do investidor em suportar perdas ou manter a sua adesão a um programa a uma estratégia de negociação, apesar de perdas já incurridas. Estes são alguns exemplos de fatores materiais que podem afetar os resultados de uma atividade de negociação em ambiente real, isto é com ativos financeiros reais. Existem vários outros fatores relacionados com os mercados financeiros em geral ou com a implementação de qualquer programa ou estratégia de negociação que não podem ser fielmente contabilizados na simulação hipotética de um programa ou de uma estratéigia de negociação e todos eles podem afetar adversamente os resultados reais de negociação.<br/><br/>
+    </div>
+    <div class="license-info-panel">
+        StrategyQuant
+        <span id="app-version"></span>
+        <br> &copy; Copyright StrategyQuant 2025. Todos os direitos reservados. 
+        <br> ID do Hardware: 
+        <span id="hardware-id"></span>
+    </div>
+    <style>
+        .br-edition a{
+            color: #43AA8B !important;
+        }
+        .br-edition .verify-btn {
+            background: #43AA8B !important;
+        }
+        .br-edition .form-control{
+            background-color: #e5faf4 !important;
+        }
+        .br-edition .licence-header{
+            background-color: #43AA8B !important;
+        }
+    </style>
+</body>
+
+</html>

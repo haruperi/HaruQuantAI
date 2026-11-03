@@ -1,0 +1,23 @@
+<!-- Uninstall confirmation - shown when the iframe requests an uninstall;
+     the local files are removed only after the user confirms here.
+     Driven by LayoutCtrl ($scope.uninstallConfirm). -->
+<div class="modal fade not-resize" id="marketplaceUninstallConfirmPopup" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" ng-if="uninstallConfirm">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="closeUninstallConfirm()" aria-label="Close"
+                        data-testid="marketplace-uninstall-confirm-close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" tsq>Uninstall extension</h4>
+            </div>
+            <div class="modal-body marketplace-uninstall-confirm-body">
+                <div class="marketplace-uninstall-confirm-lead" tsq>Are you sure you want to uninstall this extension?</div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="closeUninstallConfirm()"
+                        data-testid="marketplace-uninstall-confirm-cancel" tsq>Cancel</button>
+                <button type="button" class="btn btn-default btn-delete" ng-click="confirmUninstall()"
+                        data-testid="marketplace-uninstall-confirm-ok" tsq>Uninstall</button>
+            </div>
+        </div>
+    </div>
+</div>

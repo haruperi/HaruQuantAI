@@ -1,0 +1,1 @@
+(COTSmartDumbBearish(<@printParam block "#CotSymbol#" />))

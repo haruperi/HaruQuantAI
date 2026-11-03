@@ -1,0 +1,5 @@
+<form>
+    <input class="sqn-input instSearchInput" id="{{::filterId}}" name="search" type="text" ng-model="filter.text"
+        placeholder="{{'Filter items' | tsq}}" ng-change="filter.onSearch()" />
+    <div class="sqn-input-clear-icon" ng-if="filter.text!=''" ng-click="filter.text='';filter.onSearch();"></div>
+</form>

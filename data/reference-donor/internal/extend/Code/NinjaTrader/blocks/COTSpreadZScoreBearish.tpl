@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTSpreadZBear(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#Period#" />, <@printParam block "#ZThreshold#" />)

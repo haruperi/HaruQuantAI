@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_SpecExhaustionShort(COT_${cs}_52W_2, COT_${cs}_52W_0, <@printShift block "0" />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#SpecExtreme#" />, <@printParam block "#HedgerThreshold#" />)

@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- TEMPLATE: equity-dashboard — equity curve + drawdown + stat tiles.
+     Vetted starting point for AI-generated Custom Analysis Tabs. Copy, then adapt.
+     Data arrives via PostMessage straight from SQX (never through the AI model). -->
+<head>
+<meta charset="utf-8">
+<title>Equity Dashboard</title>
+<style>
+  :root {
+    --bg-body:#ffffff; --bg-surface:#f8f8f8; --text-main:#333333; --text-muted:#777777;
+    --border-color:#dddddd; --primary:#337ab7; --success:#5cb85c; --danger:#d9534f;
+  }
+  [data-theme="dark"] {
+    --bg-body:#1e1e1e; --bg-surface:#2d2d2d; --text-main:#e0e0e0; --text-muted:#aaaaaa;
+    --border-color:#444444; --primary:#5b9bd5; --success:#6fcf6f; --danger:#e57373;
+  }
+  html,body { margin:0; height:100%; }
+  body { background:var(--bg-body); color:var(--text-main);
+         font:13px/1.45 "Segoe UI",Arial,sans-serif; }
+  #app { display:flex; flex-direction:column; height:100vh; padding:14px; box-sizing:border-box; }
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+           gap:8px; flex-shrink:0; }
+  .tile { background:var(--bg-surface); border:1px solid var(--border-color);
+          border-radius:6px; padding:8px 10px; }
+  .tile .k { color:var(--text-muted); font-size:11px; }
+  .tile .v { font-size:17px; font-weight:600; margin-top:2px; }
+  .v.pos { color:var(--success); } .v.neg { color:var(--danger); }
+  .charts { flex:1; display:flex; flex-direction:column; gap:10px; min-height:0;
+            margin-top:12px; overflow:auto; }
+  .chartbox { background:var(--bg-surface); border:1px solid var(--border-color);
+              border-radius:6px; padding:8px; }
+  .chartbox h4 { margin:0 0 6px; font-size:12px; color:var(--text-muted); }
+  canvas { width:100%; display:block; }
+  .empty { color:var(--text-muted); text-align:center; margin-top:40px; }
+  .disclaimer { margin-top:20px; padding-top:15px; border-top:1px solid var(--border-color);
+                font-size:11px; color:var(--text-muted); line-height:1.5;
+                text-align:justify; flex-shrink:0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="tiles" id="tiles"></div>
+  <div class="charts">
+    <div class="chartbox"><h4>Equity curve</h4><canvas id="eq" height="220"></canvas></div>
+    <div class="chartbox"><h4>Drawdown</h4><canvas id="dd" height="110"></canvas></div>
+  </div>
+  <div class="empty" id="empty">Select a strategy to see its dashboard.</div>
+  <div class="disclaimer">
+    This analysis is provided strictly for informational and educational purposes within
+    StrategyQuant X. It does not constitute financial, investment, or trading advice. All
+    results, including backtests and simulations, are based on historical data and
+    hypothetical performance, which may not reflect future market conditions. Past
+    performance is not indicative of future results. Trading involves substantial risk, and
+    you should conduct your own independent research and consult a licensed financial
+    advisor before making any investment or trading decisions.
+    <strong>This tool utilizes statistical math based on historical sequences; actual market
+    execution may vary significantly.</strong>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  let orders = [], stats = null;
+
+  function css(name) {
+    return getComputedStyle(document.documentElement).getPropertyValue(name).trim();
+  }
+
+  function isValidStrategy(d) {
+    return d && d.projectName && d.projectName.trim() &&
+           d.databankName && d.databankName.trim() &&
+           d.strategyName && d.strategyName.trim();
+  }
+
+  function requestData() {
+    window.parent.postMessage({ type: 'GET_STATS',
+      params: { resultKey: 'Portfolio', direction: '0', sampleType: '127', plType: '10' } }, '*');
+    window.parent.postMessage({ type: 'GET_ORDERS',
+      params: { resultKey: 'Portfolio', direction: '0', sampleType: '127' } }, '*');
+  }
+
+  function fmt(v, dec) {
+    if (v == null || v === -99999999) return '—';
+    return Number(v).toLocaleString('en-US',
+      { minimumFractionDigits: dec == null ? 2 : dec, maximumFractionDigits: dec == null ? 2 : dec });
+  }
+
+  function tile(k, v, cls) {
+    return '<div class="tile"><div class="k">' + k + '</div><div class="v ' + (cls || '') +
+           '">' + v + '</div></div>';
+  }
+
+  function renderTiles() {
+    if (!stats) return;
+    const el = document.getElementById('tiles');
+    el.innerHTML =
+      tile('Net profit', fmt(stats.NetProfit), stats.NetProfit >= 0 ? 'pos' : 'neg') +
+      tile('Profit factor', fmt(stats.ProfitFactor)) +
+      tile('Max DD %', fmt(stats.PctDrawdown) + '%', 'neg') +
+      tile('Return/DD', fmt(stats.ReturnDDRatio)) +
+      tile('Win rate', fmt(stats.WinningPct, 1) + '%') +
+      tile('Trades', fmt(stats.NumberOfTrades, 0)) +
+      tile('Sharpe', fmt(stats.SharpeRatio)) +
+      tile('Stagnation %', fmt(stats.StagnationPeriodPct, 1) + '%');
+  }
+
+  function balances() {
+    return orders
+      .filter(o => o.Balance != null && o.Balance !== -99999999 && o.CloseTime)
+      .sort((a, b) => Number(a.CloseTime) - Number(b.CloseTime))
+      .map(o => Number(o.Balance));
+  }
+
+  function drawLine(canvasId, values, colorVar, fillBelowZero) {
+    const c = document.getElementById(canvasId);
+    const w = c.clientWidth || 600, h = c.getAttribute('height');
+    c.width = w * devicePixelRatio; c.height = h * devicePixelRatio;
+    const g = c.getContext('2d');
+    g.scale(devicePixelRatio, devicePixelRatio);
+    g.clearRect(0, 0, w, h);
+    if (!values.length) return;
+    const min = Math.min.apply(null, values), max = Math.max.apply(null, values);
+    const span = (max - min) || 1;
+    const x = i => i / (values.length - 1 || 1) * (w - 8) + 4;
+    const y = v => h - 6 - (v - min) / span * (h - 12);
+    g.strokeStyle = css('--border-color'); g.lineWidth = 1;
+    if (min < 0 && max > 0) { g.beginPath(); g.moveTo(0, y(0)); g.lineTo(w, y(0)); g.stroke(); }
+    g.strokeStyle = css(colorVar); g.lineWidth = 1.6; g.beginPath();
+    values.forEach((v, i) => i ? g.lineTo(x(i), y(v)) : g.moveTo(x(i), y(v)));
+    g.stroke();
+    if (fillBelowZero) {
+      g.lineTo(x(values.length - 1), y(0)); g.lineTo(x(0), y(0)); g.closePath();
+      g.globalAlpha = 0.25; g.fillStyle = css(colorVar); g.fill(); g.globalAlpha = 1;
+    }
+  }
+
+  function redraw() {
+    const eq = balances();
+    document.getElementById('empty').style.display = eq.length ? 'none' : '';
+    if (!eq.length) return;
+    let peak = -Infinity;
+    const dd = eq.map(v => { peak = Math.max(peak, v); return v - peak; });
+    drawLine('eq', eq, '--primary', false);
+    drawLine('dd', dd, '--danger', true);
+    renderTiles();
+  }
+
+  window.addEventListener('message', function (e) {
+    const msg = e.data || {};
+    if (msg.type === 'STRATEGY_DATA' && isValidStrategy(msg.data)) requestData();
+    else if (msg.type === 'SET_THEME') {
+      document.documentElement.setAttribute('data-theme', msg.theme);
+      redraw();
+    } else if (msg.type === 'STATS_RESPONSE') { stats = msg.data.stats; renderTiles(); }
+    else if (msg.type === 'ORDERS_RESPONSE') { orders = msg.data.orders || []; redraw(); }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    new ResizeObserver(redraw).observe(document.getElementById('app'));
+  });
+})();
+</script>
+</body>
+</html>

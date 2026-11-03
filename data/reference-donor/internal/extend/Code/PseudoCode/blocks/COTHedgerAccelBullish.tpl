@@ -1,0 +1,1 @@
+(COTHedgerAccelBullish(<@printParam block "#CotSymbol#" />, accel><@printParam block "#AccelThreshold#" />))

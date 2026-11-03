@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign>(iCustom(NULL, 0, "SqCOT", ${cotIdentifier(cs, p?upper_case)}, 0, 0, <@printShift block shift />) >= <@printParam block "#ExitLevel#" />)

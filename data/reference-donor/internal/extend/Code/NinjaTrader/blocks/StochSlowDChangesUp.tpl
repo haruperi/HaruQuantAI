@@ -1,0 +1,2 @@
+<#-- Stochastic %D changes direction upwards (local min). -->
+(<@printStochValueAt block "D" "2" /> > <@printStochValueAt block "D" "1" /> && <@printStochValueAt block "D" "1" /> < <@printStochValueAt block "D" "0" />)

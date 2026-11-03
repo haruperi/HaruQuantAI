@@ -1,0 +1,2 @@
+<#-- Opens above KC lower after the previous open was below it. -->
+(<@printSeriesAt block "1"><@printSeries block "Open" /></@printSeriesAt> < sqRound(<@printKCValueAt block "Lower" "1" />, 6) && <@printSeriesAt block shift><@printSeries block "Open" /></@printSeriesAt> > sqRound(<@printKCValueAt block "Lower" "1" />, 6))

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <base href="/GRIDCONTROL">
+    <meta charset="utf-8">
+	<title>Grid Control</title>
+	<meta name="description" content="Grid Control">
+	<meta name="author" content="webmjkfm@gmail.com">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+
+	<link rel="stylesheet" href="GRIDCONTROL/layout/layout.css">
+	<link rel="stylesheet" href="common/Batch1/styles.css">
+	<link rel="stylesheet" href="common/Batch2/styles.css">
+
+	<script src="common/Batch1/libs.js"></script>
+	<script src="common/Batch2/libs.js"></script>
+	<script src="GRIDCONTROL/build/layout.js"></script>
+</head>
+
+<body ng-app="app" style="font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif; zoom: {{$root.zoom.css}};" class="{{$root.zoom.class}}">
+
+    <div ui-view="root" style="height:100%" />
+
+    <script>
+        window.appConfig = {
+            product: 'GRIDCONTROL',
+            productName: 'GridControl',
+            defaultState: 'app',
+            defaultURL: '/app',
+            gridSkin: 'dhx_web',
+            gridImagePath: '../img/dhtmlx/web/'
+        };
+    </script>
+    
+</body>
+
+</html>

@@ -1,0 +1,18 @@
+<div class="sq-combo-input">
+	<span class="sqn-label" ng-if="label">{{::label}}</span>
+	<div class="sqn-input sqn-select" ng-click="inputClick()">
+		<input type="text" ng-model="sqModel" name="{{::name}}" ng-disabled="ngDisabled" ng-model-options="ngModelOptions" />
+
+		<select ng-if="::(!single && optionsValue && optionsDisplay)" ng-options="o.{{::optionsValue}} as o.{{::optionsDisplay}} for o in options"
+		 name="{{::name}}" ng-model="sqModel" style="display: none;" ng-disabled="ngDisabled" size="{{selectHeight}}" ng-change="selectChange(sqModel)" multiple></select>
+		
+		<select ng-if="::(!single && (!optionsValue || !optionsDisplay))" ng-options="o as o for o in options" name="{{::name}}" ng-model="sqModel"
+		 ng-disabled="ngDisabled" size="{{selectHeight}}" style="display: none;" ng-change="selectChange(sqModel)" multiple></select>
+
+		<select ng-if="::(single && optionsValue && optionsDisplay)" ng-options="o.{{::optionsValue}} as o.{{::optionsDisplay}} for o in options"
+		 name="{{::name}}" ng-model="sqModel" style="display: none;" ng-disabled="ngDisabled" size="{{selectHeight}}" ng-change="selectChange(sqModel)"></select>
+		
+		<select ng-if="::(single && (!optionsValue || !optionsDisplay))" ng-options="o as o for o in options" name="{{::name}}" ng-model="sqModel"
+		 ng-disabled="ngDisabled" size="{{selectHeight}}" style="display: none;" ng-change="selectChange(sqModel)"></select>
+	</div>
+</div>

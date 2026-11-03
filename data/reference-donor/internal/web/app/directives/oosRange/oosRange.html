@@ -1,0 +1,16 @@
+<div class="oos-range-single">
+    <label class="sqn-label oos-range-label" ng-bind="getPartLabel()"></label>
+
+    <div class="sqn-input sqn-select" ng-class="[type]" data-testid="oos-range-type">
+        <span ng-bind="getTypeLabel()"></span>
+        <select ng-model="type" ng-options="item.value as (item.name | tsq) for item in types"
+            ng-change="onTypeChange(item.value)" onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"></select>
+    </div>
+
+    <date-picker label="{{'Start' | tsq}}" date="dates.dateFrom" format="yyyy.mm.dd" min-date="bounds.dateFrom"
+        max-date="bounds.dateTo" on-date-change="onDateFromChange(date)" force-date-change="reloading" data-testid="oos-range-date-from" />
+    <date-picker label="{{'End' | tsq}}" date="dates.dateTo" format="yyyy.mm.dd" min-date="bounds.dateFrom"
+        max-date="bounds.dateTo" on-date-change="onDateToChange(date)" force-date-change="reloading" data-testid="oos-range-date-to" />
+    <button id="buttonClose-34a" class="sq-oos-btn-close" data-testid="oos-range-remove"
+        ng-click="onRemove({index: index}); $event.stopPropagation(); $event.preventDefault();"></button>
+</div>

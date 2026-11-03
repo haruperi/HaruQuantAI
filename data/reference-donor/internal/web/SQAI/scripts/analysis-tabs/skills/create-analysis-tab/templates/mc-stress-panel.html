@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<!-- TEMPLATE: mc-stress-panel — client-side Monte Carlo resampling of the trade list:
+     percentile equity cone + max-drawdown distribution. Copy, then adapt.
+     Data arrives via PostMessage straight from SQX (never through the AI model). -->
+<head>
+<meta charset="utf-8">
+<title>MC Stress Panel</title>
+<style>
+  :root {
+    --bg-body:#ffffff; --bg-surface:#f8f8f8; --text-main:#333333; --text-muted:#777777;
+    --border-color:#dddddd; --primary:#337ab7; --success:#5cb85c; --danger:#d9534f;
+  }
+  [data-theme="dark"] {
+    --bg-body:#1e1e1e; --bg-surface:#2d2d2d; --text-main:#e0e0e0; --text-muted:#aaaaaa;
+    --border-color:#444444; --primary:#5b9bd5; --success:#6fcf6f; --danger:#e57373;
+  }
+  html,body { margin:0; height:100%; }
+  body { background:var(--bg-body); color:var(--text-main);
+         font:13px/1.45 "Segoe UI",Arial,sans-serif; }
+  #app { display:flex; flex-direction:column; height:100vh; padding:14px; box-sizing:border-box; }
+  .row { display:flex; gap:8px; align-items:center; flex-shrink:0; margin-bottom:10px; }
+  .row label { color:var(--text-muted); font-size:12px; }
+  .row input { width:70px; background:var(--bg-surface); color:var(--text-main);
+               border:1px solid var(--border-color); border-radius:4px; padding:4px 6px; }
+  .row button { background:var(--primary); color:#fff; border:0; border-radius:4px;
+                padding:5px 14px; cursor:pointer; }
+  .kpis { display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr));
+          gap:8px; flex-shrink:0; margin-bottom:10px; }
+  .tile { background:var(--bg-surface); border:1px solid var(--border-color);
+          border-radius:6px; padding:8px 10px; }
+  .tile .k { color:var(--text-muted); font-size:11px; }
+  .tile .v { font-size:16px; font-weight:600; margin-top:2px; }
+  .charts { flex:1; display:flex; flex-direction:column; gap:10px; min-height:0; overflow:auto; }
+  .chartbox { background:var(--bg-surface); border:1px solid var(--border-color);
+              border-radius:6px; padding:8px; }
+  .chartbox h4 { margin:0 0 6px; font-size:12px; color:var(--text-muted); }
+  canvas { width:100%; display:block; }
+  .empty { color:var(--text-muted); text-align:center; margin-top:40px; }
+  .disclaimer { margin-top:20px; padding-top:15px; border-top:1px solid var(--border-color);
+                font-size:11px; color:var(--text-muted); line-height:1.5;
+                text-align:justify; flex-shrink:0; }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="row">
+    <label>Simulations <input id="sims" type="number" value="1000" min="100" max="5000"></label>
+    <button id="run">Re-run</button>
+  </div>
+  <div class="kpis" id="kpis"></div>
+  <div class="charts">
+    <div class="chartbox"><h4>Equity cone (5–95% of resampled trade sequences)</h4>
+      <canvas id="cone" height="210"></canvas></div>
+    <div class="chartbox"><h4>Max drawdown distribution</h4>
+      <canvas id="dds" height="130"></canvas></div>
+  </div>
+  <div class="empty" id="empty">Select a strategy to run the Monte Carlo stress test.</div>
+  <div class="disclaimer">
+    This analysis is provided strictly for informational and educational purposes within
+    StrategyQuant X. It does not constitute financial, investment, or trading advice. All
+    results, including backtests and simulations, are based on historical data and
+    hypothetical performance, which may not reflect future market conditions. Past
+    performance is not indicative of future results. Trading involves substantial risk, and
+    you should conduct your own independent research and consult a licensed financial
+    advisor before making any investment or trading decisions.
+    <strong>This tool utilizes statistical math based on historical sequences; actual market
+    execution may vary significantly. Monte Carlo resampling assumes trades are independent
+    and identically distributed, which real markets do not guarantee.</strong>
+  </div>
+</div>
+<script>
+(function () {
+  'use strict';
+  let pls = [];
+
+  function css(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+
+  function isValidStrategy(d) {
+    return d && d.projectName && d.projectName.trim() &&
+           d.databankName && d.databankName.trim() &&
+           d.strategyName && d.strategyName.trim();
+  }
+
+  // deterministic PRNG so re-renders don't repaint a different story
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      let t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  function pct(sorted, p) {
+    const i = (sorted.length - 1) * p / 100;
+    const lo = Math.floor(i), hi = Math.ceil(i);
+    return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+  }
+
+  function simulate() {
+    document.getElementById('empty').style.display = pls.length ? 'none' : '';
+    if (!pls.length) return;
+    const nSims = Math.max(100, Math.min(5000, Number(document.getElementById('sims').value) || 1000));
+    const n = pls.length, rnd = mulberry32(1234567);
+    const finals = [], dds = [];
+    // percentile bands per step, kept at chart resolution to stay light
+    const stepCount = Math.min(n, 300), stride = n / stepCount;
+    const bands = { p5: [], p25: [], p50: [], p75: [], p95: [] };
+    const samples = new Array(stepCount).fill(null).map(() => []);
+    for (let s = 0; s < nSims; s++) {
+      let eq = 0, peak = 0, maxDD = 0, step = 0;
+      for (let i = 0; i < n; i++) {
+        eq += pls[(rnd() * n) | 0];
+        peak = Math.max(peak, eq);
+        maxDD = Math.max(maxDD, peak - eq);
+        if (i >= step * stride && step < stepCount) samples[step++].push(eq);
+      }
+      finals.push(eq); dds.push(maxDD);
+    }
+    samples.forEach(col => {
+      col.sort((a, b) => a - b);
+      bands.p5.push(pct(col, 5)); bands.p25.push(pct(col, 25)); bands.p50.push(pct(col, 50));
+      bands.p75.push(pct(col, 75)); bands.p95.push(pct(col, 95));
+    });
+    finals.sort((a, b) => a - b); dds.sort((a, b) => a - b);
+
+    const f = v => Math.round(v).toLocaleString('en-US');
+    document.getElementById('kpis').innerHTML =
+      '<div class="tile"><div class="k">Median final P/L</div><div class="v">' + f(pct(finals, 50)) + '</div></div>' +
+      '<div class="tile"><div class="k">5% worst final P/L</div><div class="v">' + f(pct(finals, 5)) + '</div></div>' +
+      '<div class="tile"><div class="k">Median max DD</div><div class="v">' + f(pct(dds, 50)) + '</div></div>' +
+      '<div class="tile"><div class="k">95% max DD</div><div class="v">' + f(pct(dds, 95)) + '</div></div>' +
+      '<div class="tile"><div class="k">Prob. of loss</div><div class="v">' +
+        (finals.filter(v => v < 0).length / finals.length * 100).toFixed(1) + '%</div></div>';
+
+    drawCone(bands);
+    drawHist(dds);
+  }
+
+  function setupCanvas(id) {
+    const c = document.getElementById(id);
+    const w = c.clientWidth || 600, h = c.getAttribute('height');
+    c.width = w * devicePixelRatio; c.height = h * devicePixelRatio;
+    const g = c.getContext('2d');
+    g.scale(devicePixelRatio, devicePixelRatio);
+    g.clearRect(0, 0, w, h);
+    return { g: g, w: w, h: Number(h) };
+  }
+
+  function drawCone(b) {
+    const { g, w, h } = setupCanvas('cone');
+    const all = b.p5.concat(b.p95);
+    const min = Math.min.apply(null, all), max = Math.max.apply(null, all), span = (max - min) || 1;
+    const x = i => i / (b.p50.length - 1 || 1) * (w - 8) + 4;
+    const y = v => h - 6 - (v - min) / span * (h - 12);
+    function band(loArr, hiArr, alpha) {
+      g.beginPath();
+      loArr.forEach((v, i) => i ? g.lineTo(x(i), y(v)) : g.moveTo(x(i), y(v)));
+      for (let i = hiArr.length - 1; i >= 0; i--) g.lineTo(x(i), y(hiArr[i]));
+      g.closePath(); g.globalAlpha = alpha; g.fillStyle = css('--primary'); g.fill();
+      g.globalAlpha = 1;
+    }
+    band(b.p5, b.p95, 0.15); band(b.p25, b.p75, 0.28);
+    g.strokeStyle = css('--primary'); g.lineWidth = 1.6; g.beginPath();
+    b.p50.forEach((v, i) => i ? g.lineTo(x(i), y(v)) : g.moveTo(x(i), y(v)));
+    g.stroke();
+    if (min < 0 && max > 0) {
+      g.strokeStyle = css('--border-color');
+      g.beginPath(); g.moveTo(0, y(0)); g.lineTo(w, y(0)); g.stroke();
+    }
+  }
+
+  function drawHist(dds) {
+    const { g, w, h } = setupCanvas('dds');
+    const lo = dds[0], hi = dds[dds.length - 1], nb = 40, bw = (hi - lo) / nb || 1;
+    const hist = new Array(nb).fill(0);
+    dds.forEach(v => hist[Math.min(nb - 1, Math.floor((v - lo) / bw))]++);
+    const max = Math.max.apply(null, hist) || 1;
+    const cw = (w - 8) / nb;
+    hist.forEach((v, i) => {
+      g.fillStyle = css('--danger'); g.globalAlpha = 0.8;
+      g.fillRect(4 + i * cw + 1, h - 14 - v / max * (h - 22), Math.max(cw - 2, 1), v / max * (h - 22));
+      g.globalAlpha = 1;
+    });
+    g.fillStyle = css('--text-muted'); g.font = '9px sans-serif'; g.textAlign = 'center';
+    [0, 10, 20, 30].forEach(i => g.fillText(Math.round(lo + i * bw).toLocaleString('en-US'),
+                                            4 + i * cw, h - 3));
+  }
+
+  window.addEventListener('message', function (e) {
+    const msg = e.data || {};
+    if (msg.type === 'STRATEGY_DATA' && isValidStrategy(msg.data)) {
+      window.parent.postMessage({ type: 'GET_ORDERS',
+        params: { resultKey: 'Portfolio', direction: '0', sampleType: '127' } }, '*');
+    } else if (msg.type === 'SET_THEME') {
+      document.documentElement.setAttribute('data-theme', msg.theme);
+      simulate();
+    } else if (msg.type === 'ORDERS_RESPONSE') {
+      pls = (msg.data.orders || [])
+        .filter(o => o.ProfitLoss != null && o.ProfitLoss !== -99999999 &&
+                     [9, 10, 11].indexOf(Number(o.Type)) < 0)
+        .map(o => Number(o.ProfitLoss));
+      simulate();
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', function () {
+    const dark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    document.getElementById('run').addEventListener('click', simulate);
+    new ResizeObserver(function () { if (pls.length) simulate(); })
+      .observe(document.getElementById('app'));
+  });
+})();
+</script>
+</body>
+</html>

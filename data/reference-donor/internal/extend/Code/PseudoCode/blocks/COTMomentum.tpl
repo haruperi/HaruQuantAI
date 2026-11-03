@@ -1,0 +1,1 @@
+COTMomentum(<@printParam block "#CotSymbol#" />, <@printParam block "#Period#" />, field=<@printParam block "#FieldIndex#" />, lb=<@printParam block "#Lookback#" />)[<@printShift block shift />]

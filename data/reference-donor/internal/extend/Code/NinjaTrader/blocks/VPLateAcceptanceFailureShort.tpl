@@ -1,0 +1,2 @@
+<#-- Close back inside the VA after 3 closes above VAH + eps. The installed SqVPSignal indicator computes the Java _evaluateSignal. -->
+<#global sqUsesIndicatorPackage = true>((<@printSeriesAt block "0">SqVPSignal(<@printInput block />, 8, -1, <@printParam block "#SessionType#" />, <@printParam block "#ProfileRows#" />, <@printParam block "#ValueAreaPct#" />, <@printParam block "#MinimumDeviation#" />, 0, 3, SqPip).Values[0]</@printSeriesAt> > 0.5))

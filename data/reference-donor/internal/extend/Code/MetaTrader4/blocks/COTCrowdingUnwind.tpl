@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_CrowdingUnwind(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#Direction#" />, <@printParam block "#SpecExtreme#" />, <@printParam block "#HedgerOpposing#" />)

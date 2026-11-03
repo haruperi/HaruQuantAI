@@ -1,0 +1,3 @@
+<#-- Reflex changes direction down (local maximum): (v1<v2 && v3<v2) || (v1<v2 && v4<v3), where v1=shift,
+     v2=shift+1, v3=shift+2, v4=shift+3. Parity with ReflexChangesDirectionDown.java. -->
+<@compress_single_line>((sqRound(<@printReflexValueAt block "0" />, 6) < sqRound(<@printReflexValueAt block "1" />, 6) && sqRound(<@printReflexValueAt block "2" />, 6) < sqRound(<@printReflexValueAt block "1" />, 6)) || (sqRound(<@printReflexValueAt block "0" />, 6) < sqRound(<@printReflexValueAt block "1" />, 6) && sqRound(<@printReflexValueAt block "3" />, 6) < sqRound(<@printReflexValueAt block "2" />, 6)))</@compress_single_line>

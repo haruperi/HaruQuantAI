@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign>(sqGetIndicatorValue(COT_${cs}_${p?upper_case}_0, 0, <@printShift block "0" /> + 1) < <@printParam block "#EntryLevel#" /> && sqGetIndicatorValue(COT_${cs}_${p?upper_case}_0, 0, <@printShift block "0" />) >= <@printParam block "#EntryLevel#" />)

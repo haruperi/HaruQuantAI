@@ -1,0 +1,199 @@
+<div class="sq-app-datamanager sq-app-container" ng-class="{'br-edition': isBrazilianEdition}">
+    <div class="data-manager-title" ng-hide="isQuantDataManager" tsq>Data Manager</div>
+    <div class="datamanager-menu-header">
+        <div ng-class="{'active': ribbonActive=='home'}" ng-click="ribbonActive='home'" ng-show="isQuantDataManager">
+            <tsq>Home</tsq>
+        </div>
+        <div ng-class="{'active': ribbonActive=='data-sources'}" ng-click="ribbonActive='data-sources'" data-testid="ribbon-data-sources-btn">
+            <tsq>Data sources</tsq>
+        </div>
+        <div ng-class="{'active': ribbonActive=='export'}" ng-click="ribbonActive='export'" data-testid="ribbon-export-btn">
+            <tsq>Export</tsq>
+        </div>
+        <div ng-class="{'active': ribbonActive=='tools'}" ng-click="ribbonActive='tools'" data-testid="ribbon-tools-btn">
+            <tsq>Tools</tsq>
+        </div>
+        <div ng-class="{'active': ribbonActive=='instruments-sessions'}" ng-click="ribbonActive='instruments-sessions'" data-testid="ribbon-instruments-sessions-btn">
+            <tsq>Instruments and Sessions</tsq>
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='custom-data'}"
+            ng-click="ribbonActive='custom-data'" data-testid="ribbon-custom-data-btn">
+            <tsq>External indicators</tsq>
+        </div>
+	
+        <div ng-show="!isQuantDataManager" ng-class="{'active': ribbonActive=='baskets'}" ng-click="ribbonActive='baskets'" data-testid="datamanager-tab-stock-groups">
+            <tsq>Stock groups</tsq>
+        </div>
+
+        <div ng-show="true" ng-class="{'active': ribbonActive=='brokers'}" ng-click="ribbonActive='brokers'" data-testid="ribbon-brokers-btn">
+            <tsq>Broker profiles</tsq>
+        </div>		
+    </div>
+    <div class="datamanager-menu">
+        <div ng-if="actions.firstTools.length>0" ng-class="{'active': ribbonActive=='data-sources'}">
+            <span
+                ng-repeat="action in actions.firstTools | filter: {group: 'data-source'} | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='data-sources'}" class="right-separator">
+            <span ng-repeat="dataSource in actions.dataSources">
+                <span ng-repeat="combo in dataSource | orderBy: '+position' track by $index">
+                    <sq-combo-button title="{{combo.title | tsq}}" actions="combo.options"
+                        on-select="onSelectAction(action, item)" ng-class="[{'disabled':!combo.enabled},combo.class]"
+                        id="{{combo.id}}" data-testid="{{combo.id}}" ng-disabled="!combo.enabled" />
+                </span>
+            </span>
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='data-sources'}">
+            <span
+                ng-repeat="action in actions.tools | filter: {group: 'data-source'} | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='export'}">
+            <span ng-repeat="action in actions.exports | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='tools'}">
+            <span ng-repeat="action in actions.tools | filter: {group: '!!!'} | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='instruments-sessions'}">
+            <span ng-repeat="action in actions.instruments | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+
+            <span ng-repeat="action in actions.sessions | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+
+            <span
+                ng-repeat="action in actions.tools | filter: {group1: 'instruments-sessions'} | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='custom-data'}">
+            <span ng-repeat="action in actions.customData | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+
+            <span
+                ng-repeat="action in actions.tools | filter: {group2: 'custom-data'} | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>
+        </div>
+		
+        <div ng-show="!isQuantDataManager" ng-class="{'active': ribbonActive=='baskets'}" class="right-separator">
+            <span ng-repeat="action in actions.baskets | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>	
+			
+			<span
+                ng-repeat="action in actions.tools | filter: {group3: 'baskets'} | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="onSelectAction(action)"
+                    ng-class="[action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>			
+        </div>
+
+        <div ng-class="{'active': ribbonActive=='brokers'}" class="right-separator">
+            <span ng-repeat="action in actions.brokers | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="action.enabled&&onSelectAction(action)"
+                    ng-class="[{'disabled':!action.enabled},action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>	
+			
+			<span
+                ng-repeat="action in actions.tools | filter: {group3: 'baskets'} | orderBy: '+position' track by $index">
+                <div class="menu-button" ng-click="onSelectAction(action)"
+                    ng-class="[action.class]" id="{{action.id}}" data-testid="{{action.id}}">{{action.title
+                    | tsq}}</div>
+                <span ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+            </span>			
+        </div>        
+    </div>
+
+    <div class="datamanager-progress">
+        <div class="dataManagerFlexRow">
+            <span class="settings-title" tsq>Progress</span>	
+            <div class="progress" id="logTotalProgress">
+                <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"
+                    style="width:{{progress}}%">{{progressLabel}}</div>
+            </div>
+        </div>
+
+        <div class="data-manager-data-header-right">
+            <div class="toolbar">
+                <button id="buttonPauseAll-70a" ng-hide="batchActionPaused" type="button" class="btn btn-default"
+                    ng-click="batchAction('pause')" id="datamanager-pause-all-main" data-testid="dm-progress-pause-all">
+                    <i class="fa fa-pause-circle-o" aria-hidden="true"></i>
+                    <tsq>Pause all</tsq>
+                </button>
+                <button id="buttonContinueAll-70b" ng-show="batchActionPaused" type="button" class="btn btn-default"
+                    ng-click="batchAction('continue')" id="datamanager-continue-all-main" data-testid="dm-progress-continue-all">
+                    <i class="fa fa-play-circle-o" aria-hidden="true"></i>
+                    <tsq>Continue all</tsq>
+                </button>
+                <button id="buttonStopAll-70c" type="button" class="btn btn-default" ng-click="batchAction('stop')"
+                    id="datamanager-stop-all-main" data-testid="dm-progress-stop-all">
+                    <i class="fa fa-stop-circle-o" aria-hidden="true"></i>
+                    <tsq>Stop all</tsq>
+                </button>
+                <a class="link-button" ng-click="showDownloadCountConfig()" title="Download settings" data-testid="dm-progress-download-settings"><i class="fa fa-cog"></i></a>
+            </div>
+        </div>
+    </div>
+
+    <quant-tabs class="datamanager-main-tabs" id="datamanager-main-tabs" instance="mainTabs" translate-headers="true" />
+
+    <iframe id="iframe_qdm_no_data" src="../app/layout/views/noDataHelpScreenQDM.html" ng-class="{'shown': noData}" />
+</div>
+
+<sq-utils />
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />
+
+<div ng-include="'../SQMANAGER/layout/views/configDownloadPopup.html'"></div>

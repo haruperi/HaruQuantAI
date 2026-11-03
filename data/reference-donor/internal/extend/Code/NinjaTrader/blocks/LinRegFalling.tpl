@@ -1,0 +1,2 @@
+<#-- LinReg falling: value now lower than 1 bar ago (older > current). Parity with LinRegFalling.java. -->
+<@compress_single_line>(sqRound(<@printLinRegValueAt block "1" />, 6) > sqRound(<@printLinRegValueAt block "0" />, 6))</@compress_single_line>

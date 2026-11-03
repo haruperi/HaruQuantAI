@@ -1,0 +1,1 @@
+SqCOTMomentum(<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign>${cotIdentifier(cs, p?upper_case)}, <@printParam block "#FieldIndex#" />, <@printParam block "#Lookback#" />, <#if cotCacheFolder??>cotCacheFolder<#else>""</#if>)<@printShift block shift />

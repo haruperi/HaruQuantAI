@@ -1,0 +1,1 @@
+(COTConvergence(<@printParam block "#CotSymbol#" />, |h-s|<<@printParam block "#ConvergenceThreshold#" />))

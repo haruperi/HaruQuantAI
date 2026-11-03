@@ -1,0 +1,69 @@
+<div id="results-source-code-container" class="flex-container source-code-tab">
+    <div>
+        <form class="form-horizontal" role="form">
+
+            <div class="">
+                <label class="sqn-label" tsq>Source code type</label>
+                <div class="sqn-input sqn-select source-code-select">
+                    <span ng-bind="config.type | tsq"></span>
+                    <select ng-model="config.type" ng-options="item.name as (item.name | tsq) for item in generators"
+                        onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"
+                        onChange="sqnSelectChange(this)" data-testid="source-code-type-select"></select>
+                </div>
+
+                <button class="btn btn-default source-code-save" ng-click="onSave()" data-testid="results-source-code-save" tsq>Save to file</button>
+                <button class="btn btn-default source-code-copy" ng-click="onCopyToClipboard()" data-testid="results-source-code-copy" tsq>Copy to clipboard</button>
+                <a ng-click="onRefresh()" title="Refresh" class="source-code-refresh" data-testid="results-source-code-refresh"><i class="fa fa-refresh" aria-hidden="true" title="Refresh"></i></a>
+
+                <span class="source-code-copied" tsq>Copied to clipboard</span>
+
+                <span ng-if="broker.encryption">
+                    <button class="btn btn-default source-code-save" ng-if="broker.supportsMT4"
+                        ng-click="onSaveEA(true)" data-testid="results-source-code-save-ea-mt4" tsq>Save as EA (MT4)</button>
+                    <button class="btn btn-default source-code-save" ng-if="broker.supportsMT5"
+                        ng-click="onSaveEA(false)" data-testid="results-source-code-save-ea-mt5" tsq>Save as EA (MT5)</button>
+                    <button class="btn btn-default source-code-save" ng-click="onConfigure()" data-testid="results-source-code-configure" tsq>Configure</button>
+                </span>
+
+                <div class="pull-right">
+                    <variables-settings config="config" data-testid="results-source-code-variables-settings" />
+                    &nbsp;&nbsp;
+
+                    <label class="sqn-label" tsq>MM used</label>
+                    <div class="sqn-input sqn-select source-code-select-mm">
+                        <span ng-bind="getMMLabel()"></span>
+                        <select ng-model="config.mmType" ng-options="item.value as (item.name | tsq) for item in mmTypes"
+                            onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" data-testid="results-source-code-mm-type"></select>
+                    </div>
+
+                </div>
+            </div>
+
+            <div id="source-code-desc" ng-bind-html="generatorDescription | tsq"></div>
+            <div id="source-code-desc" ng-show="isAWCloud && config.type!='Pseudo Code(*.TXT)'">
+                <span class="pull-right">
+                    <span ng-if="config.type=='Expert Advisor for MetaTrader4 (*.MQ4)'">
+                        <a href="https://cdn.algowizard.io/indicators/MetaTrader4/Indicators.zip" data-testid="results-source-code-download-indicators-mt4" tsq>Download
+                            indicators for MetaTrader4</a>
+                    </span>
+                    <span ng-if="config.type=='Expert Advisor for MetaTrader5 (*.MQ5)'">
+                        <a href="https://cdn.algowizard.io/indicators/MetaTrader5/Indicators.zip" data-testid="results-source-code-download-indicators-mt5" tsq>Download
+                            indicators for MetaTrader5</a>
+                    </span>
+                    <span ng-if="config.type=='EasyLanguage for Tradestation / MultiCharts (*.el)'">
+                        <a href="https://cdn.algowizard.io/indicators/Tradestation/Indicators.zip" data-testid="results-source-code-download-indicators-tradestation" tsq>Download
+                            indicators for Tradestation and Multicharts</a>
+                    </span>
+                </span>
+                <div ng-bind-html="customIndicatorsInfo | tsq"></div>
+            </div>
+            <div id="source-code-warning" ng-show="warning"><span ng-bind="warning"></span><a id="source-code-learnmore" ng-show="learnMoreURL" ng-click="onLearnMore()" data-testid="results-source-code-learn-more" tsq>Learn more</a></div>
+        </form>
+    </div>
+    <!--<div class="flex-expand">-->
+    <pre class="editor" id="sc-editor" data-testid="results-source-code-editor"></pre>
+    <!-- </div>-->
+
+    <div ng-include="'../../../plugins/ResultsSourceCode/terminalConfigPopup.html'"></div>
+    <div ng-include="'../../../plugins/ResultsSourceCode/customIndicatorsPopup.html'"></div>
+</div>

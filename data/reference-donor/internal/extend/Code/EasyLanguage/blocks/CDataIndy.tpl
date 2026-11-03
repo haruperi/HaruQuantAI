@@ -1,0 +1,1 @@
+<#assign cdCode><@printCDIndy block "el" shift /></#assign>${cotRewriteCode(cdCode)}

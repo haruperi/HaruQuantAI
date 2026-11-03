@@ -1,0 +1,20 @@
+<fieldset class="sq-fieldset sq-fieldset-select-property" id="multi-property-grid-{{::id}}">
+    <legend ng-bind="title"></legend>
+
+    <div class="clearfix"></div>
+
+    <div class="row row-smaller">
+        <div class="col-lg-4 col-md-3">
+            <div class="sq-input-fixed-size-container">
+                <div ng-repeat="option in options" class="radio"><label class="sq-wradio"><input type="radio" name="type-{{::id}}"
+                            value="{{::option.class}}" ng-model="type" ng-click="onTypeChange(option.class)"><span
+                            class="sq-mark"></span>{{(option.name
+                        | tsq)}}</label></div>
+            </div>
+        </div>
+        <div class="col-lg-8 col-md-9">
+            <property-grid id="property-grid-{{::id}}" ng-if="propGridInstance" instance="propGridInstance" after-init="afterPGInit"
+                on-change="onPGChange" note-on-side="true" />
+        </div>
+    </div>
+</fieldset>

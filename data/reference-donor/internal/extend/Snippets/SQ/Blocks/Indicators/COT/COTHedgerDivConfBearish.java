@@ -1,0 +1,80 @@
+/*
+ * Copyright (c) 2026, StrategyQuant - All rights reserved.
+ * This code can be used only within StrategyQuant products.
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND.
+ */
+package SQ.Blocks.Indicators.COT;
+
+import SQ.Internal.ConditionBlock;
+import com.strategyquant.datalib.TradingException;
+import com.strategyquant.tradinglib.*;
+import com.strategyquant.tradinglib.data.CustomDataIndyMap;
+
+/** COT Hedger Divergence Confirmed — Bearish (Strategy 38 mirror). */
+@Help("Hedger Divergence Confirmed (Bearish). Hedger low + spec high + falling momentum. (Strategy 38 mirror) — COT data provided by SpreadCharts.com")
+@BuildingBlock(name="(COT50) Hedger Div Confirmed Bear", display="COTHedgDivBear(#CotSymbol#, h<#HedgerThreshold#, s>#SpecThreshold#)", returnType = ReturnTypes.Boolean)
+@SortOrder(5000)
+@OppositeBlock(value="COTHedgerDivConfBullish")
+@ParameterSet(set="CotSymbol=AUTO")
+@ForEngine("MT4,MT5,TS,MC,NT")
+public class COTHedgerDivConfBearish extends ConditionBlock {
+
+	@Parameter(defaultValue="AUTO", name="COT Symbol")
+	public String CotSymbol;
+
+	@Parameter(defaultValue="0.20", minValue=0.01, maxValue=0.40, step=0.05, name="Hedger Threshold (52w)")
+	public double HedgerThreshold;
+
+	@Parameter(defaultValue="0.80", minValue=0.60, maxValue=0.99, step=0.05, name="Spec Threshold (52w)")
+	public double SpecThreshold;
+
+	@Parameter(defaultValue="4", minValue=1, maxValue=12, step=1, name="Momentum Lookback")
+	public int MomLookback;
+
+	@Parameter
+	public int Shift;
+
+	private CustomDataIndyMap mapHedg52, mapSpec52;
+	private boolean dataReady = false;
+
+	@Override
+	protected void OnInit() {
+		// No-op: Strategy not yet available during initialize()
+	}
+
+	//------------------------------------------------------------------------
+
+	private boolean initialized = false;
+
+	private void lazyInit() {
+		if(initialized) return;
+		initialized = true;
+
+		if(Strategy == null) return;
+
+		CotSymbol = COTCompositeScore.resolveBlockSymbol(Strategy, CotSymbol);
+
+		try {
+		
+					String name52 = COTCompositeScore.findCotIndicatorName(CotSymbol, "52W");
+					if(name52 != null) {
+						mapHedg52 = COTCompositeScore.loadMap(name52, 0);
+						mapSpec52 = COTCompositeScore.loadMap(name52, 2);
+					}
+					dataReady = (mapHedg52 != null && mapSpec52 != null);
+				} catch(Exception e) { Log.error("COTHedgerDivConfBearish OnInit error", e); }
+	}
+
+	@Override
+	public boolean OnBlockEvaluate() throws TradingException {
+		lazyInit();
+
+		if(!dataReady) return false;
+		long barTime = Strategy.MarketData.Chart(0).Time(Shift);
+		long momTime = Strategy.MarketData.Chart(0).Time(Shift + MomLookback);
+		double hedgNow = mapHedg52.getTime(barTime);
+		double specNow = mapSpec52.getTime(barTime);
+		double hedgPrev = mapHedg52.getTime(momTime);
+		return (hedgNow < HedgerThreshold && specNow > SpecThreshold && hedgNow < hedgPrev);
+	}
+}

@@ -1,0 +1,5 @@
+<div ng-repeat="tab in instance.tabs | orderBy: '+position' track by $index" data-item="{{::tab.dataItem}}" ng-show="tab.active"
+    ng-class="[{'active' : tab.active}, tab.dataItem]">
+    <div ng-if="tab.templateUrl" ng-include="tab.templateUrl" ng-dynamic-controller="tab.controller" />
+    <div ng-if="tab.template" ng-dynamic-controller="tab.controller" ng-bind="tab.template"></div>
+</div>

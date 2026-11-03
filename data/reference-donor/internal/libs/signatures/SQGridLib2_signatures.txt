@@ -1,0 +1,1129 @@
+public interface com.strategyquant.gridlib.ConsoleHelper$KeyHandler {
+  public abstract void handle(char) throws java.lang.Exception;
+}
+public class com.strategyquant.gridlib.ConsoleHelper {
+  public com.strategyquant.gridlib.ConsoleHelper();
+  public void run(com.strategyquant.gridlib.ConsoleHelper$KeyHandler) throws java.lang.Exception;
+}
+public class com.strategyquant.gridlib.FileHelper {
+  private static final org.slf4j.Logger LOGGER;
+  private static final int BUFFER_SIZE = 10240;
+  public com.strategyquant.gridlib.FileHelper();
+  private static void generateFileList(java.lang.String, java.io.File, java.util.List<java.lang.String>);
+  private static java.lang.String generateZipEntry(java.lang.String, java.lang.String);
+  public static java.lang.String countHash(java.lang.String) throws java.io.IOException;
+  private static java.util.List<java.lang.String> getPaths(java.lang.String);
+  private static void fillPaths(java.util.List<java.lang.String>, java.lang.String);
+  public static java.lang.String countHash(java.io.File) throws java.io.IOException;
+  public static java.io.File zip(java.lang.String) throws java.io.IOException;
+  public static java.io.File zip(java.lang.String, java.util.List<java.lang.String>) throws java.io.IOException;
+  public static void unzip(java.lang.String, java.io.File);
+  static {};
+}
+public class com.strategyquant.gridlib.FileInfo implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  private byte[] data;
+  public com.strategyquant.gridlib.FileInfo();
+  public com.strategyquant.gridlib.FileInfo(byte[]);
+  public byte[] getData();
+  public void setData(byte[]);
+}
+public final class com.strategyquant.gridlib.TopicIdent extends java.lang.Enum<com.strategyquant.gridlib.TopicIdent> {
+  public static final com.strategyquant.gridlib.TopicIdent dataFilesTopic;
+  public static final com.strategyquant.gridlib.TopicIdent registerTaskTopic;
+  public static final com.strategyquant.gridlib.TopicIdent tasksForComputeTopic;
+  public static final com.strategyquant.gridlib.TopicIdent taskResultsTopic;
+  public static final com.strategyquant.gridlib.TopicIdent computationStatTopic;
+  public static final com.strategyquant.gridlib.TopicIdent statisticsTopic;
+  public static final com.strategyquant.gridlib.TopicIdent messagesTopic;
+  public static final com.strategyquant.gridlib.TopicIdent listenerTopic;
+  private static final com.strategyquant.gridlib.TopicIdent[] $VALUES;
+  public static com.strategyquant.gridlib.TopicIdent[] values();
+  public static com.strategyquant.gridlib.TopicIdent valueOf(java.lang.String);
+  private com.strategyquant.gridlib.TopicIdent();
+  private static com.strategyquant.gridlib.TopicIdent[] $values();
+  static {};
+}
+public class com.strategyquant.gridlib.classLoader.TaskClassLoader {
+  private static final org.slf4j.Logger LOGGER;
+  private java.lang.ClassLoader classLoader;
+  public com.strategyquant.gridlib.classLoader.TaskClassLoader();
+  public void loadJarsAndClasses(java.lang.String...);
+  private void addFileUrl(java.util.List<java.net.URL>, java.io.File);
+  private java.util.List<java.net.URL> getUrl(java.io.File);
+  private java.util.List<java.net.URL> getUrls(java.lang.String...);
+  public <T> T createInstance(java.lang.String, com.strategyquant.gridlib.compute.performer.JmsJobInfo) throws java.lang.ClassNotFoundException, java.lang.InstantiationException, java.lang.IllegalAccessException, java.lang.IllegalArgumentException, java.lang.reflect.InvocationTargetException, java.lang.NoSuchMethodException, java.lang.SecurityException;
+  static {};
+}
+class com.strategyquant.gridlib.client.Compute$1 extends java.util.TimerTask {
+  final com.strategyquant.gridlib.client.Compute this$0;
+  com.strategyquant.gridlib.client.Compute$1(com.strategyquant.gridlib.client.Compute);
+  public void run();
+}
+class com.strategyquant.gridlib.client.Compute$2 implements com.strategyquant.gridlib.compute.performer.IJobStatusChangedHandler {
+  final com.strategyquant.gridlib.client.Compute this$0;
+  com.strategyquant.gridlib.client.Compute$2(com.strategyquant.gridlib.client.Compute);
+  public void onJobFinished(java.lang.String, java.lang.String, com.strategyquant.gridlib.compute.JobResult<java.io.Serializable>);
+  public void onJobExecuted(java.lang.String, java.lang.String);
+}
+public class com.strategyquant.gridlib.client.Compute implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  private java.util.Map<java.lang.Integer, java.util.concurrent.atomic.AtomicLong> runningCounts;
+  private java.util.Map<java.lang.Integer, java.util.concurrent.atomic.AtomicLong> waitingCounts;
+  private java.util.Map<java.lang.Integer, java.util.concurrent.atomic.AtomicLong> runningUndeliveredCounts;
+  private com.strategyquant.gridlib.compute.performer.JmsComputePerformer jmsPerformer;
+  private com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer localPerformer;
+  private final com.strategyquant.gridlib.config.Config config;
+  private boolean runOnNode;
+  private com.strategyquant.gridlib.client.ListenerManager listenerManager;
+  private java.util.List<com.strategyquant.gridlib.compute.performer.FinishListener> finishListeners;
+  private volatile java.lang.String justStoppingJobGroupID;
+  public com.strategyquant.gridlib.client.Compute(com.strategyquant.gridlib.message.JmsConnectionInfo, com.strategyquant.gridlib.config.Config, boolean) throws javax.jms.JMSException;
+  protected void checkFinishListeners();
+  private void wakeupAllWaiting();
+  public void registerMessageListener(java.lang.String, com.strategyquant.gridlib.client.IGridMessageListener);
+  public boolean isRegisteredMessageListener(java.lang.String);
+  public void removeMessageListener(java.lang.String);
+  public boolean sendMessageToJob(java.lang.String, java.lang.String, com.strategyquant.gridlib.client.GridMessage);
+  public boolean sendMessageToListener(java.lang.String, com.strategyquant.gridlib.client.GridMessage);
+  private void prepareComputePerformer(com.strategyquant.gridlib.compute.performer.IComputePerformer);
+  private void jobExecuted(java.lang.String, java.lang.String);
+  protected void jobFinished(java.lang.String, java.lang.String, com.strategyquant.gridlib.compute.JobResult<?>);
+  private void createPerformers(com.strategyquant.gridlib.message.JmsConnectionInfo);
+  public boolean isLocalMode();
+  public com.strategyquant.gridlib.compute.performer.IComputePerformer getPerformer();
+  public void execute(java.lang.String, java.util.List<? extends com.strategyquant.gridlib.client.GridJob<?>>, com.strategyquant.gridlib.compute.common.ExecuteOptions) throws java.lang.Exception;
+  private void incrementJobsCounter(java.lang.String, java.util.Map<java.lang.Integer, java.util.concurrent.atomic.AtomicLong>);
+  private void decrementJobCounter(java.lang.String, java.util.Map<java.lang.Integer, java.util.concurrent.atomic.AtomicLong>);
+  public void close() throws java.lang.Exception;
+  public void pause(java.lang.String);
+  public void stop(java.lang.String);
+  public void restart(java.lang.String);
+  public long getRunningJobsCount(java.lang.String);
+  public long getExecutedUndeliveredJobsCount(java.lang.String);
+  public long getWaitingJobsCount(java.lang.String);
+  public long getCount(java.lang.String, java.util.Map<java.lang.Integer, java.util.concurrent.atomic.AtomicLong>);
+  public com.strategyquant.gridlib.topology.GridTopology getGridTopology();
+  public java.lang.String getGridDescriptions();
+  public void setProgress(java.lang.String, java.lang.String, int);
+  public void setJobWaiting(java.lang.String, java.lang.String, boolean);
+  public void waitForAllTaskFinished() throws java.lang.InterruptedException;
+  public void waitForFinish(java.lang.Object, java.lang.String, java.lang.String, java.lang.String) throws java.lang.InterruptedException;
+  public void setGroupRestrictions(java.lang.String, int);
+  public void check();
+  public int getComputedThread();
+  public int getUsedComputedThreads();
+  public void setUsedComputedThreads(int);
+  public void stop(java.lang.String, java.lang.String);
+  public void pause(java.lang.String, java.lang.String);
+  public void restart(java.lang.String, java.lang.String);
+  static org.slf4j.Logger access$000();
+  static void access$100(com.strategyquant.gridlib.client.Compute, java.lang.String, java.lang.String);
+  static {};
+}
+public class com.strategyquant.gridlib.client.GridClient implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  private com.strategyquant.gridlib.sync.guard.FolderGuards guards;
+  private com.strategyquant.gridlib.client.Compute compute;
+  private com.strategyquant.gridlib.config.Config config;
+  protected com.strategyquant.gridlib.client.GridClient(com.strategyquant.gridlib.config.Config, boolean) throws javax.jms.JMSException, java.io.IOException;
+  public com.strategyquant.gridlib.client.GridClient(com.strategyquant.gridlib.config.Config) throws javax.jms.JMSException, java.io.IOException;
+  public com.strategyquant.gridlib.config.Config getConfig();
+  protected void jobFinished(java.lang.String, java.lang.String, com.strategyquant.gridlib.compute.JobResult<?>);
+  public com.strategyquant.gridlib.topology.GridTopology getGridTopology();
+  public java.lang.String getGridDescriptions();
+  private void prepareGuards() throws java.io.IOException, javax.jms.JMSException;
+  public void dataChanged() throws javax.jms.JMSException, java.io.IOException;
+  public void close() throws java.lang.Exception;
+  public void executeOnGrid(java.lang.String, java.util.List<? extends com.strategyquant.gridlib.client.GridJob<?>>) throws java.lang.Exception;
+  public void executeOnGrid(java.lang.String, com.strategyquant.gridlib.client.GridJob<?>) throws java.lang.Exception;
+  public void executeOnGrid(java.lang.String, java.util.List<? extends com.strategyquant.gridlib.client.GridJob<?>>, com.strategyquant.gridlib.compute.common.ExecuteOptions) throws java.lang.Exception;
+  public long countRunningJobs(java.lang.String, boolean);
+  public long countRunningJobs(java.lang.String);
+  public long countWaitingJobs(java.lang.String);
+  public long countAllJobs(java.lang.String, boolean);
+  public long countAllJobs(java.lang.String);
+  public int getRunningThreads();
+  public int getComputedThreads();
+  public int getUsedComputedThreads();
+  public void setUsedComputedThreads(int);
+  public void pause(java.lang.String);
+  public void restart(java.lang.String);
+  public void stop(java.lang.String);
+  public void stop(java.lang.String, java.lang.String);
+  public void pause(java.lang.String, java.lang.String);
+  public void restart(java.lang.String, java.lang.String);
+  public void registerMessageListener(java.lang.String, com.strategyquant.gridlib.client.IGridMessageListener);
+  public boolean isRegisteredMessageListener(java.lang.String);
+  public void removeMessageListener(java.lang.String);
+  public boolean sendMessage(java.lang.String, java.lang.String, com.strategyquant.gridlib.client.GridMessage) throws java.lang.Exception;
+  protected com.strategyquant.gridlib.client.Compute getCompute();
+  public void sendProgress(java.lang.String, java.lang.String, int);
+  public void waitForFinish(java.lang.Object, java.lang.String, java.lang.String, java.lang.String) throws java.lang.InterruptedException;
+  public void setGroupRestrictions(java.lang.String, int);
+  public int getRecommendedBatchSize();
+  public void check();
+  public void waitForAllTaskFinished() throws java.lang.InterruptedException;
+  static {};
+}
+public abstract class com.strategyquant.gridlib.client.GridJob<T> implements java.util.concurrent.Callable<T>, java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  public static final int blocking_flag = 1;
+  private java.lang.String jobId;
+  private java.util.Map<java.lang.String, java.io.Serializable> parameters;
+  private int flags;
+  private java.lang.String jobGroupId;
+  private int priority;
+  public com.strategyquant.gridlib.client.GridJob(java.lang.String, int, java.util.Map<java.lang.String, java.io.Serializable>);
+  public java.lang.String getJobId();
+  public void messageReceived(com.strategyquant.gridlib.client.GridMessage);
+  public java.util.Map<java.lang.String, java.io.Serializable> getParameters();
+  public void destroy();
+  public boolean isBlocking();
+  public int getPriority();
+  public void setPriority(int);
+  public int getFlags();
+  public void sendProgress(int);
+  public java.lang.String getJobGroupId();
+  public void setJobGroupId(java.lang.String);
+}
+public class com.strategyquant.gridlib.client.GridMessage implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  public static final int JobFinished = 1;
+  public static final int JobPause = 2;
+  public static final int JobRestart = 3;
+  public static final int JobStop = 4;
+  public static final int Custom = 5;
+  public static final int ProgressUpdated = 6;
+  private int messageID;
+  private java.lang.String customID;
+  private java.io.Serializable data;
+  private com.strategyquant.gridlib.client.JobDetails jobDetails;
+  public com.strategyquant.gridlib.client.GridMessage();
+  public com.strategyquant.gridlib.client.GridMessage(int);
+  public com.strategyquant.gridlib.client.GridMessage(int, java.lang.String);
+  public com.strategyquant.gridlib.client.GridMessage(int, java.lang.String, java.io.Serializable);
+  public int getMessageID();
+  public java.lang.String getCustomID();
+  public java.io.Serializable getData();
+  public com.strategyquant.gridlib.client.JobDetails getJobDetails();
+  public void setJobDetails(com.strategyquant.gridlib.client.JobDetails);
+}
+public interface com.strategyquant.gridlib.client.IGridMessageListener {
+  public abstract void messageReceived(com.strategyquant.gridlib.client.GridMessage);
+}
+public class com.strategyquant.gridlib.client.JobDetails implements java.io.Serializable {
+  private java.lang.String id;
+  private long duration;
+  private java.lang.String exception;
+  public com.strategyquant.gridlib.client.JobDetails(java.lang.String);
+  public java.lang.String getJobID();
+  public java.lang.String getException();
+  public void setException(java.lang.String);
+  public long getDuration();
+  public void setDuration(long);
+  public boolean isSuccess();
+}
+class com.strategyquant.gridlib.client.ListenerManager$1 implements javax.jms.MessageListener {
+  final com.strategyquant.gridlib.client.ListenerManager this$0;
+  com.strategyquant.gridlib.client.ListenerManager$1(com.strategyquant.gridlib.client.ListenerManager);
+  public void onMessage(javax.jms.Message);
+}
+public class com.strategyquant.gridlib.client.ListenerManager implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  private java.util.concurrent.locks.ReentrantReadWriteLock lock;
+  private java.util.Map<java.lang.String, com.strategyquant.gridlib.client.IGridMessageListener> listeners;
+  private com.strategyquant.gridlib.message.JmsPerformer sender;
+  private com.strategyquant.gridlib.message.JmsPerformer reciever;
+  private java.util.concurrent.ConcurrentMap<java.lang.String, java.lang.Boolean> resultMap;
+  public com.strategyquant.gridlib.client.ListenerManager(com.strategyquant.gridlib.message.JmsConnectionInfo, boolean) throws javax.jms.JMSException;
+  private void prepareListener(com.strategyquant.gridlib.message.JmsConnectionInfo) throws javax.jms.JMSException;
+  public void registerMessageListener(java.lang.String, com.strategyquant.gridlib.client.IGridMessageListener);
+  public void removeMessageListener(java.lang.String);
+  public boolean isRegisteredMessageListener(java.lang.String);
+  public boolean sendToListener(java.lang.String, com.strategyquant.gridlib.client.GridMessage);
+  public void close() throws java.lang.Exception;
+  static java.util.concurrent.ConcurrentMap access$000(com.strategyquant.gridlib.client.ListenerManager);
+  static org.slf4j.Logger access$100();
+  static {};
+}
+public class com.strategyquant.gridlib.client.RunningStatus {
+  public static final int BeforeStart = 0;
+  public static final int Running = 1;
+  public static final int Paused = 2;
+  public static final int Finished = 3;
+  public static final int Stopped = 4;
+  public static final int Pausing = 5;
+  public static final int Stopping = 6;
+  public static final int Error = 50;
+  public static final int Loading = 100;
+  public com.strategyquant.gridlib.client.RunningStatus();
+  public static java.lang.String printStatus(int);
+  public static boolean canBeStarted(int);
+}
+public class com.strategyquant.gridlib.client.SQGrid {
+  private static com.strategyquant.gridlib.client.SQGrid instance;
+  private com.strategyquant.gridlib.client.GridClient gridClient;
+  public static void init(com.strategyquant.gridlib.config.Config) throws java.lang.Exception;
+  public static void init(com.strategyquant.gridlib.client.GridClient) throws java.lang.Exception;
+  private com.strategyquant.gridlib.client.SQGrid(com.strategyquant.gridlib.client.GridClient) throws javax.jms.JMSException, java.io.IOException;
+  public static com.strategyquant.gridlib.client.GridClient getGridClient();
+  public static boolean started();
+  public static void close() throws java.lang.Exception;
+}
+public class com.strategyquant.gridlib.compute.ComputeResult<T extends java.io.Serializable> implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  private T data;
+  private java.lang.String taskId;
+  public com.strategyquant.gridlib.compute.ComputeResult();
+  public com.strategyquant.gridlib.compute.ComputeResult(T, java.lang.String);
+  public T getData();
+  public void setData(T);
+  public java.lang.String getTaskId();
+  public void setTaskId(java.lang.String);
+}
+public class com.strategyquant.gridlib.compute.JobResult<T extends java.io.Serializable> implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  private boolean success;
+  private boolean stopped;
+  private T data;
+  private long duration;
+  private java.lang.String errorMessage;
+  public com.strategyquant.gridlib.compute.JobResult();
+  public T getData();
+  public void setData(T);
+  public boolean isSuccess();
+  public void setSuccess(boolean);
+  public long getDuration();
+  public void setDuration(long);
+  public java.lang.String getErrorMessage();
+  public void setErrorMessage(java.lang.String);
+  public boolean isStopped();
+  public void setStopped(boolean);
+}
+class com.strategyquant.gridlib.compute.common.DescriptionsSerializer$1 implements java.util.Comparator<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo> {
+  final com.strategyquant.gridlib.compute.common.DescriptionsSerializer this$0;
+  com.strategyquant.gridlib.compute.common.DescriptionsSerializer$1(com.strategyquant.gridlib.compute.common.DescriptionsSerializer);
+  public int compare(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+final class com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart extends java.lang.Enum<com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart> {
+  public static final com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart FINISHED;
+  public static final com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart WAITING;
+  public static final com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart RUNNING;
+  private static final com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart[] $VALUES;
+  public static com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart[] values();
+  public static com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart valueOf(java.lang.String);
+  private com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart();
+  private static com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart[] $values();
+  static {};
+}
+public class com.strategyquant.gridlib.compute.common.DescriptionsSerializer<T> {
+  private java.lang.StringBuilder sb;
+  public com.strategyquant.gridlib.compute.common.DescriptionsSerializer();
+  public java.lang.String getJson(java.util.Map<java.lang.Integer, java.util.LinkedHashSet<java.lang.Integer>>, java.util.Collection<java.lang.Integer>, java.util.Map<java.lang.Integer, com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>>, com.strategyquant.gridlib.compute.common.RingBuffer<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>>);
+  private java.util.List<java.lang.Integer> getRunning(java.util.Collection<java.lang.Integer>, java.util.Map<java.lang.Integer, com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>>);
+  private java.util.List<java.lang.Integer> getWaiting(java.util.Collection<java.lang.Integer>, java.util.Map<java.lang.Integer, java.util.LinkedHashSet<java.lang.Integer>>, java.util.Map<java.lang.Integer, com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>>);
+  private void addFinishedJobs(java.lang.String, com.strategyquant.gridlib.compute.common.RingBuffer<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>>);
+  private void addCommonsJobsInfo(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>);
+  private void addJobs(java.lang.String, com.strategyquant.gridlib.compute.common.DescriptionsSerializer$SerializedPart, java.util.Collection<java.lang.Integer>, java.util.Map<java.lang.Integer, com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>>);
+  private void beginArray();
+  private void endArray();
+  private void beginObject();
+  private void endObject();
+  private void addSeparator();
+  private void addAttrOnly(java.lang.String);
+  private void addAttribute(java.lang.String, java.lang.String);
+  private void addAttribute(java.lang.String, boolean);
+  private void addAttribute(java.lang.String, long);
+  private void addAttribute(java.lang.String, int);
+}
+public class com.strategyquant.gridlib.compute.common.ExecuteOptions {
+  private int maxRunningCount;
+  public com.strategyquant.gridlib.compute.common.ExecuteOptions();
+  public int getMaxRunningCount();
+  public void setMaxRunningCount(int);
+}
+public class com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T extends java.io.Serializable> implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  private boolean executed;
+  private java.lang.String id;
+  private java.lang.String jobGroupId;
+  private long creationTime;
+  private long executeTime;
+  private long finishTime;
+  private long duration;
+  private long durationWithWait;
+  private boolean blocking;
+  private T data;
+  private int progress;
+  private boolean success;
+  private java.lang.String message;
+  private int priority;
+  public volatile boolean waiting;
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo();
+  public boolean isWaiting();
+  public long getFinishTime();
+  public long getDurationWithWait();
+  public boolean isSuccess();
+  public java.lang.String getMessage();
+  public boolean isBlocking();
+  public java.lang.String getJobGroupId();
+  public boolean isExecuted();
+  public java.lang.String getId();
+  public T getData();
+  public void setData(T);
+  public int getProgress();
+  public void setProgress(int);
+  public long getCreationTime();
+  public void setCreationTime(long);
+  public long getDuration();
+  public void setDuration(long);
+  public long getExecuteTime();
+  public java.lang.String toString();
+  static int access$000(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+  static boolean access$100(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+  static boolean access$202(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, boolean);
+  static java.lang.String access$302(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, java.lang.String);
+  static long access$400(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+  static java.lang.String access$500(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+  static java.io.Serializable access$602(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, java.io.Serializable);
+  static java.lang.String access$702(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, java.lang.String);
+  static java.lang.String access$502(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, java.lang.String);
+  static boolean access$802(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, boolean);
+  static int access$002(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, int);
+  static int access$902(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, int);
+  static boolean access$102(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, boolean);
+  static long access$402(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, long);
+  static long access$1002(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, long);
+  static long access$1000(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+  static long access$1102(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, long);
+  static long access$1202(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo, long);
+  static long access$1300(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+}
+public interface com.strategyquant.gridlib.compute.common.JobQueue$TimeEvaluator {
+  public abstract long getTimeForWaitForTask(java.lang.String);
+}
+public class com.strategyquant.gridlib.compute.common.JobQueue<T extends java.io.Serializable> implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  private static final int DEFAULT_MAX_LAST_JOB_KEPT = 150;
+  private java.util.Map<java.lang.Integer, com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> dataMap;
+  private com.strategyquant.gridlib.compute.common.RingBuffer<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> finishedDataMap;
+  private java.util.Map<java.lang.Integer, java.util.LinkedHashSet<java.lang.Integer>> queueOfTaskForExecute;
+  private com.strategyquant.gridlib.compute.common.TaskGroupMap groupMap;
+  private java.util.Set<java.lang.Integer> pausedTasks;
+  private java.util.LinkedHashSet<java.lang.Integer> notConfirmedRunningTasks;
+  private java.lang.Object lock;
+  private com.strategyquant.gridlib.compute.common.DescriptionsSerializer serializer;
+  public com.strategyquant.gridlib.compute.common.JobQueue();
+  private int getJobIdentHash(java.lang.String, java.lang.String);
+  public void setFinishedJobsCount(int);
+  public com.strategyquant.gridlib.compute.common.PausedTasks<T> pause(java.lang.String);
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> pause(java.lang.String, java.lang.String);
+  public java.util.List<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> restore(java.lang.String);
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> restore(java.lang.String, java.lang.String);
+  public java.util.Set<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> stop(java.lang.String);
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> stop(java.lang.String, java.lang.String);
+  public boolean isEmpty();
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> tryToTakeNotFinishedTask(com.strategyquant.gridlib.compute.common.JobQueue$TimeEvaluator);
+  public void add(java.lang.String, java.lang.String, int, boolean, T, com.strategyquant.gridlib.compute.common.ExecuteOptions);
+  public void updateProgress(java.lang.String, java.lang.String, int);
+  public void computing(java.lang.String, java.lang.String);
+  public long computed(java.lang.String, java.lang.String, boolean, java.lang.String);
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> getNext(boolean, boolean);
+  private boolean canExecuteTaskDueGroupLimitation(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>);
+  private int normalizePriority(int);
+  private com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> getSuitableJob(java.lang.Boolean);
+  private void removeFromQueue(int, int);
+  private com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> searchForTask(java.util.Collection<java.lang.Integer>);
+  private void addToQueue(int, int, boolean);
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T> getJobInfo(java.lang.String, java.lang.String);
+  public java.util.Set<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> getRunningTasks();
+  public void close();
+  public java.lang.String getJsonDescriptions();
+  public void setGroupRestrictions(java.lang.String, int);
+  public void check();
+  public com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?> setJobWaiting(java.lang.String, java.lang.String, boolean);
+  static {};
+}
+public class com.strategyquant.gridlib.compute.common.PausedTasks<T extends java.io.Serializable> {
+  private java.util.List<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> resultWaiting;
+  private java.util.List<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> resultRunning;
+  public com.strategyquant.gridlib.compute.common.PausedTasks(java.util.List<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>>, java.util.List<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>>);
+  public java.util.List<com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<T>> getRunningTasks();
+}
+class com.strategyquant.gridlib.compute.common.RingBuffer$IteratorImpl implements java.util.Iterator<T> {
+  private int current;
+  private int returned;
+  final com.strategyquant.gridlib.compute.common.RingBuffer this$0;
+  public com.strategyquant.gridlib.compute.common.RingBuffer$IteratorImpl(com.strategyquant.gridlib.compute.common.RingBuffer, int);
+  public boolean hasNext();
+  public T next();
+}
+public class com.strategyquant.gridlib.compute.common.RingBuffer<T> implements java.lang.Iterable<T> {
+  private T[] data;
+  private int size;
+  private int writePos;
+  private int oldest;
+  public com.strategyquant.gridlib.compute.common.RingBuffer(int);
+  public int getSize();
+  public void add(T);
+  public void clear();
+  public java.util.Iterator<T> iterator();
+  static java.lang.Object[] access$000(com.strategyquant.gridlib.compute.common.RingBuffer);
+}
+public class com.strategyquant.gridlib.compute.common.TaskGroupMap {
+  private java.util.Map<java.lang.Integer, java.util.Set<java.lang.String>> groupMap;
+  private java.util.Map<java.lang.Integer, com.strategyquant.gridlib.compute.common.ExecuteOptions> groupLimits;
+  private java.util.Map<java.lang.Integer, java.lang.Integer> runningInGroups;
+  public com.strategyquant.gridlib.compute.common.TaskGroupMap();
+  public java.util.Set<java.lang.String> getJobsForGroup(java.lang.String);
+  public void add(java.lang.String, java.lang.String, com.strategyquant.gridlib.compute.common.ExecuteOptions);
+  public boolean remove(java.lang.String, java.lang.String);
+  public com.strategyquant.gridlib.compute.common.ExecuteOptions getOptions(java.lang.String);
+  private void removeGroup(java.lang.String);
+  public int getRunningCount(java.lang.String);
+  public void executed(java.lang.String);
+  public void finished(java.lang.String);
+  public boolean hasTasks(java.lang.String);
+}
+public class com.strategyquant.gridlib.compute.performer.FinishListener {
+  private com.strategyquant.gridlib.client.Compute compute;
+  private java.lang.Object object;
+  private java.lang.String waitGroupId;
+  public com.strategyquant.gridlib.compute.performer.FinishListener(com.strategyquant.gridlib.client.Compute, java.lang.Object, java.lang.String);
+  public java.lang.String getWaitGroupId();
+  public boolean isFinished();
+  public void notifyWaitingObj();
+}
+public interface com.strategyquant.gridlib.compute.performer.IComputePerformer extends java.lang.AutoCloseable {
+  public abstract void addJobFinishedHandler(com.strategyquant.gridlib.compute.performer.IJobStatusChangedHandler);
+  public abstract void execute(com.strategyquant.gridlib.client.GridJob<?>, java.lang.String, com.strategyquant.gridlib.compute.common.ExecuteOptions) throws java.lang.Exception;
+  public abstract void commit() throws java.lang.Exception;
+  public abstract void pause(java.lang.String) throws java.lang.Exception;
+  public abstract void pause(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public abstract void stop(java.lang.String) throws java.lang.Exception;
+  public abstract void stop(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public abstract void restart(java.lang.String) throws java.lang.Exception;
+  public abstract void restart(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public abstract boolean sendMessageToJob(java.lang.String, java.lang.String, com.strategyquant.gridlib.client.GridMessage) throws java.lang.Exception;
+  public abstract com.strategyquant.gridlib.topology.GridTopology getGridTopology();
+  public abstract java.lang.String getGridDescriptions();
+  public abstract void setProgress(java.lang.String, java.lang.String, int);
+  public abstract void setGroupRestrictions(java.lang.String, int);
+  public abstract void check();
+  public abstract void setJobWaiting(java.lang.String, java.lang.String, boolean);
+  public abstract int getComputedThread();
+  public abstract int getUsedComputedThreads();
+  public abstract void setUsedComputedThreads(int);
+}
+public interface com.strategyquant.gridlib.compute.performer.IJobStatusChangedHandler {
+  public abstract void onJobFinished(java.lang.String, java.lang.String, com.strategyquant.gridlib.compute.JobResult<java.io.Serializable>);
+  public abstract void onJobExecuted(java.lang.String, java.lang.String);
+}
+class com.strategyquant.gridlib.compute.performer.JmsComputePerformer$1 implements javax.jms.MessageListener {
+  final com.strategyquant.gridlib.compute.performer.JmsComputePerformer this$0;
+  com.strategyquant.gridlib.compute.performer.JmsComputePerformer$1(com.strategyquant.gridlib.compute.performer.JmsComputePerformer);
+  public void onMessage(javax.jms.Message);
+}
+class com.strategyquant.gridlib.compute.performer.JmsComputePerformer$2 implements javax.jms.MessageListener {
+  final com.strategyquant.gridlib.compute.performer.JmsComputePerformer this$0;
+  com.strategyquant.gridlib.compute.performer.JmsComputePerformer$2(com.strategyquant.gridlib.compute.performer.JmsComputePerformer);
+  public void onMessage(javax.jms.Message);
+}
+public class com.strategyquant.gridlib.compute.performer.JmsComputePerformer implements com.strategyquant.gridlib.compute.performer.IComputePerformer {
+  private static final org.slf4j.Logger LOGGER;
+  private com.strategyquant.gridlib.message.JmsPerformer statisticsReciever;
+  private com.strategyquant.gridlib.message.JmsPerformer jobSender;
+  private com.strategyquant.gridlib.message.JmsPerformer messageSender;
+  private com.strategyquant.gridlib.message.JmsPerformer reciever;
+  private java.util.List<com.strategyquant.gridlib.compute.performer.IJobStatusChangedHandler> handlers;
+  private com.strategyquant.gridlib.config.Config config;
+  private com.strategyquant.gridlib.topology.GridTopology gridTopology;
+  protected java.lang.String serverTarget;
+  public com.strategyquant.gridlib.compute.performer.JmsComputePerformer(com.strategyquant.gridlib.message.JmsConnectionInfo, com.strategyquant.gridlib.config.Config) throws javax.jms.JMSException;
+  private void initListeners() throws javax.jms.JMSException;
+  public void execute(com.strategyquant.gridlib.client.GridJob<?>, java.lang.String, com.strategyquant.gridlib.compute.common.ExecuteOptions) throws javax.jms.JMSException, java.io.IOException;
+  private void handleTaskComputedMessage(javax.jms.Message) throws javax.jms.JMSException, java.lang.InterruptedException, java.io.IOException, java.lang.ClassNotFoundException, java.util.zip.DataFormatException;
+  private void callHandler(java.lang.String, java.lang.String, com.strategyquant.gridlib.compute.JobResult<java.io.Serializable>);
+  public void close() throws javax.jms.JMSException;
+  public void addJobFinishedHandler(com.strategyquant.gridlib.compute.performer.IJobStatusChangedHandler);
+  public void commit() throws javax.jms.JMSException;
+  public void pause(java.lang.String) throws javax.jms.JMSException;
+  public void stop(java.lang.String) throws javax.jms.JMSException;
+  public void restart(java.lang.String) throws javax.jms.JMSException;
+  public boolean sendMessageToJob(java.lang.String, java.lang.String, com.strategyquant.gridlib.client.GridMessage) throws javax.jms.JMSException, java.io.IOException;
+  public com.strategyquant.gridlib.topology.GridTopology getGridTopology();
+  public java.lang.String getGridDescriptions();
+  public void setProgress(java.lang.String, java.lang.String, int);
+  public void setGroupRestrictions(java.lang.String, int);
+  public void check();
+  public void setJobWaiting(java.lang.String, java.lang.String, boolean);
+  public int getComputedThread();
+  public int getUsedComputedThreads();
+  public void setUsedComputedThreads(int);
+  public void pause(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public void stop(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public void restart(java.lang.String, java.lang.String) throws java.lang.Exception;
+  static void access$000(com.strategyquant.gridlib.compute.performer.JmsComputePerformer, javax.jms.Message) throws javax.jms.JMSException, java.lang.InterruptedException, java.io.IOException, java.lang.ClassNotFoundException, java.util.zip.DataFormatException;
+  static org.slf4j.Logger access$100();
+  static com.strategyquant.gridlib.topology.GridTopology access$202(com.strategyquant.gridlib.compute.performer.JmsComputePerformer, com.strategyquant.gridlib.topology.GridTopology);
+  static com.strategyquant.gridlib.topology.GridTopology access$200(com.strategyquant.gridlib.compute.performer.JmsComputePerformer);
+  static {};
+}
+public class com.strategyquant.gridlib.compute.performer.JmsHelper {
+  private static final org.nustaq.serialization.FSTConfiguration fstConf;
+  public com.strategyquant.gridlib.compute.performer.JmsHelper();
+  public static byte[] serializeAndCompress(java.io.Serializable, boolean, boolean) throws java.io.IOException;
+  public static java.io.Serializable handleBytesMessage(javax.jms.Message, boolean, boolean) throws java.io.IOException, javax.jms.JMSException, java.lang.ClassNotFoundException, java.util.zip.DataFormatException;
+  public static java.io.Serializable decompressAndDeserialize(byte[], boolean, boolean) throws java.lang.ClassNotFoundException, java.io.IOException, java.util.zip.DataFormatException;
+  public static void pause(com.strategyquant.gridlib.message.JmsPerformer, java.lang.String) throws javax.jms.JMSException;
+  public static void stop(com.strategyquant.gridlib.message.JmsPerformer, java.lang.String) throws javax.jms.JMSException;
+  public static void restart(com.strategyquant.gridlib.message.JmsPerformer, java.lang.String) throws javax.jms.JMSException;
+  public static void sendMessageToJob(com.strategyquant.gridlib.message.JmsPerformer, java.lang.String, java.lang.String, java.lang.String, boolean, boolean, com.strategyquant.gridlib.client.GridMessage) throws javax.jms.JMSException, java.io.IOException;
+  public static void sendMessageToJob(com.strategyquant.gridlib.message.JmsPerformer, java.lang.String, java.lang.String, java.lang.String, boolean, boolean, byte[]) throws javax.jms.JMSException, java.io.IOException;
+  static {};
+}
+public class com.strategyquant.gridlib.compute.performer.JmsJobInfo implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  private java.lang.String className;
+  private java.util.Map<java.lang.String, java.io.Serializable> params;
+  private int flag;
+  public com.strategyquant.gridlib.compute.performer.JmsJobInfo();
+  public com.strategyquant.gridlib.compute.performer.JmsJobInfo(java.lang.String, java.util.Map<java.lang.String, java.io.Serializable>, int);
+  public java.lang.String getClassName();
+  public void setClassName(java.lang.String);
+  public java.util.Map<java.lang.String, java.io.Serializable> getParams();
+  public void setParams(java.util.Map<java.lang.String, java.io.Serializable>);
+  public int getFlag();
+  public void setFlag(int);
+}
+class com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer$1 implements java.lang.Runnable {
+  final com.strategyquant.gridlib.compute.common.JobQueue$JobInfo val$jobInfo;
+  final com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer this$0;
+  com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer$1();
+  public void run();
+}
+public class com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer implements com.strategyquant.gridlib.compute.performer.IComputePerformer {
+  private static final int MINIMAL_CORES_FOR_SQ = 3;
+  private static final int MINIMAL_RESERVED_CORES_FOR_OS = 4;
+  private static final int TERMINATION_WAIT = 5000;
+  private static final org.slf4j.Logger LOGGER;
+  private com.strategyquant.gridlib.compute.common.JobQueue<com.strategyquant.gridlib.client.GridJob<?>> taskQueue;
+  private java.util.List<com.strategyquant.gridlib.compute.performer.IJobStatusChangedHandler> handlers;
+  private com.strategyquant.gridlib.concurrent.ThreadPool threadPool;
+  private java.util.concurrent.ExecutorService nonBlockingPool;
+  private java.util.concurrent.atomic.AtomicInteger runningBlockingJobs;
+  private java.util.concurrent.atomic.AtomicInteger runningNonBlockingJobs;
+  private java.util.concurrent.atomic.AtomicInteger waitingBlockingJobs;
+  private java.util.concurrent.atomic.AtomicInteger coreCount;
+  private int maximumCoreCount;
+  private com.strategyquant.gridlib.topology.GridTopology gridTopology;
+  private com.strategyquant.gridlib.config.Config config;
+  private volatile boolean shuttingDown;
+  public com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer(com.strategyquant.gridlib.config.Config);
+  private void fillGridTopology();
+  private java.lang.String evalIp();
+  private int adjustCoresForUsage(int, boolean);
+  private void initExecutors();
+  public void close() throws java.lang.Exception;
+  private void stopAll();
+  public void addJobFinishedHandler(com.strategyquant.gridlib.compute.performer.IJobStatusChangedHandler);
+  public void execute(com.strategyquant.gridlib.client.GridJob<?>, java.lang.String, com.strategyquant.gridlib.compute.common.ExecuteOptions) throws java.lang.Exception;
+  private void tryToExecute();
+  private void incrementRunningTasksCount(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>);
+  private void decrementRunningTasksCount(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<?>);
+  private void runJob(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<com.strategyquant.gridlib.client.GridJob<?>>);
+  protected void callJobFinishedHandlers(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<com.strategyquant.gridlib.client.GridJob<?>>, com.strategyquant.gridlib.compute.JobResult<java.io.Serializable>);
+  protected void callJobStartedHandlers(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<com.strategyquant.gridlib.client.GridJob<?>>);
+  public void commit() throws java.lang.Exception;
+  public void pause(java.lang.String);
+  public void pause(java.lang.String, java.lang.String) throws java.lang.Exception;
+  private void performStop(com.strategyquant.gridlib.compute.common.JobQueue$JobInfo<com.strategyquant.gridlib.client.GridJob<?>>, com.strategyquant.gridlib.client.GridMessage);
+  public void stop(java.lang.String);
+  public void stop(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public void restart(java.lang.String);
+  public void restart(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public boolean sendMessageToJob(java.lang.String, java.lang.String, com.strategyquant.gridlib.client.GridMessage);
+  private void sendMessageToJob(com.strategyquant.gridlib.client.GridJob<?>, com.strategyquant.gridlib.client.GridMessage);
+  public com.strategyquant.gridlib.topology.GridTopology getGridTopology();
+  public java.lang.String getGridDescriptions();
+  public void setProgress(java.lang.String, java.lang.String, int);
+  public void setGroupRestrictions(java.lang.String, int);
+  public void check();
+  public void setJobWaiting(java.lang.String, java.lang.String, boolean);
+  public int getComputedThread();
+  public int getUsedComputedThreads();
+  public void setUsedComputedThreads(int);
+  static org.slf4j.Logger access$000();
+  static com.strategyquant.gridlib.compute.common.JobQueue access$100(com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer);
+  static void access$200(com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer, com.strategyquant.gridlib.compute.common.JobQueue$JobInfo);
+  static java.util.concurrent.atomic.AtomicInteger access$300(com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer);
+  static java.util.concurrent.atomic.AtomicInteger access$400(com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer);
+  static java.util.concurrent.atomic.AtomicInteger access$500(com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer);
+  static java.util.concurrent.atomic.AtomicInteger access$600(com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer);
+  static void access$700(com.strategyquant.gridlib.compute.performer.MultithreadComputePerformer);
+  static {};
+}
+class com.strategyquant.gridlib.concurrent.ThreadPool$BlockingQueue<T> {
+  private java.util.Queue<T> queue;
+  private int maxTasksInPool;
+  private boolean limitMax;
+  final com.strategyquant.gridlib.concurrent.ThreadPool this$0;
+  public com.strategyquant.gridlib.concurrent.ThreadPool$BlockingQueue(com.strategyquant.gridlib.concurrent.ThreadPool, int, boolean);
+  public synchronized void remove(T);
+  public synchronized void clear();
+  public synchronized boolean isEmpty();
+  public synchronized void enqueue(T) throws java.lang.InterruptedException;
+  public synchronized T dequeue() throws java.lang.InterruptedException;
+}
+class com.strategyquant.gridlib.concurrent.ThreadPool$TaskExecutor implements java.lang.Runnable {
+  private com.strategyquant.gridlib.concurrent.ThreadPool$BlockingQueue<java.lang.Runnable> queue;
+  private boolean additionalExecutor;
+  private java.lang.Runnable task;
+  final com.strategyquant.gridlib.concurrent.ThreadPool this$0;
+  public com.strategyquant.gridlib.concurrent.ThreadPool$TaskExecutor(com.strategyquant.gridlib.concurrent.ThreadPool$BlockingQueue<java.lang.Runnable>);
+  public com.strategyquant.gridlib.concurrent.ThreadPool$TaskExecutor(com.strategyquant.gridlib.concurrent.ThreadPool, java.lang.Runnable);
+  public void run();
+  private void runAdditionalExecutor();
+  private void runCommonExecutor();
+  private net.openhft.affinity.AffinityLock acquireLock();
+}
+public class com.strategyquant.gridlib.concurrent.ThreadPool implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  private com.strategyquant.gridlib.concurrent.ThreadPool$BlockingQueue<java.lang.Runnable> queue;
+  private java.util.List<java.lang.Thread> threads;
+  private boolean useAffinity;
+  private volatile boolean shutdown;
+  private int additonalCount;
+  public com.strategyquant.gridlib.concurrent.ThreadPool(int, boolean);
+  private void setAffinityLibraryLoging();
+  private void initializePool(int);
+  private void prepareThreadExecutor(int);
+  private void prepareThreadExecutor(int, java.lang.Runnable);
+  public void close();
+  public void waitForTermination(long);
+  public void execute(java.lang.Runnable, boolean);
+  static boolean access$000(com.strategyquant.gridlib.concurrent.ThreadPool);
+  static org.slf4j.Logger access$100();
+  static java.util.List access$200(com.strategyquant.gridlib.concurrent.ThreadPool);
+  static boolean access$300(com.strategyquant.gridlib.concurrent.ThreadPool);
+  static {};
+}
+public class com.strategyquant.gridlib.config.Config {
+  private boolean useJavaSerialization;
+  private boolean useAffinity;
+  private boolean compressData;
+  private java.lang.String coreUsage;
+  private java.lang.String nodeId;
+  private int finishedJobsInDesc;
+  private java.lang.String serverLocation;
+  private com.strategyquant.gridlib.message.sync.FolderConfigs folderConfigs;
+  private java.lang.String[] foldersWithJars;
+  private boolean adjustTopSizeOfCores;
+  public com.strategyquant.gridlib.config.Config();
+  public com.strategyquant.gridlib.config.Config(java.lang.String);
+  public int getFinishedJobsInDesc();
+  public void setFinishedJobsInDesc(int);
+  public java.lang.String getServerLocation();
+  public void setUseJavaSerialization(boolean);
+  public boolean isUseJavaSerialization();
+  public void setServerLocation(java.lang.String);
+  public java.lang.String[] getFoldersWithJars();
+  public void setFoldersWithJars(java.lang.String[]);
+  public com.strategyquant.gridlib.message.sync.FolderConfigs getFolderConfigs();
+  public void setFolderConfigs(com.strategyquant.gridlib.message.sync.FolderConfigs);
+  public boolean isCompressData();
+  public void setCompressData(boolean);
+  public java.lang.String getCoreUsage();
+  public void setCoreUsage(java.lang.String);
+  public boolean isUseAffinity();
+  public void setUseAffinity(boolean);
+  public java.lang.String getNodeId();
+  public void setNodeId(java.lang.String);
+  public boolean isAdjustTopSizeOfCores();
+  public void setAdjustTopSizeOfCores(boolean);
+}
+public class com.strategyquant.gridlib.config.Parser {
+  public com.strategyquant.gridlib.config.Parser();
+  public com.strategyquant.gridlib.config.Config parse(java.io.File) throws java.io.UnsupportedEncodingException, java.io.IOException, org.jdom2.JDOMException;
+  private com.strategyquant.gridlib.message.sync.FolderConfigs getFolderConfigs(org.jdom2.Element);
+  private java.lang.String[] getFoldersWithJars(org.jdom2.Element);
+  private static java.lang.String getString(org.jdom2.Element, java.lang.String, java.lang.String);
+  private static boolean getBoolean(org.jdom2.Element, java.lang.String, boolean);
+}
+public class com.strategyquant.gridlib.config.SingleFolderConfig {
+  private java.lang.String folder;
+  private boolean solidFolder;
+  public com.strategyquant.gridlib.config.SingleFolderConfig();
+  public com.strategyquant.gridlib.config.SingleFolderConfig(java.lang.String, boolean);
+  public java.lang.String getFolder();
+  public boolean isSolidFolder();
+  public void setFolder(java.lang.String);
+  public void setSolidFolder(boolean);
+}
+public class com.strategyquant.gridlib.message.JmsConnection {
+  private static final org.slf4j.Logger LOGGER;
+  private java.lang.String ident;
+  private javax.jms.Connection connection;
+  private org.apache.activemq.artemis.jms.client.ActiveMQConnectionFactory factory;
+  private java.lang.String target;
+  public com.strategyquant.gridlib.message.JmsConnection(com.strategyquant.gridlib.message.JmsConnectionInfo) throws javax.jms.JMSException;
+  public javax.jms.Session createSession(boolean) throws javax.jms.JMSException;
+  protected java.lang.String getIdent();
+  private void initClient() throws javax.jms.JMSException;
+  public javax.jms.Topic createTopic(java.lang.String);
+  public void close() throws javax.jms.JMSException;
+  static {};
+}
+public class com.strategyquant.gridlib.message.JmsConnectionInfo {
+  private java.lang.String ident;
+  private java.lang.String target;
+  public com.strategyquant.gridlib.message.JmsConnectionInfo(java.lang.String);
+  public java.lang.String getIdent();
+  public void setIdent(java.lang.String);
+  public java.lang.String getTarget();
+  public void setTarget(java.lang.String);
+}
+public class com.strategyquant.gridlib.message.JmsPerformer implements java.lang.AutoCloseable {
+  private static final org.slf4j.Logger LOGGER;
+  private java.util.List<javax.jms.MessageConsumer> consumers;
+  private javax.jms.MessageProducer producer;
+  private com.strategyquant.gridlib.message.JmsConnection connection;
+  private javax.jms.Session session;
+  private javax.jms.Topic topic;
+  public com.strategyquant.gridlib.message.JmsPerformer(com.strategyquant.gridlib.TopicIdent, com.strategyquant.gridlib.message.JmsConnectionInfo) throws javax.jms.JMSException;
+  public com.strategyquant.gridlib.message.JmsPerformer(boolean, com.strategyquant.gridlib.TopicIdent, com.strategyquant.gridlib.message.JmsConnectionInfo) throws javax.jms.JMSException;
+  public com.strategyquant.gridlib.message.MessageKind getMessageKind(javax.jms.Message) throws javax.jms.JMSException;
+  public void close() throws javax.jms.JMSException;
+  public void prepareMessageClient(javax.jms.MessageListener, com.strategyquant.gridlib.message.MessageKind) throws javax.jms.JMSException;
+  public void prepareMessageClient(javax.jms.MessageListener, java.lang.String) throws javax.jms.JMSException;
+  private void ensureProducer(javax.jms.Topic) throws javax.jms.JMSException;
+  private void fillProperties(javax.jms.Message, java.util.Map<com.strategyquant.gridlib.message.MessageProperties, java.lang.String>) throws javax.jms.JMSException;
+  public void sendMessageFile(java.io.File, java.lang.String, java.lang.String) throws javax.jms.JMSException, java.io.IOException;
+  public void sendLargeMessage(java.io.InputStream, java.lang.String, java.util.Map<com.strategyquant.gridlib.message.MessageProperties, java.lang.String>, com.strategyquant.gridlib.message.MessageKind) throws javax.jms.JMSException, java.io.IOException;
+  private synchronized void sendMessage(javax.jms.Message, java.lang.String, com.strategyquant.gridlib.message.MessageKind) throws javax.jms.JMSException;
+  public void sendSimpleMessage(com.strategyquant.gridlib.message.MessageKind, java.lang.String, java.util.Map<com.strategyquant.gridlib.message.MessageProperties, java.lang.String>) throws javax.jms.JMSException;
+  public void sendTextMessage(com.strategyquant.gridlib.message.MessageKind, java.lang.String, java.lang.String) throws javax.jms.JMSException;
+  public void sendObjectMessage(com.strategyquant.gridlib.message.MessageKind, java.lang.String, java.util.Map<com.strategyquant.gridlib.message.MessageProperties, java.lang.String>, java.io.Serializable) throws javax.jms.JMSException;
+  public void commit() throws javax.jms.JMSException;
+  static {};
+}
+public final class com.strategyquant.gridlib.message.MessageKind extends java.lang.Enum<com.strategyquant.gridlib.message.MessageKind> {
+  public static final com.strategyquant.gridlib.message.MessageKind registerListener;
+  public static final com.strategyquant.gridlib.message.MessageKind unregisterListener;
+  public static final com.strategyquant.gridlib.message.MessageKind registerListenerResult;
+  public static final com.strategyquant.gridlib.message.MessageKind sendCustomJobMessage;
+  public static final com.strategyquant.gridlib.message.MessageKind registerTask;
+  public static final com.strategyquant.gridlib.message.MessageKind pauseTasks;
+  public static final com.strategyquant.gridlib.message.MessageKind restartTasks;
+  public static final com.strategyquant.gridlib.message.MessageKind stopTasks;
+  public static final com.strategyquant.gridlib.message.MessageKind resultOfTask;
+  public static final com.strategyquant.gridlib.message.MessageKind taskComputed;
+  public static final com.strategyquant.gridlib.message.MessageKind needTask;
+  public static final com.strategyquant.gridlib.message.MessageKind tasksQueueNotEmpty;
+  public static final com.strategyquant.gridlib.message.MessageKind computeTask;
+  public static final com.strategyquant.gridlib.message.MessageKind checkFileDataStatus;
+  public static final com.strategyquant.gridlib.message.MessageKind dataStatus;
+  public static final com.strategyquant.gridlib.message.MessageKind needFileData;
+  public static final com.strategyquant.gridlib.message.MessageKind sendingFileData;
+  public static final com.strategyquant.gridlib.message.MessageKind nodeHeartbeat;
+  public static final com.strategyquant.gridlib.message.MessageKind sendingTopology;
+  public static final com.strategyquant.gridlib.message.MessageKind refreshTopology;
+  private static final com.strategyquant.gridlib.message.MessageKind[] $VALUES;
+  public static com.strategyquant.gridlib.message.MessageKind[] values();
+  public static com.strategyquant.gridlib.message.MessageKind valueOf(java.lang.String);
+  private com.strategyquant.gridlib.message.MessageKind();
+  private static com.strategyquant.gridlib.message.MessageKind[] $values();
+  static {};
+}
+public final class com.strategyquant.gridlib.message.MessageProperties extends java.lang.Enum<com.strategyquant.gridlib.message.MessageProperties> {
+  public static final com.strategyquant.gridlib.message.MessageProperties targetIdent;
+  public static final com.strategyquant.gridlib.message.MessageProperties senderIdent;
+  public static final com.strategyquant.gridlib.message.MessageProperties messageKind;
+  public static final com.strategyquant.gridlib.message.MessageProperties dataVersion;
+  public static final com.strategyquant.gridlib.message.MessageProperties folder;
+  public static final com.strategyquant.gridlib.message.MessageProperties files;
+  public static final com.strategyquant.gridlib.message.MessageProperties jobId;
+  public static final com.strategyquant.gridlib.message.MessageProperties jobGroupId;
+  public static final com.strategyquant.gridlib.message.MessageProperties requiredTasks;
+  public static final com.strategyquant.gridlib.message.MessageProperties zippedContent;
+  public static final com.strategyquant.gridlib.message.MessageProperties jvmSerialization;
+  public static final com.strategyquant.gridlib.message.MessageProperties registerResult;
+  public static final com.strategyquant.gridlib.message.MessageProperties listenerTarget;
+  private static final com.strategyquant.gridlib.message.MessageProperties[] $VALUES;
+  public static com.strategyquant.gridlib.message.MessageProperties[] values();
+  public static com.strategyquant.gridlib.message.MessageProperties valueOf(java.lang.String);
+  private com.strategyquant.gridlib.message.MessageProperties();
+  private static com.strategyquant.gridlib.message.MessageProperties[] $values();
+  static {};
+}
+public class com.strategyquant.gridlib.message.sync.FolderConfigs {
+  private java.lang.String dataFolderRoot;
+  private java.util.List<com.strategyquant.gridlib.config.SingleFolderConfig> folderConfig;
+  public com.strategyquant.gridlib.message.sync.FolderConfigs();
+  public java.lang.String getDataFolderRoot();
+  public void setDataFolderRoot(java.lang.String);
+  public java.util.List<com.strategyquant.gridlib.config.SingleFolderConfig> getFolderConfig();
+  public void setFolderConfig(java.util.List<com.strategyquant.gridlib.config.SingleFolderConfig>);
+}
+public class com.strategyquant.gridlib.message.sync.FolderGuardFactory {
+  public com.strategyquant.gridlib.message.sync.FolderGuardFactory();
+  public static com.strategyquant.gridlib.sync.guard.IFolderGuard getGuard(java.lang.String, java.lang.String, boolean, com.strategyquant.gridlib.message.JmsConnectionInfo) throws java.io.IOException, javax.jms.JMSException;
+  public static com.strategyquant.gridlib.sync.updater.IFolderUpdater getUpdater(java.lang.String, java.lang.String, boolean, com.strategyquant.gridlib.message.JmsConnectionInfo) throws java.io.IOException, javax.jms.JMSException;
+}
+public class com.strategyquant.gridlib.stat.ComputingStats {
+  private long computedTasks;
+  private long resentTasks;
+  private java.util.Map<java.lang.String, com.strategyquant.gridlib.stat.Statistic> groupStats;
+  private java.util.Map<java.lang.String, com.strategyquant.gridlib.stat.Statistic> nodeStats;
+  public com.strategyquant.gridlib.stat.ComputingStats();
+  public long getComputedTasks();
+  public long getResentTasks();
+  public com.strategyquant.gridlib.stat.Statistic getStatisticForNode(java.lang.String);
+  public com.strategyquant.gridlib.stat.Statistic getStatisticForGroup(java.lang.String);
+  public void removeStatisticsForNode(java.lang.String);
+  public void jobComputed(java.lang.String, java.lang.String, long);
+  public void jobFailed(java.lang.String, java.lang.String);
+}
+public class com.strategyquant.gridlib.stat.Statistic {
+  private long computedTasks;
+  private long resentTasks;
+  private long shortestTaskTime;
+  private long longestTaskTime;
+  private long averageTaskTime;
+  private long totalDuration;
+  public com.strategyquant.gridlib.stat.Statistic();
+  public long getComputedTasks();
+  public long getResentTasks();
+  public long getShortestTaskTime();
+  public long getLongestTaskTime();
+  public long getAverageTaskTime();
+  public long getTotalDuration();
+  public synchronized void taskFailed();
+  public void taskComputed(long);
+}
+class com.strategyquant.gridlib.sync.guard.CommonFolderGuard$1 implements javax.jms.MessageListener {
+  final com.strategyquant.gridlib.sync.guard.CommonFolderGuard this$0;
+  com.strategyquant.gridlib.sync.guard.CommonFolderGuard$1(com.strategyquant.gridlib.sync.guard.CommonFolderGuard);
+  public void onMessage(javax.jms.Message);
+}
+class com.strategyquant.gridlib.sync.guard.CommonFolderGuard$2 {
+  static final int[] $SwitchMap$com$strategyquant$gridlib$message$MessageKind;
+  static {};
+}
+public class com.strategyquant.gridlib.sync.guard.CommonFolderGuard implements com.strategyquant.gridlib.sync.guard.IFolderGuard {
+  private static final org.slf4j.Logger LOGGER;
+  private java.lang.String folderIdent;
+  private java.lang.String folder;
+  private java.lang.String hash;
+  private boolean solid;
+  private com.strategyquant.gridlib.message.JmsPerformer sender;
+  private com.strategyquant.gridlib.message.JmsPerformer reciever;
+  public com.strategyquant.gridlib.sync.guard.CommonFolderGuard(java.lang.String, java.lang.String, com.strategyquant.gridlib.message.JmsConnectionInfo, boolean) throws java.io.IOException, javax.jms.JMSException;
+  private void prepareJMS() throws javax.jms.JMSException;
+  private void handleMessage(javax.jms.Message, com.strategyquant.gridlib.message.MessageKind) throws javax.jms.JMSException, java.io.IOException;
+  private void sendFiles(java.lang.String, java.util.List<java.lang.String>) throws javax.jms.JMSException, java.io.IOException;
+  private void sendStatus(java.lang.String) throws java.io.FileNotFoundException, javax.jms.JMSException;
+  public java.lang.String getFolder();
+  public void updateHash() throws java.io.IOException, javax.jms.JMSException;
+  private void updateHash(boolean) throws java.io.IOException, javax.jms.JMSException;
+  private java.io.File zipFiles(java.util.List<java.lang.String>) throws java.io.IOException;
+  public void close() throws javax.jms.JMSException;
+  static com.strategyquant.gridlib.message.JmsPerformer access$000(com.strategyquant.gridlib.sync.guard.CommonFolderGuard);
+  static void access$100(com.strategyquant.gridlib.sync.guard.CommonFolderGuard, javax.jms.Message, com.strategyquant.gridlib.message.MessageKind) throws javax.jms.JMSException, java.io.IOException;
+  static {};
+}
+public class com.strategyquant.gridlib.sync.guard.FolderGuards implements java.lang.AutoCloseable {
+  private java.util.List<com.strategyquant.gridlib.sync.guard.IFolderGuard> guards;
+  private java.lang.String path;
+  private com.strategyquant.gridlib.message.JmsConnectionInfo connection;
+  public com.strategyquant.gridlib.sync.guard.FolderGuards(java.lang.String, com.strategyquant.gridlib.message.JmsConnectionInfo) throws javax.jms.JMSException;
+  public void close() throws java.lang.Exception;
+  public void create(java.lang.String, boolean) throws java.io.IOException, javax.jms.JMSException;
+  public void updateHash() throws java.io.IOException, javax.jms.JMSException;
+}
+public interface com.strategyquant.gridlib.sync.guard.IFolderGuard {
+  public abstract java.lang.String getFolder();
+  public abstract void updateHash() throws java.io.IOException, javax.jms.JMSException;
+  public abstract void close() throws javax.jms.JMSException;
+}
+class com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater$1 implements javax.jms.MessageListener {
+  final com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater this$0;
+  com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater$1(com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater);
+  public void onMessage(javax.jms.Message);
+}
+class com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater$2 {
+  static final int[] $SwitchMap$com$strategyquant$gridlib$message$MessageKind;
+  static {};
+}
+public abstract class com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater implements com.strategyquant.gridlib.sync.updater.IFolderUpdater {
+  private static final org.slf4j.Logger LOGGER;
+  private java.lang.String folder;
+  private boolean dirty;
+  protected java.lang.String hash;
+  private java.lang.String folderIdent;
+  private com.strategyquant.gridlib.message.JmsPerformer sender;
+  private com.strategyquant.gridlib.message.JmsPerformer reciever;
+  private java.util.List<com.strategyquant.gridlib.sync.updater.IFolderUpdatedListener> listeners;
+  public com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater(java.lang.String, java.lang.String, com.strategyquant.gridlib.message.JmsConnectionInfo) throws java.io.IOException, javax.jms.JMSException;
+  public void addFolderUpdatedListener(com.strategyquant.gridlib.sync.updater.IFolderUpdatedListener);
+  private void checkVersions() throws javax.jms.JMSException;
+  protected void setDirty(boolean);
+  private void notifyListeners();
+  public boolean isDirty();
+  public java.lang.String getFolder();
+  private void prepareJMS() throws javax.jms.JMSException;
+  public void close() throws javax.jms.JMSException;
+  private void downloadData(javax.jms.BytesMessage) throws javax.jms.JMSException, java.io.IOException;
+  protected void prepareForNewData() throws java.io.IOException;
+  private void handleNewHash(java.lang.String, java.lang.String) throws java.io.FileNotFoundException, javax.jms.JMSException;
+  protected abstract com.strategyquant.gridlib.sync.updater.HandleHashResult hashChanged(java.lang.String);
+  private void handleMessage(javax.jms.Message, com.strategyquant.gridlib.message.MessageKind) throws javax.jms.JMSException, java.io.IOException;
+  static com.strategyquant.gridlib.message.JmsPerformer access$000(com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater);
+  static void access$100(com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater, javax.jms.Message, com.strategyquant.gridlib.message.MessageKind) throws javax.jms.JMSException, java.io.IOException;
+  static {};
+}
+class com.strategyquant.gridlib.sync.updater.FolderUpdaters$1 {
+}
+class com.strategyquant.gridlib.sync.updater.FolderUpdaters$FolderUpdatedListener implements com.strategyquant.gridlib.sync.updater.IFolderUpdatedListener {
+  final com.strategyquant.gridlib.sync.updater.FolderUpdaters this$0;
+  private com.strategyquant.gridlib.sync.updater.FolderUpdaters$FolderUpdatedListener(com.strategyquant.gridlib.sync.updater.FolderUpdaters);
+  public void onUpdated();
+  com.strategyquant.gridlib.sync.updater.FolderUpdaters$FolderUpdatedListener(com.strategyquant.gridlib.sync.updater.FolderUpdaters, com.strategyquant.gridlib.sync.updater.FolderUpdaters$1);
+}
+public class com.strategyquant.gridlib.sync.updater.FolderUpdaters implements java.lang.AutoCloseable {
+  private java.util.List<com.strategyquant.gridlib.sync.updater.IFolderUpdater> updaters;
+  private java.lang.String path;
+  private java.util.List<com.strategyquant.gridlib.sync.updater.IFolderUpdatedListener> listeners;
+  private com.strategyquant.gridlib.sync.updater.FolderUpdaters$FolderUpdatedListener listener;
+  private com.strategyquant.gridlib.message.JmsConnectionInfo connection;
+  public com.strategyquant.gridlib.sync.updater.FolderUpdaters(java.lang.String, com.strategyquant.gridlib.message.JmsConnectionInfo) throws javax.jms.JMSException;
+  public void createUpdater(java.lang.String, boolean) throws java.io.IOException, javax.jms.JMSException;
+  public void addFolderUpdatedListener(com.strategyquant.gridlib.sync.updater.IFolderUpdatedListener);
+  public void close() throws java.lang.Exception;
+  public boolean isDirty();
+  static java.util.List access$100(com.strategyquant.gridlib.sync.updater.FolderUpdaters);
+}
+public class com.strategyquant.gridlib.sync.updater.HandleHashResult {
+  private boolean needUpdate;
+  private java.util.LinkedList<java.lang.String> filesToUpdate;
+  public com.strategyquant.gridlib.sync.updater.HandleHashResult(boolean, java.util.LinkedList<java.lang.String>);
+  public boolean isNeedUpdate();
+  public java.util.LinkedList<java.lang.String> getFilesToUpdate();
+}
+public interface com.strategyquant.gridlib.sync.updater.IFolderUpdatedListener {
+  public abstract void onUpdated();
+}
+public interface com.strategyquant.gridlib.sync.updater.IFolderUpdater {
+  public abstract java.lang.String getFolder();
+  public abstract void updateHash() throws java.io.IOException;
+  public abstract boolean isDirty();
+  public abstract void close() throws javax.jms.JMSException;
+  public abstract void addFolderUpdatedListener(com.strategyquant.gridlib.sync.updater.IFolderUpdatedListener);
+}
+class com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$1 {
+}
+class com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureComparator {
+  private com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureComparator();
+  public com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult compare(com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures, com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures);
+  private void evalRemovedOrChangedFiles(com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult, com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures, com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures);
+  private void evalAddedFiles(com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult, com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures, com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures);
+  com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureComparator(com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$1);
+}
+class com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult {
+  private java.util.List<java.lang.String> removedFiles;
+  private java.util.List<java.lang.String> newOrChangedFiles;
+  private com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult();
+  static java.util.List access$100(com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult);
+  static java.util.List access$200(com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult);
+  com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructureCompareResult(com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$1);
+}
+class com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures {
+  private java.util.Map<java.lang.String, java.lang.String> structure;
+  public com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures(java.lang.String);
+  private void parse(java.lang.String);
+  public boolean equalsHash(java.lang.String, java.lang.String);
+  public boolean hasFile(java.lang.String);
+  public java.util.Set<java.lang.String> getFileNames();
+  public java.lang.String getHash(java.lang.String);
+}
+public class com.strategyquant.gridlib.sync.updater.SingleFolderUpdater extends com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater {
+  private com.strategyquant.gridlib.sync.updater.SingleFolderUpdater$FileStructures hashFileStructure;
+  public com.strategyquant.gridlib.sync.updater.SingleFolderUpdater(java.lang.String, java.lang.String, com.strategyquant.gridlib.message.JmsConnectionInfo) throws java.io.IOException, javax.jms.JMSException;
+  public void updateHash() throws java.io.IOException;
+  public com.strategyquant.gridlib.sync.updater.HandleHashResult hashChanged(java.lang.String);
+  private void removeUnecessaryFiles(java.util.List<java.lang.String>);
+}
+public class com.strategyquant.gridlib.sync.updater.SolidFolderUpdater extends com.strategyquant.gridlib.sync.updater.AbstractFolderUpdater {
+  private java.lang.String hash;
+  public com.strategyquant.gridlib.sync.updater.SolidFolderUpdater(java.lang.String, java.lang.String, com.strategyquant.gridlib.message.JmsConnectionInfo) throws java.io.IOException, javax.jms.JMSException;
+  public void updateHash() throws java.io.IOException;
+  public com.strategyquant.gridlib.sync.updater.HandleHashResult hashChanged(java.lang.String);
+  protected void prepareForNewData() throws java.io.IOException;
+}
+public class com.strategyquant.gridlib.topology.GridTopology implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  private java.util.List<com.strategyquant.gridlib.topology.NodeInfo> nodes;
+  private int totalCores;
+  public com.strategyquant.gridlib.topology.GridTopology();
+  public int getRunningThreads();
+  public java.util.List<com.strategyquant.gridlib.topology.NodeInfo> getNodes();
+  public void setNodes(java.util.List<com.strategyquant.gridlib.topology.NodeInfo>);
+  public int getTotalCores();
+  public void setTotalCores(int);
+}
+public class com.strategyquant.gridlib.topology.NodeInfo implements java.io.Serializable {
+  private static final long serialVersionUID = 1l;
+  private java.lang.String ip;
+  private java.lang.Long id;
+  private int totalCores;
+  private int usedCores;
+  private java.lang.Long age;
+  private java.lang.Long lastHeartBeat;
+  private int runningThreads;
+  private java.lang.String osVersion;
+  private double totalMemory;
+  private double usedMemory;
+  private int cpuUsage;
+  public com.strategyquant.gridlib.topology.NodeInfo();
+  public java.lang.String getIp();
+  public void setIp(java.lang.String);
+  public java.lang.Long getAge();
+  public void setAge(java.lang.Long);
+  public int getRunningThreads();
+  public void setRunningThreads(int);
+  public java.lang.String getOsVersion();
+  public void setOsVersion(java.lang.String);
+  public double getTotalMemory();
+  public void setTotalMemory(double);
+  public int getCpuUsage();
+  public void setCpuUsage(int);
+  public java.lang.Long getLastHeartBeat();
+  public void setLastHeartBeat(java.lang.Long);
+  public double getUsedMemory();
+  public void setUsedMemory(double);
+  public int getTotalCores();
+  public void setTotalCores(int);
+  public int getUsedCores();
+  public void setUsedCores(int);
+  public java.lang.Long getId();
+  public void setId(java.lang.Long);
+}
+public class com.strategyquant.gridlib.utils.BeanUtils {
+  public com.strategyquant.gridlib.utils.BeanUtils();
+  public static byte[] serialize(java.lang.Object) throws java.io.IOException;
+  public static java.io.Serializable deserializeObject(byte[]) throws java.io.IOException, java.lang.ClassNotFoundException;
+}
+public class com.strategyquant.gridlib.utils.CompressionUtils {
+  public com.strategyquant.gridlib.utils.CompressionUtils();
+  public static byte[] compress(byte[]) throws java.io.IOException;
+  public static byte[] decompress(byte[]) throws java.io.IOException, java.util.zip.DataFormatException;
+}
+public class com.strategyquant.gridlib.utils.CoreUsagesEvaluator {
+  private static final org.slf4j.Logger LOGGER;
+  public com.strategyquant.gridlib.utils.CoreUsagesEvaluator();
+  public static int getCores(java.lang.String);
+  private static int getSafeCountOFCores(int, int);
+  static {};
+}

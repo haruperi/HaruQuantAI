@@ -1,0 +1,91 @@
+<html>
+<!--
+Template for printing RESULT OVERVIEW on DASHBOARD panel.
+
+Placeholders {XXXX} and {{XXXX}} are replaced with the correct stats value.
+Example usage
+{StatsMoney.NumberOfTrades}
+{{StatsMoney.NetProfit}}
+
+Placeholders with double curly braces are printed green or red based on their value. 
+
+Available stat types
+--------------------------------------
+StatsMoney - statistics computed from money results
+StatsPips - statistics computed from pips/ticks results
+StatsPct - statistics computed from % results
+
+Available stat values
+--------------------------------------
+all databank columns - visible in Snippets SQ.Columns.Databanks, for example:
+AnnualPctReturn
+AnnualPctReturnDDRatio
+AvgBarsInTrade
+AvgBarsLoss
+AvgBarsWin
+AvgLoss
+AvgWin
+CAGR
+CalmarRatio
+Commission
+Drawdown
+DrawdownPct
+DrawdownPips
+Exposure
+Fitness
+InitialDeposit
+NetProfit
+Note
+NumberOfTrades
+PctStagnation
+PctWins
+ProfitFactor
+ResultsName
+ReturnDDRatio
+RExpectancy
+SharpeRatio
+Stability
+Stagnation
+Symmetry
+WinLossRatio
+-->
+
+<head>
+<style type="text/css">
+html, body { background-color: white; font-family: Arial,Helvetica,sans-serif; font-size: 11px; padding: 0; margin: 0; }
+body {
+    padding: 16px;
+}
+.positiveNum { color: #119911 !important; }
+.negativeNum { color: #FF4040 !important; }
+.line {
+    font-size: 11px;
+    color: #777777;
+    max-width: 490px;
+    margin: 0 auto 4px auto;
+}
+.line:after {
+    clear: both;
+}
+.line .number {
+    float: right;
+}
+</style>
+</head>
+<body class="results-panel-body">
+<div>
+<div class="line">${Label_1} <div class="number">{{StatsMoney.NetProfit}}</div></div>
+<div class="line">${Label_2} <div class="number">{StatsMoney.AvgProfitPerYear}</div></div>
+<div class="line">${Label_3} <div class="number">{StatsPct.AnnualPctReturn}</div></div>
+<div class="line">${Label_4} <div class="number">{StatsMoney.CAGR}</div></div><br/>
+<div class="line">${Label_5} <div class="number">{{StatsMoney.NumberOfTrades}}</div></div>
+<div class="line">${Label_6} <div class="number">{StatsMoney.SharpeRatio}</div></div>
+<div class="line">${Label_7} <div class="number">{StatsMoney.ProfitFactor}</div></div>
+<div class="line">${Label_8} <div class="number">{StatsMoney.ReturnDDRatio}</div></div>
+<div class="line">${Label_9} <div class="number">{StatsPct.WinningPct}</div></div>
+<div class="line">${Label_10} <div class="number">{{StatsMoney.Drawdown}}</div></div>
+<div class="line">${Label_11} <div class="number">{{StatsPct.DrawdownPct}}</div></div>
+</div>
+</body>
+</html>
+

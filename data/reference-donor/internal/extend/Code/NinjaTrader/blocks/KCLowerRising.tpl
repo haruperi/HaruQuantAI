@@ -1,0 +1,2 @@
+<#-- Keltner lower band is rising (Lower[1] < Lower[0]). See printKCValueAt (Parameters.inc). -->
+(sqRound(<@printKCValueAt block "Lower" "1" />, 6) < sqRound(<@printKCValueAt block "Lower" "0" />, 6))

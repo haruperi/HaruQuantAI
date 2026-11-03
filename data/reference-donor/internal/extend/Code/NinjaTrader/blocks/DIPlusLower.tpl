@@ -1,0 +1,2 @@
+<#-- +DI is lower than -DI (DI+ < DI-). Special variant: compares the two DM lines, not a level. -->
+(sqRound(<@printDMValueAt block "DiPlus" "0" />, 6) < sqRound(<@printDMValueAt block "DiMinus" "0" />, 6))

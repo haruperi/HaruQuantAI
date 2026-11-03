@@ -1,0 +1,2 @@
+<#-- CCI crosses above #Level#. See printIndCrossUp (Parameters.inc). -->
+<@printIndCrossUp block "CCI" />

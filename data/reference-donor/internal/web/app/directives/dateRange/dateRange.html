@@ -1,0 +1,23 @@
+<div>
+    <div class="date-range-time-line">
+        <date-picker label="From" date="config.dateFrom" min-date="config.dateMin" max-date="config.dateMax" format="yyyy.mm.dd"
+            on-date-change="onDateFromChange(date)" sqclass="{{::sqclass}}-from" force-date-change="forceDateChange" ng-attr-date-picker-id="{{::fromInputId}}" />
+        <button ng-show="sinceLastDateEnabled" id="btnLastDate" class="btn btn-dukasRange" ng-click="onSinceLastDate()" ng-class="config.lastSelection=='LastDate'?'btn-primary':'btn-default'"
+            tsq>Since last date</button>
+        <button id="btnLast6Months" class="btn btn-default btn-dukasRange" ng-click="onLast6Months()" ng-class="config.lastSelection=='Last6Months'?'btn-primary':'btn-default'"
+            tsq>Last 6 months</button>
+        <button id="btnLastYear" class="btn btn-default btn-dukasRange" ng-click="onLastYear()" ng-class="config.lastSelection=='LastYear'?'btn-primary':'btn-default'"
+            tsq>Last year</button>
+    </div>
+
+    <div class="date-range-time-line">
+        <date-picker label="To" date="config.dateTo" min-date="config.dateMin" max-date="config.dateMax" format="yyyy.mm.dd"
+            on-date-change="onDateToChange(date)" sqclass="{{::sqclass}}-to" force-date-change="forceDateChange" ng-attr-date-picker-id="{{::toInputId}}" />
+        <button id="btnLast5Years" class="btn btn-default btn-dukasRange" ng-click="onLast5Years()" ng-class="config.lastSelection=='Last5Years'?'btn-primary':'btn-default'"
+            tsq>Last 5 years</button>
+        <button id="btnLast10Years" class="btn btn-default btn-dukasRange" ng-click="onLast10Years()" ng-class="config.lastSelection=='Last10Years'?'btn-primary':'btn-default'"
+            tsq>Last 10 years</button>
+        <button id="btnAllTime" class="btn btn-default btn-dukasRange" ng-click="onAllTime()" ng-class="config.lastSelection=='AllTime'?'btn-primary':'btn-default'"
+            tsq>All time</button>
+    </div>
+</div>

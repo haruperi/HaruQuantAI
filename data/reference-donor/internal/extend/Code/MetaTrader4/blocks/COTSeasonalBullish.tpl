@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_SeasonalBullish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#SeasonalLookback#" />, <@printParam block "#SeasonalThreshold#" />)

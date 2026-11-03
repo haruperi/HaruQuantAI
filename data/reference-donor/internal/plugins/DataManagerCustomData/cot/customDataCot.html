@@ -1,0 +1,31 @@
+<!-- Modal window-->
+<div class="modal" id="customDataCotModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Update COT data</h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <p tsq>Get the Commitments of Traders positioning data as ready-to-use external indicators for every COT symbol – updated weekly, directly in StrategyQuant.
+</p>
+<p tsq>COT data provided by SpreadCharts – the analytics platform that turns COT, seasonality and spread data into a real edge for commodity and futures traders.
+                <div class="custom-data-cot-promo">
+                    <div class="custom-data-cot-logo" ng-click="$root.openlink('https://spreadcharts.com')"></div>
+                </div>
+</p>
+<p tsq>SpreadCharts COT indices are independently calculated using public-domain data published by the U.S. Commodity Futures Trading Commission (CFTC). The CFTC does not endorse these products.
+</p>
+                <!-- data provider promo - the logo is a background image so a skin can swap it, see dark.skin.css -->
+            </div>
+            <div class="modal-footer">
+                <button data-testid="dm-custom-data-cot-help-btn" ng-click="openHelp();" class="btn btn-default sqn-btn-help" tsq>Help</button>
+
+                <a data-dismiss="modal" tsq data-testid="dm-custom-data-cot-close">Close</a>
+                <button type="button" class="btn btn-primary" ng-click="onUpdateCot()" tsq data-testid="dm-custom-data-cot-update">Update COT</button>
+            </div>
+        </div>
+    </div>
+</div>

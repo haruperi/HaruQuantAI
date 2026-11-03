@@ -1,0 +1,2 @@
+<#-- Bar opens below MA after the previous open was above it (Open[shift+1] > MA[shift+1] && Open[shift] < MA[shift+1]). -->
+(<@printSeriesAt block "1"><@printSeries block "Open" /></@printSeriesAt> > <@printMAValueAt block "1" /> && <@printSeriesAt block shift><@printSeries block "Open" /></@printSeriesAt> < <@printMAValueAt block "1" />)

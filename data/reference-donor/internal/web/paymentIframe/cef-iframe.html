@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Purchase StrategyQuant License</title>
+    <script
+      id="fsc-api"
+      src="https://d1f8f9xcsvx3ha.cloudfront.net/sbl/0.8.3/fastspring-builder.min.js"
+      type="text/javascript"
+      data-storefront="strategyquant.onfastspring.com/popup-sq"
+      data-popup-webhook-received="paymentReceivedWebhook"
+      data-error-callback="paymentErrorCallback"
+      data-popup-closed="paymentPopupClosedCallback"
+    ></script>
+    <link
+      rel="stylesheet"
+      href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"
+      integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z"
+      crossorigin="anonymous"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,400;0,700;1,300;1,400&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        font-family: "Open Sans", sans-serif;
+        background-color: #3b3b3b;
+        color: #cccccc;
+        text-align: center;
+      }
+
+      .centeredLink {
+        display: inline-block;
+        font-size: 30px;
+        color: #ffffff;
+        margin-top: 180px;
+        font-weight: 600;
+      }
+
+      .centeredLink:hover {
+        color: #ffffff;
+      }
+
+      body #fscCanvas {
+        overflow: auto !important;
+      }
+    </style>
+  </head>
+
+  <body>
+    <script>
+      window.addEventListener("load", (event) => {
+        if (!window.SQPayment) {
+          window.SQPayment = {
+            perform: function (request, callback) {
+              window.cefQuery({
+                request: request,
+                onSuccess: function (response) {
+                  if (callback !== undefined) {
+                    callback(response);
+                  }
+                },
+                onFailure: function (error_code, error_message) {},
+              });
+            },
+          };
+        }
+      });
+
+      function getJsonFromUrl(url) {
+        if (!url) url = location.search;
+        var query = url.substr(1);
+        var result = {};
+        query.split("&").forEach(function (part) {
+          var item = part.split("=");
+          result[item[0]] = decodeURIComponent(item[1]);
+        });
+        return result;
+      }
+
+      returnToStrategyQuant = function () {
+        SQPayment.perform("closeWindow");
+      };
+
+      var urlParams = getJsonFromUrl();
+
+      var paymentContact = {
+        email: "",
+      };
+
+      if (urlParams.email) {
+        paymentContact.email = urlParams.email;
+      }
+      var productId = "strategyquant-full-license";
+      if (urlParams.product && urlParams.product != "") {
+        productId = urlParams.product;
+      }
+      var s = {
+        products: [
+          {
+            path: productId,
+            quantity: 1,
+          },
+        ],
+        coupon: "",
+        checkout: true,
+      };
+
+      if (!("fastspring" in window)) {
+        alert(
+          "Problem connecting to payment page. Please check your internet connection and try again."
+        );
+        returnToStrategyQuant();
+      } else {
+        fastspring.builder.recognize(paymentContact);
+        fastspring.builder.push(s);
+      }
+
+      paymentReceivedWebhook = function (dataObject) {
+        if ("items" in dataObject && dataObject.items[0] != undefined) {
+          if (dataObject.items[0].product == productId) {
+            SQPayment.perform("orderFinished:" + dataObject.id);
+          }
+        }
+      };
+
+      paymentErrorCallback = function (code, message) {
+        console.error("paymentErrorCallback", code, message);
+      };
+
+      paymentPopupClosedCallback = function (a, b, c) {
+        SQPayment.perform("closeWindow");
+      };
+    </script>
+  </body>
+</html>

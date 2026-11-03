@@ -1,0 +1,1 @@
+(COTSmartDumbBullish(<@printParam block "#CotSymbol#" />))

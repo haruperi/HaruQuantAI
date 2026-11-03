@@ -1,0 +1,31 @@
+<div class="sq-app-grid-control" ng-class="{'br-edition': isBrazilianEdition}">
+    <h2 tsq>Grid engine overview</h2>
+
+    <fieldset class="sq-fieldset control-panel">
+        <div class="pull-right" tsq>Auto-refresh every 3 seconds</div>
+        <sq-input sq-model="config.gridNode" options="gridNodes" inputtype="select" label="{{'Grid' | tsq}}" data-testid="grid-ctrl-node" />
+        <a class="icons-system-regenerate" ng-click="onRefreshData()" data-testid="grid-ctrl-refresh"></a>
+    </fieldset>
+
+    <fieldset class="sq-fieldset grid-panel">
+        <legend tsq>Jobs in progress</legend>
+        <span data-testid="grid-jobs-inprogress-count"><tsq>Records</tsq>: {{inProgressRecords}}</span>
+        <div id="inProgressGrid" class="job-grid" data-testid="grid-jobs-inprogress-grid"></div>
+    </fieldset>
+
+    <fieldset class="sq-fieldset grid-panel">
+        <legend tsq>Waiting jobs</legend>
+        <span data-testid="grid-jobs-waiting-count"><tsq>Records</tsq>: {{waitingRecords}}</span>
+        <div id="waitingGrid" class="job-grid" data-testid="grid-jobs-waiting-grid"></div>
+    </fieldset>
+
+    <fieldset class="sq-fieldset grid-panel">
+        <legend tsq>Last 100 finished jobs</legend>
+        <div id="finishedGrid" class="job-grid" data-testid="grid-jobs-finished-grid"></div>
+    </fieldset>
+</div>
+
+<sq-utils/>
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />

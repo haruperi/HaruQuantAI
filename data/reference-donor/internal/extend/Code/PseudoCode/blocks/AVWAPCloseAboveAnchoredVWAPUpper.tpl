@@ -1,0 +1,1 @@
+Close[<@printShift block shift />] above AnchoredVWAP(<@printParamOptions block "#SessionType#" "1=Daily,2=Weekly,3=Monthly" />, <@printParam block "#StdDevMult#" />).Upper[<@printShift block shift />]

@@ -1,0 +1,31 @@
+<div class="quant-tabs">
+    <div class="tabs-header">
+        <div ng-repeat="tab in instance.tabs | orderBy: '+position'" data-item="{{::tab.dataItem}}"
+            id="{{::tab.htmlId}}" ng-class="{'active': tab.active, 'sqn-results-tab-custom': tab.isCustom}" ng-click="onSelectTab(tab)"
+            ng-show="tab.display === undefined || tab.display" ng-attr-data-testid="{{::tab.dataTestid}}">
+            <i ng-if="tab.isCustom" class="fa fa-puzzle-piece sqn-tab-custom-icon" aria-hidden="true" title="{{'Custom analysis' | tsq}}"></i>
+            {{translateHeaders ? (tab.title | tsq) : tab.title}} <span ng-show="showNumberOfRecords">(<span
+                    ng-bind="tab.records"></span>)</span>
+            <!-- Delete button -->
+            <span ng-if="tab.tooltipHelp" class="help" data-container="body" data-placement="right"
+                ng-attr-title="{{tab.tooltipHelp}}"><i class="fa fa-question-circle-o" aria-hidden="true"></i></span>
+            <span ng-if="tab.hasDeleteButton" class="ico-tab-delete" ng-click="tab.onClose(tab);"></span>
+            <!-- Menu items -->
+            <div ng-if="tab.hasMenu" data-toggle="dropdown" class="tab-menu dropdown-toggle"
+                ng-click="showMenu($event, tab)" data-testid="builder-dbk-tab-menu-toggle">
+            </div>
+        </div>
+        <div class="{{::control.class}}" ng-repeat="control in instance.controls track by $index"
+            ng-click="control.onClick();" ng-attr-data-testid="{{::control.dataTestid}}">
+            <i ng-if="control.iconClass!=''" class="{{::control.iconClass}}"></i>
+            {{::control.title | tsq}}
+        </div>
+    </div>
+    <div class="tabs-body">
+        <div ng-repeat="tab in instance.tabs | orderBy: '+position'" data-item="{{::tab.dataItem}}"
+            ng-class="{'active': tab.active}" ng-show="tab.display === undefined || tab.display">
+            <div ng-if="tab.templateUrl" ng-include="tab.templateUrl" ng-dynamic-controller="tab.controller" />
+            <div ng-if="tab.template" ng-dynamic-controller="tab.controller" ng-bind="tab.template"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,2 @@
+<#-- Fixed amount size via sqMMFixedAmount (SL distance from the entry). Mirrors FixedAmount.java. -->
+sqMMFixedAmount(<@printSLTicks block sqMMPriceRef />, mmRiskedMoney, mmDecimals, mmLotsIfNoMM, mmMaxLots)

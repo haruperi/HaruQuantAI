@@ -1,0 +1,1 @@
+<#if block.@mt5[0]?? && block.@mt5[0]?contains("sqCOTData")><#assign cdCode><@printCDIndy block "mt5" shift /></#assign>${cotRewriteCode(cdCode)}<#else>NormalizeDouble((double) sqGetIndicatorValue(CI_${mt5CDataIndyName(block)}_<@printParam block "#Value#" />, <@printParam block "#Value#" />, <@printShift block shift />), 6)</#if>

@@ -1,0 +1,1 @@
+(COT52v156ShiftBearish(<@printParam block "#CotSymbol#" />, shift><@printParam block "#ShiftThreshold#" />))

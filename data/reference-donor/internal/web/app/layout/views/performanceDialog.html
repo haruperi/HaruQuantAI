@@ -1,0 +1,518 @@
+<!-- Modal window-->
+<div class="modal centered" id="performanceDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" tsq>Configuration</h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <div class="quant-tabs">
+                    <div class="tabs-header">
+                        <div data-item="global" class="active" tsq>Global</div>
+                        <div data-item="cpu" tsq>CPU</div>
+                        <div data-item="performance" tsq>Performance</div>
+                        <div data-item="memory" tsq>Memory</div>
+                        <div data-item="databanks" tsq>Databanks</div>
+                        <div data-item="optimizations" tsq>Optimizations</div>
+                        <div data-item="troubleshooting" tsq>Troubleshooting</div>
+                    </div>
+                    <div class="tabs-body">
+
+                        <!-- ------------------------------------------------------------------------------------------------------------- -->
+                        <div data-item="global" class="active">
+                            <div class="clearfix"></div>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.soundsoff" id="performance-soundoff">
+                                <label for="performance-soundoff">
+                                    <tsq>Turn off notification sounds</tsq>
+                                </label>
+                            </div>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.advancedFileChooser"
+                                    id="performance-filechooser">
+                                <label for="performance-filechooser">
+                                    <tsq>Remember View type and Sorting in File chooser</tsq>
+                                </label>
+                            </div>
+                            
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.showControlOrders" id="performance-showControlOrders">
+                                <label for="performance-showControlOrders">
+                                    <tsq>Show control orders when using MT5 netting engine</tsq>
+                                </label>
+                            </div>
+
+                            <br>
+
+                            <div class="row row-smaller">
+                                <div class="col-sm-4">
+                                    <label class="sqn-label">
+                                        <tsq>Window Header custom text</tsq>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input type="text" class="sqn-input" ng-model="performance.headerCustomText"
+                                        maxlength="30" size="30" />
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div class="row row-smaller">
+                                <div class="col-sm-4">
+                                    <label class="sqn-label">
+                                        <tsq>Window Footer custom text</tsq>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <input type="text" class="sqn-input" ng-model="performance.footerCustomText"
+                                        maxlength="30" size="30" />
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div class="row row-smaller">
+                                <div class="col-sm-4">
+                                    <label class="sqn-label">
+                                        <tsq>What result to display on default</tsq>
+                                    </label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="radio">
+                                        <label class="sq-wradio">
+                                            <input type="radio" name="DefaultResultToDisplay" value="portfolio"
+                                                ng-model="performance.defaultResultToDisplay" />
+                                            <span class="sq-mark"></span>
+                                            <tsq>Portfolio (if exists)</tsq>
+                                        </label>
+                                    </div>
+                                </div>
+                                <div class="col-sm-4">
+                                    <div class="radio">
+                                        <label class="sq-wradio">
+                                            <input type="radio" name="DefaultResultToDisplay" value="main"
+                                                ng-model="performance.defaultResultToDisplay" />
+                                            <span class="sq-mark"></span>
+                                            <tsq>Main backtest result</tsq>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row row-smaller">
+                                <div class="col-sm-4"></div>
+                                <div class="col-sm-8">
+                                    <div class="performance-affinity-description nomargin">
+                                        <tsq>This affects which of the results are displayed by default in databank and
+                                            in Results screen</tsq>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <br>
+
+                            <div class="row row-smaller">
+                                <div class="col-sm-4">
+                                    <label class="sqn-label">
+                                        <tsq>Check the data frame when a project starts</tsq>
+                                    </label>
+                                </div>
+                                <div class="col-sm-8">
+                                    <div class="radio">
+                                        <label class="sq-wradio">
+                                            <input type="radio" name="DataFrameGuard" value="warn"
+                                                ng-model="performance.dataFrameGuard" />
+                                            <span class="sq-mark"></span>
+                                            <tsq>Warn in the project log</tsq>
+                                        </label>
+                                        <label class="sq-wradio">
+                                            <input type="radio" name="DataFrameGuard" value="stop"
+                                                ng-model="performance.dataFrameGuard" />
+                                            <span class="sq-mark"></span>
+                                            <tsq>Stop the project</tsq>
+                                        </label>
+                                        <label class="sq-wradio">
+                                            <input type="radio" name="DataFrameGuard" value="off"
+                                                ng-model="performance.dataFrameGuard" />
+                                            <span class="sq-mark"></span>
+                                            <tsq>Off</tsq>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="row row-smaller">
+                                <div class="col-sm-4"></div>
+                                <div class="col-sm-8">
+                                    <div class="performance-affinity-description nomargin">
+                                        <tsq>A bar timestamp means either the moment the bar opened or the moment it
+                                            closed. If a symbol is declared the wrong way round, every backtest on it is
+                                            shifted by one bar. This reads a small sample of the stored data when a
+                                            project starts and says so. Healthy data produces no message.</tsq>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+                        <div data-item="memory">
+                            <div class="radio gc">
+                                <label class="title" tsq>Garbage collector:</label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="GCOptionRadio" value="{{::gcTypes.parallel}}"
+                                        ng-model="performance.gc" />
+                                    <span class="sq-mark"></span>
+                                    <tsq>ParallelGC (Recommended)</tsq>
+                                </label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="GCOptionRadio" value="{{::gcTypes.g1}}"
+                                        ng-model="performance.gc" />
+                                    <span class="sq-mark"></span>
+                                    <tsq>G1</tsq>
+                                </label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="GCOptionRadio" value="{{::gcTypes.auto}}"
+                                        ng-model="performance.gc" />
+                                    <span class="sq-mark"></span>
+                                    <tsq>Let Java decide</tsq>
+                                </label>
+                            </div>
+
+                            <div class="radio performance">
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="MemoryOptionRadio" ng-value="0"
+                                        ng-model="performance.memoryUsage">
+                                    <span class="sq-mark"></span>
+                                    <tsq>Let program determine maximum memory</tsq>
+                                </label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="MemoryOptionRadio" ng-value="1"
+                                        ng-model="performance.memoryUsage">
+                                    <span class="sq-mark"></span>
+                                    <tsq>Set maximum memory to</tsq>
+                                    <div class="sqn-spinner">
+                                        <input type="text" class="sqn-input" min="0" max="999999" step="1"
+                                            ng-model="performance.memory" onFocus="sqnSpinnerFocus(this)"
+                                            onBlur="sqnSpinnerBlur(this)" />
+                                        <div class="sqn-spinner-btns">
+                                            <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                            <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                        </div>
+                                    </div>
+                                    GB
+                                </label>
+                            </div>
+
+                            <div class="sq-checkbox" style="margin-top: 8px;">
+                                <input type="checkbox" ng-model="performance.dontStorePendingOrders"
+                                    name="PerformancePendingOrders" id="PerformancePendingOrders" />
+                                <label for="PerformancePendingOrders" tsq>Don't store unfilled pending orders
+                                    (Recommended)</label>
+                            </div>
+                            <div class="performance-affinity-description">
+                                <tsq>It is usually not necessary to keep unfilled pending orders(orders that expired or were replaced).</tsq>&nbsp;<tsq>This would make the resulting strategy files smaller.</tsq>
+                            </div>
+
+                            <br>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.memoryCleanup" name="MemoryCleanup"
+                                    id="MemoryCleanup" />
+                                <label for="MemoryCleanup" tsq>Perform memory cleanup periodically - </label>
+                                <div class="sqn-input sqn-select">
+                                    <span ng-bind="getCleanupIntervalName(performance.cleanupInterval)"></span>
+                                    <select ng-model="performance.cleanupInterval"
+                                        ng-options="item.value as (item.name | tsq) for item in cleanupIntervals"
+                                        onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"
+                                        onChange="sqnSelectChange(this)"></select>
+                                </div>
+                            </div>
+                            <div class="performance-affinity-description">
+                                <tsq>Clean memory periodically by explicitly calling Java Garbage Collector.</tsq><br>
+                                <tsq>Use it if you experience problems with memory, otherwise keep it turned off.</tsq><br>
+                                <tsq>Java does this automatically and it usually does a very good job.</tsq><br>
+                                <tsq>Turning it on without reason might slow down the application.</tsq>
+                            </div>
+                        </div>
+                        <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+                        <div data-item="cpu">
+                            <div class="radio performance">
+                                <label class="sqn-label">
+                                    <tsq>Total cores available</tsq> {{performance.cores}}
+                                </label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="PerformanceOptionRadio"
+                                        value="{{::performanceOptions.singleCore}}" ng-model="performance.coreUsage" />
+                                    <span class="sq-mark"></span>
+                                    <tsq>Single threaded - program runs tasks sequentially, one after another.</tsq>
+                                    <br>
+                                    <tsq>This is slower, but consumes less memory.</tsq>
+                                </label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="PerformanceOptionRadio"
+                                        value="{{::performanceOptions.reserve1Core}}"
+                                        ng-model="performance.coreUsage" />
+                                    <span class="sq-mark"></span>
+                                    <tsq>Reserve 1 core for UI, compute tasks in parallel on all remaining cores.</tsq>
+                                </label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="PerformanceOptionRadio"
+                                        value="{{::performanceOptions.customCores}}" ng-model="performance.coreUsage" />
+                                    <span class="sq-mark"></span>
+                                    <tsq>Custom number of cores</tsq>
+                                    <div class="sqn-spinner">
+                                        <input type="text" class="sqn-input" min="1" max="200" step="1"
+                                            ng-model="performance.customCores" onFocus="sqnSpinnerFocus(this)"
+                                            onBlur="sqnSpinnerBlur(this)" />
+                                        <div class="sqn-spinner-btns">
+                                            <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                            <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                        </div>
+                                    </div>
+                                </label>
+                                <label class="block-label sq-wradio">
+                                    <input type="radio" name="PerformanceOptionRadio"
+                                        value="{{::performanceOptions.maxPerformance}}"
+                                        ng-model="performance.coreUsage" /><span class="sq-mark"></span>
+                                    <tsq>Max
+                                        performance - running multiple
+                                        tasks in parallel, using all processor cores.</tsq>
+                                </label>
+
+                                <br />
+                                
+                                <div class="sq-checkbox">
+                                    <input type="checkbox" ng-model="performance.highPriority"
+                                        id="highPriorityCheckbox">
+                                    <label for="highPriorityCheckbox">
+                                        <tsq>Run StrategyQuant in high priority mode</tsq>
+                                    </label>
+                                    
+                                    <div class="performance-affinity-description">
+                                        <tsq>
+                                            Use this option ONLY if your SQX doesn't fully utilize your CPU in maximum settings - this could happen 
+                                            with newest processors with P and E-cores.<br>
+                                            By using it, SQX process will run in high priority mode, overcoming the efficiency limitations of the system.
+                                        </tsq>
+                                    </div>
+                                </div>
+
+                                <!--
+                                    <div class="sq-checkbox">
+                                        <input type="checkbox" ng-model="performance.threadAffinity" name="PerformanceThreadAffinity" id="PerformanceThreadAffinity"
+                                        />
+                                        <label for="PerformanceThreadAffinity" tsq>Use thread affinity</label>
+                                    </div>
+                                    <div class="performance-affinity-description">
+                                        <tsq>Thread affinity means that every computing threads is bound to a fixed CPU core.</tsq>
+                                        <br> <tsq>This should prevent thread context switching and improve the performance.</tsq>
+                                        <br> <tsq>The real results may wary depending on your configuration.</tsq>
+                                    </div>
+                                    -->
+                            </div>
+                        </div>
+
+                        <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+                        <div data-item="performance">
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.computePipsMetrics"
+                                    id="ComputePipsMetrics">
+                                <label for="ComputePipsMetrics">
+                                    <tsq>Compute metrics in pips (Recommended turned off)</tsq>
+                                </label>
+                            </div>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.computePctsMetrics"
+                                    id="ComputePctsMetrics">
+                                <label for="ComputePctsMetrics">
+                                    <tsq>Compute metrics in percent (Recommended turned off)</tsq>
+                                </label>
+                            </div>
+
+                            <div class="performance-affinity-description">
+                                <tsq>In addition to metrics in money, also metrics for % and pips results can be computed.</tsq>
+                                <tsq>It is generally recommended to have it turned off. Most people don't need these results and not computing and storing them will improve speed and memory consumption.</tsq>
+                            </div>
+
+                            <br />
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.computeSeparateMetrics"
+                                    id="ComputeSeparateMetrics">
+                                <label for="ComputeSeparateMetrics">
+                                    <tsq>Compute metrics separate for every data part of the same type</tsq>
+                                </label>
+                            </div>
+
+                            <div class="performance-affinity-description">
+                                <tsq>Turning this on means that if you have your data divided into multiple OOS parts,
+                                    for example OOS1, OOS2, OOS3, OOS4 - then the metrics like Net profit etc. will be
+                                    computed also separately for each of these parts.
+                                </tsq><br><br>
+
+                                <tsq>
+                                    This enables you to see these metrics separately in Results or databank, or use
+                                    them in conditions but it also slows down the program and uses more memory.
+                                </tsq><br><br>
+
+                                <tsq>
+                                    On by default, turn it off if you don't use it. Whole OOS metrics are always
+                                    computed.
+                                </tsq>
+                            </div>
+                        </div>
+
+                        <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+                        <div data-item="databanks">
+
+                            <div class="toolbar autosync">
+
+                                <div class="dropdown">
+                                    <label class="sqn-label" tsq>Default auto-sync interval</label>
+                                    <button id="buttonChangeInterval-53a" class="btn btn-normal btn-default dropdown-toggle" type="button"
+                                        data-toggle="dropdown" title="{{'Default auto-sync interval' | tsq}}">
+                                        <span ng-bind="performance.databankSyncInterval | tsq"></span>
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li ng-repeat="option in databankSyncOptions"
+                                            ng-class="{'divider': option.separator}">
+                                            <a ng-if="!option.separator"
+                                                ng-click="performance.databankSyncInterval = option.title"
+                                                ng-class="{ 'dropdown-item-checked': selectedOption==option.title }">
+                                                <i ng-class="option.icon" aria-hidden="true"
+                                                    v-if="option.icon"></i>{{::option.title}}
+                                                <i class="fa fa-check"
+                                                    ng-if="performance.databankSyncInterval == option.title"
+                                                    aria-hidden="true"></i>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+
+                                <button id="buttonApplyToAllExistingDatabanks-53b" class="btn btn-normal btn-default pull-right"
+                                    ng-click="setAutoSyncToAllDatabanks()" ng-disabled="disableAutoSyncButton" tsq>Apply
+                                    to all existing databanks</button>
+
+                            </div>
+
+                            <div class="performance-affinity-description">
+                                <tsq>Databanks keep strategies in memory for fast access.</tsq>
+                                <br>
+                                <tsq>They can be automatically synchronized to the disc in a preconfigured interval so that there is a backup in in case of program crash.</tsq> 
+                                <tsq>Don't synchronize them too often though, it negatively impacts the performance.</tsq>
+                                <br><br>
+                                <tsq>Settings here are applied to all newly created databanks.</tsq> 
+                                <tsq>If you want to apply them to all the existing databanks click on the button below.</tsq>
+                                
+                            </div>
+
+                            <br>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.syncDatabanksAfterTaskDone" name="SyncDatabanksAfterTaskDone"
+                                    id="SyncDatabanksAfterTaskDone" />
+                                <label for="SyncDatabanksAfterTaskDone" tsq>Synchronize to files automatically after task completion</label>
+                            </div>
+                            <div class="performance-affinity-description">
+                                <tsq>If on, strategies in task's output databank will be saved to files automatically after the task is done.</tsq><br>
+                                <tsq>No restart needed for this setting to take effect.</tsq>
+                                
+                            </div>
+
+                            <br>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.storeChartData" name="StoreChartData"
+                                    id="StoreChartData" />
+                                <label for="StoreChartData" tsq>Save chart data to .sq4 file (not recommended)</label>
+                            </div>
+                            <div class="performance-affinity-description">
+                                <tsq>If on and you have configured to Store Chart Data in Trading Options, trades on chart are saved to .sq4 file.</tsq> 
+                                <tsq>This makes the resulting file much bigger, but it allows you to view Trades on chart later.</tsq><br><br> 
+                                <tsq>If off, chart data are kept only temporarily and will be thrown away when not used.</tsq><br> 
+                                <tsq>You'll have to retest the strategy to get the chart data again.</tsq>
+                            </div>
+                        </div>
+
+                        <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+                        <div data-item="troubleshooting">
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.gpuAccelerated" name="PerformanceDisplay"
+                                    id="PerformanceDisplay" />
+                                <label for="PerformanceDisplay" tsq>Accelerate internal browser using GPU</label>
+                            </div>
+                            <div class="performance-affinity-description">
+                                <tsq>If you experience problems with GUI, such as freezing or black screen, try turning this off.</tsq><tsq>It will switch to a different rendering method.</tsq>
+                            </div>
+
+                            <br>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.memoryProtection"
+                                    name="PerformanceMemoryProtection" id="PerformanceMemoryProtection" />
+                                <label for="PerformanceMemoryProtection" tsq>Use memory protection - stop projects when
+                                    85% of memory is reached</label>
+                            </div>
+                            <div class="performance-affinity-description">
+                                <tsq>This will stop your projects when SQ reaches 85% of memory usage.</tsq><br>
+                                <tsq>It prevents program from freezing and being unresponsive.</tsq><br>
+                                <tsq>Turn it on if you experience program freezes.</tsq>
+                            </div>
+
+                            <br>
+
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.debugLevelActive"
+                                    name="PerformanceDebugLevelActive" id="PerformanceDebugLevelActive" />
+                                <label for="PerformanceDebugLevelActive" tsq>Activate debug level</label>
+                            </div>
+                            <div class="performance-affinity-description">
+                                <tsq>By turning this on you'll activate debug logging level.</tsq>
+                                <tsq>Debug level should be used only when investigating some problem, it is much slower and produces very large log files.</tsq>
+                            </div>
+                        </div>
+
+                        <!-- ------------------------------------------------------------------------------------------------------------- -->
+
+                        <div data-item="optimizations">
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="performance.dontStoreOP3DChartsData"
+                                    name="Performance3DChart" id="Performance3DChart" />
+                                <label for="Performance3DChart" tsq>Don't store data for 3D charts in Optimization profile</label>
+                            </div>
+                            <div class="performance-affinity-description">
+                                    <tsq>Turned on by default, it saves a lot of memory both in RAM and in disk files<br>when working with Optimizations (simple or WF).</tsq>
+                                    <br><br>
+                                    <tsq>Data required for 3D optimization charts are very big and are usually not needed at all.</tsq>
+                                    <br>
+                                    <tsq>This does not affect other functionality of Optimization profile - filtering<br>and conditions will work as usual.</tsq>
+                                    <br>
+                                    <tsq>It also has nothing to do with Walk-Forward results charts.</tsq>
+                                    <br><br>
+                                    <tsq>To show 3D optimization charts just reoptimize the strategy with this setting off.</tsq>
+                                </tsq>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="performance-settings-footer-note" tsq>You have to restart the program to apply the settings.</div>
+
+                <a data-dismiss="modal" tsq>Close</a>
+                <button id="buttonSave-53c" type="button" class="btn btn-primary" ng-click="onSavePerformanceSettings()" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_ScoreZeroCrossUp(${cotSymbolInput(cs)}, <@printShift block shift />)

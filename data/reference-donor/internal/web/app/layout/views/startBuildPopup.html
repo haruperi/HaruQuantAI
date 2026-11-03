@@ -1,0 +1,25 @@
+<!-- Modal window-->
+<div class="modal" id="startBuildPopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog type-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-59a" type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="confirmDialog.onClose()"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Start build</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-12" style="text-align: center; font-size: 16px;">
+                            <tsq>Build configuration was successfully loaded.</tsq><br>
+                            <tsq>Do you want to start build?</tsq>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+                <button id="buttonStart-59b" type="button" class="btn btn-primary" data-dismiss="modal" ng-click="onStartConfirmed()" tsq>Start</button>
+            </div>
+        </div>
+    </div>
+</div>

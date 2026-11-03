@@ -1,0 +1,2 @@
+<#-- Reflex rising: current value greater than 1 bar ago. Parity with ReflexRising.java (curValue > prevValue). -->
+<@compress_single_line>(sqRound(<@printReflexValueAt block "0" />, 6) > sqRound(<@printReflexValueAt block "1" />, 6))</@compress_single_line>

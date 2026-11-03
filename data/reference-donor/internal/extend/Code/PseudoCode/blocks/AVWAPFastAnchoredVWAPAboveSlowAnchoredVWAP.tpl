@@ -1,0 +1,1 @@
+Fast AnchoredVWAP(<@printParamOptions block "#FastSessionType#" "1=Daily,2=Weekly,3=Monthly" />, <@printParam block "#FastStdDevMult#" />)[<@printShift block shift />] is above Slow AnchoredVWAP(<@printParamOptions block "#SlowSessionType#" "1=Daily,2=Weekly,3=Monthly" />, <@printParam block "#SlowStdDevMult#" />)[<@printShift block shift />]

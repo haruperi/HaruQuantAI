@@ -1,0 +1,3 @@
+<#-- Open crosses above the prior Highest: previous Open below MAX[s+1], current Open above MAX[s+1].
+     Native NT MAX. Parity with BarOpensAboveHighestAfterOpenBelow.java. -->
+<@compress_single_line>(<@printSeriesAt block "1"><@printSeries block "Open" /></@printSeriesAt> < <@printIndValueAt block "MAX" "1" /> && <@printSeriesAt block "0"><@printSeries block "Open" /></@printSeriesAt> > <@printIndValueAt block "MAX" "1" />)</@compress_single_line>

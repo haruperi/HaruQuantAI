@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_MomentumRevBullish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#MomPeriod#" />)

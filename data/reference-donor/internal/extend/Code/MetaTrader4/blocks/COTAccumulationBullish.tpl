@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_AccumulationBullish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#MinWeeks#" />)

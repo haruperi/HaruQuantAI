@@ -1,0 +1,225 @@
+<!-- Modal window-->
+<div class="modal centered edit-param-popup" id="{{::editParamPopupId}}" data-testid="block-config-edit-param-popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-smaller" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-21a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Edit parameter</h4>
+            </div>
+            <div class="modal-body">
+                <form name="editSetupForm" class="form-horizontal" role="form" ng-class="{'submitted': errors}">
+                    <form-errors errors="errors"></form-errors>
+
+                    <label id="param-name">
+                        <tsq>Parameter</tsq>:
+                        <span ng-bind-html="selectedParam.name | html" />
+                    </label>
+
+                    <fieldset class="sq-fieldset">
+                        <div class="row">
+                            <div class="col-xs-12 toolbar type">
+                                <label class="sqn-label">
+                                    <tsq>Type</tsq>:
+                                </label>
+                                <div class="btn-group" ng-class="{'disabled':selectedParam.type == 'string'}">
+                                    <button id="buttonRandomlyGenerated-21b" data-testid="block-config-edit-param-random" ng-click="selectedParam.generation = generationTypes.random" type="button"
+                                        class="btn btn-default" ng-class="{active: selectedParam.generation == generationTypes.random}"
+                                        ng-disabled="selectedParam.type == 'string'" tsq>Randomly generated</button>
+                                    <button id="buttonFixedValue-21c" data-testid="block-config-edit-param-fixed" ng-click="selectedParam.generation = generationTypes.fixed" type="button"
+                                        class="btn btn-default" ng-class="{active: selectedParam.generation == generationTypes.fixed}"
+                                        ng-disabled="selectedParam.type == 'string'" tsq>Fixed value</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <span ng-if="(selectedParam.type == 'int' || selectedParam.type == 'double') && !selectedParam.isCombo"
+                            ng-show="selectedParam.generation != generationTypes.fixed">
+                            <div ng-if="selectedParam.genMinValue" class="special-param-settings">
+                                <div class="row">
+                                    <div class="col-xs-12 toolbar" ng-show="selectedParam.key != '#Shift#' && (!selectedParam.paramType || selectedParam.paramType != 'shift')">
+                                        <label class="sqn-label fixed-width">
+                                            <tsq>Minimum</tsq>:
+                                        </label>
+
+                                        <div class="btn-group" ng-class="{'disabled':selectedParam.type == 'string'}">
+                                            <button id="buttonGlobal-21d" data-testid="block-config-edit-param-min-global" ng-click="selectedParam.minValue = selectedParam.genMinValue; selectedParam.customMinValue = false;"
+                                                type="button" class="btn btn-default" ng-class="{active: selectedParam.minValue == selectedParam.genMinValue}"
+                                                tsq>Global</button>
+                                            <button id="buttonCustom-21e" data-testid="block-config-edit-param-min-custom" ng-click="selectedParam.minValue = getRealGenValue(selectedParam, true); selectedParam.customMinValue = true;"
+                                                type="button" class="btn btn-default" ng-class="{active: selectedParam.minValue != selectedParam.genMinValue}"
+                                                tsq>Custom</button>
+                                        </div>
+
+                                        <div class="sqn-spinner" ng-show="selectedParam.minValue != selectedParam.genMinValue || selectedParam.customMinValue">
+                                            <input type="text" class="sqn-input" data-testid="block-config-edit-param-min-input" min="{{selectedParam.originalMinValue}}" max="{{selectedParam.originalMaxValue}}" step="{{selectedParam.originalStep}}" ng-model="selectedParam.minValue"
+                                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                                            <div class="sqn-spinner-btns">
+                                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                            </div>
+                                        </div>
+
+                                        <label class="value-label" ng-show="selectedParam.minValue == selectedParam.genMinValue && !selectedParam.customMinValue"
+                                            ng-bind="getRealGenValue(selectedParam, true)"></label>
+                                    </div>
+                                    <div class="col-xs-12 toolbar">
+                                        <label class="sqn-label fixed-width">
+                                            <tsq>Maximum</tsq>:
+                                        </label>
+
+                                        <div class="btn-group" ng-class="{'disabled':selectedParam.type == 'string'}">
+                                            <button id="buttonGlobal-21f" data-testid="block-config-edit-param-max-global" ng-click="selectedParam.maxValue = selectedParam.genMaxValue; selectedParam.customMaxValue = false;"
+                                                type="button" class="btn btn-default" ng-class="{active: selectedParam.maxValue == selectedParam.genMaxValue}"
+                                                tsq>Global</button>
+                                            <button id="buttonCustom-21g" data-testid="block-config-edit-param-max-custom" ng-click="selectedParam.maxValue = getRealGenValue(selectedParam, false); selectedParam.customMaxValue = true;"
+                                                type="button" class="btn btn-default" ng-class="{active: selectedParam.maxValue != selectedParam.genMaxValue}"
+                                                tsq>Custom</button>
+                                        </div>
+
+                                        <div class="sqn-spinner" ng-show="selectedParam.maxValue != selectedParam.genMaxValue || selectedParam.customMaxValue">
+                                            <input type="text" class="sqn-input" data-testid="block-config-edit-param-max-input" min="{{selectedParam.originalMinValue}}" max="{{selectedParam.originalMaxValue}}" step="{{selectedParam.originalStep}}" ng-model="selectedParam.maxValue"
+                                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                                            <div class="sqn-spinner-btns">
+                                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                            </div>
+                                        </div>
+
+                                        <label class="value-label" ng-show="selectedParam.maxValue == selectedParam.genMaxValue && !selectedParam.customMaxValue"
+                                            ng-bind="getRealGenValue(selectedParam, false)"></label>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 toolbar step">
+                                        <label class="sqn-label fixed-width">
+                                            <tsq>Step</tsq>:
+                                        </label>
+                                        <div class="sqn-spinner">
+                                            <input type="text" class="sqn-input" data-testid="block-config-edit-param-step-input" step="1" ng-model="selectedParam.step"
+                                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                                            <div class="sqn-spinner-btns">
+                                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row help">
+                                    <label>
+                                        <tsq>Global Minimum and Maximum can be configured in</tsq>
+                                        <br>
+                                        <b tsq>What to build -> Additional build config</b>
+                                    </label>
+                                </div>
+                            </div>
+                            <div ng-if="!selectedParam.genMinValue">
+                                <div class="row">
+                                    <div class="col-xs-12 toolbar">
+                                        <label class="sqn-label fixed-width">
+                                            <tsq>Minimum</tsq>:
+                                        </label>
+                                        <div class="sqn-spinner">
+                                            <input type="text" class="sqn-input" data-testid="block-config-edit-param-min-input" min="{{selectedParam.originalMinValue}}" max="{{selectedParam.originalMaxValue}}" step="{{selectedParam.originalStep}}" ng-model="selectedParam.minValue"
+                                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                                            <div class="sqn-spinner-btns">
+                                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-xs-12 toolbar">
+                                        <label class="sqn-label fixed-width">
+                                            <tsq>Maximum</tsq>:
+                                        </label>
+                                        <div class="sqn-spinner">
+                                            <input type="text" class="sqn-input" data-testid="block-config-edit-param-max-input" min="{{selectedParam.originalMinValue}}" max="{{selectedParam.originalMaxValue}}" step="{{selectedParam.originalStep}}" ng-model="selectedParam.maxValue"
+                                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                                            <div class="sqn-spinner-btns">
+                                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-xs-12 toolbar step">
+                                        <label class="sqn-label fixed-width">
+                                            <tsq>Step</tsq>:
+                                        </label>
+                                        <div class="sqn-spinner">
+                                            <input type="text" class="sqn-input" data-testid="block-config-edit-param-step-input" step="1" ng-model="selectedParam.step"
+                                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                                            <div class="sqn-spinner-btns">
+                                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </span>
+
+                        <div class="row" ng-if="selectedParam.isCombo" ng-show="selectedParam.generation != generationTypes.fixed">
+                            <div class="col-xs-12" ng-if="selectedParam.type != 'boolean'">
+                                <legend>Available options:</legend>
+                                <span ng-if="selectedParam.key == '#Chart#' || (selectedParam.paramType && selectedParam.paramType == 'data')">
+                                    <div class="sq-checkbox" ng-click="selectedParam.allCharts=!selectedParam.allCharts">
+                                        <input type="checkbox" ng-model="selectedParam.allCharts" data-testid="block-config-edit-param-all-charts">
+                                        <label tsq>All available charts</label>
+                                    </div>
+                                    <label class="chart-param-hint" tsq>or pick only specific charts below:</label>
+                                </span>
+
+                                <div ng-repeat="option in selectedParam.options">
+                                    <div class="sq-checkbox" ng-click="!selectedParam.allCharts?option.checked=!option.checked:void">
+                                        <input type="checkbox" ng-model="option.checked" ng-disabled="selectedParam.allCharts" data-testid="block-config-edit-param-option">
+                                        <label ng-bind="::option.name"></label>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row" ng-if="selectedParam.generation == generationTypes.fixed">
+                            <div class="col-xs-8 toolbar">
+                                <label ng-if="!selectedParam.isCombo && selectedParam.type == 'string'" class="sqn-label fixed-width">
+                                    <tsq>Value</tsq>:
+                                    <input type="text" class="sqn-input" ng-model="selectedParam.fixedValue" data-testid="block-config-edit-param-fixed-value" />
+                                </label>
+                                <div class="fixed-value" ng-if="!selectedParam.isCombo && (selectedParam.type == 'int' || selectedParam.type == 'double')">
+                                    <label class="sqn-label fixed-width">
+                                        <tsq>Value</tsq>:
+                                    </label>
+                                    <div class="sqn-spinner">
+                                        <input type="text" class="sqn-input" data-testid="block-config-edit-param-fixed-value" min="{{selectedParam.minValue}}" max="{{selectedParam.maxValue}}"
+                                            step="{{::selectedParam.step}}" ng-model="selectedParam.fixedValue" onFocus="sqnSpinnerFocus(this)"
+                                            onBlur="sqnSpinnerBlur(this)" />
+                                        <div class="sqn-spinner-btns">
+                                            <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                            <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="fixed-value" ng-if="selectedParam.isCombo || selectedParam.type == 'boolean'">
+                                    <label class="sqn-label fixed-width">
+                                        <tsq>Value</tsq>:
+                                    </label>
+                                    <div class="sqn-input sqn-select">
+                                        <span>{{selectedParam.fixedValueDisplay}}</span>
+                                        <select ng-model="selectedParam.fixedValue" data-testid="block-config-edit-param-fixed-value" ng-options="item.value as item.name for item in selectedParam.options"
+                                            onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" onChange="sqnSelectChange(this)"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" data-testid="block-config-edit-param-close" tsq>Close</a>
+                <button id="buttonSave-21h" type="button" class="btn btn-primary" data-testid="block-config-edit-param-save" ng-click="onSaveParamConfig()" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

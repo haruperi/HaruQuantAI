@@ -1,0 +1,88 @@
+<!doctype html>
+
+<html lang="en">
+  <head>
+    <base href="/SQUANT" />
+    <meta charset="utf-8" />
+    <title>StrategyQuantX</title>
+    <meta name="description" content="StrategyQuant" />
+    <meta name="author" content="webmjkfm@gmail.com" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <meta http-equiv="cache-control" content="no-cache" />
+    <meta http-equiv="expires" content="0" />
+    <meta http-equiv="expires" content="Tue, 01 Jan 1980 1:00:00 GMT" />
+    <meta http-equiv="pragma" content="no-cache" />
+    <meta http-equiv="cache-control" content="max-age=0" />
+
+    <link rel="stylesheet" href="common/Batch1/styles.css" />
+    <link rel="stylesheet" href="common/Batch2/styles.css" />
+    <link rel="stylesheet" href="common/Batch3/styles.css" />
+
+    <script src="common/Batch1/libs.js"></script>
+    <script src="common/Batch2/libs.js"></script>
+    <script src="common/Batch3/libs.js"></script>
+
+    <script src="SQUANT/build/layout.js"></script>
+    <script src="libs/vs/loader.js"></script>
+  </head>
+
+  <body ng-app="app" class="sq-main-body {{$root.brEdition}}">
+    <preload-templates></preload-templates>
+
+    <div
+      id="main-load-screen"
+      class="sq4-load-screen"
+      data-testid="loading-overlay"
+      tsq
+    >
+      The UI is loading, please wait...
+    </div>
+
+    <div
+      ui-view="root"
+      style="height:100%; font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif; zoom: {{$root.zoom.css}};"
+      class="{{$root.zoom.class}} {{$root.brEdition}}"
+    />
+
+    <script>
+      window.apps = [];
+      window.appsToPreload = [
+        "BUILDER",
+        "RETESTER",
+        "OPTIMIZER",
+        "PORTFOLIOMASTER",
+        "SQMANAGER",
+        "RESULTS",
+        "AlgoWizard",
+      ];
+
+      window.appConfig = {
+        product: "SQUANT",
+        productName: "StrategyQuantX",
+        defaultState: "app",
+        defaultURL: "/",
+        gridSkin: "dhx_web",
+        gridImagePath: "../img/dhtmlx/web/",
+      };
+
+      window.performanceSettingsCallbacks = [];
+      window.getPerformanceSettings = function (callbackFn) {
+        window.performanceSettingsCallbacks.push(callbackFn);
+      };
+    </script>
+
+    <!-- AI chat side panel: wraps the shell body in a flex layout and mounts the chat
+         iframe (#sq-ai-frame -> /SQAI/chat/), with resize/toggle state in localStorage,
+         and dispatches the SQAI_ACTION messages the chat sends back. Tracked in this repo
+         (internal/web/SQAI/aichat.js); QDM/index.html loads the same script. App state (config,
+         skin, language, license) does NOT go through here: the chat reads it from
+         window.top.aichatInterface, published by plugins/ServletSQAI/SQAIChatService.js. -->
+    <script src="SQAI/aichat.js"></script>
+
+    <!-- SQX UI dispatcher: exposes window.squi (exec/run) so the AI can navigate the UI
+         (full control gated behind /drive-ui).
+         Loaded on the shell top document so it can reach module iframes. Catalog stays in docs/ui. -->
+    <script src="SQAI/squi.js"></script>
+  </body>
+</html>

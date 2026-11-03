@@ -1,0 +1,3 @@
+<#-- Close crosses below KAMA: current Close below KAMA, previous Close above. Reuses printKamaValueAt.
+     Parity with BarClosesBelowKAMA.java. -->
+<@compress_single_line>(<@printSeriesAt block "0"><@printSeries block "Close" /></@printSeriesAt> < sqRound(<@printKamaValueAt block "0" />, 6) && <@printSeriesAt block "1"><@printSeries block "Close" /></@printSeriesAt> > sqRound(<@printKamaValueAt block "1" />, 6))</@compress_single_line>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <META NAME="ROBOTS" CONTENT="NOINDEX,FOLLOW">
+
+    <title>AlgoWizard Shared Strategy</title>
+
+    <script src="Commons-chart.js"></script>
+
+    <script src="EquityChart.js"></script>
+
+    <link rel="stylesheet" href="hljs.min.css">
+
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="hljs.min.js"></script>
+
+</head>
+
+
+
+<body>
+
+
+
+    <div class="buttons">
+
+        <div class="btn btn-default" id="btn-message" style="display: none;">Send message to author</div>
+
+        <!--        <div class="btn btn-success" id="btn-clone" style="display:none;">Clone strategy</div> -->
+
+    </div>
+
+    <div class="tabs">
+
+        <div class="tabs-header" id="tabs-header">
+
+            <div class="active" onClick="clickedTab(this)">Overview</div>
+
+            <div onClick="clickedTab(this)">Analysis</div>
+
+            <div onClick="clickedTab(this)">Source code</div>
+
+            <button id="buttonCloneStrategy-61a" class="btn btn-success" id="btn-clone" type="button" style="display:none;"
+                onclick="cloneStrategy()">Clone strategy</button>
+
+            <span id="strategy-name">Strategy Name</span>
+
+        </div>
+
+        <div class="tabs-body" id="tabs-body">
+
+            <div class="active" id="tab-1-body">loading...</div>
+
+            <div id="tab-2-body"></div>
+
+            <div id="tab-3-body" class="javascript"></div>
+
+        </div>
+
+        <div class="aw-link-wrapper">Created by <a href="http://algowizard.io" class="aw-link"
+                target="_blank">AlgoWizard.io</a>
+        </div>
+
+    </div>
+
+
+
+    <script src="main.js"></script>
+
+</body>
+
+
+
+</html>

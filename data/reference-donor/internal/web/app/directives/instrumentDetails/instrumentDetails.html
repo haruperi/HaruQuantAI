@@ -1,0 +1,293 @@
+<span class="instrument-details" ng-class="{'massedit': massEdit}">
+
+    <p class="instrument-info" ng-if="!disabled" ng-bind-html="infoText"></p>
+
+    <fieldset class="sq-fieldset">
+        <div ng-if="legend" class="sq-legend-help" ng-bind="legend"></div>
+
+        <div class="row smaller">
+            <div class="col-xs-4" style="display: grid;">
+                <div ng-show="!massEdit"> 
+                    <label class="sqn-label" tsq>Broker profile *</label>{{massEdit}}
+                    <div class="sqn-input sqn-select" ng-class="{'disabled': currentAction == 'Edit' || disabled}">
+                        <span ng-bind="getBrokerProfileLabel()"></span>
+                        <select ng-model="instrument.broker" data-testid="dm-instruments-add-broker" ng-options="item.id as item.name for item in brokerProfiles" onFocus="sqnSelectFocus(this)"
+                            onBlur="sqnSelectBlur(this)" ng-disabled="currentAction == 'Edit' || disabled"
+                            ng-change="onBrokerChange()"
+                            ></select>
+                    </div>
+                </div>               
+
+                <div> 
+                    <label class="sqn-label" tsq>Data type *</label>
+                    <div class="wrapper">
+                        <div style="display: inline" ng-show="massEdit">
+                            <div class="sq-checkbox" ng-click="instrument.changeDataType = !instrument.changeDataType">
+                                <input type="checkbox" ng-model="instrument.changeDataType">
+                                <label tsq> </label>
+                            </div>
+                        </div>
+                        <div class="sqn-input sqn-select" ng-class="{'disabled': disabled}">
+                            <span ng-bind="getDataTypeLabel()"></span>
+                            <select ng-model="instrument.dataType" data-testid="dm-instruments-add-data-type" ng-options="item.value as item.name for item in dataTypes" onFocus="sqnSelectFocus(this)"
+                                onBlur="sqnSelectBlur(this)" ng-disabled="disabled"></select>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="sqn-label" tsq>Pip/Tick size *</label>
+                    <div class="wrapper">
+                        <div style="display: inline" ng-show="massEdit">
+                            <div class="sq-checkbox" ng-click="instrument.changeTickSize = !instrument.changeTickSize">
+                                <input type="checkbox" ng-model="instrument.changeTickSize">
+                                <label tsq> </label>
+                            </div>
+                        </div>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" min="0" step="{{getTickSizeStep()}}" ng-model="instrument.tickSize" data-testid="dm-instruments-add-tick-size" onFocus="sqnSpinnerFocus(this)"
+                                onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="sqn-label" tsq>Default spread * pips</label>
+                    <div class="wrapper">
+                        <div style="display: inline" ng-show="massEdit">
+                            <div class="sq-checkbox" ng-click="instrument.changeDefaultSpread = !instrument.changeDefaultSpread">
+                                <input type="checkbox" ng-model="instrument.changeDefaultSpread">
+                                <label tsq> </label>
+                            </div>
+                        </div>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" min="0" step="1" ng-model="instrument.defaultSpread" data-testid="dm-instruments-add-default-spread" onFocus="sqnSpinnerFocus(this)"
+                                onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <label class="sqn-label" tsq>Order size multiplier</label>
+                    <div class="wrapper">
+                        <div style="display: inline" ng-show="massEdit">
+                            <div class="sq-checkbox" ng-click="instrument.changeSizeMultiplier = !instrument.changeSizeMultiplier">
+                                <input type="checkbox" ng-model="instrument.changeSizeMultiplier">
+                                <label tsq> </label>
+                            </div>
+                        </div>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" min="1" step="1" ng-model="instrument.orderSizeMultiplier" data-testid="dm-instruments-add-order-size-multiplier" onFocus="sqnSpinnerFocus(this)"
+                                onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>              
+            </div>
+            <div class="col-xs-8" style="display:grid">
+                <div ng-show="!massEdit">
+                    <label class="sqn-label" tsq>Instrument *</label>
+                    <input type="text" class="sqn-input" ng-model="instrument.instrument" data-testid="dm-instruments-add-name" ng-disabled="currentAction == 'Edit' || disabled" /> {{brokerProfile.postfix}}
+                </div>
+
+                <div  ng-show="!massEdit" class="instrument-description">
+                    <label class="sqn-label" tsq>Description</label>
+                    <input type="text" class="sqn-input" ng-model="instrument.description" data-testid="dm-instruments-add-description" ng-disabled="disabled" />
+                </div>
+
+                <!-- Jine zobrazeni pro NE - mass edit mod-->
+                <div class="pipWrapper"  ng-show="!massEdit">
+                    <div>
+                        <label class="sqn-label" tsq>Point value in $ *</label>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" min="0" step="1" ng-model="instrument.pointValue" data-testid="dm-instruments-add-point-value" onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                                ng-disabled="disabled" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="margin-left:48px">
+                        <label class="sqn-label" tsq>Pip/Tick step *</label>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" min="0" step="{{getTickStepStep()}}" ng-model="instrument.tickStep" data-testid="dm-instruments-add-tick-step" onFocus="sqnSpinnerFocus(this)"
+                                onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Jine zobrazeni pro mass edit mod-->
+                <div ng-show="massEdit">
+                    <label class="sqn-label" tsq>Point value in $ *</label>
+                    <div class="wrapper">
+                        <div style="display: inline" ng-show="massEdit">
+                            <div class="sq-checkbox" ng-click="instrument.changePointValue = !instrument.changePointValue">
+                                <input type="checkbox" ng-model="instrument.changePointValue">
+                                <label tsq> </label>
+                            </div>
+                        </div>                    
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" min="0" step="1" ng-model="instrument.pointValue" onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                                ng-disabled="disabled" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div ng-show="massEdit">
+                    <label class="sqn-label" tsq>Pip/Tick step *</label>
+                    <div class="wrapper">
+                        <div style="display: inline" ng-show="massEdit">
+                            <div class="sq-checkbox" ng-click="instrument.changeTickStep = !instrument.changeTickStep">
+                                <input type="checkbox" ng-model="instrument.changeTickStep">
+                                <label tsq> </label>
+                            </div>
+                        </div>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" min="0" step="{{getTickStepStep()}}" ng-model="instrument.tickStep" onFocus="sqnSpinnerFocus(this)"
+                                onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pipWrapper">
+                    <div>
+                        <label class="sqn-label" tsq>Default slippage * pips</label>
+                        <div class="wrapper">
+                            <div style="display: inline" ng-show="massEdit">
+                                <div class="sq-checkbox" ng-click="instrument.changeDefaultSlippage = !instrument.changeDefaultSlippage">
+                                    <input type="checkbox" ng-model="instrument.changeDefaultSlippage">
+                                    <label tsq> </label>
+                                </div>
+                            </div>
+                            <div class="sqn-spinner">
+                                <input type="text" class="sqn-input" min="0" step="1" ng-model="instrument.defaultSlippage" data-testid="dm-instruments-add-default-slippage" onFocus="sqnSpinnerFocus(this)"
+                                    onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                                <div class="sqn-spinner-btns">
+                                    <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                    <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-style="{'margin-left': !massEdit ? '48px' : null }">
+                        <label class="sqn-label" tsq>Min distance</label>
+                        <div class="wrapper">
+                            <div style="display: inline" ng-show="massEdit">
+                                <div class="sq-checkbox" ng-click="instrument.changeMinDistance = !instrument.changeMinDistance">
+                                    <input type="checkbox" ng-model="instrument.changeMinDistance">
+                                    <label tsq> </label>
+                                </div>
+                            </div>
+                            <div class="sqn-spinner">
+                                <input type="text" class="sqn-input" min="0" step="1" ng-model="instrument.minDistance" data-testid="dm-instruments-add-min-distance" onFocus="sqnSpinnerFocus(this)"
+                                    onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                                <div class="sqn-spinner-btns">
+                                    <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                    <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>  
+                </div>
+
+                <div class="pipWrapper">
+                    <div>
+                        <label class="sqn-label" tsq>Order size step</label>
+                        <div class="wrapper">
+                            <div style="display: inline" ng-show="massEdit">
+                                <div class="sq-checkbox" ng-click="instrument.changeOrderSizeStep = !instrument.changeOrderSizeStep">
+                                    <input type="checkbox" ng-model="instrument.changeOrderSizeStep">
+                                    <label tsq> </label>
+                                </div>
+                            </div>
+                            <div class="sqn-spinner">
+                                <input type="text" class="sqn-input" min="0" step="1" ng-model="instrument.orderSizeStep" data-testid="dm-instruments-add-order-size-step" onFocus="sqnSpinnerFocus(this)"
+                                    onBlur="sqnSpinnerBlur(this)" ng-disabled="disabled" />
+                                <div class="sqn-spinner-btns">
+                                    <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                    <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div ng-style="{'margin-left': !massEdit ? '48px' : null }">
+                        <label class="sqn-label" tsq>COT</label>
+                        <div class="wrapper">
+                            <div style="display: inline" ng-show="massEdit">
+                                <div class="sq-checkbox" ng-click="instrument.changeCot = !instrument.changeCot">
+                                    <input type="checkbox" ng-model="instrument.changeCot">
+                                    <label tsq> </label>
+                                </div>
+                            </div>
+                            <div class="sqn-input sqn-select" ng-if="cotAvailable" ng-class="{'disabled': disabled}">
+                                <span ng-bind="getCotLabel()"></span>
+                                <select ng-model="instrument.cot" data-testid="dm-instruments-add-cot" ng-options="item.id as item.name for item in cotList" onFocus="sqnSelectFocus(this)"
+                                    onBlur="sqnSelectBlur(this)" ng-disabled="disabled"></select>
+                            </div>
+                            <input type="text" class="sqn-input" ng-if="!cotAvailable" maxlength="100" ng-model="instrument.cot" data-testid="dm-instruments-add-cot" ng-disabled="disabled" />
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <div style="display: inline" ng-show="massEdit">
+        <div class="sq-checkbox" ng-click="instrument.changeCommisionModel = !instrument.changeCommisionModel">
+            <input type="checkbox" ng-model="instrument.changeCommisionModel">
+            <label tsq>Edit default commision model</label>
+        </div>
+    </div>
+    <fieldset class="sq-fieldset" ng-show="commissionSettings">
+        <multi-property-grid instance="commPGInstance" on-change="onCommPGChange" options="commissionMethods" title="Default commissions model"  ng-disabled="disabled"/>
+    </fieldset>
+
+    <div style="display: inline" ng-show="massEdit">
+        <div class="sq-checkbox" ng-click="instrument.changeSwap = !instrument.changeSwap">
+            <input type="checkbox" ng-model="instrument.changeSwap">
+            <label tsq>Edit swap</label>
+        </div>
+    </div>
+    <swap-settings sq-model="instrument.swap" />    
+
+    <fieldset class="sq-fieldset" ng-show="false">
+        <legend tsq>Optional fields</legend>
+
+        <div class="row smaller" style="margin-top: -15px;">
+            <div class="col-xs-6">
+                <sq-combo-input sq-model="instrument.exchange" label="Exchange" options="exchanges" ng-disabled="disabled" single="true" />
+            </div>
+            <div class="col-xs-6">
+                <sq-combo-input sq-model="instrument.country" label="Country" options="countries" ng-disabled="disabled" single="true" />
+            </div>
+        </div>
+        <div class="row smaller" ng-show="instrument.dataType == 1" style="margin-top: -15px;">
+            <div class="col-xs-6">
+                <sq-combo-input sq-model="instrument.sector" label="Sector" options="sectors" ng-disabled="disabled" single="true" />
+            </div>
+        </div>
+    </fieldset>
+</span>

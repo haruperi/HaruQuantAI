@@ -1,0 +1,1 @@
+(COTSpreadZScoreBullish(<@printParam block "#CotSymbol#" />, z><@printParam block "#ZThreshold#" />))

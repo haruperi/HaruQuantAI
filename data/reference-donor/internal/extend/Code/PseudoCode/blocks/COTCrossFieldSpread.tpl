@@ -1,0 +1,1 @@
+COTCrossFieldSpread(<@printParam block "#CotSymbol#" />, <@printParam block "#Period#" />, f<@printParam block "#Field1Index#" />-f<@printParam block "#Field2Index#" />)[<@printShift block shift />]

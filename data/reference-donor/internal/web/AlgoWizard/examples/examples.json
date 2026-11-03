@@ -1,0 +1,84 @@
+[
+    {
+        "name": "EMA Cross",
+        "description": "Simple, but popular strategy of entering the market when faster EMA crosses above slower EMA.<br/><br/>Rules:<br/>- Enter Long when faster EMA crosses above slower EMA<br/>- Enter Short when faster EMA crosses below slower EMA<br/>",
+        "img": "ema_cross.png",
+        "strategyFile": "EMACross.sqx",
+        "tourUrl": "https://www.appdemostore.com/embed?id=6003056167616512",
+        "type": "STANDARD",
+        "bonus": true
+    },
+    {
+        "name": "Inside Bar Breakout",
+        "description": "Strategy powerful on higher timeframes - entering at the break of inside bar.<br/><br/>Rules:<br/>- When there is an inside bar (a bar smaller than the bar before) then place two stop orders:<br/>- Long Stop X pips above the inside bar high<br/> - Short Stop X pips below the inside bar low<br/>- Stop Loss is the opposite boundary of inside bar",
+        "img": "inside_break.png",
+        "strategyFile": "InsideBarBreakout.sqx",
+        "type": "STANDARD",
+        "bonus": true
+    },
+    {
+        "name": "Grid Example 1",
+        "description": "Example 3-level Martingale strategy. Principle of Grid/Martingale is that after every losing trade it doubles the lots size for the next trade in attempt to compensate the previous losing trade.",
+        "img": "grid1.png",
+        "strategyFile": "GridExample1.sqx",
+        "type": "STANDARD",
+        "bonus": false
+    },
+    {
+        "name": "Range Breakout",
+        "description": "Quite powerful strategy of entering the market when price breaks predefined range.<br/><br/>Rules:<br/>- Range is defined by a number of bars in the past<br/> - Enter Long when price breaks above the range<br/>- Enter Short when price breaks below the range<br/>- Use the opposite range boundary as Stop Loss",
+        "img": "range_break.png",
+        "strategyFile": "RangeBreakout.sqx",
+        "type": "STANDARD",
+        "bonus": false
+    },
+    {
+        "name": "Bearish Divergence",
+        "description": "Example of strategy trading on bearish divergence between price and MACD",
+        "img": "bearish_div.png",
+        "strategyFile": "BearishDivergence.sqx",
+        "type": "STANDARD",
+        "bonus": false
+    },
+    {
+        "name": "Trail Stop by EA",
+        "description": "Example how to handle custom trailing stop using AlgoWizard.<br/>Strategy will open an order and then trails the stop loss programtically using AlgoWizard, instead of build-in trailing stop functionality.",
+        "img": "trail_stop_low.png",
+        "strategyFile": "TrailingStopByEA.sqx",
+        "type": "STANDARD",
+        "bonus": false
+    },
+    {
+        "name": "Trail Stop by Lowest",
+        "description": "Example of strategy that moves its Stop Loss always to the low of the previous 5 candles.",
+        "img": "trail_stop_low.png",
+        "strategyFile": "TrailingStopByLowest.sqx",
+        "type": "STANDARD",
+        "bonus": false
+    },
+    {
+        "name": "Buy dips",
+        "description": "Example of strategy that opens position during temporary market drop.",
+        "img": "buy_dips.png",
+        "strategyFile": "buy_dips.sqx",
+        "type": "STOCKPICKER",
+        "bonus": true
+    },
+    {
+        "name": "Mean reversion",
+        "description": "Example of strategy that open pending limit order after yesterday's significant price move",
+        "img": "mean_reversion.png",
+        "strategyFile": "mean_reversion.sqx",
+        "type": "STOCKPICKER",
+        "bonus": true
+    },
+    {
+        "name": "Breakout",
+        "description": "Example of strategy that open position after price break its long-term highest value.",
+        "img": "breakout.png",
+        "strategyFile": "breakout.sqx",
+        "type": "STOCKPICKER",
+        "bonus": true
+    }
+    
+]

@@ -1,0 +1,27 @@
+<!-- Modal window-->
+<div class="modal" id="errorDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-testid="error-dialog">
+    <div class="modal-dialog type-warning" role="document" style="width: 800px; height: 600px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-47a" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel" ng-bind="errorDialog.title | tsq"></h4>
+            </div>
+            <div class="modal-body">
+                <div ng-if="errorDialog.displayTextarea">
+                    <textarea rows="12" readonly style="width: 100%; font-size:11px" ng-bind="errorDialog.message | tsq"></textarea>
+                </div>
+                <div ng-if="!errorDialog.displayTextarea">
+                    <form class="form-horizontal" role="form">
+                        <div class="form-group">
+                            <label ng-if="!errorDialog.isHtmlContent" class="col-sm-12" style="text-align: center;font-size: 16px;" ng-bind="errorDialog.message | tsq"></label>
+                            <label ng-if="errorDialog.isHtmlContent" class="col-sm-12" style="text-align: center;font-size: 16px;" ng-bind-html="errorDialog.message | tsq | html"></label>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button id="buttonOK-47b" type="button" class="btn btn-primary" data-dismiss="modal" data-testid="error-dialog-ok-btn" tsq>OK</button>
+            </div>
+        </div>
+    </div>
+</div>

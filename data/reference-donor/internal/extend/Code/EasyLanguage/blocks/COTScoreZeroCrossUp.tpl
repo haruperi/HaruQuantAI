@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>(SQ_COT_Score(${cotSymbolInput(cs)}, 0, "")[<@printShiftAsParam block shift />] > 0 and SQ_COT_Score(${cotSymbolInput(cs)}, 1, "")[<@printShiftAsParam block shift />] <= 0)

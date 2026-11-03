@@ -1,0 +1,1 @@
+(COTMultiWindowBearish(<@printParam block "#CotSymbol#" />))

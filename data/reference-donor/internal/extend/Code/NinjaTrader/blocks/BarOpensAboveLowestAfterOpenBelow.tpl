@@ -1,0 +1,3 @@
+<#-- Open crosses above the prior Lowest: previous Open below MIN[s+1], current Open above MIN[s+1].
+     Native NT MIN. Parity with BarOpensAboveLowestAfterOpenBelow.java. -->
+<@compress_single_line>(<@printSeriesAt block "1"><@printSeries block "Open" /></@printSeriesAt> < <@printIndValueAt block "MIN" "1" /> && <@printSeriesAt block "0"><@printSeries block "Open" /></@printSeriesAt> > <@printIndValueAt block "MIN" "1" />)</@compress_single_line>

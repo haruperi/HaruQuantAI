@@ -1,0 +1,1 @@
+(sqClose(NULL, 0, <@printShift block "0" />) < sqLowest("Current", 0, PRICE_LOW, <@printParam block "#MonthLookback#" />, <@printShift block "0" /> + 1))

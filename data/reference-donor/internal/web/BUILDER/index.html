@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <base href="/BUILDER">
+    <meta charset="utf-8">
+    <title>Builder</title>
+    <meta name="description" content="StrategyQuant Builder">
+    <meta name="author" content="webmjkfm@gmail.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="common/Batch1/styles.css">
+    <link rel="stylesheet" href="common/Batch2/styles.css">
+    <link rel="stylesheet" href="common/Batch3/styles.css">
+    <link rel="stylesheet" href="BUILDER/layout/layout.css">
+
+    <script src="common/Batch1/libs.js"></script>
+    <script src="common/Batch2/libs.js"></script>
+    <script src="common/Batch3/libs.js"></script>
+    <script src="BUILDER/build/layout.js"></script>
+    <script src="libs/vs/loader.js"></script>
+</head>
+
+<body ng-app="app" style="font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif; zoom: {{$root.zoom.css}};" class="{{$root.zoom.class}} {{$root.brEdition}}">
+    <preload-templates></preload-templates>
+    
+    <script>
+        window.appConfig = {
+            product: 'BUILDER',
+            project: 'Builder',
+            task: {
+                type: 'Build',
+                name: 'Build',
+                default: true
+            },
+            productName: 'Builder',
+            defaultState: 'app',
+            defaultURL: '/app',
+            gridSkin: 'dhx_web',
+            gridImagePath: '../img/dhtmlx/web/'
+        };
+    </script>
+
+    <div ui-view style="height:100%" />
+
+    <!--script src="../BUILDER/sqapp.js?decache=" + Math.random()></script-->
+    <!--script src="../BUILDER/plugins.js"></script-->
+
+
+
+
+
+</body>
+
+</html>

@@ -1,0 +1,96 @@
+public interface com.strategyquant.jobslib.JobCompletionListener {
+  public abstract void onCompleted(com.strategyquant.jobslib.SQJob);
+}
+class com.strategyquant.jobslib.JobEngine$1 implements com.strategyquant.jobslib.JobCompletionListener {
+  final com.strategyquant.jobslib.JobEngine this$0;
+  com.strategyquant.jobslib.JobEngine$1(com.strategyquant.jobslib.JobEngine);
+  public void onCompleted(com.strategyquant.jobslib.SQJob);
+}
+class com.strategyquant.jobslib.JobEngine$2 implements java.lang.Runnable {
+  final com.strategyquant.jobslib.SQJob val$job;
+  final com.strategyquant.jobslib.JobEngine this$0;
+  com.strategyquant.jobslib.JobEngine$2();
+  public void run();
+}
+public class com.strategyquant.jobslib.JobEngine {
+  public static final org.slf4j.Logger Log;
+  private static com.strategyquant.jobslib.JobEngine instance;
+  private java.util.concurrent.ExecutorService executor;
+  private com.strategyquant.jobslib.JobsList jobs;
+  public static void init(com.strategyquant.jobslib.JobEngine) throws java.lang.Exception;
+  public com.strategyquant.jobslib.JobEngine(int);
+  private static com.strategyquant.jobslib.JobEngine get();
+  public static void submit(com.strategyquant.tradinglib.taskImpl.ISQTask, com.strategyquant.jobslib.SQJob);
+  public static com.strategyquant.jobslib.JobsList jobs();
+  private com.strategyquant.jobslib.JobsList _jobs();
+  private void _submit(com.strategyquant.tradinglib.taskImpl.ISQTask, com.strategyquant.jobslib.SQJob);
+  private void _executeJob(com.strategyquant.jobslib.SQJob);
+  private void _addJobToArray(com.strategyquant.tradinglib.taskImpl.ISQTask, com.strategyquant.jobslib.SQJob);
+  protected void _removeFromArray(com.strategyquant.jobslib.SQJob);
+  static java.util.concurrent.ExecutorService access$000(com.strategyquant.jobslib.JobEngine);
+  static {};
+}
+public class com.strategyquant.jobslib.JobsList {
+  private java.util.ArrayList<com.strategyquant.jobslib.SQJob> list;
+  public com.strategyquant.jobslib.JobsList();
+  public void add(com.strategyquant.jobslib.SQJob);
+  public void remove(com.strategyquant.jobslib.SQJob);
+  public int size();
+}
+class com.strategyquant.jobslib.SQJob$Listener implements java.lang.Runnable {
+  private com.strategyquant.jobslib.SQJob job;
+  private com.strategyquant.jobslib.JobCompletionListener listener;
+  final com.strategyquant.jobslib.SQJob this$0;
+  public com.strategyquant.jobslib.SQJob$Listener(com.strategyquant.jobslib.SQJob, com.strategyquant.jobslib.SQJob, com.strategyquant.jobslib.JobCompletionListener);
+  public void run();
+}
+public abstract class com.strategyquant.jobslib.SQJob {
+  public static final int ErrorNone = 0;
+  public static final int ErrorException = 1;
+  private static final int RunningStatus_BeforeRun = 0;
+  private static final int RunningStatus_Running = 1;
+  private static final int RunningStatus_Finished = 2;
+  public static final int JobStatus_None = 0;
+  public static final int JobStatus_Success = 1;
+  public static final int JobStatus_Error = 2;
+  private java.util.concurrent.atomic.AtomicInteger runningStatus;
+  private java.util.concurrent.atomic.AtomicInteger status;
+  private java.lang.Object result;
+  private java.lang.Exception exception;
+  private java.util.ArrayList<com.strategyquant.jobslib.JobCompletionListener> listeners;
+  public com.strategyquant.jobslib.SQJob();
+  public void addCompletionListener(com.strategyquant.jobslib.JobCompletionListener);
+  protected void setResult(java.lang.Object);
+  private void callCompletionListeners(java.util.concurrent.ExecutorService);
+  void runWithCallback(java.util.concurrent.ExecutorService);
+  public int getId();
+  public int getStatus();
+  public boolean isFinished();
+  public boolean isRunning();
+  public java.lang.Object getResult();
+  public abstract void run() throws java.lang.Exception;
+}
+public class com.strategyquant.jobslib.databank.AddToDatabankJob extends com.strategyquant.jobslib.SQJob {
+  private com.strategyquant.tradinglib.ResultsGroup resultsGroup;
+  private com.strategyquant.tradinglib.Databank databank;
+  public com.strategyquant.jobslib.databank.AddToDatabankJob(com.strategyquant.tradinglib.ResultsGroup, com.strategyquant.tradinglib.Databank);
+  public void run() throws java.lang.Exception;
+}
+public class com.strategyquant.jobslib.databank.DeleteFromDatabankJob extends com.strategyquant.jobslib.SQJob {
+  private com.strategyquant.tradinglib.ResultsGroup resultsGroup;
+  private com.strategyquant.tradinglib.Databank databank;
+  public com.strategyquant.jobslib.databank.DeleteFromDatabankJob(com.strategyquant.tradinglib.ResultsGroup, com.strategyquant.tradinglib.Databank);
+  public void run() throws java.lang.Exception;
+}
+public class com.strategyquant.jobslib.databank.LoadFileToDatabankJob extends com.strategyquant.jobslib.SQJob {
+  private com.strategyquant.tradinglib.Databank databank;
+  private java.io.File file;
+  public com.strategyquant.jobslib.databank.LoadFileToDatabankJob(java.io.File, com.strategyquant.tradinglib.Databank);
+  public void run() throws java.lang.Exception;
+}
+public class com.strategyquant.jobslib.databank.MoveToDatabankJob extends com.strategyquant.jobslib.SQJob {
+  private com.strategyquant.tradinglib.ResultsGroup resultsGroup;
+  private com.strategyquant.tradinglib.Databank databank;
+  public com.strategyquant.jobslib.databank.MoveToDatabankJob(com.strategyquant.tradinglib.ResultsGroup, com.strategyquant.tradinglib.Databank);
+  public void run() throws java.lang.Exception;
+}

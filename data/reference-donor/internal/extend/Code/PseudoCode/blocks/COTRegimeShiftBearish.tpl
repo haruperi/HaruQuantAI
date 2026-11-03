@@ -1,0 +1,1 @@
+(COTRegimeShiftBearish(<@printParam block "#CotSymbol#" />))

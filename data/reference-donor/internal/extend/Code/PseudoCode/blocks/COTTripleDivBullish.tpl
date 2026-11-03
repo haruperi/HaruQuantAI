@@ -1,0 +1,1 @@
+(COTTripleDivBullish(<@printParam block "#CotSymbol#" />))

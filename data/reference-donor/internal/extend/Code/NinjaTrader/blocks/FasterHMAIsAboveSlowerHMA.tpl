@@ -1,0 +1,4 @@
+<#-- Faster HMA above slower HMA: HMA(FasterPeriod) > HMA(SlowerPeriod). Two instances of the
+     installed SqHullMovingAverage indicator, different periods. Parity with JForex
+     FasterHMAIsAboveSlowerHMA. Compared at 6 decimals, as the Java reads Value.getRounded(). -->
+<#global sqUsesIndicatorPackage = true><@compress_single_line>(sqRound(<@printSeriesAt block "0">SqHullMovingAverage(<@printInput block />, <@printParam block "#FasterPeriod#" />).Values[0]</@printSeriesAt>, 6) > sqRound(<@printSeriesAt block "0">SqHullMovingAverage(<@printInput block />, <@printParam block "#SlowerPeriod#" />).Values[0]</@printSeriesAt>, 6))</@compress_single_line>

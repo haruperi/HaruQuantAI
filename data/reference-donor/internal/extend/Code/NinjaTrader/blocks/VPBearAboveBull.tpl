@@ -1,0 +1,2 @@
+<#-- Bear POC above bull POC. -->
+<#global sqUsesIndicatorPackage = true>(sqRound(<@printSeriesAt block "0">SqVolumeProfile(<@printInput block />, <@printParam block "#SessionType#" />, <@printParam block "#ProfileRows#" />, 2, 3, <@printParam block "#ValueAreaPct#" />, 0).Values[6]</@printSeriesAt>, 6) > sqRound(<@printSeriesAt block "0">SqVolumeProfile(<@printInput block />, <@printParam block "#SessionType#" />, <@printParam block "#ProfileRows#" />, 2, 3, <@printParam block "#ValueAreaPct#" />, 0).Values[5]</@printSeriesAt>, 6))

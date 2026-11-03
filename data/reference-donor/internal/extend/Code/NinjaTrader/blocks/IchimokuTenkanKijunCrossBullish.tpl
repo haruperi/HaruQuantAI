@@ -1,0 +1,4 @@
+<#-- Ichimoku Tenkan crosses above Kijun. #SignalStrength# (Weak=0/Neutral=1/Strong=2, compile-time) adds a
+     kumo-position filter: strong=above cloud, neutral=above cloud bottom. Parity with
+     IchimokuTenkanKijunCrossBullish.java. -->
+<@compress_single_line>(sqRound(<@printIchimokuValueAt block "0" "1" />, 6) < sqRound(<@printIchimokuValueAt block "1" "1" />, 6) && sqRound(<@printIchimokuValueAt block "0" "0" />, 6) > sqRound(<@printIchimokuValueAt block "1" "0" />, 6)<#if getParam(block, "#SignalStrength#", "1") == "2"> && sqRound(<@printIchimokuValueAt block "0" "0" />, 6) > Math.Max(sqRound(<@printIchimokuValueAt block "2" "0" />, 6), sqRound(<@printIchimokuValueAt block "3" "0" />, 6))<#elseif getParam(block, "#SignalStrength#", "1") == "1"> && sqRound(<@printIchimokuValueAt block "0" "0" />, 6) > Math.Min(sqRound(<@printIchimokuValueAt block "2" "0" />, 6), sqRound(<@printIchimokuValueAt block "3" "0" />, 6))</#if>)</@compress_single_line>

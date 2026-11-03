@@ -1,0 +1,14 @@
+<div class="pc-layout sqn-container sqn-container-common split-pane horizontal-percent" id="sq-splitter-main">
+    <div class="split-pane-component-dashboard">
+        <div class="sqn-dashboard-header">
+            <div class="sqn-project-name sqn-project-name-clickable" tsq>Portfolio Composer</div>
+        </div>
+
+        <div ng-include="'../../../plugins/PortfolioComposer/portfolioComposer.html'" ng-dynamic-controller="'PortfolioComposerCtrl'" />
+    </div>
+</div>
+
+<sq-utils/>
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />

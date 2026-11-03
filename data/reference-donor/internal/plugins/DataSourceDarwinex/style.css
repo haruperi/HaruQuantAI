@@ -1,0 +1,166 @@
+#darwinexImportModal .td-dir-select {
+    display: flex;
+    margin-bottom: 12px;
+}
+
+#darwinexImportModal .td-dir-select .sqn-label {
+    margin-left: 0;
+}
+
+#darwinexImportModal .td-dir-select .sqn-input {
+    margin-top: 1px;
+    margin-right: 6px;
+    flex: 1 1 auto;
+}
+
+#darwinexImportModal .td-dir-select a {
+    margin-top: 3px;
+}
+
+#darwinexDownloadModal .modal-dialog {
+    width: 670px;
+}
+
+
+#darwinexDownloadModal .cdn-part {
+    margin-left: 10px;
+    margin-right: 8px;
+    position: relative;
+    top: -10px;
+}
+
+#darwinexDownloadModal .sq-fieldset .row.cdn-part>div {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+#darwinexDownloadModal .cdn-server-selector {
+    margin-top: 10px;
+}
+
+#darwinexDownloadModal .cdn-server-options {
+    display: flex;
+    width: 100%;
+}
+
+#darwinexDownloadModal .cdn-server-options .btn {
+    flex: 1;
+    height: auto;
+    padding: 8px 10px;
+    margin-bottom: 0;
+    border-radius: 6px;
+    white-space: normal;
+    line-height: 20px;
+}
+
+#darwinexDownloadModal .cdn-server-options .btn + .btn {
+    margin-left: 4px;
+}
+
+#darwinexDownloadModal .cdn-server-options .btn:focus-within {
+    outline: 2px solid currentColor;
+    outline-offset: -3px;
+    z-index: 3;
+}
+
+#darwinexDownloadModal .cdn-server-options .fa {
+    margin-right: 6px;
+    font-size: 2em;
+    vertical-align: middle;
+}
+
+#darwinexDownloadModal .cdn-server-recommended {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #1e70bc;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+#darwinexDownloadModal .cdn-server-help {
+    margin: 10px 0 6px;
+}
+
+
+#darwinexDownloadModal #darwinex-download-upgrade {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid #f5cf75;
+    border-radius: 10px;
+    background: #fff4d6;
+    color: #59431a;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+#darwinexDownloadModal .cdn-upgrade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffb91c;
+    color: #302300;
+    font-size: 20px;
+}
+
+#darwinexDownloadModal .cdn-upgrade-copy {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+#darwinexDownloadModal .cdn-upgrade-title {
+    display: block;
+    margin-bottom: 4px;
+    color: #654300;
+    font-weight: 700;
+}
+
+#darwinexDownloadModal .cdn-upgrade-copy p {
+    margin: 0;
+}
+
+body #darwinexDownloadModal .btn.cdn-upgrade-button {
+    flex: 0 1 auto;
+    max-width: 100%;
+    height: auto;
+    margin: 0 0 0 auto;
+    padding: 9px 14px;
+    border: 1px solid #dfa000;
+    border-radius: 7px;
+    background: #ffb91c;
+    color: #302300;
+    font-weight: 700;
+    line-height: 20px;
+    white-space: normal;
+    text-shadow: none;
+    box-shadow: 0 2px 6px rgba(125, 87, 0, 0.15);
+}
+
+body #darwinexDownloadModal .btn.cdn-upgrade-button:hover {
+    background: #f5ad0d;
+}
+
+body #darwinexDownloadModal .btn.cdn-upgrade-button:focus-visible {
+    outline: 2px solid #654300 !important;
+    outline-offset: 2px;
+}
+
+#darwinexDownloadModal .cdn-upgrade-crown {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    vertical-align: middle;
+}

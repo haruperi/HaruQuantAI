@@ -1,0 +1,21 @@
+<div class="sq-data-input">
+	<div class="sqn-input sqn-select" ng-if="availableData.length<10">
+		<span ng-bind="sqModel"></span>
+		<select ng-model="sqModel" ng-options="data.symbol as data.symbol for data in availableData"
+			onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" ng-change="selectChange(sqModel)"></select>
+	</div>
+	<div class="sqn-input sqn-select bx" ng-class="{'active': dropdownOpened}" ng-if="availableData.length>=10"
+		ng-click="inputClick()">
+		<span ng-bind="sqModel" ng-if="!dropdownOpened"></span>
+		<div class="sq-data-input-dropdown" ng-click="dropdownClicked($event)">
+			<input type="text" class="sqn-input sq-data-input-input" ng-model="searchString"
+				ng-keyup="onInputKeyUp($event)" ng-blur="onInputBlur($event)" />
+			<!-- <select ng-model="innerModel" ng-options="data as data for data in filteredData"
+				ng-click="selectChange(innerModel)" multiple></select> -->
+			<select ng-model="innerModel" ng-click="selectChange(innerModel)" ng-keyup="onSelectKeyUp($event)" multiple>
+				<option value="{{data}}" ng-repeat="data in filteredData track by $index"
+					ng-class="{'recent': isRecentItem(data)}">{{data}}</option>
+			</select>
+		</div>
+	</div>
+</div>

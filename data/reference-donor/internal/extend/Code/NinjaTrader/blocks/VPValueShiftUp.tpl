@@ -1,0 +1,2 @@
+<#-- Value area migrated up (VAL above prior VAH + #MinimumGap# pips). The installed SqVPSignal indicator computes the Java _evaluateSignal. -->
+<#global sqUsesIndicatorPackage = true>((<@printSeriesAt block "0">SqVPSignal(<@printInput block />, 2, 1, <@printParam block "#SessionType#" />, <@printParam block "#ProfileRows#" />, <@printParam block "#ValueAreaPct#" />, <@printParam block "#MinimumGap#" />, 0, <@printParam block "#LookbackBars#" "0" />, SqPip).Values[0]</@printSeriesAt> > 0.5))

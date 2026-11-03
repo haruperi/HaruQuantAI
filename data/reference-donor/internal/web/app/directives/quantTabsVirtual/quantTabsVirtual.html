@@ -1,0 +1,12 @@
+<div class="quant-tabs">
+    <div class="tabs-header">
+        <div ng-repeat="tab in instance.tabs | orderBy: '+position' track by $index" ng-class="{'active': tab.active}" ng-click="onSelectTab(tab)" ng-show="tab.active === undefined || tab.active">
+             {{::tab.title}}
+        </div>
+    </div>
+    <div class="tabs-body">
+        <div ng-repeat="tab in instance.tabs | orderBy: '+position'" data-item="{{::tab.dataItem}}" ng-class="{'active': tab.active}" ng-show="tab.active === undefined || tab.active">
+            <div ng-include="tab.templateUrl"/>
+        </div>
+    </div>
+</div> 

@@ -1,0 +1,21 @@
+<div class="sq-app-home" style="text-align: center">
+    <h1>Grid test</h1>
+
+    <div class="infoPanel">
+        <label>Rows in grid:
+            <span ng-bind="rowsCount" />
+        </label>
+    </div>
+
+    <div id="testGrid" style="width: 500px; height: 300px; margin-left: auto; margin-right: auto;"></div>
+
+    <div class="controlPanel" style="margin-top: 20px;">
+        <button id="buttonStartStopTest-64a" class="btn btn-primary" ng-bind="testRunning ? 'Stop test' : 'Start test'" ng-click="onClick()"></button>
+        <button id="buttonSelectAll-64b" class="btn btn-default" ng-click="onSelectAll()">Select All</button>
+        <button id="buttonSelectNone-64c" class="btn btn-default" ng-click="onSelectNone()">Select None</button>
+        <button id="buttonClear-64d" class="btn btn-default" ng-click="onClear()">Clear</button>
+        <button id="buttonAdd100Rows-64e" class="btn btn-default" ng-click="onAdd100Rows()">Add 100 rows</button>
+    </div>
+</div>
+
+<sq-utils/>

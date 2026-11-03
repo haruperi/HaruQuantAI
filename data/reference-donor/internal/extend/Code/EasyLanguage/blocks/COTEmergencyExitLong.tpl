@@ -1,0 +1,1 @@
+(Close<@printShift block shift /> < SQ_Lowest(Low, <@printParam block "#MonthLookback#" />)[<@printCIShift block shift /> + 1])

@@ -1,0 +1,1 @@
+(sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 28, <@printShift block "0" />) < <@printParam block "#ThresholdPct#" />) && (sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 28, <@printShift block "0" />) > 0)

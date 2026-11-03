@@ -1,0 +1,2 @@
+<#-- Bar closes below the LinReg line (Close[shift] < LinReg[shift]). Parity with LinRegBarClosesBelow.java. -->
+<@compress_single_line>(<@printSeriesAt block shift><@printSeries block "Close" /></@printSeriesAt> < sqRound(<@printLinRegValueAt block shift />, 6))</@compress_single_line>

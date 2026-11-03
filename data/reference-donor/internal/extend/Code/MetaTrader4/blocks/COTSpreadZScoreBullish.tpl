@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_SpreadZScoreBullish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#Period#" />, <@printParam block "#ZThreshold#" />)

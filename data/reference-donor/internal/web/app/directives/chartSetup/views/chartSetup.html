@@ -1,0 +1,190 @@
+<form name="editSetupForm" class="form-horizontal chart-setup" role="form">
+    <fieldset class="sq-fieldset">
+        <legend tsq>Trading engine</legend>
+
+        <div class="row row-smaller chart-setup-engine">
+            <div class="col-sm-5 chart-setup-box-1">
+                <label class="sqn-label" tsq>Engine</label>
+                <div class="sqn-input sqn-select input-engine" data-testid="chart-setup-engine">
+                    <span ng-bind="getEngineLabel()"></span>
+                    <select ng-model="setup.engine" ng-options="engine.value as (engine.name | tsq) for engine in constants.engineTypes"
+                        onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"></select>
+                </div>
+            </div>
+            <div class="col-sm-7 chart-setup-box-2 subchart-count" ng-show="showSubchartSpinner">
+                <label class="sqn-label" tsq>Additional charts</label>
+                <div class="sqn-spinner" data-testid="chart-setup-additional-charts">
+                    <input type="text" class="sqn-input" min="0" step="1" ng-model="additionalCharts.count" onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" ng-change="onSubchartsChangeEvent()"/>
+                    <div class="sqn-spinner-btns">
+                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                    </div>
+                </div>
+                <div class="subcharts-help">
+                    <label tsq>these are additional charts that strategy has access to</label>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="sq-fieldset">
+        <legend tsq>Backtest data settings</legend>
+
+        <div class="row row-smaller">
+            <div class="col-sm-5 chart-setup-box-1">
+                <div class="setup-input-symbol-wrapper">
+                    <label ng-show="setup.engine == 'Stockpicker'" class="sqn-label" tsq>Group</label>
+                    <label ng-show="setup.engine != 'Stockpicker'" class="sqn-label labelAlignRight" ng-bind="setup.subcharts.length > 0 ? ('Main chart' | tsq) : ('Symbol' | tsq)"></label>
+                    
+                    <sq-data-box sq-model="setup.symbol" class="setup-input" engine="setup.engine" data-testid="chart-setup-symbol" />
+                </div>
+            </div>
+            <div class="col-sm-5 chart-setup-box-2">
+                <label class="sqn-label" tsq>Timeframe</label>
+                <timeframe-picker timeframe="setup.timeframe" class="timeframe" min-timeframe="setup.minTimeframe"
+                    ng-disabled="ngDisabled" main-chart="mainSetup" higher-tfs-disabled="setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy'" data-testid="chart-setup-timeframe"/>
+            </div>
+        </div>
+
+        <div class="row row-smaller">
+            <div class="col-sm-5 chart-setup-box-1">
+                <date-picker label="{{'Start day' | tsq}}" date="setup.dateFrom" min-date="symbolDateRangeFrom"
+                    max-date="symbolDateRangeTo" format="yyyy.mm.dd" on-date-change="onDateFromChange(date)"
+                    ng-disabled="ngDisabled" force-date-change="forceDateChange" data-testid="chart-setup-date-from" />
+            </div>
+            <div class="col-sm-7 chart-setup-box-2">
+                <date-picker label="{{'End day' | tsq}}" date="setup.dateTo" min-date="symbolDateRangeFrom"
+                    max-date="symbolDateRangeTo" format="yyyy.mm.dd" on-date-change="onDateToChange(date)"
+                    ng-disabled="ngDisabled" force-date-change="forceDateChange" data-testid="chart-setup-date-to" />
+                <button id="buttonResetDates-23a" class="btn btn-normal btn-default btn-thin" ng-click="resetDates()"
+                    class="chart-setup-reset-dates" tsq data-testid="chart-setup-reset-dates">Reset dates</button>
+            </div>
+        </div>
+
+        <div class="row row-smaller chart-setup-available-data">
+            <div class="col-sm-5 chart-setup-box-1">
+                <div class="sq-input">
+                    <label tsq>Available from</label>
+                    <label ng-bind="symbolDateRangeFrom" data-testid="chart-setup-available-from"></label>
+                </div>
+            </div>
+            <div class="col-sm-5 chart-setup-box-2">
+                <div class="sq-input">
+                    <label tsq>to</label>
+                    <label ng-bind="symbolDateRangeTo" data-testid="chart-setup-available-to"></label>
+                </div>
+            </div>
+        </div>
+
+        <div class="clearfix"></div>
+
+        <div class="subcharts" ng-if="setup.subcharts.length > 0">
+            <div class="subcharts-title">
+                <tsq>Subcharts</tsq> ({{setup.subcharts.length}})
+            </div>
+            <div class="row row-smaller" ng-repeat="subchart in setup.subcharts">
+                <div class="col-sm-5 chart-setup-box-1">
+                    <div class="setup-input-symbol-wrapper">
+                        <label class="sqn-label">
+                            <tsq>Subcharts</tsq> {{($index + 1)}}
+                        </label>
+                        <sq-data-box sq-model="subchart.symbol" class="setup-input" engine="'MetaTrader4'" data-testid="chart-setup-subchart-symbol" />
+                    </div>
+                </div>
+                <div class="col-sm-5 chart-setup-box-2">
+                    <label class="sqn-label" tsq>Timeframe</label>
+                    <timeframe-picker timeframe="subchart.timeframe" class="timeframe"
+                        min-timeframe="(setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy') ? 'D1' :subchart.minTimeframe"
+                        custom-tfs-disabled="setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy'" data-testid="chart-setup-subchart-timeframe"/>
+                </div>
+            </div>
+        </div>
+    </fieldset>
+
+    <fieldset class="sq-fieldset">
+        <legend tsq>Test parameters</legend>
+
+        <div class="row row-smaller">
+            <div class="col-sm-5 chart-setup-box-1">
+                <label class="sqn-label precision-label" tsq>Precision</label>
+                <div class="sqn-input sqn-select precision-input" data-testid="chart-setup-precision">
+                    <span ng-bind="getPrecisionLabel()"></span>
+                    <select ng-model="setup.precision" ng-options="item.value as (item.name | tsq) for item in precisions"
+                        onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"></select>
+                </div>
+            </div>
+            <div class="col-sm-7 chart-setup-box-2">
+                <label class="sqn-label precision-label" tsq>Commisions & swap</label>
+                <label class="sqn-label precision-label comission-label-value" ng-bind="getCommisionSwapLabel()" data-testid="chart-setup-commissions-label"></label>
+                <i class="fa fa-cog" ng-click="showOtherSettingsPopup()" data-testid="chart-setup-commissions-gear"></i>
+            </div>
+        </div>
+
+        <div class="row row-smaller">
+            <div class="col-sm-5 chart-setup-box-1">
+                <label ng-hide="setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy'" class="sqn-label" ng-show="setup.precision != 4" tsq>Spread</label>
+                <div ng-hide="setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy'" class="sqn-spinner setup-input setup-input-small" ng-show="setup.precision != 4" data-testid="chart-setup-spread">
+                    <input type="text" class="sqn-input" min="0" step="1" ng-model="setup.spread"
+                        onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                    <div class="sqn-spinner-btns">
+                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                    </div>
+                </div>
+                <label ng-hide="setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy'" class="pipsLabel"  ng-show="setup.precision != 4" tsq>pips</label>
+            </div>
+            <div class="col-xs-4 chart-setup-box-2"
+                ng-class="{'col-sm-7': setup.engine == 'Tradestation' || setup.engine == 'MultiCharts'}">
+                <label class="sqn-label">{{setup.engine == 'Stockpicker' || setup.engine == 'Single-asset cloud strategy' ? ('Slippage / Spread' | tsq) : ('Slippage' | tsq)}}</label>
+                <div class="sqn-spinner setup-input setup-input-small slippage-spinner" data-testid="chart-setup-slippage">
+                    <input type="text" class="sqn-input" min="0" step="1" ng-model="setup.slippage"
+                        onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                    <div class="sqn-spinner-btns">
+                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                    </div>
+                </div>
+                <label ng-hide="setup.engine == 'Tradestation' || setup.engine == 'MultiCharts'" class="pipsLabel" tsq>pips</label>
+                <tsq ng-show="setup.engine == 'Tradestation' || setup.engine == 'MultiCharts'">$ per trade</tsq>
+            </div>
+            <div class="col-sm-3 chart-setup-box-2"
+                ng-hide="setup.engine == 'Tradestation' || setup.engine == 'MultiCharts'">
+                <label class="sqn-label" tsq>Min. distance</label>
+                <div class="sqn-spinner setup-input setup-input-small" data-testid="chart-setup-min-distance">
+                    <input type="text" class="sqn-input" min="0" step="1" ng-model="setup.minDistance"
+                        onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                    <div class="sqn-spinner-btns">
+                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                    </div>
+                </div>
+                <label class="pipsLabel" tsq>pips</label>
+            </div>
+        </div>
+    </fieldset>
+
+    <!-- Modal window-->
+    <div class="modal centered other-params-popup" id="{{::otherParamsPopupId}}" tabindex="-1" role="dialog"
+        aria-labelledby="myModalLabel-{{::otherParamsPopupId}}" data-testid="chart-setup-commissions-modal">
+        <div class="modal-dialog modal-smaller" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="buttonTimes-23b" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel" tsq>Commission & swap settings</h4>
+                </div>
+                <div class="modal-body">
+                    <multi-property-grid ng-if="commPGInstance" instance="commPGInstance" on-change="onCommPGChange" options="commissionMethods" after-init="afterPGInit()" title="Commission" ng-disabled="ngDisabled"/>
+                    <hr>
+
+                    <swap-settings sq-model="setup.swap" />
+                </div>
+                <div class="modal-footer">
+                    <a data-dismiss="modal" class="btn-only-close" tsq data-testid="chart-setup-commissions-close">Close</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</form>

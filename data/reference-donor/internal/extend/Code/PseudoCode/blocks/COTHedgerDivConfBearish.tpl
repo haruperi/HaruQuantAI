@@ -1,0 +1,1 @@
+(COTHedgerDivConfBearish(<@printParam block "#CotSymbol#" />))

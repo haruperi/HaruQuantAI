@@ -1,0 +1,32 @@
+<!-- Modal window-->
+<div class="modal" id="CSVXLSXExportDialogModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-45a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Export format</h4>
+            </div>
+            <div class="modal-body" style="height: auto">
+                <form class="form-horizontal" role="form">
+                    <div>
+                        <label tsq>
+                            You can export contents either to classic CSV file or MS Office XLSX file.<br>
+                            Which file format do you prefer?
+                        </label>
+                        <div class="radio">
+                            <input type="checkbox" ng-model="CSVXLSXExport.useComma" />
+                            <label ng-click="CSVXLSXExport.useComma = !CSVXLSXExport.useComma" style="padding-left: 8px;" tsq>Use comma in numeric values</label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+                <button id="buttonXLSX-45b" type="button" class="btn btn-primary" ng-click="CSVXLSXExport.callback(true)" tsq>XLSX</button>
+                <button id="buttonCSV-45c" type="button" class="btn btn-primary" ng-click="CSVXLSXExport.callback(false)" tsq>CSV</button>
+            </div>
+        </div>
+    </div>
+</div>

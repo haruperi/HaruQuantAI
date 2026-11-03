@@ -1,0 +1,47 @@
+<div class="modal centered" id="initSettingsDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 610px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" tsq>Settings</h4>
+            </div>
+            <div class="modal-body">
+                <fieldset class="sq-fieldset">
+                    <legend tsq>Choose your skin</legend>
+
+                    <div class="clearfix"></div>
+
+                    <div class="sq-skins">
+                        <div ng-repeat="skin in skins">
+                            <label class="sqn-label">{{skin.name | tsq}}</label>
+                            <img ng-src="{{::skin.previewImgPath}}" alt="Skin preview" ng-class="{active : initSettings.skin.name == skin.name}" ng-click="initSettings.skin = skin">
+                        </div>
+                    </div>
+
+                    <legend tsq>And language</legend>
+
+                    <div>
+                        <div class="sqn-input sqn-select">
+                            <span ng-bind="initSettings.language.title"></span>
+                            <select ng-model="initSettings.language" data-testid="shell-modal-init-settings-language-select" ng-options="language as language.title for language in languages" onFocus="sqnSelectFocus(this)"
+                                onBlur="sqnSelectBlur(this)" onChange="sqnSelectChange(this)"></select>
+                        </div>
+                    </div>
+                </fieldset>
+
+                <br>
+
+                <div ng-hide="isQDM" class="sq-checkbox" ng-click="initSettings.IntroWalkthrough=!initSettings.IntroWalkthrough">
+                    <input type="checkbox" ng-model="initSettings.IntroWalkthrough" data-testid="shell-modal-init-settings-walkthrough">
+                    <label>
+                        <tsq>Start quick program introduction walkthrough</tsq>
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="skins-note" ng-bind="initSettings.help"></div>
+                <a ng-click="closeInitSettings(false)" data-testid="shell-modal-init-settings-close" tsq>Close</a>
+                <button id="buttonSave-48a" type="button" class="btn btn-primary" ng-click="closeInitSettings(true)" data-testid="shell-modal-init-settings-save" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

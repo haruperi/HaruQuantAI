@@ -1,0 +1,72 @@
+<div class="modal" id="downloadCountModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<button id="buttonTimes-69a" type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+						aria-hidden="true">&times;</span></button>
+				<h4 class="modal-title" id="myModalLabel" tsq>Parallel download count configuration</h4>
+			</div>
+			<div class="modal-body">
+				<label class="sqn-label">
+					<tsq>Parallel download count</tsq>
+				</label>
+				<div class="sqn-spinner">
+					<input type="text" class="sqn-input" min="1" max="10" step="1" ng-model="parallelDownload.common"
+						onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" data-testid="dm-progress-download-config-parallel" />
+					<div class="sqn-spinner-btns">
+						<div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+						<div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+					</div>
+				</div>
+				<br>
+				<label class="sqn-label">
+					<tsq>CDN Parallel download count</tsq>
+				</label>
+				<div class="sqn-spinner">
+					<input type="text" class="sqn-input" min="1" max="10" step="1" ng-model="parallelDownload.cdn"
+						onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" ng-disabled="!cdnAllowed" data-testid="dm-progress-download-config-cdn-parallel" />
+					<div class="sqn-spinner-btns">
+						<div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+						<div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+					</div>
+				</div>
+
+				<br>
+				<br>
+
+				<div ng-if="cdnAllowed">
+					<b>
+						<tsq>Preffered CDN for Dukascopy, SQ Equities and SQ Futures data</tsq>
+					</b><br>
+
+					<div class="radio">
+						<label class="sq-wradio">
+							<input type="radio" name="DukasFastDownload" value="cdn" ng-model="parallelDownload.cdnType"
+								ng-change="settingsChanged()" ng-class="{'checked': parallelDownload.cdnType=='cdn'}" />
+							<span class="sq-mark"></span>
+							<tsq>Global StrategyQuant CDN</tsq>
+							<div class="modal-help-box" tsq>Fast Global CDN for user all around the world</div>
+					</div>
+
+					<div class="radio">
+						<label class="sq-wradio">
+							<input type="radio" name="DukasFastDownload" value="cdn-cn"
+								ng-model="parallelDownload.cdnType" ng-change="settingsChanged()"
+								ng-class="{'checked': parallelDownload.cdnType=='cdn-cn'}" />
+							<span class="sq-mark"></span>
+							<tsq>Hong Kong location</tsq>
+							<div class="modal-help-box" tsq>Recommended for China and south-east Asia users</div>
+						</label>
+					</div>
+				</div>
+
+			</div>
+			<div class="modal-footer">
+				<div class="data-manager-helptext pull-left">
+					Change will take effect only if there is no active download
+				</div>
+				<a data-dismiss="modal" ng-click="parallelDownloadChanged()" tsq data-testid="dm-progress-download-config-close">Close</a>
+			</div>
+		</div>
+	</div>
+</div>

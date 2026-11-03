@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTScore(${cotSymbolInput(cs)}, <@printCIShift block shift />)

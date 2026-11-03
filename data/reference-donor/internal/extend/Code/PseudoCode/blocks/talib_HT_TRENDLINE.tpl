@@ -1,0 +1,1 @@
+(HT_TL) Hilbert Transform - Instantaneous Trendline(<@printInput block true />, <@printComputedFromParam block "#ComputedFrom#" />)[<@printShift block shift />]

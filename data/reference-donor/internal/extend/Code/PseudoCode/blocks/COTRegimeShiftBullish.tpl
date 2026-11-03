@@ -1,0 +1,1 @@
+(COTRegimeShiftBullish(<@printParam block "#CotSymbol#" />))

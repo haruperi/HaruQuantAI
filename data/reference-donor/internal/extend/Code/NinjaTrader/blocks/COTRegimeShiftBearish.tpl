@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTRegShiftBear(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#Level#" />, <@printParam block "#ShiftWeeks#" />)

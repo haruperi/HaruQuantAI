@@ -1,0 +1,1 @@
+(MAXINDEX) Index of highest value over a specified period(<@printInput block true />, <@printComputedFromParam block "#ComputedFrom#" />, <@printParam block "#TimePeriod#" />)[<@printShift block shift />]

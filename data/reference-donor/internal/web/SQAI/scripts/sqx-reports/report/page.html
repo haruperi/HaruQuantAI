@@ -1,0 +1,42 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="{{csp}}">
+<title>{{title}}</title>
+<style>
+{{css}}</style>
+</head>
+<body>
+
+<!-- Anything you put here appears at the top of EVERY report. For example:
+<div class="card"><strong>ACME Capital</strong> <span class="muted">internal research</span></div>
+-->
+
+<!-- Save as PDF: inside the SQX app the button asks the chat to open the native save dialog
+     and render the PDF server-side (the SaverPDF plugin); opened standalone in a browser it
+     falls back to the print dialog. Hidden on the printout itself (@media print). -->
+<div class="report-toolbar"><button type="button" id="sq-save-pdf">Save as PDF</button></div>
+<script>
+(function () {
+    document.getElementById('sq-save-pdf').addEventListener('click', function () {
+        if (window.parent === window) { window.print(); return; }
+        window.parent.postMessage({ type: 'SQAI_REPORT_SAVE_PDF',
+            url: location.pathname, title: document.title }, '*');
+    });
+    // The chat answers with a print request when no SQX shell is around to save the file.
+    window.addEventListener('message', function (e) {
+        if (e.data && e.data.type === 'SQAI_REPORT_PRINT') window.print();
+    });
+})();
+</script>
+
+{{body}}
+
+<!-- ...and anything here at the bottom of every report. For example:
+<p class="muted"><small>Past performance is not indicative of future results.</small></p>
+-->
+
+</body>
+</html>

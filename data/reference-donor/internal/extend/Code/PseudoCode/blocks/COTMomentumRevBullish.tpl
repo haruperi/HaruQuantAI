@@ -1,0 +1,1 @@
+(COTMomentumRevBullish(<@printParam block "#CotSymbol#" />))

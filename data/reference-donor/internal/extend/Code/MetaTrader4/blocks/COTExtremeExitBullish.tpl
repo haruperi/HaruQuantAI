@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_ExtremeExitBullish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#ExitThreshold#" />, <@printParam block "#ExtremeThreshold#" />)

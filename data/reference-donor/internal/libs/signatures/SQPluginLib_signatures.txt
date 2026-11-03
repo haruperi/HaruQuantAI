@@ -1,0 +1,111 @@
+public class com.strategyquant.pluginlib.DirManager {
+  private static java.lang.String originPath;
+  public com.strategyquant.pluginlib.DirManager();
+  public static void usePathsRelativeTo(java.lang.String);
+  public static void useAbsolutePaths();
+  public static java.util.ArrayList<java.lang.String> listAllSubdirectoryPaths(java.lang.String) throws java.lang.Exception;
+  public static java.util.ArrayList<java.lang.String> getSubdirectoryNames(java.lang.String) throws java.lang.Exception;
+  private static java.util.ArrayList<java.lang.String> getSubdirectoriesNames(java.util.ArrayList<java.lang.String>) throws java.lang.Exception;
+  public static java.util.ArrayList<java.lang.String> listFileNamesInFolder(java.lang.String);
+  private static java.lang.String formatPath(java.lang.String);
+}
+class com.strategyquant.pluginlib.ISQPlugin$1 implements java.util.Comparator<com.strategyquant.pluginlib.ISQPlugin> {
+  com.strategyquant.pluginlib.ISQPlugin$1();
+  public int compare(com.strategyquant.pluginlib.ISQPlugin, com.strategyquant.pluginlib.ISQPlugin);
+  public int compare(java.lang.Object, java.lang.Object);
+}
+public interface com.strategyquant.pluginlib.ISQPlugin extends net.xeoh.plugins.base.Plugin {
+  public static final java.util.Comparator<com.strategyquant.pluginlib.ISQPlugin> PositionComparator;
+  public abstract java.lang.String getProduct();
+  public abstract int getPreferredPosition();
+  public abstract void initPlugin() throws java.lang.Exception;
+  public default java.lang.String forEngine();
+  public default boolean disabledForSpecialTrial();
+  static {};
+}
+public class com.strategyquant.pluginlib.SQPluginManager {
+  public static final org.slf4j.Logger Log;
+  public static final java.lang.String PLUGIN_CATEGORY_OTHERS = "Others";
+  private net.xeoh.plugins.base.PluginManager pm;
+  private static net.xeoh.plugins.base.util.PluginManagerUtil pmu;
+  private net.xeoh.plugins.base.PluginInformation pi;
+  private java.lang.String product;
+  private java.util.HashMap<java.lang.Class, java.util.ArrayList> loadedPluginsMap;
+  private java.util.HashMap<java.lang.Class, java.util.ArrayList> availablePluginsMap;
+  private static com.strategyquant.pluginlib.SQPluginManager instance;
+  private static java.lang.String workDirectory;
+  public com.strategyquant.pluginlib.SQPluginManager();
+  public static com.strategyquant.pluginlib.SQPluginManager getInstance();
+  public static void setWorkDirectory(java.lang.String);
+  public java.util.HashMap<java.lang.Class, java.util.ArrayList> getAvailablePlugins();
+  public static <P extends com.strategyquant.pluginlib.ISQPlugin> java.lang.String getPluginName(java.lang.Class<P>);
+  public static void initForProduct(java.lang.String) throws java.lang.Exception;
+  public static void initForProduct(java.lang.String, java.lang.String) throws java.lang.Exception;
+  private static void loadFromFolder(java.lang.String, java.lang.String) throws java.lang.Exception;
+  public static <P extends com.strategyquant.pluginlib.ISQPlugin> java.util.ArrayList<P> getPlugins(java.lang.Class<P>);
+  private <P extends com.strategyquant.pluginlib.ISQPlugin> java.util.ArrayList<P> _getPlugins(java.lang.Class<P>);
+  public static <P extends com.strategyquant.pluginlib.ISQPlugin> void loadPlugins(java.lang.Class<P>) throws java.lang.Exception;
+  private <P extends com.strategyquant.pluginlib.ISQPlugin> void _loadPlugins(java.lang.Class<P>) throws java.lang.Exception;
+  public static java.lang.String getPluginAuthor(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String getLicense(com.strategyquant.pluginlib.ISQPlugin);
+  public static boolean isPluginMandatory(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String getPluginName(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String getPluginCategory(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String getPluginShortDesc(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String getPluginLongDesc(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String getPluginPageUrl(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String getPluginDownloadUrl(com.strategyquant.pluginlib.ISQPlugin);
+  public static int getPluginVersion(com.strategyquant.pluginlib.ISQPlugin);
+  public static java.lang.String printPluginVersion(com.strategyquant.pluginlib.ISQPlugin);
+  public static com.strategyquant.pluginlib.ISQPlugin findPluginByName(java.lang.String);
+  public static java.lang.String formatVersion(int);
+  public static <P extends com.strategyquant.pluginlib.ISQPlugin> java.util.ArrayList<P> getAllAvailablePlugins(java.lang.Class<P>);
+  static {};
+}
+public interface com.strategyquant.pluginlib.annotations.Category extends java.lang.annotation.Annotation {
+  public abstract java.lang.String name();
+}
+public interface com.strategyquant.pluginlib.annotations.DownloadUrl extends java.lang.annotation.Annotation {
+  public abstract java.lang.String url();
+}
+public interface com.strategyquant.pluginlib.annotations.HideDatabankChoice extends java.lang.annotation.Annotation {
+}
+public interface com.strategyquant.pluginlib.annotations.License extends java.lang.annotation.Annotation {
+  public abstract java.lang.String text();
+}
+public interface com.strategyquant.pluginlib.annotations.LongDesc extends java.lang.annotation.Annotation {
+  public abstract java.lang.String text();
+}
+public interface com.strategyquant.pluginlib.annotations.Mandatory extends java.lang.annotation.Annotation {
+  public abstract boolean value();
+}
+public interface com.strategyquant.pluginlib.annotations.Name extends java.lang.annotation.Annotation {
+  public abstract java.lang.String name();
+}
+public interface com.strategyquant.pluginlib.annotations.PageUrl extends java.lang.annotation.Annotation {
+  public abstract java.lang.String url();
+}
+public interface com.strategyquant.pluginlib.annotations.ShortDesc extends java.lang.annotation.Annotation {
+  public abstract java.lang.String text();
+}
+public interface com.strategyquant.pluginlib.program.IProgram {
+  public abstract java.lang.Object call(java.lang.String, java.lang.Object...) throws java.lang.Exception;
+}
+public class com.strategyquant.pluginlib.program.Program {
+  public static final org.slf4j.Logger Log;
+  public static java.util.HashMap<java.lang.String, com.strategyquant.pluginlib.program.IProgram> programsMap;
+  public com.strategyquant.pluginlib.program.Program();
+  public static com.strategyquant.pluginlib.program.IProgram get(java.lang.String) throws com.strategyquant.pluginlib.program.ProgramDoesntExistException;
+  public static void register(java.lang.String, com.strategyquant.pluginlib.program.IProgram);
+  public static boolean isRegistered(java.lang.String);
+  static {};
+}
+public class com.strategyquant.pluginlib.program.ProgramDoesntExistException extends java.lang.Exception {
+  public com.strategyquant.pluginlib.program.ProgramDoesntExistException(java.lang.String);
+}
+public class com.strategyquant.pluginlib.program.ProgramMethodDoesntExistException extends java.lang.Exception {
+  public com.strategyquant.pluginlib.program.ProgramMethodDoesntExistException(java.lang.String);
+}
+Compiled from "package-info.java"
+interface com.strategyquant.pluginlib.program.package-info {
+}

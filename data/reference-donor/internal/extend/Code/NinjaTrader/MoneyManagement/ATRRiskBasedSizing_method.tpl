@@ -1,0 +1,2 @@
+<#-- ATR risk-based sizing via sqMMAtrRisk (equity risk / ATR-based SL in money). Mirrors ATRRiskBasedSizing.java. -->
+<@useAtrRuntime />sqMMAtrRisk(mmRiskPercent, mmAtrPeriod, mmAtrMult, mmDecimals, mmLotsIfNoMM, mmMaxLots)

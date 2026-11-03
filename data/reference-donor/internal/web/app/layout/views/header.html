@@ -1,0 +1,141 @@
+<header id="header">
+    <div class="br-header">
+    <span class="br-img-span">
+        <span ng-if="currentEditionCustomization && (currentEditionCustomization.edition_name || currentEditionCustomization.edition_icon)" class="br-edition brContentSpan" data-testid="shell-topbar-edition-label">
+            <img ng-if="currentEditionCustomization.edition_icon" ng-src="{{ currentEditionCustomization.edition_icon }}" class="br-edition-icon" alt="" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;" />
+            <span ng-if="currentEditionCustomization.edition_name">{{ currentEditionCustomization.edition_name }}</span>
+        </span>
+        <span ng-if="!currentEditionCustomization && isBrazilianEdition" class="br-edition brContentSpan" data-testid="shell-topbar-edition-label">Edição Brasileira<div class="br-img" data-testid="shell-topbar-edition-flag"></div></span>
+    </span>
+    <div class="headerUlDiv">
+    <ul class="icons-system">
+        <li ng-repeat="navigationItem in topMenuItems | orderBy: '+position'" class="{{::navigationItem.parentClass}}">
+            <a id="{{::navigationItem.linkId}}" data-testid="nav-{{navigationItem.linkId}}" ng-click="switchToApp(navigationItem)" class="{{::navigationItem.iconClass}}" ng-class="{'disabled': navigationItem.onlyInPro && !$root.license.isProVersion}" title="{{navigationItem.onlyInPro && !$root.license.isProVersion ? onlyInProTitle : navigationItem.title}}"
+                data-toggle="tooltip" data-container="body" data-placement="bottom">{{navigationItem.showText ? navigationItem.title : ''}}</a>
+        </li>
+
+        <li ng-if="$root.developmentMode" onclick="regenerate()">
+            <a class="icons-system-regenerate fa fa-refresh" data-toggle="tooltip" title="Regenerate" data-testid="shell-topbar-regenerate"></a>
+        </li>
+        <li ng-if="$root.developmentMode" ng-click="dataTrialPopup()">
+            <a class="icons-system-regenerate fa fa-database" data-toggle="tooltip" title="Data trial" data-testid="shell-topbar-data-trial"></a>
+        </li>
+        <li ng-click="volumeProfileAddonPopup()">
+            <a class="fa fa-area-chart" data-toggle="tooltip" title="Volume &amp; Market Profile Addon" data-testid="shell-topbar-addon"></a>
+        </li>
+        <li>
+            <div class="dropdown">
+                <a class="icons-system-settings fa fa-cog dropdown-toggle" data-toggle="dropdown" aria-expanded="true" title="Settings" id="global-settings-cog" data-testid="shell-topbar-settings"></a>
+                <ul class="dropdown-menu">
+                    <li ng-click="showPopup('#performanceDialog')" data-testid="shell-settings-config">
+                        <a><i class="fa fa-cog"></i>
+                            <tsq>Configuration...</tsq>
+                        </a>
+                    </li>
+                    <li ng-click="showBenchmark()" data-testid="shell-settings-benchmark">
+                        <a><i class="fa fa-bar-chart" aria-hidden="true"></i>
+                            <tsq>Benchmark...</tsq>
+                        </a>
+                    </li>
+                    <li ng-click="showRemoteAccessSettings()" data-testid="shell-settings-remote">
+                        <a><i class="fa fa-globe" aria-hidden="true"></i>
+                            <tsq>Remote access...</tsq>
+                        </a>
+                    </li>
+                    <li ng-click="showSMTPSettings()" data-testid="shell-settings-smtp">
+                        <a><i class="fa fa-envelope-o" aria-hidden="true"></i>
+                            <tsq>SMTP server...</tsq>
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li class="dropdown-submenu">
+                        <a tabindex="-1" class="dropdown-dont-close">
+                            <i class="fa fa-flag-checkered" aria-hidden="true"></i>
+                            <tsq>Language</tsq>
+                        </a>
+                        <language-menu />
+                    </li>
+                    <li class="divider"></li>
+                    <li class="dropdown-submenu">
+                        <a tabindex="-1" class="dropdown-dont-close">
+                            <i class="fa fa-paint-brush" aria-hidden="true"></i>
+                            <tsq>Skin</tsq>
+                        </a>
+                        <skin-picker />
+                    </li>
+                    <li class="divider"></li>
+                    <li class="item-nolink dropdown-dont-close">
+                        <tsq>Zoom</tsq>
+                        <span class="menu-zoom">
+                            <apps-zoom /> &nbsp;|&nbsp;
+                            <a ng-click="fullscreen()" class="menu-zoom-fullscreen" data-testid="shell-settings-fullscreen"></a>
+                        </span>
+                    </li>
+                    <li class="divider"></li>
+                    <li>
+                        <a ng-click="openlink('https://www.strategyquant.com/')" data-testid="shell-settings-website"><i class="fa fa-external-link"
+                                aria-hidden="true"></i>
+                            <tsq>StrategyQuant Website</tsq>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-click="openlink('https://docs.strategyquant.com')" data-testid="shell-settings-help"><i class="fa fa-external-link"
+                                aria-hidden="true"></i>
+                            <tsq>Help center</tsq>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-click="openlink('https://strategyquant.com/contactus/')" data-testid="shell-settings-support"><i class="fa fa-external-link"
+                                aria-hidden="true"></i>
+                            <tsq>Support</tsq>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-click="updateLicense()" data-testid="shell-settings-update-license"><i class="fa fa-user-o" aria-hidden="true"></i>
+                            <tsq>Update license</tsq>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-click="about()" data-testid="shell-settings-about"><i class="fa fa-info-circle" aria-hidden="true"></i>
+                            <tsq>About</tsq>
+                        </a>
+                    </li>
+                    <li class="divider"></li>
+                    <li ng-click="reloadUI()" data-testid="shell-settings-reload">
+                        <a><i class="fa fa-refresh" aria-hidden="true"></i>
+                            <tsq>Reload UI</tsq>
+                        </a>
+                    </li>
+                    <li>
+                        <a ng-click="exitapp()" data-testid="shell-settings-exit"><i class="fa fa-times" aria-hidden="true"></i>
+                            <tsq>Exit</tsq>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </li>
+        <!--<li ng-click="fullscreen()"><a class="icons-system-fullscreen"></a></li> -->
+    </ul>
+</div>
+    <!--skin-picker/-->
+    </div>
+</header>
+
+<script>
+    function regenerate() {
+        var iframes = $(".sq4-maincontent iframe");
+
+        for (var i = 0; i < iframes.length; i++) {
+            var iframe = $(iframes[i]);
+            if (iframe.css('display') != 'none') {
+                if(iframe[0].contentWindow.regenerate) {
+                    iframe[0].contentWindow.regenerate();
+                } else {
+                    console.log("Not implemented.");
+                }
+
+                break;
+            }
+        }
+    }
+</script>

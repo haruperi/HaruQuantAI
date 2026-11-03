@@ -1,0 +1,2 @@
+<#-- Simple Martingale via sqMMMartingale (last closed trade size/PL). Mirrors SimpleMartingaleMM.java. -->
+sqMMMartingale(mmLotsStart, mmLotsMultiplier, mmLotsReset, mmDecimals, <@printMMSize "#SeparateByDirection#" />)

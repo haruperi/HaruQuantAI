@@ -1,0 +1,3 @@
+<#-- Price breaks out below the kumo cloud (Open above cloud bottom, Close below cloud bottom).
+     kumoBottom = Min(SenkouA, SenkouB). Parity with IchimokuKumoBreakoutBearish.java. -->
+<@compress_single_line>(<@printSeriesAt block "0"><@printSeries block "Open" /></@printSeriesAt> > Math.Min(sqRound(<@printIchimokuValueAt block "2" "0" />, 6), sqRound(<@printIchimokuValueAt block "3" "0" />, 6)) && <@printSeriesAt block "0"><@printSeries block "Close" /></@printSeriesAt> < Math.Min(sqRound(<@printIchimokuValueAt block "2" "0" />, 6), sqRound(<@printIchimokuValueAt block "3" "0" />, 6)))</@compress_single_line>

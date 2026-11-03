@@ -1,0 +1,2 @@
+<#-- Wick pierced IBH by #Tolerance# and the close rejected below by #MinimumRejection#. The installed SqVPSignal indicator computes the Java _evaluateSignal. -->
+<#global sqUsesIndicatorPackage = true>((<@printSeriesAt block "0">SqVPSignal(<@printInput block />, 5, -1, <@printParam block "#SessionType#" />, <@printParam block "#ProfileRows#" />, <@printParam block "#ValueAreaPct#" />, <@printParam block "#Tolerance#" />, <@printParam block "#MinimumRejection#" />, 0, SqPip).Values[0]</@printSeriesAt> > 0.5))

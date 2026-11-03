@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTSpecExhShort(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#SpecExtreme#" />, <@printParam block "#HedgerThreshold#" />)

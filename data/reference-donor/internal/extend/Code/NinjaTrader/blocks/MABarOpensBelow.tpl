@@ -1,0 +1,2 @@
+<#-- Bar opens below the MA of the previous bar (Open[shift] < MA[shift+1]). #Type# selects SMA/EMA/SMMA/WMA. -->
+(<@printSeriesAt block shift><@printSeries block "Open" /></@printSeriesAt> < <@printMAValueAt block "1" />)

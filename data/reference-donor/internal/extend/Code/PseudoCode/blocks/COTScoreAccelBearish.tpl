@@ -1,0 +1,1 @@
+(COTScoreAccelBearish(<@printParam block "#CotSymbol#" />))

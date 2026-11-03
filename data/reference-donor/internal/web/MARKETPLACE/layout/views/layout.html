@@ -1,0 +1,34 @@
+<div class="sqx-app-marketplace">
+    <iframe ng-if="marketplaceIframeUrl" id="marketplace-iframe" ng-src="{{marketplaceIframeUrl}}" style="width:100%; height:100%; border:none;"></iframe>
+
+    <div class="marketplace-install-overlay" ng-if="install">
+        <div class="marketplace-install-box">
+            <div class="marketplace-install-spinner"><i class="fa fa-circle-o-notch fa-spin"></i></div>
+            <h4 class="marketplace-install-title" tsq>Installing</h4>
+            <div class="marketplace-install-name">{{install.title}}</div>
+
+            <div class="marketplace-install-bar">
+                <div class="marketplace-install-bar-fill"
+                     ng-class="{indeterminate: install.status != 'downloading'}"
+                     ng-style="install.status == 'downloading' ? {width: install.progress + '%'} : {}"></div>
+            </div>
+
+            <div class="marketplace-install-step">
+                <span ng-if="install.status == 'downloading'"><span tsq>Downloading</span>&hellip; {{install.progress}}%</span>
+                <span ng-if="install.status == 'verifying'" tsq>Verifying package&hellip;</span>
+                <span ng-if="install.status == 'installing'" tsq>Installing files&hellip;</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-include="'../MARKETPLACE/layout/views/marketplaceSharePopup.html'" />
+
+<div ng-include="'../MARKETPLACE/layout/views/marketplaceInstallResultPopup.html'" />
+
+<div ng-include="'../MARKETPLACE/layout/views/marketplaceUninstallConfirmPopup.html'" />
+
+<sq-utils />
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />

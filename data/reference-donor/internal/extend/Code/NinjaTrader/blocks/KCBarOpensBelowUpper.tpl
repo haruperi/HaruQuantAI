@@ -1,0 +1,2 @@
+<#-- Bar opens below the Keltner upper band of the previous bar (Open[shift] < Upper[shift+1]). -->
+(<@printSeriesAt block shift><@printSeries block "Open" /></@printSeriesAt> < sqRound(<@printKCValueAt block "Upper" "1" />, 6))

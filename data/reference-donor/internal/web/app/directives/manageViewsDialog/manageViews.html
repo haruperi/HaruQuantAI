@@ -1,0 +1,134 @@
+<!-- Modal manage views window-->
+<div class="modal manageViewsDialog" id="{{popupId}}" data-testid="manage-views-modal-{{type | lowercase}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-33a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Manage views</h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <form class="form-horizontal dbViewsForm" role="form">
+                    <fieldset class="sq-fieldset">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="sqn-label" tsq>Select view to edit</label>
+                                <div class="sqn-input sqn-select">
+                                    <span>{{selectedView.originalName}}</span>
+                                    <select data-testid="databank-views-select" ng-model="selectedView.originalName"
+                                        ng-options="item.name as item.name for item in views"
+                                        onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"
+                                        ng-change="onViewSelect()"></select>
+                                </div>
+
+                                <label class="sqn-label" tsq>or</label>
+                                <button id="buttonCreateNewView-33b" data-testid="databank-views-create" class="btn btn-default btn-create-new-view" ng-click="onAdd()" tsq>Create new view</button>
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+
+                <form class="form-horizontal dbViewDetailsForm" role="form">
+                    <fieldset class="sq-fieldset">
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <label class="sqn-label">
+                                    <tsq>View name</tsq>
+                                </label>
+                                <input type="text" data-testid="databank-views-name-input" class="sqn-input view-name-input" ng-model="selectedView.name"
+                                    ng-disabled="isDefaultViewSelected()" ng-change="onViewNameChange()" />
+                            </div>
+                        </div>
+                        <div class="columnsGroup">
+                            <div class="sqn-label" tsq>Columns in view</div>
+                            <label class="help-text" tsq>Use drag and drop to change columns order</label>
+
+                            <div class="view-columns-selector-wrapper">
+                                <div class="view-columns-selector">
+                                    <div dnd-list="selectedView.columns" data-testid="databank-views-columns-list">
+                                        <div class="overlay" ng-if="isDefaultViewSelected()" />
+                                        <div ng-repeat="column in selectedView.columns" dnd-draggable="column"
+                                            dnd-effect-allowed="move" dnd-selected=""
+                                            ng-dblclick="onSelectColumn(column)"
+                                            ng-class="{'active': selectedView.selectedColumn == column}"
+                                            dnd-moved="onColumnMoved($index)"
+                                            ng-if="column.entryName != 'Confidence level'"
+                                            data-testid="databank-views-column">
+                                            <div>{{column.entryName}}</div>
+                                            <div dnd-nodrag class="arrow-move" ng-click="onMoveColumnBy($index, -1)" data-testid="databank-views-column-move-up">
+                                                <i class="fa fa-arrow-up" title="Move up" aria-hidden="true"></i>
+                                            </div>
+                                            <div dnd-nodrag class="arrow-move" ng-click="onMoveColumnBy($index, 1)" data-testid="databank-views-column-move-down">
+                                                <i class="fa fa-arrow-down" title="Move down" aria-hidden="true"></i>
+                                            </div>
+                                            <div dnd-nodrag class="remove" ng-click="onRemoveColumn($index)" data-testid="databank-views-column-remove">
+                                                <i class="fa fa-times" aria-hidden="true"></i>
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <button id="buttonAddColumns-33c" data-testid="databank-views-add-columns" class="btn btn-default" ng-click="openColumnsChooser()"
+                                    ng-disabled="isDefaultViewSelected()" tsq>Add columns</button>
+                            </div>
+
+                            <div class="views-manage-buttons">
+                                <button id="buttonCloneThisView-33d" data-testid="databank-views-clone" class="btn btn-default" ng-click="onClone()" tsq>Clone this view</button>
+                                <button id="buttonDeleteThisView-33e" data-testid="databank-views-delete" class="btn btn-default" ng-click="onDelete()"
+                                    ng-disabled="isDefaultViewSelected()" tsq>Delete this view</button>
+                                <button id="buttonSaveChanges-33f" type="button" data-testid="databank-views-save" class="btn btn-primary" ng-click="onSave()"
+                                    ng-disabled="isDefaultViewSelected() || changesSaved" tsq>Save changes</button>
+                            </div>
+
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a ng-click="onClose()" data-testid="databank-views-close" tsq>Close</a>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<items-chooser-modal instance="columnsChooser" on-add="onAddColumns(selectedItems)" title="Add columns"
+    placeholder="Select columns" chooserLabel="Choose columns to add" multi-select="true" recent-items="true" />
+
+<div class="modal column-settings-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel"
+    id="{{::columnSettingsModalId}}">
+    <div class="modal-dialog modal-lg" role="document" style="width: 432px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-33g" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <tsq>Column properties</tsq>
+                </h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <fieldset class="sq-fieldset">
+                    <div class="paramsGroup">
+                        <div class="toolbar clearfix">
+                            <label tsq>
+                                <tsq>Column</tsq>
+                            </label>
+                            <span>
+                                {{selectedView.selectedColumn.entryName}}
+                            </span>
+                        </div>
+                    </div>
+                    <column-settings instance="columnSettings" on-change="onColumnSettingsChange" type="manage-views"
+                        ng-show="displayColumnSettings();"></column-settings>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+            </div>
+        </div>
+    </div>
+</div>

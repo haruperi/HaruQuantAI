@@ -1,0 +1,1 @@
+(COTScoreAccelBullish(<@printParam block "#CotSymbol#" />))

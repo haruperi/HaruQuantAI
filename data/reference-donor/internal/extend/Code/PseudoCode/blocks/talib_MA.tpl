@@ -1,0 +1,1 @@
+(MA) All Moving Average(<@printInput block true />, <@printComputedFromParam block "#ComputedFrom#" />, <@printParam block "#TimePeriod#" />, <@printParam block "#MAType#" />)[<@printShift block shift />]

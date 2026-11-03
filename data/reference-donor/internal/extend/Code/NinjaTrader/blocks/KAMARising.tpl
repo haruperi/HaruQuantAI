@@ -1,0 +1,2 @@
+<#-- KAMA is rising (value[1] < value[0]). See printKamaValueAt (Parameters.inc). -->
+(sqRound(<@printKamaValueAt block "1" />, 6) < sqRound(<@printKamaValueAt block "0" />, 6))

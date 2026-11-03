@@ -1,0 +1,1 @@
+(COTHigherLow(<@printParam block "#CotSymbol#" />, short=<@printParam block "#ShortWindow#" />, long=<@printParam block "#LongWindow#" />))

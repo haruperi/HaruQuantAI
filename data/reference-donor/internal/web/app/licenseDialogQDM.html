@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8">
+    <title tsq>QuantDataManager</title>
+    <meta name="description" content="QuantDataManager">
+    <link rel="stylesheet" href="../libs/Batch1/styles/bootstrap.min.css">
+    <link rel="stylesheet" href="../libs/Batch1/styles/sqstyle.css">
+    <link rel="stylesheet" href="../libs/Batch1/styles/open-sans.css">
+
+    <script src="../libs/Batch1/js/jquery-3.1.1.min.js"></script>
+    <script src="../libs/Batch1/js/bootstrap.min.js"></script>
+
+    <script>
+        $(document).ready(function () {
+            $("#license-verify-prog").hide();
+
+            if (!window.SQLicense) {
+                window.SQLicense = {
+                    perform: async (request, callback) => {
+                        const response = await window.electron.http('license/'+request);
+                        console.log("ICP response: ", response); 
+
+                        if(callback) {
+                            callback(response);
+                        }
+                    }
+                }
+            }
+
+            printDetails();
+        });
+
+        $(document).on("click", "a.help-link", function () {
+            window.SQLicense.perform("help");
+        });
+
+        $(document).on("click", "a.btn1", function () {
+            window.SQLicense.perform("btn1");
+        });
+
+        $(document).on("click", "a.btn2", function () {
+            window.SQLicense.perform("btn2");
+        });
+
+        $(document).on("click", "a.licproblem", function () {
+            window.SQLicense.perform("licproblem");
+        });
+
+        $(document).on("click", "a.btn3", function () {
+            window.SQLicense.perform("btn3");
+        });
+
+        $(document).on("click", "a.btn4", function () {
+            window.SQLicense.perform("btn4");
+        });
+
+        $(document).on("click", "a.btnLST", function () {
+            window.SQLicense.perform("showLicenseTerms");
+        });
+        /*
+                    //help
+                    $("a.help-link").click(function(event) {
+                        window.SQLicense.perform("help");
+                    });
+                    
+                    //btn1
+                    $("a.btn1").click(function(event) {
+                        window.SQLicense.perform("btn1");
+                    });
+                    
+                    //btn2
+                    $("a.btn2").click(function(event) {
+                         window.SQLicense.perform("btn2");           
+                    });
+                    
+                    //btn3
+                    $("a.btn3").click(function(event) {
+                        window.SQLicense.perform("btn3");               
+                    });
+                    */
+        //print license details
+        function printDetails() {
+            window.SQLicense.perform("getdetails", function (response) {
+                afterRequest(response);
+            });           
+        }
+
+        //verify license online ------------------------------------------        
+        $(document).on('submit', 'form', function (e) {
+            e.preventDefault();
+
+            if ($('#checkboxLST').not(':checked').length) {
+                window.SQLicense.perform("showAlert:Verify license:You have to agree with licensing terms.");
+
+                return;
+            }
+
+            verifyLicense();
+        });
+
+        function verifyLicense() {
+            $("#license-verify-prog").show();
+
+            setTimeout(verifyLicenseTimeout, 1000);
+        }
+
+        function verifyLicenseTimeout() {
+            $("body").removeClass("failed");
+            $("#license-panel-info").html("Verifying...");
+
+            var license = $("input#license").val();
+
+            window.SQLicense.perform('verify:' + license, function (response) {
+                afterRequest(response);
+            });            
+        }
+
+        function afterRequest(response) {
+            $("#license-verify-prog").hide();
+
+            $("#help-link").css("display", "none");
+            $("#upgrade-link").css("display", "none");
+            $("#downgrade-link").css("display", "none");
+            
+            var data = JSON.parse(response);
+
+            if (data.success) {
+                $("body").removeClass("failed");
+            } else {
+                $("#help-link").css("display", "block");
+
+                $("body").addClass("failed");
+            }
+
+            if (typeof data.appversion !== 'undefined') $("#app-version").html(data.appversion);
+            if (typeof data.hardwareid !== 'undefined') $("#hardware-id").html(data.hardwareid);
+            if (typeof data.license_info !== 'undefined') $("#license-info").html(data.license_info);
+            if (typeof data.license_panel_info !== 'undefined') $("#license-panel-info").html(data.license_panel_info);
+            if (typeof data.btn3 !== 'undefined') $("a.btn3").html(data.btn3);
+
+            if (typeof data.license !== 'undefined' && data.license != '') {
+                $("input#license").val(data.license);
+
+                verifyLicense();
+            }
+        }
+    </script>
+</head>
+
+<body class="licence-dialog">
+    <div class="licence-header product-QDM-header"></div>
+    <div id="license-panel-info"></div>
+    <div id="license-info"></div>
+    <div id="help-link-panel">
+        <a id="help-link" class="licproblem" style="display: none;" tsq>Problem with license? Click here</a>
+    </div>
+    <div class="license-panel">
+        <form role="form" id="license-form" autocomplete="off">
+            <div class="form-group">
+                <label for="license" tsq>Enter license number:</label>
+                <input type="text" class="form-control" id="license" autocomplete="off">
+                <img src="../img/sq-license-progress.gif" id="license-verify-prog" />
+
+                <div class="sq-checkbox license-terms">
+                    <input type="checkbox" id="checkboxLST" name="checkboxLST"/>
+                    <label>
+                        <tsq>I agree with</tsq><a class="btnLST" tsq>License and Service Terms</a>
+                    </label>
+                </div>    
+
+                <button id="buttonVerifyLicense-16a" type="submit" class="verify-btn" tsq>Verify license</button>
+            </div>
+        </form>
+
+        <div class="licence-buttons">
+            <div class="licence-or"></div>
+            <tsq class="licence-QDM-free">QDM now requires a license for a free version.</tsq>
+            <br>
+
+            <a class="btn4" tsq>Get your free license here</a>
+            <div tsq>or</div>
+            <a class="btn1" tsq>Purchase Pro version</a>
+            <a class="btn2" tsq>QDM Home page</a>
+            <a class="btn3" tsq>Exit</a>
+        </div>
+    </div>
+    <div class="license-flex-panel"></div>
+    <div class="license-disclaimer">
+        Bonuses Disclosure:<br/>
+        Any bonus strategies included / provided together with StrategyQuant X are for educational purpose only, they are not an investment advice and their performance in the future is not guaranteed.
+        <br/><br/>            
+        Risk Disclosure:<br/>
+        Forex, futures, equities, crypto trading contains substantial risk and is not for every investor. An investor could  potentially lose all or more than the initial investment. Risk capital is money that can be lost without  jeopardizing ones’ financial security or life style. 
+        Only risk capital should be used for trading and only those with sufficient risk capital should consider trading. Past performance is not necessarily indicative of future results.
+        <br/><br/>            
+        Hypothetical Performance Disclosure:<br/>
+        Hypothetical performance results have many inherent limitations, some of which are described below. no  representation is being made that any account will or is likely to achieve profits or losses similar to those  shown; in fact, there are frequently sharp differences between 
+        hypothetical performance results and the actual results subsequently achieved by any particular trading program. One of the limitations of hypothetical performance results is that they are generally prepared with the benefit of hindsight. 
+        In addition, hypothetical trading does not involve financial risk, and no hypothetical trading record can  completely account for the impact of financial risk of actual trading. for example, the ability to withstand  losses or to adhere to a particular trading program 
+        in spite of trading losses are material points which  can also adversely affect actual trading results. There are numerous other factors related to the markets  in general or to the implementation of any specific trading program which cannot be fully accounted for 
+        in the preparation of hypothetical performance results and all which can adversely affect trading results.<br/><br/>
+    </div>
+    <div class="license-info-panel">
+        QuantDataManager
+        <span id="app-version"></span>
+        <br> &copy; Copyright StrategyQuant 2025. All rights reserved.
+        <br> Hardware ID:
+        <span id="hardware-id"></span>
+    </div>
+
+</body>
+
+</html>

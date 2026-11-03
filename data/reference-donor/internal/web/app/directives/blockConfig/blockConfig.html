@@ -1,0 +1,108 @@
+<div class="block-params">
+    <div class="quant-tabs">
+        <div class="tabs-header">
+            <div data-item="parameter-sets-item" data-testid="block-config-tab-parameter-sets" ng-show="selectedBlock.category != categories.orderTypes && !disableParamSets"
+                ng-class="{'active': selectedTab=='sets'}" ng-click="selectedTab='sets';refreshGrids()" tsq>Parameter sets</div>
+            <div data-item="parameters-item" data-testid="block-config-tab-parameters" ng-class="{'active': selectedTab=='params'}" ng-click="selectedTab='params';refreshGrids()" tsq>Parameter values</div>
+            <div data-item="indicator-values-item" data-testid="block-config-tab-indicator-values" ng-show="selectedBlock.indicatorMin != null" ng-class="{'active': selectedTab=='indicator-values'}" ng-click="selectedTab='indicator-values';refreshGrids()" tsq>Indicator values</div>
+        </div>
+        <div class="tabs-body">
+            <div data-item="parameters-item">
+                <div class="help-panel">
+                    <label><tsq>Parameters of this building block. They can be generated randomly or have fixed value - you can configure
+                        it for every parameter by double-clicking on it in the grid below.
+                        <br/>
+                        <br/> If you wish SQ to choose from some most common values (for example for periods), define them as
+                        parameter sets in the
+                        <strong >Predefined Parameter Sets</strong> tab.</tsq>
+                    </label>
+                </div>
+
+                <div class="grid-popup-wrapper">
+                    <div id="{{::parametersGridId}}" data-testid="block-config-params-grid" style="width: 100%!important; height: 200px;" />
+                </div>
+
+                <div class="bottom-buttons">
+                    <button id="buttonApplyToAllBlocksOfTheSameIndicator-20a" data-testid="block-config-params-apply-all" class="btn btn-default" ng-show="selectedBlock.category == categories.signals" ng-click="selectedBlock.onApplyToAll(true)" tsq>Apply to all blocks of the same indicator</button>
+                    <button id="buttonResetToDefault-20b" data-testid="block-config-params-reset" class="btn btn-default" ng-click="selectedBlock.onResetToDefault(selectedBlock, true)" tsq>Reset to default</button>
+                </div>
+            </div>
+            <div data-item="parameter-sets-item" ng-show="selectedBlock.category != categories.orderTypes && !disableParamSets" class="active">
+                <div class="help-panel">
+                    <label><tsq>Parameters are either generated all randomly as defined in tab
+                        <strong>Parameters</strong>, or SQ can choose one of the predefined parameter sets specified below.<br/>
+                        This allows you to define most common indicator values (for example periods). Even in parameter
+                        sets some of the parameers can be generated randomly (denoted by *), while others will have predefined
+                        value.</tsq>
+                    </label>
+                </div>
+
+                <div class="grid-popup-wrapper">
+                    <div id="{{::parameterSetsGridId}}" data-testid="block-config-sets-grid" style="width: 100%; height: 210px;" />
+                </div>
+
+                <div class="bottom-buttons">
+                    <button id="buttonApplyToAllBlocksOfTheSameIndicator-20c" data-testid="block-config-sets-apply-all" class="btn btn-default" ng-show="selectedBlock.category == categories.signals" ng-click="selectedBlock.onApplyToAll(false)" tsq>Apply to all blocks of the same indicator</button>
+                    <button id="buttonResetToDefault-20d" data-testid="block-config-sets-reset" class="btn btn-default" ng-click="selectedBlock.onResetToDefault(selectedBlock, false)" tsq>Reset to default</button>
+                </div>
+            </div>
+            <div data-item="indicator-values-item" ng-show="selectedBlock.indicatorMin != null">
+                <div class="help-panel">
+                    <label tsq>Range of indicator output values. It will be used in conditions that compare this indicator with a numeric value</label>
+                </div>
+
+                <div class="row">
+                    <div class="col-xs-12 toolbar">
+                        <label class="sqn-label fixed-width">
+                            <tsq>Minimum</tsq>:
+                        </label>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" step="1" ng-model="selectedBlock.indicatorMin" data-testid="block-config-indicator-min"
+                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 toolbar">
+                        <label class="sqn-label fixed-width">
+                            <tsq>Maximum</tsq>:
+                        </label>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" step="1" ng-model="selectedBlock.indicatorMax" data-testid="block-config-indicator-max"
+                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-xs-12 toolbar">
+                        <label class="sqn-label fixed-width">
+                            <tsq>Step</tsq>:
+                        </label>
+                        <div class="sqn-spinner">
+                            <input type="text" class="sqn-input" step="1" ng-model="selectedBlock.indicatorStep" data-testid="block-config-indicator-step"
+                                onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" />
+                            <div class="sqn-spinner-btns">
+                                <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <br>
+                <br>
+                
+                <div class="bottom-buttons">
+                    <button id="buttonResetToDefault-20e" data-testid="block-config-indicator-reset" class="btn btn-default" ng-click="onResetMinMaxToDefault()" tsq>Reset to default</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div ng-include="'../app/directives/blockConfig/editParamPopup.html'" />
+    <div ng-include="'../app/directives/blockConfig/editParamSetPopup.html'" />
+</div>

@@ -1,0 +1,2 @@
+<#-- QQE Value1 rising: current value greater than 1 bar ago. Parity with QQEValue1Rising.java. -->
+<@compress_single_line>(sqRound(<@printQQEValue1At block "1" />, 6) < sqRound(<@printQQEValue1At block "0" />, 6))</@compress_single_line>

@@ -1,0 +1,18 @@
+<div class="modal" id="snippetsErrorModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog type-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-58a" type="button" class="close" data-dismiss="modal" aria-label="Close" data-testid="shell-modal-snippets-error-close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Snippets Compilation Failed!</h4>
+            </div>
+            <div class="modal-body">
+                <tsq>Previous correct version of snippets is used. Failed snippets:</tsq><br>
+                <textarea rows="12" readonly style="width: 100%; font-size:11px" ng-bind="SnippetsCompilationFailed" data-testid="shell-modal-snippets-error-log"></textarea>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" data-testid="shell-modal-snippets-error-dismiss" tsq>Close</a>
+                <button id="buttonGoToCodeEditor-58b" type="button" class="btn btn-primary" ng-click="switchToCodeEditor()" data-testid="shell-modal-snippets-error-goto-editor" tsq>Go to Code Editor</button>
+            </div>
+        </div>
+    </div>
+</div>

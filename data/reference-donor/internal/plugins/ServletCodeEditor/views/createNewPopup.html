@@ -1,0 +1,172 @@
+<div class="modal" id="createNewModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Create new</h4>
+            </div>
+            <div class="modal-body">
+                <form name="createNewForm" class="form-horizontal" role="form" ng-class="{'submitted': errors}" style="text-align: left;">
+
+                    <form-errors errors="errors"></form-errors>
+
+                    <label class="sqn-label">
+                        <tsq>Name</tsq>
+                    </label>
+                    <input type="text" class="sqn-input new-snippet-name" ng-model="createNewItem.name" name="Name"
+                        ng-required="true" data-testid="editor-createnew-name" />
+                    <div class="clearfix"></div>
+                    <br />
+
+                    <label class="sqn-label" tsq>Snippet type</label>
+
+                    <div class="clearfix"></div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" ng-model="createNewItem.type" name="type" value="BlocksIndicators"
+                                ng-checked="createNewItem.type=='BlocksIndicators'" data-testid="editor-createnew-type-indicator" />
+                            <span class="sq-mark"></span>
+                            <tsq>Indicator</tsq><br>
+                        </label>
+                        <p tsq>Create new custom indicator</p>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" ng-model="createNewItem.type" name="type" value="BlocksSignal"
+                                ng-checked="createNewItem.type=='BlocksSignal'" data-testid="editor-createnew-type-signal" />
+                            <span class="sq-mark"></span>
+                            <tsq>Signal</tsq><br>
+                        </label>
+                        <p tsq>Create signal based on existing indicator</p>
+                        <div class="sqn-input sqn-select" ng-class="{'disabled': createNewItem.type!='BlocksSignal'}">
+                            <span ng-bind="createNewItem.indicator"></span>
+                            <select ng-model="createNewItem.indicator" ng-options="item for item in indicators" onFocus="sqnSelectFocus(this)"
+                                onBlur="sqnSelectBlur(this)" ng-disabled="createNewItem.type!='BlocksSignal'" data-testid="editor-createnew-signal-indicator"></select>
+                        </div>
+                    </div>
+
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="BlocksOrder"
+                                ng-checked="createNewItem.type=='BlocksOrder'" data-testid="editor-createnew-type-order-action" />
+                            <span class="sq-mark"></span>
+                            <tsq>Order action</tsq><br>
+                        </label>
+                        <p tsq>New trading action</p>
+                        <div class="sqn-input sqn-select" ng-class="{'disabled':createNewItem.type!='BlocksOrder'}">
+                            <span ng-bind="getOrderActionLabel()"></span>
+                            <select ng-model="createNewItem.orderActionType" ng-options="item.value as item.name for item in orderActionTypes"
+                                onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" ng-disabled="createNewItem.type!='BlocksOrder'" data-testid="editor-createnew-order-action-type"></select>
+                        </div>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="BlocksOtherActions"
+                                ng-checked="createNewItem.type=='BlocksOtherActions'" data-testid="editor-createnew-type-other-action" />
+                            <span class="sq-mark"></span>
+                            <tsq>Other action</tsq><br>
+                        </label>
+                        <p tsq>New custom action</p>
+                    </div>
+
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="ColumnsDatabanks"
+                                ng-checked="createNewItem.type=='ColumnsDatabanks'" data-testid="editor-createnew-type-databank-column" />
+                            <span class="sq-mark"></span>
+                            <tsq>Databank column</tsq><br>
+                        </label>
+                        <p tsq>New column (stats value) that can be used in databank</p>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="ColumnsTrades"
+                                ng-checked="createNewItem.type=='ColumnsTrades'" data-testid="editor-createnew-type-trade-column" />
+                            <span class="sq-mark"></span>
+                            <tsq>List of trades column</tsq><br>
+                        </label>
+                        <p tsq>New column (order value) that can be used in trade list</p>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="MoneyManagement"
+                                ng-checked="createNewItem.type=='MoneyManagement'" data-testid="editor-createnew-type-money-management" />
+                            <span class="sq-mark"></span>
+                            <tsq>Money management</tsq><br>
+                        </label>
+                        <p tsq>New money management</p>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="TradeAnalysis"
+                                ng-checked="createNewItem.type=='TradeAnalysis'" data-testid="editor-createnew-type-trade-analysis" />
+                            <span class="sq-mark"></span>
+                            <tsq>Trade analysis chart</tsq><br>
+                        </label>
+                        <p tsq>New trade analysis chart</p>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="MonteCarlo"
+                                ng-checked="createNewItem.type=='MonteCarlo'" data-testid="editor-createnew-type-monte-carlo" />
+                            <span class="sq-mark"></span>
+                            <tsq>Monte Carlo method</tsq><br>
+                        </label>
+                        <p tsq>New Monte Carlo method</p>
+                        <div class="sqn-input sqn-select">
+                            <span ng-bind="getMCTypeLabel()"></span>
+                            <select ng-model="createNewItem.mcType" ng-options="item.value as item.name for item in mcTypes"
+                                onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" ng-disabled="createNewItem.type!='MonteCarlo'" data-testid="editor-createnew-mc-type"></select>
+                        </div>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="WhatIf"
+                                ng-checked="createNewItem.type=='WhatIf'" data-testid="editor-createnew-type-what-if" />
+                            <span class="sq-mark"></span>
+                            <tsq>What if method</tsq><br>
+                        </label>
+                        <p tsq>New what if method</p>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="CustomAnalysis"
+                                ng-checked="createNewItem.type=='CustomAnalysis'" data-testid="editor-createnew-type-custom-analysis" />
+                            <span class="sq-mark"></span>
+                            <tsq>Custom analysis</tsq><br>
+                        </label>
+                        <p tsq>New custom analysis method</p>
+                    </div>
+
+                    <div class="radio">
+                        <label class="sq-wradio">
+                            <input type="radio" name="type" ng-model="createNewItem.type" value="AITools"
+                                ng-checked="createNewItem.type=='AITools'" data-testid="editor-createnew-type-ai-tool" />
+                            <span class="sq-mark"></span>
+                            <tsq>AI tool</tsq><br>
+                        </label>
+                        <p tsq>New tool that the AI assistant can call</p>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Cancel</a>
+                <button type="button" class="btn btn-primary" ng-click="createNew(createNewForm)" tsq data-testid="editor-createnew-ok">OK</button>
+            </div>
+        </div>
+    </div>
+</div>

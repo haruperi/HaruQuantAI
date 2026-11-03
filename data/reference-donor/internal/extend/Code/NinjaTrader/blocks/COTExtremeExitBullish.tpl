@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTExtExitBull(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#ExitThreshold#" />, <@printParam block "#ExtremeThreshold#" />)

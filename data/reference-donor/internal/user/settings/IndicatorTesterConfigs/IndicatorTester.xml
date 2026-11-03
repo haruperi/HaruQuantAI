@@ -1,0 +1,6 @@
+<IndicatorTester>
+  <Tests>
+  </Tests>
+  <Engine>MetaTrader4</Engine>
+  <BarsToReserve>300</BarsToReserve>
+</IndicatorTester>

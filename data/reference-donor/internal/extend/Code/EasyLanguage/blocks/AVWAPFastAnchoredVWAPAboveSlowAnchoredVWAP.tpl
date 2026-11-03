@@ -1,0 +1,1 @@
+SQ_AnchoredVWAP(<@printParam block "#FastSessionType#" />, <@printParam block "#FastStdDevMult#" />, 0)<@printShift block "0" /> > SQ_AnchoredVWAP(<@printParam block "#SlowSessionType#" />, <@printParam block "#SlowStdDevMult#" />, 0)<@printShift block "0" />

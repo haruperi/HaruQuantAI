@@ -1,0 +1,24 @@
+<!-- Modal window-->
+<div class="modal centered" id="awExamplesDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" tsq>AlgoWizard Examples</h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <div class="aw-examples-wrapper aw-examplesEditor">
+                    <div class="aw-examples-item" ng-repeat="singleExample in awExamples">
+                        <h3>{{singleExample.name}}</h3>
+                        <div style="font-size: 10px; margin-bottom: 1rem;">{{singleExample.type}} STRATEGY EXAMPLE</div>
+                        <p ng-bind-html="singleExample.description" class="single-example-desc"></p>
+                        <div class="single-example-img"><img ng-src="/AlgoWizard/examples/{{singleExample.img}}"></div>
+                        <div class="single-example-button"><button id="buttonOpen-13ah" type="button" class="btn btn-primary" data-dismiss="modal" ng-click="loadExampleFile(singleExample.strategyFile)" tsq>Open</button></div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+            </div>
+        </div>
+    </div>
+</div>

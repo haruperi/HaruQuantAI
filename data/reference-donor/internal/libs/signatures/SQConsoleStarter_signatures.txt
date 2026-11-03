@@ -1,0 +1,155 @@
+class com.strategyquant.strategyquant.MainWindow$1 extends java.lang.Thread {
+  final com.strategyquant.strategyquant.MainWindow this$0;
+  com.strategyquant.strategyquant.MainWindow$1(com.strategyquant.strategyquant.MainWindow);
+  public void run();
+}
+public class com.strategyquant.strategyquant.MainWindow implements com.strategyquant.lib.app.IMainWindow {
+  public static final org.slf4j.Logger Log;
+  private com.strategyquant.webguilib.BrowserGUI frame;
+  private com.strategyquant.webguilib.WebServer webServer;
+  public com.strategyquant.strategyquant.MainWindow();
+  public void initialize();
+  public void initWebServer();
+  private void waitUntilFrameReady();
+  public void setTitle();
+  public void destroy();
+  public com.strategyquant.webguilib.WebServer getWebServer();
+  static com.strategyquant.webguilib.BrowserGUI access$000(com.strategyquant.strategyquant.MainWindow);
+  static {};
+}
+class com.strategyquant.strategyquant.SQApp$1 implements java.lang.Runnable {
+  final com.strategyquant.strategyquant.SQApp this$0;
+  com.strategyquant.strategyquant.SQApp$1(com.strategyquant.strategyquant.SQApp);
+  public void run();
+}
+class com.strategyquant.strategyquant.SQApp$2 implements java.lang.Runnable {
+  final com.strategyquant.strategyquant.SQApp this$0;
+  com.strategyquant.strategyquant.SQApp$2(com.strategyquant.strategyquant.SQApp);
+  public void run();
+}
+class com.strategyquant.strategyquant.SQApp$3 implements java.lang.Runnable {
+  final com.strategyquant.strategyquant.SQApp this$0;
+  com.strategyquant.strategyquant.SQApp$3(com.strategyquant.strategyquant.SQApp);
+  public void run();
+}
+class com.strategyquant.strategyquant.SQApp$4 implements java.lang.Runnable {
+  final com.strategyquant.strategyquant.SQApp this$0;
+  com.strategyquant.strategyquant.SQApp$4(com.strategyquant.strategyquant.SQApp);
+  public void run();
+}
+class com.strategyquant.strategyquant.SQApp$5 extends java.util.TimerTask {
+  final com.strategyquant.strategyquant.SQApp this$0;
+  com.strategyquant.strategyquant.SQApp$5(com.strategyquant.strategyquant.SQApp);
+  public void run();
+}
+public class com.strategyquant.strategyquant.SQApp extends com.strategyquant.lib.app.impl.MainAppStandardImpl {
+  public static final org.slf4j.Logger Log;
+  private com.strategyquant.webguilib.WebServer webServer;
+  private com.strategyquant.tradinglib.project.console.SQConsole consoleAppInstance;
+  private static java.lang.String p;
+  private static java.lang.String lpc;
+  private static java.lang.String ps;
+  public static void main(java.lang.String[]);
+  public static void main(java.lang.String[], boolean);
+  private static void hideConsoleForUIApp();
+  private static void activateDebugLoggingLevel();
+  private static void redirectLogMessagesToFile(java.util.logging.Logger, java.lang.String) throws java.io.IOException;
+  private static java.lang.String lpc();
+  public com.strategyquant.strategyquant.SQApp(com.strategyquant.strategyquant.MainWindow);
+  protected boolean initApp() throws java.lang.Exception;
+  private void createUserFolders();
+  private void checkMaxLoadingTime();
+  private void deleteDeprecatedFiles();
+  private void copyUpdaterFiles();
+  private void renameSQ4DatabankFiles();
+  public void renameFiles(java.lang.String);
+  protected void afterInit() throws java.lang.Exception;
+  private void setTimeZone();
+  private void initBlocks() throws java.lang.Exception;
+  private void regenerateWizardConfig(boolean);
+  private void initStatsComputer(boolean) throws java.lang.Exception;
+  private void updateLoadingInfo(java.lang.String);
+  private void iUKTXv8M();
+  private void initEngines() throws java.lang.Exception;
+  private void addAlias(java.lang.String, java.lang.String) throws com.strategyquant.datalib.data.DataException;
+  private void importInstruments();
+  private void initBackgroundTasks() throws java.lang.Exception;
+  protected void initPluginSystem();
+  protected void initPrograms();
+  private void checkData();
+  private void importSymbols() throws java.lang.Exception;
+  private void testImportData(java.lang.String, java.lang.String, java.lang.String, int, java.lang.String);
+  private void importData(java.lang.String, java.lang.String, com.strategyquant.datalib.data.io.newDataFormat.DataBinWriterNew, com.strategyquant.datalib.DataInfo, java.lang.String) throws java.lang.Exception;
+  public static java.util.ArrayList<com.strategyquant.datalib.data.io.columns.DefaultCol> getTickColumnList();
+  public static java.util.ArrayList<com.strategyquant.datalib.data.io.columns.DefaultCol> getOHLCColumnList();
+  public static java.util.ArrayList<com.strategyquant.datalib.data.io.columns.DefaultCol> getOHLCV2ColumnList();
+  public void beforeExit();
+  public void exitApp(boolean);
+  public boolean isRunInConsole();
+  private static void saveWindowSettings();
+  public void regenerateLangs() throws java.lang.Exception;
+  public java.lang.String getFrameTitle();
+  public boolean initWebServer();
+  public void reloadApp();
+  private static void lambda$iUKTXv8M$2();
+  private static void lambda$renameSQ4DatabankFiles$1(java.lang.String);
+  private static boolean lambda$renameSQ4DatabankFiles$0(java.nio.file.Path, java.nio.file.attribute.BasicFileAttributes);
+  static {};
+}
+public class com.strategyquant.strategyquant.SQConsoleStarter {
+  public com.strategyquant.strategyquant.SQConsoleStarter();
+  public static void main(java.lang.String[]) throws java.lang.Exception;
+  public static void disableWarning();
+}
+public class com.strategyquant.strategyquant.SQInitializer {
+  public com.strategyquant.strategyquant.SQInitializer();
+}
+class com.strategyquant.strategyquant.SQInstaller$1 implements java.lang.Runnable {
+  final com.strategyquant.strategyquant.SQInstaller this$0;
+  com.strategyquant.strategyquant.SQInstaller$1(com.strategyquant.strategyquant.SQInstaller);
+  public void run();
+}
+public class com.strategyquant.strategyquant.SQInstaller {
+  private static final org.slf4j.Logger Log;
+  private static final java.lang.String ConfigUrl = "https://1859438673.rsc.cdn77.org/ninstall/sqxinstaller/updates.xml";
+  private static final java.lang.String VersionPath;
+  public com.strategyquant.strategyquant.SQInstaller();
+  public void checkForUpdatesAsync();
+  public void checkForUpdates();
+  private int getCurrentVersion();
+  static {};
+}
+public class com.strategyquant.strategyquant.SQStarter {
+  public com.strategyquant.strategyquant.SQStarter();
+  public static void main(java.lang.String[]) throws java.lang.Exception;
+}
+class com.strategyquant.strategyquant.SQWebServer$1 extends java.lang.Thread {
+  final com.strategyquant.strategyquant.SQWebServer this$0;
+  com.strategyquant.strategyquant.SQWebServer$1(com.strategyquant.strategyquant.SQWebServer);
+  public void run();
+}
+public class com.strategyquant.strategyquant.SQWebServer implements com.strategyquant.webguilib.WebServer {
+  private static final org.slf4j.Logger Log;
+  private static int portFrom;
+  private static int portTo;
+  private static java.lang.String pluginsPath;
+  private static java.lang.String webPath;
+  private com.strategyquant.webguilib.WebAppManager webAppManager;
+  public com.strategyquant.strategyquant.SQWebServer();
+  public void start() throws java.lang.Exception;
+  private void jettyFailover();
+  private static void checkVariables();
+  public void showErrorDialog(java.lang.String, java.lang.String);
+  public void setPortRange(int, int);
+  public void setPluginsFolderPath(java.lang.String);
+  public java.lang.String getPluginsPath();
+  public java.lang.String getWebPath();
+  public int getPortFrom();
+  public int getPortTo();
+  public int getUsedPort();
+  public void regenerateFiles() throws java.lang.Exception;
+  public com.strategyquant.webguilib.WebAppManager getWebAppManager();
+  public java.lang.String getBaseURL();
+  static org.slf4j.Logger access$000();
+  static {};
+}

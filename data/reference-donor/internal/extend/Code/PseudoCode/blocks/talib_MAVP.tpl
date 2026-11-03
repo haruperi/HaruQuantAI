@@ -1,0 +1,1 @@
+(MAVP) Moving Average with Variable Period(<@printInput block true />, <@printComputedFromParam block "#ComputedFrom#" />, <@printParam block "#MinPeriod#" />, <@printParam block "#MaxPeriod#" />, <@printParam block "#MAType#" />)[<@printShift block shift />]

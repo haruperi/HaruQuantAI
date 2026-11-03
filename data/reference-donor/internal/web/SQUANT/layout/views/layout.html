@@ -1,0 +1,81 @@
+<div class="sq4-wrapper" ng-class="{'sq4-layout-tiny':(menuSize==1),'sq4-layout-large':(menuSize==2),'br-edition': isBrazilianEdition}">
+    <div class="sq4-mainmenu">
+        <div class="sq4-menu-logo">
+            <div class="sq4-menu-size-switch" ng-click="onMenuResize()" id="global-menu-size-switch" data-testid="shell-menu-size-toggle"></div>
+        </div>
+        <ul>
+            <span ng-repeat="section in itemSections | orderBy: '+position'">
+                <li ng-repeat="navigationItem in section.navigationItems | orderBy: '+position'">
+                    <a id="{{::navigationItem.linkId}}" data-testid="nav-{{navigationItem.linkId}}" ng-click="switchToApp(navigationItem)"
+                        class="{{::navigationItem.iconClass}}" ng-if="!navigationItem.hidden"
+                        ng-class="{'disabled': navigationItem.onlyInPro && !$root.license.isProVersion, 'br-broker': isBrazilianEdition}"
+                        title="{{navigationItem.onlyInPro && !$root.license.isProVersion ? onlyInProTitle : ''}}"
+                        data-toggle="tooltip" data-container="body" data-placement="right">
+                        <span>{{navigationItem.title | tsq}}</span>
+                        <span id="{{::navigationItem.appCode}}-menuprogress" class="sq-menuprogress"
+                            style="display: none">
+                            <span id="{{::navigationItem.appCode}}-menuprogress-span" style="width: 0%;"></span>
+                        </span>
+                    </a>
+                </li>
+                <li ng-if="$index != itemSections.length - 1" class="sq4-menu-separator">
+            </span>
+        </ul>
+    </div>
+    <div class="sq4-maincontent">
+        <div ng-include="'../app/layout/views/header.html'"></div>
+
+        <span ng-repeat="app in apps">
+            <iframe id="{{::app.iframeId}}" name="sq4_mainframe" class="sq4-mainframe" ng-if="!app.hidden"
+                style="display: none;" allowfullscreen="allowfullscreen" mozallowfullscreen="mozallowfullscreen"
+                msallowfullscreen="msallowfullscreen" oallowfullscreen="oallowfullscreen"
+                webkitallowfullscreen="webkitallowfullscreen" allow="autoplay" />
+        </span>
+
+        <iframe ng-if="!results2" id="iframe_results_overlayed" data-testid="results-overlay-frame" src="../RESULTS/index.html" />
+        <iframe ng-if="results2" id="iframe_results_overlayed" data-testid="results-overlay-frame" src="../RESULTS2/index.html" />
+    </div>
+    <div class="sq4-mainfooter">
+        <span class="custom-footer-text">{{footerCustomText}}</span>
+
+        <tsq>Build</tsq>: {{appVersion}}
+
+        <a ng-click="openLinkDocumentation()" data-testid="shell-footer-docs">
+            <i class="fa fa-book" aria-hidden="true"></i><tsq>Documentation</tsq></a>
+        |
+        <a ng-click="openLinkSupport()" data-testid="shell-footer-support">
+            <i class="fa fa-life-ring" aria-hidden="true"></i><tsq>Support</tsq></a>
+        |
+        <a ng-click="openLinkBugs()" data-testid="shell-footer-bug">
+            <i class="fa fa-bug" aria-hidden="true"></i><tsq>Report Bug / Suggest Feature</tsq></a>
+        |
+        <a ng-click="onAbout()" id="footer-about" data-testid="shell-footer-about">
+            <i class="fa fa-info-circle" aria-hidden="true"></i><tsq>About</tsq></a>
+    </div>
+
+    <div ng-include="'../../../plugins/HomeAbout/views/about.html'" ng-controller="AboutCtrl" />
+    <div ng-include="'../app/layout/views/snippetsErrorDialog.html'"></div>
+    <div ng-include="'../app/layout/views/customProjectNotifPopup.html'"></div>
+    <div ng-include="'../app/layout/views/initSettings.html'"></div>
+    <div ng-include="'../app/layout/views/dataTrialPopup.html'"></div>
+    <div ng-include="'../app/layout/views/volumeProfileAddonPopup.html'"></div>
+</div>
+
+<sq-utils />
+
+<div class="modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" id="home-iframe-modal">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" style="height: 99%;">
+            <div class="modal-header">
+                <button id="buttonTimes-71a" type="button" class="close" data-dismiss="modal" aria-label="Close" data-testid="shell-modal-tutorial-close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                </h4>
+            </div>
+            <div class="modal-body" style="height: 0;">
+                <iframe src="" />
+            </div>
+        </div>
+    </div>
+</div>

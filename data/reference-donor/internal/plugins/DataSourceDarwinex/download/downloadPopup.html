@@ -1,0 +1,95 @@
+<div class="modal" id="darwinexDownloadModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <tsq>Download Darwinex data for</tsq> {{selectedFor}}
+                </h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <form class="form-horizontal" role="form">
+
+                    <fieldset class="sq-fieldset">
+                        <legend tsq>Choose data range to download</legend>
+
+                        <date-range instance="dateRange" sqclass="darwinex-download" on-date-change="onDateRangeChange" />
+
+                    </fieldset>
+
+                    <fieldset class="sq-fieldset">
+                        <legend tsq>Redownload options</legend>
+
+                        <div class="row radios">
+                            <div class="col-xs-6">
+                                <div class="radio">
+                                    <label class="sq-wradio">
+                                        <input type="radio" name="DarwinexDownloadRadios" ng-model="newImport.overwrite"
+                                            value="false" id="darwinex-download-addonly" />
+                                        <span class="sq-mark"></span>
+                                        <tsq>Add only missing data</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="radio">
+                                    <label class="sq-wradio">
+                                        <input type="radio" name="DarwinexDownloadRadios" ng-model="newImport.overwrite"
+                                            value="true" id="darwinex-download-overwrite" />
+                                        <span class="sq-mark"></span>
+                                        <tsq>Overwrite existing data</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                    <fieldset class="sq-fieldset">
+                        <legend id="darwinex-download-server-label" tsq>Download server</legend>
+
+                        <div class="row cdn-part">
+                            <div class="col-xs-12">
+                                <div class="toolbar cdn-server-selector">
+                                    <div class="btn-group cdn-server-options" role="group" aria-labelledby="darwinex-download-server-label" aria-describedby="darwinex-download-server-help">
+                                        <label class="btn btn-default" ng-class="{active: newImport.downloadType=='cdn'}">
+                                            <input class="sr-only" type="radio" name="DarwinexDownloadServer" value="cdn" ng-model="newImport.downloadType" data-testid="dm-darwinex-download-server-cdn" />
+                                            <i class="fa fa-globe" aria-hidden="true"></i>
+                                            <tsq>StrategyQuant CDN</tsq>
+                                            <small class="cdn-server-recommended" tsq>Recommended</small>
+                                        </label>
+                                        <label class="btn btn-default" ng-class="{active: newImport.downloadType=='cdn-cn'}">
+                                            <input class="sr-only" type="radio" name="DarwinexDownloadServer" value="cdn-cn" ng-model="newImport.downloadType" data-testid="dm-darwinex-download-server-hong-kong" />
+                                            <i class="fa fa-server" aria-hidden="true"></i>
+                                            <tsq>Hong Kong server</tsq>
+                                        </label>
+                                    </div>
+                                </div>
+                                <p id="darwinex-download-server-help" class="cdn-server-help">
+                                    <tsq>Global CDN with prepared data packages - best for most users. Choose Hong Kong if you are in Asia or China.</tsq>
+                                </p>
+                            </div>
+                            <div class="clearfix"></div>
+                        </div>
+                    </fieldset>
+
+                    <div ng-show="displayUpgradeLink" id="darwinex-download-upgrade">
+                        <span class="cdn-upgrade-icon" aria-hidden="true"><i class="fa fa-tachometer"></i></span>
+                        <div class="cdn-upgrade-copy">
+                            <strong class="cdn-upgrade-title" tsq>You're on the Free plan – your downloads run at 300 KB/s, still faster than the original direct download from Darwinex</strong>
+                            <p tsq>This download will take you about 10 min. With QDM Pro you'd be done in about 1 min (up to 10× faster). Applies to both servers.</p>
+                        </div>
+                        <button data-testid="dm-darwinex-download-upgrade-license-btn" type="button" class="btn btn-warning cdn-upgrade-button" ng-click="onUpgradeLicense()">
+                            <svg class="cdn-upgrade-crown" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M1 3l4 4 3-5 3 5 4-4-2 10H3z" /></svg>
+                            <tsq>Upgrade to QDM Pro</tsq>
+                        </button>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+                <button data-testid="dm-darwinex-download-download-btn" type="button" class="btn btn-primary" ng-click="onDownload()" tsq>Start download</button>
+            </div>
+        </div>
+    </div>
+</div>

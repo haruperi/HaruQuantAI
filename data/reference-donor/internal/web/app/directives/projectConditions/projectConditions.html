@@ -1,0 +1,14 @@
+<span>
+    <div class="goto-conditions-wrapper">
+        <div ng-repeat="condition in conditions">
+            <div class="goto-condition" ng-click="onConditionClick(condition, $index)">
+                <label class="left-side" ng-bind="getConditionDescription(condition)"></label>
+                <span class="delete-btn" ng-click="onRemoveCondition($index);$event.stopPropagation()">&times;</span>
+            </div>
+        </div>
+    </div>
+    <button id="buttonAddNewCondition-36a" class="btn btn-primary goto-conditions-button" ng-click="onAddCondition()">Add new condition</button>
+    <span class="goto-conditions-info" tsq>If no conditions exist then it is evaluated as true</span>
+    
+    <div ng-include="'../app/directives/projectConditions/addConditionModal.html'"/>
+</span>

@@ -1,0 +1,3 @@
+<#-- Woodies CCI trend down: CCI negative on the last 6 bars (Shift+0..5). SqCCI operands rounded half-up to 6 decimals (sqRound; Java reads the series via getRounded). Parity with
+     WoodiesTrendDown.java. -->
+<@compress_single_line>(<@printWoodiesCCI block "1" /> < 0 && <@printWoodiesCCI block "2" /> < 0 && <@printWoodiesCCI block "3" /> < 0 && <@printWoodiesCCI block "4" /> < 0 && <@printWoodiesCCI block "5" /> < 0 && <@printWoodiesCCI block "0" /> < 0)</@compress_single_line>

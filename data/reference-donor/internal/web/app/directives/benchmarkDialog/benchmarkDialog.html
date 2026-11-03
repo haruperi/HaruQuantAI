@@ -1,0 +1,73 @@
+<div class="modal centered" id="benchmarkDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document" style="width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" tsq>Benchmark StrategyQuant speed</h4>
+            </div>
+            <div class="modal-body" style="min-height: 390px;">
+                <div>
+                    <div ng-show="afterStart" tsq>To estimate strategy testing time we have to run some initial benchmarks of StrategyQuant speed on this computer.</div>
+                    <br> <tsq>This benchmark will use your actual performance settings, which is:</tsq>
+                    <br>
+                    <span ng-bind="performance"></span>
+
+                </div>
+
+                <div ng-show="status=='beforeStart' || status=='running'">
+                    <br> <tsq>Please be patient, benchmark shouldn't take more than a couple of minutes.</tsq>
+                    <br>
+                    <br>
+                </div>
+
+                <button id="buttonStartBenchmark-19a" ng-show="status=='beforeStart'" type="button" class="btn btn-primary" ng-click="start()" tsq>Start benchmark</button>
+
+                <div ng-show="status=='running'" class="progress">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100"
+                        style="width:{{progress}}%">{{progress}} %</div>
+                </div>
+
+                <div ng-show="status=='showResults'">
+                    <br>
+                    <div class="benchmark-title" tsq>Benchmark results</div>
+
+                    <table class="engine-project-stats">
+                        <tr>
+                            <td><tsq>Total duration (data preparation / test)</tsq>
+                                <span ng-bind="results.duration"></span>
+                            </td>
+                            <td><tsq>Strategy avg. time (parallel)</tsq>
+                                <span ng-bind="results.strategyAverageTime"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><tsq>Time per tick</tsq>
+                                <span ng-bind="results.timePerTick"></span>
+                            </td>
+                            <td><tsq>Total ticks</tsq>
+                                <span ng-bind="results.totalTicks"></span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td><tsq>Strategies per hour</tsq>
+                            </td>
+                            <td>
+                                <span ng-bind="results.avgStrategiesPerHour"></span>
+                            </td>
+                        </tr>
+                    </table>
+
+                    <br>
+                    <br> <tsq>You can repeat this benchmark by choosing Benchmark... action in the global menu on the top right corner.</tsq>
+                    <br> <tsq>Please note that benchmark runs using standardized artifical strategy and data, so its result can be
+                    compared with other installations of SQ on another computers.</tsq>
+                    <br> <tsq>It is only an estimation, real backtest time depends a lot on the complexity of the strategy, timeframe
+                    and data range and precision.</tsq>
+                    <br>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a ng-hide="hideClose" data-dismiss="modal" tsq>Close</a>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTSeasonBear(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#SeasonalLookback#" />, <@printParam block "#SeasonalThreshold#" />)

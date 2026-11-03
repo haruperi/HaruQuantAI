@@ -1,0 +1,106 @@
+<fieldset class="sq-fieldset swapFieldset">
+    <legend tsq>Swap
+        <button id="buttonHelp-swapSettings" type="button" class="btn btn-default sqn-btn-help" onClick='showPopup("#swapAndCommissionHelp")'>
+            <span tsq="">Help</span>
+        </button>
+    </legend>
+
+    <table class="swap-table">
+        <tr>
+            <td colspan="2">
+                <div style="display: inline">
+                    <div class="sq-checkbox" ng-click="config.useSwap = !config.useSwap">
+                        <input type="checkbox" ng-model="config.useSwap">
+                        <label tsq>Use</label>
+                    </div>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="sqn-label" tsq>Swap type</label></td>
+            <td>
+                <div class="sqn-input sqn-select" ng-class="{'disabled': !config.useSwap}">
+                    <span ng-bind="config.swapType"></span>
+                    <select ng-model="config.swapType" ng-options="item as item for item in swapTypes" onFocus="sqnSelectFocus(this)"
+                        onBlur="sqnSelectBlur(this)" ng-disabled="!config.useSwap"></select>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="sqn-label" tsq>Long</label></td>
+            <td>
+                <div class="sqn-spinner">
+                    <input type="text" class="sqn-input" step="0.1" ng-model="config.swapLong" onFocus="sqnSpinnerFocus(this)" 
+                        onBlur="sqnSpinnerBlur(this)" ng-disabled="!config.useSwap" ng-model-options="{ updateOn: 'blur' }" />
+                    <div class="sqn-spinner-btns">
+                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                    </div>
+                </div>
+                <tsq ng-show="config.swapType === swapTypes.percent">% per year</tsq>
+                <tsq ng-show="config.swapType === swapTypes.money">$ per day</tsq>
+                <tsq ng-show="config.swapType === swapTypes.points">points per day</tsq>
+            </td>
+        </tr>
+        <tr>
+            <td><label class="sqn-label" tsq>Short</label></td>
+            <td>
+                <div class="sqn-spinner">
+                    <input type="text" class="sqn-input" step="0.1" ng-model="config.swapShort" onFocus="sqnSpinnerFocus(this)"
+                        onBlur="sqnSpinnerBlur(this)" ng-disabled="!config.useSwap" ng-model-options="{ updateOn: 'blur' }" />
+                    <div class="sqn-spinner-btns">
+                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                    </div>
+                </div>
+                <tsq ng-show="config.swapType === swapTypes.percent">% per year</tsq>
+                <tsq ng-show="config.swapType === swapTypes.money">$ per day</tsq>
+                <tsq ng-show="config.swapType === swapTypes.points">points per day</tsq>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="sqn-label" tsq>Triple swap on</label>
+            </td>
+            <td>
+                <div class="sqn-input sqn-select" ng-class="{'disabled': !config.useSwap}">
+                    <span ng-bind="config.tripleSwapOn"></span>
+                    <select ng-model="config.tripleSwapOn" ng-options="item as item for item in tripleSwapOptions" onFocus="sqnSelectFocus(this)"
+                        onBlur="sqnSelectBlur(this)" ng-disabled="!config.useSwap"></select>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <label class="sqn-label" tsq>Rollout hour</label>
+            </td>
+            <td>
+                <div class="sqn-spinner">
+                    <time-spinner min="0" max="86340" step="1800" sq-model="config.rolloutHour" not-convert="true" sq-disabled="!config.useSwap"></time-spinner>
+                </div>
+            </td>
+        </tr>
+    </table>
+    <div class="modal" id="swapAndCommissionHelp" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document" style="width: 800px;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel" tsq>Commission & Swap Explanation</h4>
+                </div>
+                <div class="modal-body" style="height: auto;">
+                    In MetaTrader 4 and 5, a swap is the interest rate charged or paid for holding a trading position overnight. If the interest rate on the currency you are buying is higher than the interest rate on the currency you are selling, you will earn a positive swap. If the interest rate on the currency you are buying is lower than the interest rate on the currency you are selling, you will incur a negative swap. The swap rate varies depending on the currency pair and broker. It can affect your trading profitability, so it's important to be aware of the swap rates for the currency pairs you trade.
+                    <br/><br />
+                    Positive swap: If you are long on the AUD/JPY currency pair and the interest rate on the Australian dollar is higher than the interest rate on the Japanese yen, you will earn a positive swap. This means that you will receive a small amount of money in your trading account for holding the position overnight.
+                    <br/><br />
+                    Negative swap: If you are short on the EUR/USD currency pair and the interest rate on the euro is lower than the interest rate on the US dollar, you will incur a negative swap. This means that you will have to pay a small amount of money from your trading account for holding the position overnight.
+                    <br/><br />
+                    The swap is calculated on a daily basis at 11pm (Rollover time). If you have any trades that were opened after 11pm, they will not incur any swap charges until the next day's 11pm calculation.
+                </div>
+                <div class="modal-footer">
+                    <a data-dismiss="modal">Close</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</fieldset>

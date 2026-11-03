@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SQ_COT_RegShiftBull(${cotSymbolInput(cs)}, <@printShiftAsParam block shift />, <@printParam block "#Level#" />, <@printParam block "#ShiftWeeks#" />, "")

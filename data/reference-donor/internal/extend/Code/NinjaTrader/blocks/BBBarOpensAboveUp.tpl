@@ -1,0 +1,2 @@
+<#-- Bar opens above the Bollinger upper band of the previous bar (Open[shift] > Upper[shift+1]). -->
+(<@printSeriesAt block shift><@printSeries block "Open" /></@printSeriesAt> > sqRound(<@printBollingerValueAt block "Upper" "1" />, 6))

@@ -1,0 +1,116 @@
+<div>
+    <div class="paramsGroup" ng-if="onlyISOOS">
+        <div class="toolbar clearfix">
+            <label tsq>Sample type</label>
+            <div class="btn-group pull-right">
+                <button id="buttonInSample-25a" ng-click="onSampleTypeSelect(sampleTypes.in);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.sampleType == sampleTypes.in}" tsq>In
+                    sample</button>
+                <button id="buttonOutOfSample-25b" ng-click="onSampleTypeSelect(sampleTypes.out);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.sampleType == sampleTypes.out}" tsq>Out of
+                    sample</button>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="paramsGroup" ng-if="!onlyISOOS">
+        <div class="toolbar clearfix" ng-hide="type=='wf-chart' || isFitness()">
+            <label tsq>From backtest</label>
+            <div class="sqn-input sqn-select from-backtest-column-setting pull-right">
+                <span ng-bind="getResultTypeLabel()"></span>
+                <select ng-model="config.resultType" ng-options="item.value as (item.name | tsq) for item in resultTypesList"
+                    onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" ng-change="onSettingsChange()">
+                </select>
+            </div>
+        </div>
+
+        <div class="toolbar clearfix"
+            ng-show="(config.resultType=='MonteCarloManipulation' || config.resultType=='MonteCarloRetest') && !isFitness()">
+            <label tsq>At confidence level</label>
+            <div class="sqn-spinner pull-right">
+                <input type="text" class="sqn-input" min="1" max="100" step="1" ng-model="config.confidenceLevel"
+                    onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)" ng-change="onSettingsChange()" />
+                <div class="sqn-spinner-btns">
+                    <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                    <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar clearfix" ng-show="config.resultType=='RetestOnAdditionalMarkets'">
+            <label tsq>Market</label>
+            <div class="sqn-input sqn-select pull-right">
+                <span ng-bind="getMarketLabel()"></span>
+                <select ng-model="config.market" ng-options="item.value as item.name for item in markets"
+                    onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)" ng-change="onSettingsChange()">
+                </select>
+            </div>
+        </div>
+
+        <div class="clearfix wf-columns-settings" ng-show="(config.resultType=='WalkForwardMatrix' || config.resultType=='WalkForwardOptimization') && config.subresult != columnTypes.wfSpecial.value && !hideForWF();">
+            <div class="sqn-label" tsq>WF result type:</div>
+
+            <div class="radio">
+                <label class="sq-wradio" ng-click="onWFResultTypeSelect(columnTypes.wf.value)">
+                    <input type="radio" ng-value="columnTypes.wf.value" ng-model="config.subresult">
+                    <span class="sq-mark"></span>
+                    <tsq>Final WF result</tsq>
+                </label>
+            </div>
+
+            <div class="radio">
+                <label class="sq-wradio" ng-click="onWFResultTypeSelect(columnTypes.wfStability.value)">
+                    <input type="radio" ng-value="columnTypes.wfStability.value" ng-model="config.subresult">
+                    <span class="sq-mark"></span>
+                    <tsq>WF Stability (%) - performance in run vs in optimization part</tsq>
+                </label>
+            </div>
+
+            <div class="radio">
+                <label class="sq-wradio" ng-click="onWFResultTypeSelect(columnTypes.wfScore.value)">
+                    <input type="radio" ng-value="columnTypes.wfScore.value" ng-model="config.subresult">
+                    <span class="sq-mark"></span>
+                    <tsq>WF Score (%) - how much the optimization improved against original strategy</tsq>
+                </label>
+            </div>
+        </div>        
+
+        <div class="toolbar clearfix" ng-hide="isCrossCheck() && !displayWFValueOptions()">
+            <sample-type selected="config.sampleType" on-change="onSampleTypeSelect" extended="extSampleType" every="conditionsEvery"></sample-type>
+        </div>
+        <div class="toolbar clearfix"
+            ng-hide="(isCrossCheck() && !displayWFValueOptions()) || isFitness() || isMiniEquityChart()">
+            <label tsq>Direction</label>
+            <div class="btn-group pull-right">
+                <button id="buttonBoth-25c" ng-click="onDirectionSelect(directions.both);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.direction == directions.both}" tsq>Both</button>
+                <button id="buttonLong-25d" ng-click="onDirectionSelect(directions.long);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.direction == directions.long}" tsq>Long</button>
+                <button id="buttonShort-25e" ng-click="onDirectionSelect(directions.short);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.direction == directions.short}" tsq>Short</button>
+            </div>
+        </div>
+        <div class="toolbar clearfix"
+            ng-hide="(isCrossCheck() && !displayWFValueOptions()) || isFitness() || isMiniEquityChart()">
+            <label tsq>Result in</label>
+            <div class="btn-group pull-right">
+                <button id="buttonMoney-25f" ng-click="onPlTypeSelect(plTypes.money);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.plType == plTypes.money}" tsq>Money</button>
+                <button id="buttonPercent-25g" ng-click="onPlTypeSelect(plTypes.percent);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.plType == plTypes.percent}" tsq>Percent</button>
+                <button id="buttonPips-25h" ng-click="onPlTypeSelect(plTypes.pips);$event.stopPropagation();" type="button"
+                    class="btn btn-default" ng-class="{active: config.plType == plTypes.pips}" tsq>Pips</button>
+            </div>
+        </div>
+
+        <div class="toolbar clearfix checkboxrow" ng-show="showCCMainResultOption() && type=='manage-views'">
+            <label ng-click="config.showMainResult = !config.showMainResult; onSettingsChange()" tsq>Show
+                main result if Cross check result doesn't exist</label>
+            <div class="sq-checkbox pull-right">
+                <input type="checkbox" ng-model="config.showMainResult" />
+                <label ng-click="config.showMainResult = !config.showMainResult; onSettingsChange()"></label>
+            </div>
+        </div>
+    </div>
+</div>

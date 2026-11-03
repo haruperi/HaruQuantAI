@@ -1,0 +1,2 @@
+<#-- Aroon Up crosses above Aroon Down (prev bar Up below Down, current Up above Down). -->
+((sqRound(<@printAroonValueAt block "Up" "1" />, 6) < sqRound(<@printAroonValueAt block "Down" "1" />, 6)) && (sqRound(<@printAroonValueAt block "Up" "0" />, 6) > sqRound(<@printAroonValueAt block "Down" "0" />, 6)))

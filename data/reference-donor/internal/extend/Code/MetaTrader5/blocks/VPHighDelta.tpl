@@ -1,0 +1,1 @@
+(sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 21, <@printShift block "0" />) - sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 22, <@printShift block "0" />) > <@printParam block "#MinDelta#" "100" />)

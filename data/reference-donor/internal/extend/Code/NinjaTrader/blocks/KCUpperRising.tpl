@@ -1,0 +1,2 @@
+<#-- Keltner upper band is rising (Upper[1] < Upper[0]). See printKCValueAt (Parameters.inc). -->
+(sqRound(<@printKCValueAt block "Upper" "1" />, 6) < sqRound(<@printKCValueAt block "Upper" "0" />, 6))

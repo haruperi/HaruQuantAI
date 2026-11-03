@@ -1,0 +1,2 @@
+<#-- Close inside the VA and below POC - #MinimumDeviation#. The installed SqVPSignal indicator computes the Java _evaluateSignal. -->
+<#global sqUsesIndicatorPackage = true>((<@printSeriesAt block "0">SqVPSignal(<@printInput block />, 6, 1, <@printParam block "#SessionType#" />, <@printParam block "#ProfileRows#" />, <@printParam block "#ValueAreaPct#" />, <@printParam block "#MinimumDeviation#" />, 0, 0, SqPip).Values[0]</@printSeriesAt> > 0.5))

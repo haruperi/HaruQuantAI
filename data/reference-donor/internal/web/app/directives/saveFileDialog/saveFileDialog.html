@@ -1,0 +1,49 @@
+<span>
+    <!-- Modal window-->
+    <div class="modal" data-testid="save-file-dialog" id="{{::popupId}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="buttonTimes-40a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel" ng-bind="title"></h4>
+                </div>
+                <div class="modal-body">
+                    <form class="form-horizontal saveFileDialog" role="form" ng-class="{'submitted': errors}">
+
+                        <form-errors errors="errors"></form-errors>
+
+                        <fieldset class="sq-fieldset">
+                            <legend tsq>Target file path</legend>
+                            <div class="clearfix"></div>
+                            <div class="input-line">
+                                <label class="sqn-label input-elem">
+                                    <tsq>Directory</tsq>
+                                </label>
+                                <input type="text" class="sqn-input" data-testid="save-file-dir-input" ng-model="selectedFolder" />
+                                &nbsp;
+                                <a ng-click="openLastDir();" tsq>Browse</a>
+                            </div>
+                            <div class="input-line">
+                                <label class="sqn-label input-elem">
+                                    <tsq>File name</tsq>
+                                </label>
+                                <input type="text" class="sqn-input" data-testid="save-file-name-input" ng-model="newFile.name" ng-init="newFile.name=''" />
+                                &nbsp;
+                                <label>.{{fileExtension}}</label>
+                            </div>
+                        </fieldset>
+
+                        <ng-transclude></ng-transclude>
+
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <a data-testid="save-file-close-btn" data-dismiss="modal" tsq>Close</a>
+                    <button id="buttonSave-40b" data-testid="save-file-save-btn" type="button" class="btn btn-primary" ng-click="onSaveFile(form)" tsq>Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</span>

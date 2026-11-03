@@ -1,0 +1,26 @@
+<!-- Modal window-->
+<div class="modal" id="confirmDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-testid="confirm-dialog">
+    <div class="modal-dialog type-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header" ng-class="{'modal-header-red':confirmDialog.deleteConfirm}">
+                <button id="buttonTimes-44a" type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="confirmDialog.onClose()" data-testid="confirm-dialog-close-btn">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" ng-bind="confirmDialog.title | tsq" data-testid="confirm-dialog-title"></h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-12" style="text-align: center; font-size: 16px;">
+                            <span ng-bind-html="confirmDialog.message | tsq | html" data-testid="confirm-dialog-message"></span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="buttonCancel-44b" type="button" class="btn btn-default" data-dismiss="modal" ng-click="confirmDialog.callback(false)" ng-bind="confirmDialog.yesNo ? 'No' : 'Cancel'" data-testid="confirm-dialog-no-btn"></button>
+                <button id="buttonConfirm-44c" type="button" class="btn btn-primary" data-dismiss="modal" ng-click="confirmDialog.callback(true)" ng-bind="confirmDialog.yesNo ? 'Yes' : (confirmDialog.okButtonTitle ? confirmDialog.okButtonTitle : 'OK')" data-testid="confirm-dialog-ok-btn"></button>
+            </div>
+        </div>
+    </div>
+</div>

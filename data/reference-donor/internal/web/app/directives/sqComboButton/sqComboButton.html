@@ -1,0 +1,14 @@
+<div class="dropdown">
+	<div class="menu-button dropdown-toggle" type="button" data-toggle="dropdown" ng-class="{'disabled':ngDisabled}">
+		{{::title}}
+		<div class="caret"></div>
+	</div>
+	<ul class="dropdown-menu">
+		<li ng-repeat="action in actions track by $index">
+			<a ng-if="action.items" ng-repeat="item in action.items track by $index" ng-click="onSelect({action: action, item: item})" ng-class="::action.controller" id="{{item.id}}" data-testid="{{item.id}}">{{item.title | tsq}}</a>
+
+			<a  ng-if="!action.items" ng-click="onSelect({action: action})" ng-class="::action.controller" id="{{action.id}}" data-testid="{{action.id}}">{{action.title | tsq}}</a>
+			<div ng-dynamic-controller="action.controller" ng-include="action.templateUrl" />
+		</li>
+	</ul>
+</div>

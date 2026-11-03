@@ -1,0 +1,2 @@
+<#-- Schaff Trend Cycle below Level. Parity with SchaffTrendCycleBelowLevel.java (Value < Level). -->
+<@compress_single_line>(sqRound(<@printSTCValueAt block "0" />, 6) < <@printParam block "#Level#" />)</@compress_single_line>

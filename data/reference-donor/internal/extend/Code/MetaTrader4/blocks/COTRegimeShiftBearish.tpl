@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_RegimeShiftBearish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#Level#" />, <@printParam block "#ShiftWeeks#" />)

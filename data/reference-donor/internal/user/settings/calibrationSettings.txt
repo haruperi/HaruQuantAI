@@ -1,0 +1,21 @@
+#
+# Indicator calibration settings file
+#
+# Use numbers delimited by comma for indicator parameter values
+# Naming convention is identical to Java snippets -> {class}.{parameter/output}
+# In case of missing values, the default parameter value from indicator's snippet will be used
+# Optionally you can disable output buffers by setting it to disabled
+# Syntax is as follows: {class}.{parameter/output}={comma_separated_values/disabled}
+#
+# Example:
+# QQE.RSIPeriod=10,20,40
+# QQE.sF=5,8,16,32
+# QQE.Value1=disabled
+#
+# Final note: Calibration results are rounded by default. 
+# If you want to disable rounding to get the more precise numbers, uncomment the following line:
+#rounding=disabled
+#
+QQE.RSIPeriod=10,20,50,100,200
+QQE.sF=5,10,20,40
+QQE.Value1=disabled

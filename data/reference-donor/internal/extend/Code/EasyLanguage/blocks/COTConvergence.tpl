@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>(AbsValue(SQ_COT_GetValue(${cotIdentifier(cs, "52W")}, 0, <@printShiftAsParam block shift />, "") - SQ_COT_GetValue(${cotIdentifier(cs, "52W")}, 2, <@printShiftAsParam block shift />, "")) < <@printParam block "#ConvergenceThreshold#" />)

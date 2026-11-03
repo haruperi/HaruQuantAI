@@ -190,8 +190,6 @@ log_*.txt
 # ============================================================================
 # Data Files & Storage
 # ============================================================================
-data/reference/
-data/reference-donor/
 data/market/*
 data/resources/*
 /results/

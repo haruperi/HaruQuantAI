@@ -1,0 +1,1 @@
+(COTSeasonalBullish(<@printParam block "#CotSymbol#" />))

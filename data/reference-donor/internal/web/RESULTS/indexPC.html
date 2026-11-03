@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <base href="/RESULTS">
+    <title>Results</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta http-equiv="Cache-control" content="no-cache">
+
+    <link rel="stylesheet" href="../common/Batch1/styles.css">
+    <link rel="stylesheet" href="../common/Batch2/styles.css">
+    <link rel="stylesheet" href="../common/Batch3/styles.css">
+	<link rel="stylesheet" href="SQEDITOR/layout/layout.css">		
+
+    <link rel="stylesheet" href="RESULTS/main.css?v=2">
+    <link rel="stylesheet" href="RESULTS/responsive.css">
+
+    <script src="../common/Batch1/libs.js"></script>
+    <script src="../common/Batch2/libs.js"></script>
+    <script src="../common/Batch3/libs.js"></script>
+
+    <script src="RESULTS/layout/app.js"></script>
+
+    <script src="RESULTS/layout/layoutModule.js"></script>
+    <script src="RESULTS/layout/LayoutCtrl.js"></script>
+    <script src="RESULTS/layout/LayoutService.js"></script>
+	<script src="libs/vs/loader.js"></script>	
+</head>
+
+<body ng-app="app" style="font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif; zoom: {{$root.zoom.css}};" class="body-results {{$root.zoom.class}} {{$root.brEdition}}">
+    <preload-templates></preload-templates>
+    
+    <script>
+        window.appConfig = {
+            appCode: 'RESULTSPC',
+            product: 'RESULTSPC', //results for Portfolio Composer
+            defaultState: 'app',
+            defaultURL: '/app',
+            gridSkin: 'dhx_web',
+            gridImagePath: '../img/dhtmlx/web/'
+        };
+    </script>
+
+    <!-- AW Cloud communication interface -->
+
+    <script>
+        //Stores last results parameters until UI is initialized
+        //After initialization, this method is overwritten by Results LayoutCtrl
+        window.showResults = function (params) {    
+            console.log("awcloud: showResults called with params: ", params);
+            window.waitingResults = { name: "showResults", params: params };
+        }
+
+        //Dumps results tabs initialization states
+        //Overwritten by SQResultsData
+        //You can use $('#resultsFrame')[0].contentWindow.dumpResultsTabsStates();
+        window.dumpResultsTabsStates = function() {
+            console.error("Not available yet");
+        }
+
+        //Sets editor XML output to Source code tab
+        //After initialization, this method is overwritten by SQResultsData
+        window.setStrategyXML = function (strategyXML, settingsXML) {
+            window.waitingSourceCode = { strategyXML: strategyXML, settingsXML : settingsXML };
+        }
+
+        window.performanceSettingsCallbacks = [];
+        window.getPerformanceSettings = function(callbackFn){
+            window.performanceSettingsCallbacks.push(callbackFn);
+        }
+    </script>
+
+
+    <div ui-view style="height:100%" />
+
+</body>
+
+</html>

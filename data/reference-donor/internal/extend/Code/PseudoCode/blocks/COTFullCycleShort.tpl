@@ -1,0 +1,1 @@
+(COTFullCycleShort(<@printParam block "#CotSymbol#" />, entry=<@printParam block "#EntryLevel#" />, <@printParam block "#Period#" />))

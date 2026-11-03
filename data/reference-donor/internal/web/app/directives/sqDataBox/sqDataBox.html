@@ -1,0 +1,41 @@
+<div class="sq-data-box">
+    <div class="sq-data-box-overlay" ng-show="dropdownOpened" ng-click="dropdownClose()"></div>
+    <div ng-style="{'background-color': disabled ? '#eeeef4' : null }" class="sqn-input sqn-select" ng-click="dropdownOpen()">
+        <span ng-if="filterText=='' && !dropdownOpened" ng-bind="sqModel"></span>
+        <span ng-if="filterText!=''" ng-bind="filterText"></span>
+        <span ng-if="filterText=='' && dropdownOpened" class="pulsing-text" tsq>search by typing...</span>
+    </div>
+    <div class="sq-data-box-dropdown" ng-show="dropdownOpened" ng-click="dropdownClicked($event)">
+        <div class="sq-data-box-left">
+            <div class="data-selector"></div>
+            <!--
+			<select class="sq-data-box-select" ng-if="filterTypeValue == -1 && filterText==''" ng-model="innerModel"
+				ng-change="selectChange(innerModel)" ng-click="selectClicked()" ng-keyup="onSelectKeyUp($event)"
+				ng-mouseover="hoveredSelect($event)" multiple>
+				<optgroup label="{{dataTypesList[filterOption]}}" ng-repeat="filterOption in filterTypeOptions">
+					<option value="{{data.symbol}}" ng-repeat="data in availableData track by $index"
+						ng-if="shouldShowItem(data) && data.dataType==filterOption">
+						{{data.symbol}}</option>
+				</optgroup>
+			</select>
+			<select class="sq-data-box-select" ng-if="!(filterTypeValue == -1 && filterText=='')" ng-model="innerModel"
+				ng-change="selectChange(innerModel)" ng-click="selectClicked()" ng-keyup="onSelectKeyUp($event)"
+				ng-mouseover="hoveredSelect($event)" multiple>
+				<option value="{{data.symbol}}" ng-repeat="data in availableData track by $index"
+					ng-if="shouldShowItem(data)">
+					{{data.symbol}}</option>
+			</select>-->
+        </div>
+        <div class="sq-data-box-right">
+            <div class="selectTypeButtons toolbar">
+                <label tsq>Type:</label>
+                <div class="btn-group">
+                    <button id="buttonAll-42a" class="btn btn-default" ng-class="{'active':filterTypeValue == -1}" ng-click="selectFilterType(-1)" tsq>All</button>
+                    <button id="buttonSelectFilter-42b" class="btn btn-default" ng-class="{'active':filterTypeValue == filterOption}" ng-repeat="filterOption in filterTypeOptions" ng-click="selectFilterType(filterOption)">{{dataTypesList[filterOption]}}</button>
+                </div>
+            </div>
+            <div class="recent-cloud-title" tsq><label>Recently used</label></div>
+            <div class="recent-cloud"></div>
+        </div>
+    </div>
+</div>

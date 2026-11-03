@@ -1,0 +1,1 @@
+(Close<@printShift block "1" /><@printInput block /> > SQ_AnchoredVWAP(<@printParam block "#SessionType#" />, <@printParam block "#StdDevMult#" />, 2)<@printShift block "1" />) and (Close<@printShift block "0" /><@printInput block /> < SQ_AnchoredVWAP(<@printParam block "#SessionType#" />, <@printParam block "#StdDevMult#" />, 2)<@printShift block "0" />)

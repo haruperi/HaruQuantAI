@@ -1,0 +1,1 @@
+(COTSmallFadeBullish(<@printParam block "#CotSymbol#" />, sm<<@printParam block "#SmallThreshold#" />))

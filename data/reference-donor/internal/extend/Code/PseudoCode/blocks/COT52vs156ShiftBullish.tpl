@@ -1,0 +1,1 @@
+(COT52v156ShiftBullish(<@printParam block "#CotSymbol#" />, shift><@printParam block "#ShiftThreshold#" />))

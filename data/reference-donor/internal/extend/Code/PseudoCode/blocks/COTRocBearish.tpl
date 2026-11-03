@@ -1,0 +1,1 @@
+(COTRocBearish(<@printParam block "#CotSymbol#" />, roc<-<@printParam block "#ROCThreshold#" />))

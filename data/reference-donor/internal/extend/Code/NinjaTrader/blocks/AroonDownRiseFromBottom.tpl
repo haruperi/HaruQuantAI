@@ -1,0 +1,2 @@
+<#-- Aroon Down rises from bottom (was <= 8, now > 8) while Aroon Up stays elevated (> 30). -->
+(sqRound(<@printAroonValueAt block "Down" "1" />, 6) <= 8 && sqRound(<@printAroonValueAt block "Down" "0" />, 6) > 8 && sqRound(<@printAroonValueAt block "Up" "0" />, 6) > 30)

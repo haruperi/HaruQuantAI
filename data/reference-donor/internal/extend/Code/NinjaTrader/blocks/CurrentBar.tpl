@@ -1,0 +1,2 @@
+<#-- Current bar number -> NinjaScript built-in CurrentBar. Parity with CurrentBar.java (Chart.getCurrentBar()). -->
+<@compress_single_line><#if getParam(block, "#Chart#", "0") == "0">CurrentBar<#else>CurrentBars[${getParam(block, "#Chart#", "0")}]</#if></@compress_single_line>

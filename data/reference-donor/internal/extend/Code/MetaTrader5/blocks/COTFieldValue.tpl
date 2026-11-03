@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign><#assign fi><@printParam block "#FieldIndex#" /></#assign>SqCOT_Value(COT_${cs}_${p?upper_case}_${fi}, ${fi}, <@printShift block "0" />)

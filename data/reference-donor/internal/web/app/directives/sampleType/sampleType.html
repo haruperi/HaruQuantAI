@@ -1,0 +1,47 @@
+<div
+ class="sample-type-selector-wrapper">
+    <label tsq>Sample</label>
+
+    <div ng-show="!extended || displaySimpleButtons" class="btn-group">
+        <button id="buttonFull-39a" ng-attr-data-testid="{{tkey ? tkey+'-sample-full' : 'sample-type-full'}}" ng-click="onSampleSelect(sampleTypes.full)" type="button" class="btn btn-default"
+            ng-class="{active: selected == sampleTypes.full}" tsq>Full</button>
+        <button id="buttonIS-39b" ng-attr-data-testid="{{tkey ? tkey+'-sample-is' : 'sample-type-is'}}" ng-click="onSampleSelect(sampleTypes.in)" type="button" class="btn btn-default"
+            ng-class="{active: selected == sampleTypes.in}" tsq>IS</button>
+        <button id="buttonOOS-39c" ng-attr-data-testid="{{tkey ? tkey+'-sample-oos' : 'sample-type-oos'}}" ng-click="onSampleSelect(sampleTypes.out)" type="button" class="btn btn-default"
+            ng-class="{active: selected == sampleTypes.out}" tsq>OOS</button>
+    </div>
+
+    <div ng-show="extended && !displaySimpleButtons" class="btn-group sample-type-selector">
+        <button id="buttonfull-39d" ng-attr-data-testid="{{tkey ? tkey+'-sample-ext-full' : 'sample-type-ext-full'}}" ng-click="onSampleSelect(sampleTypes.full)" type="button" class="btn btn-default"
+            ng-class="{active: selectedType=='full'}" tsq>Full</button>
+        <div class="btn-group">
+            <button id="buttonSelectSampleIn-39e" ng-attr-data-testid="{{tkey ? tkey+'-sample-ext-in' : 'sample-type-ext-in'}}" type="button" class="btn btn-default" ng-class="{active: selectedType=='in'}"
+                ng-click="onSampleSelectIn(inPreselected)"><span ng-bind="getSampleTypeLabel(inPreselected)"
+                    class="sample-type-btn-name"></span></button>
+            <button id="buttonToggleDropdown-39f" ng-attr-data-testid="{{tkey ? tkey+'-sample-ext-in-toggle' : 'sample-type-ext-in-toggle'}}" type="button" class="btn btn-default dropdown-toggle" ng-class="{active: selectedType=='in'}"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" ng-click="closeDropdown($event)">
+                <li ng-repeat="item in sampleTypeListIn"><a ng-attr-data-testid="{{tkey ? tkey+'-sample-ext-in-item-'+item.value : 'sample-type-ext-in-item-'+item.value}}" ng-click="onSampleSelectIn(item.value)"
+                        ng-bind="item.name | tsq"></a></li>
+            </ul>
+        </div>
+        <div class="btn-group">
+            <button id="buttonSelectSampleOut-39g" ng-attr-data-testid="{{tkey ? tkey+'-sample-ext-out' : 'sample-type-ext-out'}}" type="button" class="btn btn-default" ng-class="{active: selectedType=='out'}"
+                ng-click="onSampleSelectOut(outPreselected)"><span ng-bind="getSampleTypeLabel(outPreselected)"
+                    class="sample-type-btn-name"></span></button>
+            <button id="buttonToggleDropdown-39h" ng-attr-data-testid="{{tkey ? tkey+'-sample-ext-out-toggle' : 'sample-type-ext-out-toggle'}}" type="button" class="btn btn-default dropdown-toggle" ng-class="{active: selectedType=='out'}"
+                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <span class="caret"></span>
+                <span class="sr-only">Toggle Dropdown</span>
+            </button>
+            <ul class="dropdown-menu" ng-click="closeDropdown($event)">
+                <li ng-repeat="item in sampleTypeListOut"><a ng-attr-data-testid="{{tkey ? tkey+'-sample-ext-out-item-'+item.value : 'sample-type-ext-out-item-'+item.value}}" ng-click="onSampleSelectOut(item.value)"
+                        ng-bind="item.name | tsq"></a></li>
+            </ul>
+        </div>
+    </div>
+
+</div>

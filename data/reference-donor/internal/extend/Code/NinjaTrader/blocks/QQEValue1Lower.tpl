@@ -1,0 +1,2 @@
+<#-- QQE Value1 lower than Level: Value1[Shift] < Level. Parity with QQEValue1Lower.java. -->
+<@compress_single_line>(sqRound(<@printQQEValue1At block "0" />, 6) < <@printParam block "#Level#" />)</@compress_single_line>

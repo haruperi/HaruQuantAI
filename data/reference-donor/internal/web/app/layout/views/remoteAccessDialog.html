@@ -1,0 +1,61 @@
+<!-- Modal window-->
+<div class="modal centered" id="remoteAccessDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" tsq>Remote access</h4>
+            </div>
+            <div class="modal-body">
+                <fieldset class="sq-fieldset">
+                    <div class="header">
+                        <h3>
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="remoteAccess.allow" id="remoteAccess-allow">
+                                <label for="remoteAccess-allow" tsq>Allow remote access</label>
+                            </div>
+                        </h3>
+                    </div>
+                    <div ng-show="!remoteAccess.allow" class="remote-access-description remote-access-box">
+                        <tsq>By checking this you'll allow access to your StrategyQuant remotely from browser on a
+                            given URL address and port.</tsq>
+                        <br />
+                        <tsq>Of course, StrategyQuant must be running in order to access it.</tsq>
+                    </div>
+                    <div ng-show="remoteAccess.allow" class="remote-access-box remote-access-box-allowed">
+                        <div class="remote-access-url-desc" tsq>URL to access the system</div>
+                        <div class="remote-access-url">
+                            <a ng-click="openBrowser(linkURL)" ng-bind="linkURL"></a>
+                        </div>
+                        <div class="oneline" ng-if="$root.chromiumBrowser">
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="remoteAccess.requirePassword" id="remoteAccess.requirePassword">
+                                <label for="remoteAccess.requirePassword">
+                                    <tsq>Require password</tsq>
+                                </label>
+                            </div>
+                            <label class="sqn-label">
+                                <tsq>Password</tsq>
+                                <input type="password" class="sqn-input" ng-model="remoteAccess.password" ng-disabled="!remoteAccess.requirePassword"/>
+                            </label>
+                        </div>
+                        <div class="oneline secure-connection" ng-if="false && $root.chromiumBrowser">
+                            <div class="sq-checkbox">
+                                <input type="checkbox" ng-model="remoteAccess.secureConnection" id="remoteAccess.secureConnection">
+                                <label for="remoteAccess.secureConnection">
+                                    <tsq>Secure connection</tsq>
+                                </label>
+                            </div>
+                            <label class="sqn-label" tsq>Certificate not installed</label>
+                            <button id="buttonInstall-55a" class="btn btn-default" ng-click="install" ng-disabled="!remoteAccess.secureConnection"
+                                tsq>Install</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+                <button id="buttonSave-55b" type="button" class="btn btn-primary" ng-click="onSaveRemoteAccessSettings()" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

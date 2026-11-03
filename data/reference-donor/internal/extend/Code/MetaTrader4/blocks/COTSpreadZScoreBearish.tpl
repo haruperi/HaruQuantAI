@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_SpreadZScoreBearish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#Period#" />, <@printParam block "#ZThreshold#" />)

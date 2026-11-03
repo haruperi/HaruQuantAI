@@ -1,0 +1,2 @@
+<#-- MACD main line crosses below the signal line. -->
+(<@printMACDValueAt block "MAIN" "1" /> > <@printMACDValueAt block "SIGNAL" "1" /> && <@printMACDValueAt block "MAIN" "0" /> < <@printMACDValueAt block "SIGNAL" "0" />)

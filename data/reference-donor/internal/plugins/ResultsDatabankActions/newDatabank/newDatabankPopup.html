@@ -1,0 +1,25 @@
+<!-- Modal window-->
+<div class="modal modal-onefield" id="newDatabankModal" data-testid="new-databank-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>New databank</h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <label class="sqn-label" id="newDBNameInput">
+                        <tsq>Databank name</tsq>
+                        <input type="text" class="sqn-input" ng-model="newDatabank.name" data-testid="new-databank-name-input" />
+                    </label>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" data-testid="new-databank-close-btn" tsq>Close</a>
+                <button type="button" class="btn btn-primary" ng-click="createDatabank()" data-testid="new-databank-create-btn" tsq>Create</button>
+            </div>
+        </div>
+    </div>
+</div>

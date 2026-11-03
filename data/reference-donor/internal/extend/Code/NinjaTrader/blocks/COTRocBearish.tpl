@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTRocBear(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#RocPeriod#" />, <@printParam block "#ROCThreshold#" />)

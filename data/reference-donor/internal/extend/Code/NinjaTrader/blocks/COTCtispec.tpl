@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign period><@printParam block "#Period#" /></#assign>SqCOT(${cotIdentifier(cs, period?upper_case)}, 0, "").Values[3]<@printShift block shift />

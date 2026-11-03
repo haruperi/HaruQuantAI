@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign><#assign fi><@printParam block "#FieldIndex#" /></#assign><#assign lb><@printParam block "#Lookback#" /></#assign>SqCOT_Momentum(COT_${cs}_${p?upper_case}_${fi}, ${fi}, ${lb}, <@printShift block "0" />)

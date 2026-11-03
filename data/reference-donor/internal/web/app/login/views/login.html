@@ -1,0 +1,39 @@
+<div id="loginScreen">
+    <div id="loginForm" class="container" ng-init="logout()" ng-if="!accessDisabled && settingsLoaded">
+        <div class="well no-padding">
+            <form class="smart-form client-form">
+                <header tsq>
+                    Enter the remote access password
+                </header>
+                <div style="margin: 8px 8px;">
+                    <section>
+                        <label class="label" style="color: gray" tsq>Password</label>
+                        <label class="input"> 
+                            <i class="fa fa-lock"></i>
+                            <input type="password" ng-model="credentials.password">
+                            <b class="tooltip tooltip-top-right">
+                                <i class="fa fa-lock txt-color-teal"></i> 
+                                <tsq>Enter your password</tsq>
+                            </b> 
+                        </label>
+                    </section>
+                </div>
+                <footer>
+                    <button id="buttonSubmit-60a" class="btn btn-primary" ng-click="login()" style="margin-bottom: 10px;" tsq>Submit</button>
+                </footer>
+            </form>
+        </div>
+    </div>
+
+    <div id="access-disabled-screen" ng-if="accessDisabled && settingsLoaded" >
+        <div>
+            <i class="fa fa-lock" id="bigLock"></i>
+            <h1 tsq>Unauthorized access. Remote access is disabled.</h1>
+        </div>
+    </div>
+
+    <div ng-include="'../app/layout/views/errorDialog.html'"/>
+
+    <span us-spinner="{radius:30, width:8, length: 16}" spinner-key="spinner-login"></span>
+
+</div>

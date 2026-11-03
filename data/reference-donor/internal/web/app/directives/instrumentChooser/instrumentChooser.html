@@ -1,0 +1,37 @@
+<span class="instrument-chooser">
+    <fieldset class="sq-fieldset" ng-show="!infoOnly">
+        <legend ng-if="!infoOnly" tsq>Choose instrument</legend>
+        <div class="sq-legend-help" ng-if="helpText && !infoOnly">
+            <tsq>Instrument is a specification of this symbol - it contains tick size, point value etc.</tsq>
+            <br> <tsq>You can have mutiple data imported - for example EURUSD_1, EURUSD_2, EURUSD_3, but they share the same instrument
+            specification for EURUSD.</tsq>
+        </div>
+        <div class="row instrument-select">
+            <div class="col-xs-12">
+                <label class="sqn-label" tsq>Instrument *</label>
+                <div class="sqn-input sqn-select smallSelect" ng-class="{'disabled':ngDisabled}">
+                    <span ng-bind="getBrokerProfileLabel()"></span>
+                    <select ng-model="broker" ng-options="item.id as (item.name | tsq) for item in brokers" onFocus="sqnSelectFocus(this)"
+                        onBlur="sqnSelectBlur(this)" ng-change="onBrokerChange(item)" ng-disabled="ngDisabled">
+                        <option value="" tsq>All broker profiles</option>
+                    </select>
+                </div>
+                <div class="sqn-input sqn-select" ng-class="{'disabled':ngDisabled}">
+                    <span ng-bind="selected.instrument"></span>
+                    <select ng-model="selected.instrument" ng-options="item.instrument as item.instrument for item in instruments" onFocus="sqnSelectFocus(this)"
+                        onBlur="sqnSelectBlur(this)" ng-change="onInstrumentChange(item)" ng-disabled="ngDisabled">
+                    </select>
+                </div>
+                <a ng-hide="ngDisabled" ng-click="onAddInstrument()">
+                    <i class="fa fa-plus-circle data-plus-icon"></i><tsq>Add new instrument</tsq></a>
+            </div>
+        </div>
+    </fieldset>
+    <div class="row">
+        <div class="col-xs-12">
+            <instrument-details instrument="selectedInstrument" current-action="selectedInstrument.currentAction" disabled="true" class="instrument-details-symbol" commission-settings="commissionSettings"/>
+        </div>
+    </div>
+
+    <div ng-include="'../app/directives/instrumentChooser/addInstrumentPopup.html'" />
+</span>

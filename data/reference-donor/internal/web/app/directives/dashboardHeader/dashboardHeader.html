@@ -1,0 +1,19 @@
+<div class="sqn-dashboard-header">
+
+    <div ng-if="!taskmanager || taskmanager === 'false'" class="sqn-project-name sqn-project-name-clickable" data-testid="tab-name"
+        ng-class="{ 'sqn-project-name-running' : (activePanel != 'dashboard' && $root.project.state == projectStates.running) }"
+        ng-bind="::engineTitle" ng-click="switchToPanel('dashboard')"
+        ng-attr-title="{{activePanel != 'dashboard' && $root.project.state == projectStates.running ? projectInProgressTitle: ''}}">
+    </div>
+    <div ng-if="taskmanager === 'true'" class="sqn-project-name">
+        <a ng-href="" ng-click="switchToPanel('tmprojects', true)" data-testid="tm-back-to-projects-link" tsq>Custom projects</a> / <span ng-bind="engineTitle"
+            ng-class="{ 'sqn-project-name-running' : (activePanel != 'dashboard' && $root.project.state == projectStates.running) }"
+            ng-attr-title="{{activePanel != 'dashboard' && $root.project.state == projectStates.running ? projectInProgressTitle: ''}}"></span>
+    </div>
+
+    <div class="sqn-tabs-large">
+        <div data-testid="tab-progress" ng-class="{'active' : activePanel=='dashboard'}" ng-click="switchToPanel('dashboard')" tsq>Progress</div>
+        <div data-testid="tab-full-settings" ng-class="{'active' : activePanel=='settings'}" ng-click="switchToPanel('settings');" ng-show="showSettingsTab()" tsq>Full settings</div>
+        <div data-testid="tab-results" ng-class="{'active' : activePanel=='results'}" ng-click="switchToPanel('results')" tsq>Results</div>
+    </div>
+</div>

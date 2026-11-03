@@ -1,0 +1,2 @@
+<#-- MACD main line changes direction upwards (local min). -->
+(<@printMACDValueAt block "MAIN" "2" /> > <@printMACDValueAt block "MAIN" "1" /> && <@printMACDValueAt block "MAIN" "1" /> < <@printMACDValueAt block "MAIN" "0" />)

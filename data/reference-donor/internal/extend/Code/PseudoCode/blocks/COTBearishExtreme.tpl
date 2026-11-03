@@ -1,0 +1,1 @@
+(COTBearishExtreme(<@printParam block "#CotSymbol#" />, hedg<<@printParam block "#HedgerThreshold#" />, spec><@printParam block "#SpecThreshold#" />))

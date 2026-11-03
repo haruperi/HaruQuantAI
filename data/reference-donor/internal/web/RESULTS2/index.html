@@ -1,0 +1,62 @@
+<!--
+<!DOCTYPE html>
+<html>
+	<body>
+	<h1>
+	Results2
+	</h1>
+
+	<div>
+		Tento subor v internal/web/RESULTS2/index.html sa nahradi vybuildovanou Vue appkou.<br>
+	</div>
+<br>
+	<div>
+		Vyber strategiu v databanku a zobrazia sa info o vybranej strategie
+		<br>
+		<hr>
+		
+		<div id="strategyInfo"></div>
+		<hr>
+		<button onclick="saveToFile()">Source code SAVE</button><br>
+		<button onclick="exportListOfTrades()">List of trades EXPORT</button><br>
+		<button onclick="showSuccess()">Show success</button><br>
+		<button onclick="showError()">Show error</button>
+		<button onclick="openLink()">Open link</button>
+	</div>
+
+	<script src="example/results2.js"></script>
+
+	</body>
+</html>
+-->
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.ico">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vite App</title>
+    <!--
+      Host communication stubs — must be defined SYNCHRONOUSLY, before the (deferred)
+      app module runs. SQX calls resultsWindow.setStrategyXML() / showResults()
+      unguarded (AlgoWizardService.js:341-342), so a call that lands before the Vue app
+      mounts would throw. Buffer it instead; App.vue replays the buffer on mount and
+      replaces these stubs with the real implementations (parity with
+      RESULTS/index.html:50-70).
+    -->
+    <script>
+      window.showResults = function (params) {
+        window.waitingResults = { name: "showResults", params: params };
+      };
+
+      window.setStrategyXML = function (strategyXML, settingsXML) {
+        window.waitingSourceCode = { strategyXML: strategyXML, settingsXML: settingsXML };
+      };
+    </script>
+    <script type="module" crossorigin src="result2.js"></script>
+    <link rel="stylesheet" crossorigin href="result2.css">
+  </head>
+  <body>
+    <div id="app"></div>
+  </body>
+</html>

@@ -1,0 +1,1 @@
+(COTSpecTrendLong(<@printParam block "#CotSymbol#" />, s52><@printParam block "#SpecMin#" /><<@printParam block "#SpecMax#" />))

@@ -1,0 +1,8 @@
+<div class="sqn-spinner">
+	<input type="text" class="sqn-input" ng-model="modelSQ.val" ng-disabled="sqDisabled" ng-attr-min="{{::min}}" ng-attr-max="{{::max}}"
+	 ng-attr-step="{{::step}}" ng-blur="changeValue()" ng-model-options="{ updateOn : 'blur' }" />
+	<div class="sqn-spinner-btns">
+		<div class="sqn-spinner-minus" ng-click="spinnerMinus()"></div>
+		<div class="sqn-spinner-plus" ng-click="spinnerPlus()"></div>
+	</div>
+</div>

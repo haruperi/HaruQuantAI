@@ -1,0 +1,35 @@
+<!-- Modal window-->
+<div class="modal" id="moveDatabankDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog type-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-49a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Move databank</h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <form class="form-horizontal" role="form">
+                    <label class="sqn-label" tsq>Move to position: </label>
+                    <div class="sqn-spinner">
+                        <input type="text" class="sqn-input" data-testid="databank-move-position-input" min="1" max="1000" step="1"
+                            ng-model="moveDatabankDialog.newPosition" onFocus="sqnSpinnerFocus(this)"
+                            onBlur="sqnSpinnerBlur(this)" />
+                        <div class="sqn-spinner-btns">
+                            <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                            <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                        </div>
+                    </div>
+                    <div class="modal-help-box" tsq>Note: Positions start after default databanks.<br>Default databanks
+                        are
+                        always displayed first</div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button id="buttonCancel-49b" type="button" class="btn btn-default" data-testid="databank-move-cancel" data-dismiss="modal" tsq>Cancel</button>
+                <button id="buttonMove-49c" type="button" class="btn btn-primary" data-testid="databank-move-confirm" data-dismiss="modal"
+                    ng-click="moveDatabankDialog.callback(moveDatabankDialog.newPosition)" tsq>Move</button>
+            </div>
+        </div>
+    </div>
+</div>

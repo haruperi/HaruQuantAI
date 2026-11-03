@@ -1,0 +1,26 @@
+<div class="project-control-panel" ng-class="{'active':!startBtnEnabled}">
+
+    <label class="pull-left progress-info" style="display:none;" ng-bind="progressInfo" ng-if="!hideButtons"></label>
+
+    <button id="buttonStop-37a" type="button" class="btn btn-default sq-btn-process sq-btn-stop" ng-click="stop()" ng-disabled="!stopBtnEnabled"
+        ng-if="!hideButtons" id="{{::projectName}}-button-stop" ng-attr-data-testid="project-stop-{{kebab(projectName)}}">
+        <i class="fa fa-stop-circle-o" aria-hidden="true"></i>
+        <span tsq>Stop</span>
+    </button>
+    <button id="buttonPause-37b" type="button" class="btn btn-default sq-btn-process sq-btn-pause" ng-click="pause()" ng-disabled="!pauseBtnEnabled"
+        ng-if="!hideButtons" id="{{::projectName}}-button-pause" ng-hide="isPortfolioMaster" ng-attr-data-testid="project-pause-{{kebab(projectName)}}">
+        <i class="fa fa-pause-circle-o" aria-hidden="true"></i>
+        <span ng-bind="pauseBtnTitle"></span>
+    </button>
+    <button id="buttonStart-37c" type="button" class="btn btn-primary sq-btn-process sq-btn-start" ng-click="start()" ng-disabled="!startBtnEnabled || disabled"
+        ng-if="!hideButtons" id="{{::projectName}}-button-start" ng-attr-data-testid="project-start-{{kebab(projectName)}}">
+        <i class="fa fa-play-circle-o" aria-hidden="true"></i>
+        <span tsq>Start</span>
+    </button>
+    <div class="clearfix" ng-if="!hideButtons"></div>
+
+    <div class="progress sq-build-progress">
+        <div class="progress-bar progress-bar-infinite" role="progressbar" aria-valuenow="70" aria-valuemin="0"
+            aria-valuemax="100" style="width: {{progressPercent}}%;" ng-show="!startBtnEnabled"></div>
+    </div>
+</div>

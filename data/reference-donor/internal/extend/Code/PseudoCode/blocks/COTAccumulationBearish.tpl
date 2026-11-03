@@ -1,0 +1,1 @@
+(COTAccumulationBearish(<@printParam block "#CotSymbol#" />, weeks=<@printParam block "#MinWeeks#" />))

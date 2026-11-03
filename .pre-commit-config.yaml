@@ -4,7 +4,7 @@ default_install_hook_types:
   - pre-commit
   - pre-push
 
-exclude: ^\.agents/task/
+exclude: ^(\.agents/task/|data/reference-donor/|data/reference/)
 
 repos:
   # Repository hygiene

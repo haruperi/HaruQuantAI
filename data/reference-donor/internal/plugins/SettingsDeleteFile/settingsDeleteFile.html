@@ -1,0 +1,11 @@
+<fieldset class="sq-fieldset task-delete-file">
+    <legend tsq>Delete file</legend>
+
+    <div class="clearfix"></div>
+
+    <div class="task-delete-file-line">
+        <label class="sqn-label task-file-label" tsq>File</label>
+        <input type="text" class="sqn-input" ng-model="config.file" readonly="1" ng-attr-title="{{config.file}}" data-testid="settings-delete-file-file-path" />
+        <a ng-click="openFilePicker()" tsq data-testid="settings-delete-file-browse">Browse</a>
+    </div>
+</fieldset>

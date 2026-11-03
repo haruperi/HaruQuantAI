@@ -1,0 +1,21 @@
+/*
+ * Decompiled with CFR 0.152.
+ */
+package com.strategyquant.datalib.data;
+
+public class DataException
+extends Exception {
+    public static final int CONNECTION = 1;
+    public static final int DATA = 2;
+    public static final int INSTRUMENT = 3;
+    public static final int BARTYPE = 4;
+    public static final int SERIES = 5;
+    public static final int TIMEFRAME = 6;
+    private int type;
+
+    public DataException(int n, String string) {
+        super(string);
+        this.type = n;
+    }
+}
+

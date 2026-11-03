@@ -1,0 +1,1 @@
+(COTFullCycleExitLong(<@printParam block "#CotSymbol#" />, exit=<@printParam block "#ExitLevel#" />, <@printParam block "#Period#" />))

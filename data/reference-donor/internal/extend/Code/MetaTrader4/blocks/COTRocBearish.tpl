@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_RocBearish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#RocPeriod#" />, <@printParam block "#ROCThreshold#" />)

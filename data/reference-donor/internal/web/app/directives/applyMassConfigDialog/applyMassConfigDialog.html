@@ -1,0 +1,17 @@
+<div class="modal centered" id="applyMassConfigDialog-{{::id}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog" role="document" style="width: 700px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-18a" type="button" class="close" data-dismiss="modal" aria-label="Close" data-testid="settings-apply-mass-config-dialog-close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" ng-bind="title"></h4>
+            </div>
+            <div class="modal-body" style="min-height: 390px;">
+                <apply-mass-config instance="instance" config="config" source="{{source}}"></apply-mass-config>
+            </div>
+            <div class="modal-footer">
+                <a ng-hide="hideClose" data-dismiss="modal" tsq>Close</a>
+                <button id="buttonApplyMassConfig-18b" type="button" class="btn btn-primary" ng-click="onApplyMassConfig()" tsq data-testid="settings-apply-mass-config-dialog-apply">Apply mass config</button>
+            </div>
+        </div>
+    </div>
+</div>

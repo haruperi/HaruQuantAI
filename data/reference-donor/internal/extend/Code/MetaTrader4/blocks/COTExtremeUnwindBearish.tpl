@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_ExtremeUnwindBearish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#NormalizeThreshold#" />, <@printParam block "#CrowdedThreshold#" />)

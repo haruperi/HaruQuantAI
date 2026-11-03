@@ -1,0 +1,30 @@
+<div ng-include="'../../../plugins/ServletCodeEditor/views/menu.html'"></div>
+
+<div class="codeeditor-content">
+	<div id="editor-split-root">
+		<div id="rootComponentTop">
+			<div id="editor-split-toppart">
+				<div id="leftPanel">
+					<rightTabs id="rightTabs" instance='rightTabs' />
+				</div>
+				<div id="editorsPanel">
+					<maintabs id="mainTabs" instance='mainTabs' after-init='afterMainTabsInit'
+						tabs-changed='tabsChanged' />
+				</div>
+			</div>
+		</div>
+		<div id="rootComponentBottom">
+			<bottomtabs id="bottomTabs" instance='bottomTabs' />
+		</div>
+	</div>
+</div>
+
+<div ng-include="'../../../plugins/ServletCodeEditor/views/findInFilesPopup.html'"></div>
+<div ng-include="'../../../plugins/ServletCodeEditor/views/createNewPopup.html'"></div>
+
+<sq-utils />
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />
+
+{{afterLoaded()}}

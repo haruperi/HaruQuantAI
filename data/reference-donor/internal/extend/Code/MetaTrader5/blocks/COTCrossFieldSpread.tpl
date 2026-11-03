@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign><#assign f1><@printParam block "#Field1Index#" /></#assign><#assign f2><@printParam block "#Field2Index#" /></#assign>SqCOT_Spread(COT_${cs}_${p?upper_case}_${f1}, ${f1}, COT_${cs}_${p?upper_case}_${f2}, ${f2}, <@printShift block "0" />)

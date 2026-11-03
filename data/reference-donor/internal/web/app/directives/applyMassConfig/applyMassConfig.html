@@ -1,0 +1,363 @@
+<fieldset class="task-apply-mass-config">
+  <legend tsq>Settings summary</legend>
+
+  <div class="clearfix"></div>
+
+  <fieldset class="sq-fieldset">
+    <legend tsq>Source config</legend>
+
+    <div class="clearfix"></div>
+
+    <div ng-if="!source" class="radio">
+      <label class="sq-wradio file-line">
+        <input
+          type="radio"
+          name="AMCSourceConfigType"
+          value="file"
+          ng-model="config.loadFrom.type"
+          ng-change="settingsChanged()"
+          ng-class="{'checked': config.loadFrom.type=='file'}"
+          data-testid="settings-apply-mass-config-source-type-file"
+        />
+        <span class="sq-mark"></span>
+        <label class="sqn-label task-file-label" tsq>Load from file</label>
+        <input
+          type="text"
+          class="sqn-input"
+          ng-model="config.loadFrom.file"
+          readonly="1"
+          ng-attr-title="{{config.loadFrom.file}}"
+          data-testid="settings-apply-mass-config-source-file"
+        />
+        <a ng-click="openFilePicker()" tsq>Browse</a>
+      </label>
+    </div>
+
+    <div ng-if="!source" class="radio">
+      <label class="sq-wradio">
+        <input
+          type="radio"
+          name="AMCSourceConfigType"
+          value="task"
+          ng-model="config.loadFrom.type"
+          ng-change="settingsChanged()"
+          ng-class="{'checked': config.loadFrom.type=='task'}"
+          data-testid="settings-apply-mass-config-source-type-task"
+        />
+        <span class="sq-mark"></span>
+        <tsq>Load from existing task</tsq>
+        <div class="sqn-input sqn-select select-task">
+          <span ng-bind="getSourceTaskLabel()"></span>
+          <select
+            ng-model="config.loadFrom.task"
+            ng-options="item.taskName as item.taskTitle for item in config.availableTasks"
+            onFocus="sqnSelectFocus(this)"
+            onBlur="sqnSelectBlur(this)"
+            data-testid="settings-apply-mass-config-source-task"
+          ></select>
+        </div>
+      </label>
+    </div>
+
+    <div ng-if="source && source=='file'" class="file-line">
+      <label class="sqn-label" tsq>Load from file</label>
+      <input
+        type="text"
+        class="sqn-input"
+        ng-model="config.loadFrom.file"
+        readonly="1"
+        ng-attr-title="{{config.loadFrom.file}}"
+        data-testid="settings-apply-mass-config-source-file"
+      />
+      <a ng-click="openFilePicker()" tsq>Browse</a>
+    </div>
+
+    <div ng-if="source && source!='file'">
+      <label class="sqn-label" tsq>Load from existing task:</label>
+      <div class="sqn-input sqn-select">
+        <span ng-bind="getSourceTaskLabel()"></span>
+        <select
+          class="select-task"
+          ng-model="config.loadFrom.task"
+          ng-options="item.taskName as item.taskTitle for item in config.availableTasks"
+          onFocus="sqnSelectFocus(this)"
+          onBlur="sqnSelectBlur(this)"
+          ng-disabled="true"
+          data-testid="settings-apply-mass-config-source-task"
+        ></select>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="sq-fieldset what-to-apply" data-testid="settings-apply-mass-config-what-to-apply">
+    <legend tsq>What to apply</legend>
+
+    <div class="clearfix"></div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.whatToBuild"
+          id="AMCWhatToBuild-{{::id}}"
+        />
+        <label for="AMCWhatToBuild-{{::id}}" class="sqn-label" tsq>What to build</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.geneticOptions"
+          id="AMCGeneticOptions-{{::id}}"
+          ng-disabled="!config.whatToApply.whatToBuild"
+        />
+        <label for="AMCGeneticOptions-{{::id}}" class="sqn-label" tsq>Genetic options</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.whatToRetest"
+          id="AMCWhatToRetest-{{::id}}"
+        />
+        <label for="AMCWhatToRetest-{{::id}}" class="sqn-label" tsq>What to retest</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.partsToImprove"
+          id="AMCPartsToImprove-{{::id}}"
+        />
+        <label for="AMCPartsToImprove-{{::id}}" class="sqn-label" tsq>Parts to improve</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.optimization"
+          id="AMCOptimization-{{::id}}"
+        />
+        <label for="AMCOptimization-{{::id}}" class="sqn-label" tsq>Optimization</label>
+      </div>
+    </div>
+    
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.data"
+          id="AMCData0-{{::id}}"
+        />
+        <label for="AMCData0-{{::id}}" class="sqn-label" tsq>Data</label>
+        <a tsq ng-click="selectAllData()" id="SAMCDataSelectAll-{{::id}}" data-testid="settings-apply-mass-config-select-all-data"
+          >select all</a
+        >
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.dataTradingEngine"
+          id="AMCData1-{{::id}}"
+          ng-disabled="!config.whatToApply.data"
+        />
+        <label for="AMCData1-{{::id}}" tsq>Trading engine</label>
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.dataBacktestData"
+          id="AMCData2-{{::id}}"
+          ng-disabled="!config.whatToApply.data"
+        />
+        <label for="AMCData2-{{::id}}" tsq>Backtest data</label>
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.dataTestParameters"
+          id="AMCData3-{{::id}}"
+          ng-disabled="!config.whatToApply.data"
+        />
+        <label for="AMCData3-{{::id}}" tsq>Test parameters</label>
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.dataDataRangeParts"
+          id="AMCData4-{{::id}}"
+          ng-disabled="!config.whatToApply.data"
+        />
+        <label for="AMCData4-{{::id}}" tsq>Data range parts</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.tradingOptions"
+          id="AMCTO-{{::id}}"
+        />
+        <label for="AMCTO-{{::id}}" class="sqn-label" tsq
+          >Trading options</label
+        >
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.blocks"
+          id="AMCBlocks0-{{::id}}"
+        />
+        <label for="AMCBlocks0-{{::id}}" class="sqn-label" tsq
+          >Building blocks</label
+        >
+        <a tsq ng-click="selectAllBlocks()" id="AMCBlocksSelectAll-{{::id}}" data-testid="settings-apply-mass-config-select-all-blocks"
+          >select all</a
+        >
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.blocksSignals"
+          id="AMCBlocks1-{{::id}}"
+          ng-disabled="!config.whatToApply.blocks"
+        />
+        <label for="AMCBlocks1-{{::id}}" tsq>Signals</label>
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.blocksIndicators"
+          id="AMCBlocks2-{{::id}}"
+          ng-disabled="!config.whatToApply.blocks"
+        />
+        <label for="AMCBlocks2-{{::id}}" tsq>Indicators</label>
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.blocksStopLimitEntry"
+          id="AMCBlocks3-{{::id}}"
+          ng-disabled="!config.whatToApply.blocks"
+        />
+        <label for="AMCBlocks3-{{::id}}" tsq>Stop/Limit entry blocks</label>
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.blocksOrderTypes"
+          id="AMCBlocks4-{{::id}}"
+          ng-disabled="!config.whatToApply.blocks"
+        />
+        <label for="AMCBlocks4-{{::id}}" tsq>Order types</label>
+      </div>
+      <div class="sq-checkbox tabbed">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.blocksExitTypes"
+          id="AMCBlocks5-{{::id}}"
+          ng-disabled="!config.whatToApply.blocks"
+        />
+        <label for="AMCBlocks5-{{::id}}" tsq>Exit types</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.atm"
+          id="AMCATM-{{::id}}"
+        />
+        <label for="AMCATM-{{::id}}" class="sqn-label" tsq>ATM</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.moneyManagement"
+          id="AMCMM-{{::id}}"
+        />
+        <label for="AMCMM-{{::id}}" class="sqn-label" tsq
+          >Money management</label
+        >
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.crossChecks"
+          id="AMCCC-{{::id}}"
+        />
+        <label for="AMCCC-{{::id}}" class="sqn-label" tsq>Cross checks</label>
+      </div>
+    </div>
+
+    <div>
+      <div class="sq-checkbox">
+        <input
+          type="checkbox"
+          ng-model="config.whatToApply.ranking"
+          id="AMCRanking-{{::id}}"
+        />
+        <label for="AMCRanking-{{::id}}" class="sqn-label" tsq>Ranking</label>
+      </div>
+    </div>
+  </fieldset>
+
+  <fieldset class="sq-fieldset">
+    <legend>
+      <tsq>Target task(s)</tsq
+      ><a
+          tsq
+          ng-click="selectAllTargetTasks()"
+          id="AMCTargetTaskSelectAll-{{::id}}"
+          data-testid="settings-apply-mass-config-target-select-all"
+          >select all</a
+        ><a
+        tsq
+        ng-click="deselectAllTargetTasks()"
+        id="AMCTargetTaskDeselectAll-{{::id}}"
+        data-testid="settings-apply-mass-config-target-deselect-all"
+        >deselect all</a
+      >
+    </legend>
+
+    <div class="clearfix"></div>
+
+    <div class="gen-help">
+      <tsq>Note - only the compatible configs will be applied</tsq>
+    </div>
+
+    <div
+      class="sq-checkbox"
+      ng-repeat="task in config.availableTasks track by $index"
+    >
+      <input
+        type="checkbox"
+        ng-model="task.apply"
+        id="AMCTargetTask{{$index}}-{{::id}}"
+      />
+      <label
+        for="AMCTargetTask{{$index}}-{{::id}}"
+        ng-bind="task.taskTitle"
+      ></label>
+    </div>
+  </fieldset>
+</fieldset>

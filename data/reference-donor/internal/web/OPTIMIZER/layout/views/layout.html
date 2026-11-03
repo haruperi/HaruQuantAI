@@ -1,0 +1,17 @@
+<div class="sqn-container sqn-container-common split-pane horizontal-percent" id="sq-splitter-main" ng-class="{'br-edition': isBrazilianEdition}">
+    <div class="split-pane-component-dashboard">
+        <dashboard-header/>
+        
+        <card-panels instance="panels" class="sqn-dashboard-view"/>
+    </div>
+    
+    <div class="sqn-databanks">
+        <div ng-include="'../../../plugins/ProjectDatabanks/views/databanks.html'" ng-dynamic-controller="'DatabanksCtrl'" />
+    </div>
+    
+</div>
+
+<sq-utils/>
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />

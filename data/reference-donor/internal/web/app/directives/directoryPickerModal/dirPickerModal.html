@@ -1,0 +1,27 @@
+<div class="modal sq-filepicker" data-testid="file-picker-modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-29a" type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel" ng-bind="title"></h4>
+            </div>
+            <div class="modal-body">
+                <form class="form-horizontal" role="form">
+                    <div class="sq-filepicker-location" data-testid="file-picker-path">
+                        <span class="lbl"><tsq>Location:</tsq></span>
+                        <span class="val">{{directoryTree.selectedPath}}</span>
+                    </div>
+                    <directory-picker class="sq-filepicker-tree" dir-picker-id="{{::dirPickerId}}" instance='directoryTree' multiselection="{{multiselection}}"/>
+                    <div class="sq-filepicker-filename">
+                        <label for="filePickerNameInput"><tsq>File name:</tsq></label>
+                        <input id="filePickerNameInput" data-testid="file-picker-path-input" class="sq-filepicker-input" type="text" autocomplete="off" ng-model="typedPath" placeholder="Type or paste a full file path" ng-keydown="$event.keyCode===13 && onOpenTyped()"/>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-testid="file-picker-close-btn" data-dismiss="modal" tsq>Cancel</a>
+                <button id="buttonSelect-29b" data-testid="file-picker-select-btn" type="button" class="btn btn-primary" data-dismiss="modal" ng-if="onSelect" ng-click="onOpenTyped()" tsq>Open</button>
+            </div>
+        </div>
+    </div>
+</div>

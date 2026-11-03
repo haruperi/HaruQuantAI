@@ -1,0 +1,1 @@
+(COTVixProxyBullish(hedg><@printParam block "#HedgerThreshold#" />, spec<<@printParam block "#SpecThreshold#" />, <@printParam block "#Period#" />))

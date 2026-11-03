@@ -1,0 +1,1 @@
+COTCompositeScore(<@printParam block "#CotSymbol#" />)[<@printShift block shift />]

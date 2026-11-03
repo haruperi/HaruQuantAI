@@ -1,0 +1,22 @@
+<div class="toolbar" ng-attr-data-testid="results-toolbar-{{key}}">
+    <label tsq>Data</label>
+    <div class="sqn-input sqn-select">
+        <span>{{resultKey}}</span>
+        <select ng-model="resultKey" ng-options="item for item in dataItems" onFocus="sqnSelectFocus(this)"
+            onBlur="sqnSelectBlur(this)" ng-change="onKeySelect()" ng-attr-data-testid="results-toolbar-{{key}}-data"></select>
+    </div>
+
+    <label ng-hide="displayOnlyData" tsq>Direction</label>
+    <div ng-hide="displayOnlyData" class="btn-group">
+        <button id="LSbtn" ng-click="onDirectionSelect(directions.both)" type="button" class="btn btn-default"
+            ng-class="{active: direction == directions.both}" ng-attr-data-testid="results-toolbar-{{key}}-direction-both" tsq>L+S</button>
+        <button id="Lngbtn" ng-click="onDirectionSelect(directions.long)" type="button" class="btn btn-default"
+            ng-class="{active: direction == directions.long}" ng-attr-data-testid="results-toolbar-{{key}}-direction-long" tsq>Lng</button>
+        <button id="Shrbtn" ng-click="onDirectionSelect(directions.short)" type="button" class="btn btn-default"
+            ng-class="{active: direction == directions.short}" ng-attr-data-testid="results-toolbar-{{key}}-direction-short" tsq>Shr</button>
+    </div>
+
+    <sample-type ng-hide="displayOnlyData || isAWCloud || isMTAnalyzer" selected="sampleType" on-change="onSampleTypeChange" extended="extSampleType" instance="sampleTypeInstance" tkey="results-toolbar-{{key}}"></sample-type>
+
+    <span ng-transclude></span>
+</div>

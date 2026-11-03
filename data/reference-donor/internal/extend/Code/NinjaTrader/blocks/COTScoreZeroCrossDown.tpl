@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>(SqCOTScore(${cotSymbolInput(cs)}, <@printCIShift block shift />) < 0 && SqCOTScore(${cotSymbolInput(cs)}, SqCOTWeeksAgo(<@printCIShift block shift />, 1)) >= 0)

@@ -1,0 +1,1 @@
+(COTTripleDivBearish(<@printParam block "#CotSymbol#" />))

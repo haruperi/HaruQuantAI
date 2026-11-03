@@ -1,0 +1,3 @@
+<#-- +DI crosses below -DI: previous bar +DI above -DI, current bar +DI below -DI. Reuses the DM macro
+     (the installed SqADX indicator, Values[1] = +DI, Values[2] = -DI). Parity with JForex DICrossDown. -->
+<@compress_single_line>((sqRound(<@printDMValueAt block "DiPlus" "1"/>, 6) > sqRound(<@printDMValueAt block "DiMinus" "1"/>, 6)) && (sqRound(<@printDMValueAt block "DiPlus" "0"/>, 6) < sqRound(<@printDMValueAt block "DiMinus" "0"/>, 6)))</@compress_single_line>

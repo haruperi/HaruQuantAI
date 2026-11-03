@@ -1,0 +1,5 @@
+<div class="sq-slider" style="display: inline-flex">
+    <label ng-if="valueAlign == alignTypes.left" style="min-width: 40px!important; margin-right: 10px; margin-top: -1px;"><span ng-bind="value"/> <span ng-bind="postfix"/></label>
+    <input type="hidden" class="sq-slider-input" value="{{::sqModel}}" />
+    <label ng-if="valueAlign == alignTypes.right" style="min-width: 40px!important; margin-left: 10px; margin-top: -1px;"><span ng-bind="value"/> <span ng-bind="postfix"/></label>
+</div>

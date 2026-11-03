@@ -1,0 +1,18 @@
+<div class="modal" id="popupBannerModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-keyboard="false">
+    <div class="modal-dialog" role="document" style="width: 780px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-54a" type="button" class="close" aria-label="Close" ng-click="onBannerClicked(popupBanner, true);">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Promo</h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <img height="500" width="750" ng-src="{{popupBanner.image}}" ng-click="onBannerClicked(popupBanner);">
+            </div>
+            <div class="modal-footer">
+                <a ng-click="onBannerClicked(popupBanner, true);" tsq>DISMISS</a>
+            </div>
+        </div>
+    </div>
+</div>

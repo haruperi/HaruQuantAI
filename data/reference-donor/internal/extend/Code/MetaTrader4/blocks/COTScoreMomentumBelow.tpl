@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_ScoreMomentumBelow(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#MomentumLookback#" />, <@printParam block "#MomentumThreshold#" />, <@printParam block "#LevelThreshold#" />)

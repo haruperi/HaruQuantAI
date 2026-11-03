@@ -1,0 +1,36 @@
+<div class="modal item-chooser-modal" id="{{::popupId}}" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" data-testid="items-chooser-modal">
+    <div class="modal-dialog" role="document" style="width: 426px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-32a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="{{::popupId}}Label" ng-bind="::title"></h4>
+            </div>
+            <div class="modal-body" style="height: auto; min-height: 303px">
+                <form name="addItemsForm" class="form-horizontal" role="form" style="text-align: left;">
+                    <div class="sqn-label" style="margin-left: 0; margin-bottom: 6px;" ng-bind="::chooserLabel"></div>
+                    <items-chooser ng-if="itemsChooser" style="width: 100%" instance="itemsChooser" placeholder="{{::placeholder}}"
+                        multi-select="{{::multiSelect}}" no-results-text="{{::noResultsText}}"
+                        after-init="onItemsChooserInit" class="item-chooser-minheight"></items-chooser>
+                    <br />
+                    <div class="recent-cloud-title" tsq><label>Frequently used</label></div>
+                    <div class="recent-cloud" ng-click="cloudWordsClicked($event)"></div>
+                    <!-- <fieldset class="sq-fieldset recent-items" ng-if="recentItems">
+                        <label style="margin: 4px 0px 10px 4px; width: 100%;" class="sqn-label" tsq>Or choose from
+                            frequently used</label>
+                        <div class=""></div>
+                        <div ng-repeat="item in recentItemsList" class="col-sm-6" style="padding: 4px;">
+                            <button ng-click="onAddRecentItem(item.class)" style="width: 100%;"
+                                ng-bind="::(item.name | tsq)" class="btn btn-default"></button>
+                        </div>
+                    </fieldset> -->
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq data-testid="items-chooser-modal-close-btn">Close</a>
+                <button id="buttonAdd-32b" type="button" class="btn btn-primary" ng-click="onAddItems()" tsq data-testid="items-chooser-modal-add-btn">Add</button>
+            </div>
+        </div>
+    </div>
+</div>

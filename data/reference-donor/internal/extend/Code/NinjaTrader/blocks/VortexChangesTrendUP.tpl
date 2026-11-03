@@ -1,0 +1,2 @@
+<#-- Vortex changes to uptrend: VIPlus crosses above VIMinus (prev below, current above). -->
+((<@printVortexValueAt block "VIPlus" "0" /> > <@printVortexValueAt block "VIMinus" "0" />) && (<@printVortexValueAt block "VIPlus" "1" /> < <@printVortexValueAt block "VIMinus" "1" />))

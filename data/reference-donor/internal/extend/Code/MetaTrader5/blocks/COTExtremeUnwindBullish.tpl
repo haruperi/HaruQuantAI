@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_ExtremeUnwindBullish(COT_${cs}_52W_2, <@printShift block "0" />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#NormalizeThreshold#" />, <@printParam block "#CrowdedThreshold#" />)

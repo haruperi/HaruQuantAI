@@ -1,0 +1,219 @@
+<!-- Share a product - native form for the marketplace share flow -->
+<div class="modal fade not-resize" id="marketplaceSharePopup" tabindex="-1" role="dialog" ng-controller="ShareFormCtrl">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="closeShare()" aria-label="Close"
+                        data-testid="marketplace-share-close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title"><span ng-if="!isUpdate" tsq>Share a product</span><span ng-if="isUpdate" tsq>Update product</span></h4>
+            </div>
+            <!-- explicit style attr: showPopup() freezes modal-body height only when the style attribute is absent -->
+            <div class="modal-body marketplace-share-body" style="height: auto;">
+                <div class="marketplace-share-update-note" ng-if="isUpdate" data-testid="marketplace-share-update-banner">
+                    <i class="fa fa-refresh"></i>
+                    <span><span tsq>Publishing a new version of</span> <strong>{{form.updateSlug}}</strong>.
+                        <span ng-if="isMetadataOnly()" tsq>No files selected - the currently published file is kept.</span>
+                        <span ng-if="!isMetadataOnly()" tsq>The uploaded file replaces the current one.</span></span>
+                </div>
+                <div class="marketplace-share-review-note" ng-if="settings.reviewRequired" tsq>
+                    Your submission will be reviewed before it is published.
+                </div>
+
+                <div class="marketplace-share-layout">
+                    <!-- Left column: product details -->
+                    <div class="marketplace-share-col marketplace-share-col-form">
+                        <h3 class="marketplace-share-section-title" tsq>Product details</h3>
+
+                        <div class="form-group">
+                            <label for="mpShareTitle"><span tsq>Title</span> <span class="marketplace-share-required">*</span></label>
+                            <input id="mpShareTitle" type="text" class="form-control" ng-model="form.title"
+                                   ng-disabled="uploadState" data-testid="marketplace-share-title" />
+                        </div>
+
+                        <div class="form-group marketplace-share-desc-group">
+                            <label for="mpShareDescription"><span tsq>Description</span> <span class="marketplace-share-required">*</span></label>
+                            <textarea id="mpShareDescription" class="form-control" rows="2" ng-model="form.description"
+                                      ng-disabled="uploadState" data-testid="marketplace-share-description"></textarea>
+                        </div>
+
+                        <div class="form-group marketplace-share-details-group">
+                            <label tsq>Detailed description</label>
+                            <div id="mpShareDetails" sq-rich-editor ng-model="form.detailsHtml"
+                                 rich-editor-disabled="uploadState"
+                                 placeholder="Features, requirements, how to use it..."
+                                 data-testid="marketplace-share-details"></div>
+                            <div class="marketplace-share-hint" tsq>Long-form content shown on the product detail page.</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mpShareCategory"><span tsq>Category</span> <span class="marketplace-share-required">*</span></label>
+                            <select id="mpShareCategory" class="form-control" ng-model="form.categoryId"
+                                    ng-change="onPrimaryChanged()"
+                                    ng-disabled="uploadState" data-testid="marketplace-share-category"
+                                    ng-options="category.id as category.label for category in categories">
+                            </select>
+                            <div class="marketplace-share-hint" tsq>The extension's main placement in the catalog.</div>
+                        </div>
+
+                        <!-- The catalog finds the extension under any of these too. -->
+                        <div class="form-group" ng-if="categories.length > 1">
+                            <label><span tsq>Additional categories</span> <span class="marketplace-share-hint">(<span tsq>optional</span>)</span></label>
+                            <div class="marketplace-share-catlist" data-testid="marketplace-share-secondary-categories">
+                                <label class="marketplace-share-catlist-item" ng-repeat="category in categories"
+                                       ng-if="category.id != form.categoryId"
+                                       ng-style="{'padding-left': (category.depth * 16) + 'px'}">
+                                    <input type="checkbox" ng-checked="isSecondary(category.id)"
+                                           ng-click="toggleSecondary(category.id)" ng-disabled="uploadState"
+                                           data-testid="marketplace-share-secondary-{{$index}}" />
+                                    {{category.name}}
+                                </label>
+                            </div>
+                            <div class="marketplace-share-hint">
+                                {{form.secondaryCategoryIds.length}}/{{maxSecondaryCategories}} <span tsq>selected</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mpShareVersion" tsq>Version</label>
+                            <input id="mpShareVersion" type="text" class="form-control" placeholder="1.0.0"
+                                   ng-model="form.version" ng-disabled="uploadState" data-testid="marketplace-share-version" />
+                            <div class="marketplace-share-hint" ng-if="versionFormatRegex" data-testid="marketplace-share-version-hint">
+                                <span tsq>Required format</span>: <code>{{versionFormatRegex}}</code>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="mpShareAuthor" tsq>Author</label>
+                            <input id="mpShareAuthor" type="text" class="form-control"
+                                   ng-model="form.author" ng-disabled="uploadState" data-testid="marketplace-share-author" />
+                            <div class="marketplace-share-hint" tsq>Pre-filled from your license info.</div>
+                        </div>
+
+                        <!-- Release notes (#520) - update lane only, ignored on create. -->
+                        <div class="form-group marketplace-share-changelog-group" ng-if="isUpdate">
+                            <label tsq>Release notes</label>
+                            <div id="mpShareChangelog" sq-rich-editor ng-model="form.changelogHtml"
+                                 rich-editor-disabled="uploadState"
+                                 placeholder="What changed in this version..."
+                                 data-testid="marketplace-share-changelog"></div>
+                            <div class="marketplace-share-hint" tsq>Shown in the product's version history.</div>
+                        </div>
+
+                        <div class="form-group marketplace-share-image-group">
+                            <label><span tsq>Cover image</span> <span class="marketplace-share-required" ng-if="!isUpdate">*</span> <span class="marketplace-share-hint">(<span tsq>max 5 MB</span>)</span></label>
+                            <div class="marketplace-share-current-media" ng-if="isUpdate && prefill.coverImageUrl && !coverImage"
+                                 data-testid="marketplace-share-cover-current">
+                                <img ng-src="{{prefill.coverImageUrl}}" alt="" />
+                                <span class="marketplace-share-hint" tsq>Current cover - kept unless you pick a new one.</span>
+                            </div>
+                            <div class="marketplace-share-images" ng-if="coverImage" data-testid="marketplace-share-cover">
+                                <div class="marketplace-share-image-item">
+                                    <i class="fa fa-picture-o"></i>
+                                    <span class="marketplace-share-image-name">{{coverImage.name}}</span>
+                                    <button type="button" class="marketplace-share-image-remove" aria-label="Remove"
+                                            ng-click="removeCoverImage()" ng-disabled="uploadState"
+                                            data-testid="marketplace-share-cover-remove">&times;</button>
+                                </div>
+                            </div>
+                            <a href="" class="marketplace-share-image-add" ng-if="!coverImage"
+                               ng-class="{disabled: uploadState}" ng-click="addCoverImage()"
+                               data-testid="marketplace-share-cover-add"><i class="fa fa-plus"></i> <span tsq>Add image</span></a>
+                            <input id="mpShareCoverInput" type="file" accept="image/*" style="display: none" />
+                        </div>
+
+                        <div class="form-group marketplace-share-image-group">
+                            <label><span tsq>Details gallery</span> <span class="marketplace-share-hint">(<span tsq>optional</span>)</span></label>
+                            <div class="marketplace-share-images" ng-if="galleryImages.length" data-testid="marketplace-share-gallery">
+                                <div class="marketplace-share-image-item" ng-repeat="img in galleryImages track by $index">
+                                    <i class="fa fa-picture-o"></i>
+                                    <span class="marketplace-share-image-name">{{img.name}}</span>
+                                    <button type="button" class="marketplace-share-image-remove" aria-label="Remove"
+                                            ng-click="removeGalleryImage($index)" ng-disabled="uploadState"
+                                            data-testid="marketplace-share-gallery-remove-{{$index}}">&times;</button>
+                                </div>
+                            </div>
+                            <a href="" class="marketplace-share-image-add"
+                               ng-if="galleryImages.length < maxGalleryImages"
+                               ng-class="{disabled: uploadState}" ng-click="addGalleryImage()"
+                               data-testid="marketplace-share-gallery-add"><i class="fa fa-plus"></i> <span tsq>Add image</span></a>
+                            <input id="mpShareGalleryInput" type="file" accept="image/*" style="display: none" />
+                            <div class="marketplace-share-hint" tsq>Up to 5 extra images shown under the cover on the product detail page.</div>
+                            <div class="marketplace-share-hint" ng-if="isUpdate && prefill.galleryImageUrls.length && !galleryImages.length"
+                                 data-testid="marketplace-share-gallery-current" tsq>
+                                The current gallery is kept - add images only to replace it.
+                            </div>
+                        </div>
+
+                        <!-- Update existing product (updateSlug, #489) - hidden for now.
+                             A free-text slug is poor UX; a proper "my products" picker or a
+                             product-initiated update entry point should drive this instead.
+                             form.updateSlug stays '' so no revision is triggered. See TODO.md. -->
+                        <!--
+                        <div class="form-group">
+                            <label for="mpShareUpdateSlug"><span tsq>Update existing product</span> <span class="marketplace-share-hint">(<span tsq>slug, optional</span>)</span></label>
+                            <input id="mpShareUpdateSlug" type="text" class="form-control" placeholder="my-module"
+                                   ng-model="form.updateSlug" ng-disabled="uploadState" data-testid="marketplace-share-update-slug" />
+                        </div>
+                        -->
+                    </div>
+
+                    <!-- Right column: files to share -->
+                    <div class="marketplace-share-col marketplace-share-col-files">
+                        <h3 class="marketplace-share-section-title">
+                            <span tsq>Files to share</span> <span class="marketplace-share-required" ng-if="!isUpdate">*</span>
+                            <span class="marketplace-share-count">({{selectedCount()}} <span tsq>selected</span>)</span>
+                        </h3>
+                        <div class="marketplace-share-hint" ng-if="isUpdate" data-testid="marketplace-share-files-optional" tsq>
+                            Optional - leave everything unselected to change only the description and keep the published file.
+                        </div>
+                        <input type="text" class="form-control marketplace-share-filter"
+                               placeholder="{{'Filter files...' | tsq}}"
+                               ng-model="treeFilter" ng-change="filterTree()" ng-disabled="uploadState"
+                               data-testid="marketplace-share-filter" />
+                        <div class="marketplace-share-tree" data-testid="marketplace-share-tree">
+                            <div ng-repeat="node in tree track by $index" class="marketplace-share-tree-node"
+                                 ng-if="!node.hidden"
+                                 ng-style="{'padding-left': (node.depth * 18) + 'px'}">
+                                <span class="marketplace-share-tree-toggle" ng-if="node.isDir"
+                                      ng-click="toggleExpand($index)"
+                                      data-testid="marketplace-share-toggle-{{$index}}">
+                                    <i class="fa" ng-class="node.expanded ? 'fa-caret-down' : 'fa-caret-right'"></i>
+                                </span>
+                                <span class="marketplace-share-tree-toggle" ng-if="!node.isDir"></span>
+                                <label>
+                                    <input type="checkbox" ng-model="node.checked" ng-change="toggleNode($index)"
+                                           ng-disabled="uploadState" data-testid="marketplace-share-file-{{$index}}" />
+                                    <i class="fa" ng-class="node.isDir ? (node.expanded ? 'fa-folder-open-o' : 'fa-folder-o') : 'fa-file-o'"></i>
+                                    {{node.text}}
+                                </label>
+                            </div>
+                            <div ng-if="!tree.length" class="marketplace-share-tree-empty" tsq>
+                                No shareable files found in your user folder.
+                            </div>
+                        </div>
+                        <div class="marketplace-share-hint" ng-if="excludedDirs.length"
+                             data-testid="marketplace-share-excluded">
+                            <span tsq>Hidden system folders</span>: {{excludedDirs.join(', ')}}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="marketplace-share-status" ng-if="uploadState">
+                    <i class="fa fa-spinner fa-spin"></i>
+                    <span ng-if="uploadState == 'submitting'" tsq>Submitting update&hellip;</span>
+                    <span ng-if="uploadState == 'building'" tsq>Building package&hellip;</span>
+                    <span ng-if="uploadState == 'waiting-grant'" tsq>Creating product draft&hellip;</span>
+                    <span ng-if="uploadState == 'uploading'" tsq>Uploading package&hellip;</span>
+                    <span ng-if="uploadState == 'finishing'" tsq>Finishing submission&hellip;</span>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" ng-click="closeShare()" ng-disabled="uploadState"
+                        data-testid="marketplace-share-cancel" tsq>Cancel</button>
+                <button type="button" class="btn btn-primary" ng-click="submitShare()" ng-disabled="uploadState"
+                        data-testid="marketplace-share-submit" tsq>Submit</button>
+            </div>
+        </div>
+    </div>
+</div>

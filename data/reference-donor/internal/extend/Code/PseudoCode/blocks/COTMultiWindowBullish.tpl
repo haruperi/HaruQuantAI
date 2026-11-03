@@ -1,0 +1,1 @@
+(COTMultiWindowBullish(<@printParam block "#CotSymbol#" />))

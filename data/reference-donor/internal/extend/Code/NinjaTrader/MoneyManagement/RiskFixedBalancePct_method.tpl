@@ -1,0 +1,2 @@
+<#-- Risk fixed % of balance via sqMMRiskBalancePct (balance, SL distance). Mirrors RiskFixedBalancePct.java. -->
+sqMMRiskBalancePct(<@printSLTicks block sqMMPriceRef />, mmRiskPercent, mmDecimals, mmLotsIfNoMM, mmMaxLots)

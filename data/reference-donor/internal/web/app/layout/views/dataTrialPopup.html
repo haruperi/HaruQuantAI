@@ -1,0 +1,22 @@
+<div class="modal centered" id="dataTrialPopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" tsq>Data subscription</h4>
+            </div>
+            <div class="modal-body">
+                <div class="text1" tsq>Your SQ Data Subscription trial will finish in 7 days.</div>
+                <div class="text2" tsq>Please sign up for SQ Data if you want to continue using it.</div>
+
+                <img src="https://cdn.strategyquant.com/images/data_subscription_banner.png"
+                                    width="728" height="90"
+                                    ng-click="$root.openlink('https://strategyquant.com/data-subscription-special-offer')" data-testid="shell-modal-data-trial-banner" />
+
+                <a class="link" ng-click="openBrowser('https://strategyquant.com/data-subscription-special-offer')" data-testid="shell-modal-data-trial-promo-link">Click here to get SQ Data for a year at Promo price</a>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" data-testid="shell-modal-data-trial-close" tsq>Close</a>
+            </div>
+        </div>
+    </div>
+</div>

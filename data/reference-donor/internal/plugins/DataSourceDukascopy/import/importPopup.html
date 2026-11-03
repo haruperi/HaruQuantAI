@@ -1,0 +1,106 @@
+<!-- Modal window-->
+<div class="modal" id="dukasImportModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel">
+                    <tsq>Download Dukascopy data for</tsq> {{selectedFor}}
+                </h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <form class="form-horizontal" role="form">
+
+                    <fieldset class="sq-fieldset">
+                        <legend tsq>Choose data range to download</legend>
+
+                        <date-range from-input-id="dukascopyDateInputFrom" to-input-id="dukascopyDateInputTo" instance="dateRange" sqclass="dukascopy-download" on-date-change="onDateRangeChange" />
+
+                    </fieldset>
+
+                    <fieldset class="sq-fieldset">
+                        <legend tsq>Redownload options</legend>
+
+                        <div class="row radios">
+                            <div class="col-xs-6">
+                                <div class="radio">
+                                    <label class="sq-wradio">
+                                        <input type="radio" name="ImportOptionsRadios" ng-model="newImport.overwrite"
+                                            value="false" id="dukascopy-download-addonly" />
+                                        <span class="sq-mark"></span>
+                                        <tsq>Add
+                                            only missing data</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="radio">
+                                    <label class="sq-wradio">
+                                        <input type="radio" name="ImportOptionsRadios" ng-model="newImport.overwrite"
+                                            value="true" id="dukascopy-download-overwrite" />
+                                        <span class="sq-mark"></span>
+                                        <tsq>Overwrite
+                                            existing data</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="sq-fieldset">
+                        <legend id="dukas-download-server-label" tsq>Download server</legend>
+
+                        <div class="row cdn-part">
+                            <div class="col-xs-12">
+                                <div class="toolbar cdn-server-selector">
+                                    <div class="btn-group cdn-server-options" role="group" aria-labelledby="dukas-download-server-label" aria-describedby="dukas-download-server-help">
+                                        <label class="btn btn-default" ng-class="{active: newImport.downloadType=='cdn', disabled: !cdnAllowed}">
+                                            <input class="sr-only" type="radio" name="DukasFastDownload" value="cdn" ng-model="newImport.downloadType" ng-change="settingsChanged()" ng-disabled="!cdnAllowed" data-testid="dm-dukas-import-server-cdn" />
+                                            <i class="fa fa-globe" aria-hidden="true"></i>
+                                            <tsq>StrategyQuant CDN</tsq>
+                                            <small class="cdn-server-recommended" tsq>Recommended</small>
+                                        </label>
+                                        <label class="btn btn-default" ng-class="{active: newImport.downloadType=='cdn-cn', disabled: !cdnAllowed}">
+                                            <input class="sr-only" type="radio" name="DukasFastDownload" value="cdn-cn" ng-model="newImport.downloadType" ng-change="settingsChanged()" ng-disabled="!cdnAllowed" data-testid="dm-dukas-import-server-hong-kong" />
+                                            <i class="fa fa-server" aria-hidden="true"></i>
+                                            <tsq>Hong Kong server</tsq>
+                                        </label>
+                                    </div>
+                                </div>
+                                <p id="dukas-download-server-help" class="cdn-server-help">
+                                    <tsq>StrategyQuant CDN servers a cached copy of Dukascopy data as prepared packages. The Hong Kong server, optimized for users in Asia and China, is available with QDM Pro.</tsq>
+                                </p>
+                                <a data-testid="dm-dukas-import-show-popup-btn" ng-click="$root.showPopup('#cdnDisclaimerModal')" tsq>StrategyQuant CDN data disclaimer</a>
+                            </div>
+
+                            <div class="clearfix"></div>
+
+                        </div>
+                    </fieldset>
+
+                    <div ng-show="displayUpgradeLink" id="full-license-only">
+                        <span class="cdn-upgrade-icon" aria-hidden="true"><i class="fa fa-tachometer"></i></span>
+                        <div class="cdn-upgrade-copy">
+                            <strong class="cdn-upgrade-title" tsq>Free plan: StrategyQuant CDN at 300 KB/s</strong>
+                            <p tsq>This download will take about 10 minutes. QDM Pro speeds up the StrategyQuant CDN by up to 10× (about 1 minute) and unlocks the Hong Kong server.</p>
+                        </div>
+                        <button data-testid="dm-dukas-import-upgrade-license-btn" type="button" class="btn btn-warning cdn-upgrade-button" ng-click="onUpgradeLicense()">
+                            <svg class="cdn-upgrade-crown" viewBox="0 0 16 16" aria-hidden="true" focusable="false"><path fill="currentColor" d="M1 3l4 4 3-5 3 5 4-4-2 10H3z" /></svg>
+                            <tsq>Upgrade to QDM Pro</tsq>
+                        </button>
+                    </div>
+
+                </form>
+            </div>
+            <div class="modal-footer">
+                <p class="dukas-footer-note"><tsq>Data provided by</tsq> <a data-testid="dm-dukas-import-dukascopy-link" ng-click="onOpenDukascopy()">Dukascopy</a>. <tsq>Data served from the StrategyQuant CDN may differ from data downloaded directly from Dukascopy. In case of any discrepancies, the data provided directly by Dukascopy prevails.</tsq></p>
+                <a data-dismiss="modal" tsq>Close</a>
+                <button data-testid="dm-dukas-import-start-import-btn" type="button" class="btn btn-primary" ng-click="onStartImport()" tsq>Start download</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div ng-include="'../../../plugins/DataSourceDukascopy/import/cdnDisclaimerPopup.html'" />

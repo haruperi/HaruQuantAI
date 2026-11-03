@@ -1,0 +1,1 @@
+(COTExtremeExitBearish(<@printParam block "#CotSymbol#" />, ext><@printParam block "#ExtremeThreshold#" />))

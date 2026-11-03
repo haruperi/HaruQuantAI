@@ -1,0 +1,1 @@
+SqCOT(<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign>${cotIdentifier(cs, p?upper_case)}, 0, <#if cotCacheFolder??>cotCacheFolder<#else>""</#if>).Values[<@printParam block "#FieldIndex#" />]<@printShift block shift />

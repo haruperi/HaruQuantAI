@@ -1,0 +1,292 @@
+.btn-dukasRange.selected {
+    background: #2196f3;
+    color: white;
+}
+
+#importProgressTable {
+    width: 100%;
+    text-align: center;
+    vertical-align: middle;
+}
+
+#importProgressTable tr {
+    height: 30px;
+}
+
+#importProgressTable td.symbol {
+    width: 140px;
+}
+
+.add-data-postfix {
+    clear: both;
+    padding-top: 18px;
+}
+
+.add-data-postfix .sq-input {
+    margin-top: 3px;
+    width: 124px;
+    padding-top: 0;
+}
+
+.add-data-postfix label {
+    font-weight: 400;
+}
+
+div.dukascopy-menu>button:before {
+    content: '';
+    background: url("../../../plugins/DataSourceDukascopy/dukascopy.ico") no-repeat;
+    padding-left: 22px;
+    display: inline-block;
+    margin-left: -4px;
+    width: 16px;
+    height: 16px;
+    vertical-align: middle;
+}
+
+#dukasDisclaimerModal .sq-fieldset h1, #cdnDisclaimerModal .sq-fieldset h1 {
+    text-align: center;
+    color: #444;
+    margin-top: 0px;
+}
+
+#dukasDisclaimerModal .sq-fieldset p, #cdnDisclaimerModal .sq-fieldset p {
+    color: #666;
+}
+
+#dukasDisclaimerModal .modal-body, #cdnDisclaimerModal .modal-body {
+    padding-bottom: 0px;
+}
+
+#dukasImportModal .modal-dialog {
+    width: 670px;
+}
+
+#dukasImportModal .row-btns {
+    margin-top: 18px;
+    margin-bottom: 12px;
+    margin-left: -6px;
+    margin-right: -6px;
+}
+
+#dukasImportModal .row-btns .btn-dukasRange {
+    width: 100%;
+    margin: 0;
+}
+
+#dukasImportModal .radios {
+    margin-left: -22px;
+    position: relative;
+    top: -10px;
+}
+
+#dukasImportModal .cdn-part {
+    margin-left: 10px;
+    margin-right: 8px;
+    position: relative;
+    top: -10px;
+}
+
+#dukasImportModal .sq-fieldset .row.cdn-part>div {
+    padding-left: 6px !important;
+    padding-right: 6px !important;
+}
+
+#dukasImportModal .sq-fieldset .row.cdn-part>div:last-child {
+    padding-left: 12px !important;
+}
+
+#dukasImportModal .cdn-part .sqn-label {
+    margin-left: 0;
+}
+
+#dukasImportModal .cdn-part a {
+    display: block;
+    margin-top: 4px;
+}
+
+#dukasImportModal .cdn-server-selector {
+    margin-top: 10px;
+}
+
+#dukasImportModal .cdn-server-options {
+    display: flex;
+    width: 100%;
+}
+
+#dukasImportModal .cdn-server-options .btn {
+    flex: 1;
+    height: auto;
+    padding: 8px 10px;
+    margin-bottom: 0;
+    border-radius: 6px;
+    white-space: normal;
+    line-height: 20px;
+}
+
+#dukasImportModal .cdn-server-options .btn + .btn {
+    margin-left: 4px;
+}
+
+#dukasImportModal .cdn-server-options .btn:focus-within {
+    outline: 2px solid currentColor;
+    outline-offset: -3px;
+    z-index: 3;
+}
+
+#dukasImportModal .cdn-server-options .fa {
+    margin-right: 6px;
+    font-size: 2em;
+    vertical-align: middle;
+}
+
+#dukasImportModal .cdn-server-recommended {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 5px;
+    border-radius: 3px;
+    background: #ffffff;
+    color: #1e70bc;
+    font-size: 10px;
+    font-weight: 700;
+    line-height: 16px;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    vertical-align: middle;
+}
+
+#dukasImportModal .cdn-server-help {
+    margin: 10px 0 6px;
+}
+
+#dukasImportModal .sq-checkbox {
+    margin-top: 4px;
+}
+
+#dukasImportTDModal .sq-legend-help {
+    font-weight: 400;
+}
+
+#dukasImportTDModal .sqn-label {
+    width: 168px;
+}
+
+#dukasImportTDModal .sqn-input {
+    width: 326px;
+    margin-right: 6px;
+}
+
+#dukasImportModal .cdn-part hr {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    border-top: 1px solid #D0D0D0;
+}
+
+#dukasImportModal #full-license-only {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 14px;
+    padding: 16px;
+    border: 1px solid #f5cf75;
+    border-radius: 10px;
+    background: #fff4d6;
+    color: #59431a;
+    font-weight: 400;
+    line-height: 1.5;
+}
+
+#dukasImportModal .cdn-upgrade-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: #ffb91c;
+    color: #302300;
+    font-size: 20px;
+}
+
+#dukasImportModal .cdn-upgrade-copy {
+    flex: 1 1 260px;
+    min-width: 0;
+}
+
+#dukasImportModal .cdn-upgrade-title {
+    display: block;
+    margin-bottom: 4px;
+    color: #654300;
+    font-weight: 700;
+}
+
+#dukasImportModal .cdn-upgrade-copy p {
+    margin: 0;
+}
+
+body #dukasImportModal .btn.cdn-upgrade-button {
+    flex: 0 1 auto;
+    max-width: 100%;
+    height: auto;
+    margin: 0 0 0 auto;
+    padding: 9px 14px;
+    border: 1px solid #dfa000;
+    border-radius: 7px;
+    background: #ffb91c;
+    color: #302300;
+    font-weight: 700;
+    line-height: 20px;
+    white-space: normal;
+    text-shadow: none;
+    box-shadow: 0 2px 6px rgba(125, 87, 0, 0.15);
+}
+
+body #dukasImportModal .btn.cdn-upgrade-button:hover {
+    background: #f5ad0d;
+}
+
+body #dukasImportModal .btn.cdn-upgrade-button:focus-visible {
+    outline: 2px solid #654300 !important;
+    outline-offset: 2px;
+}
+
+#dukasImportModal .cdn-upgrade-crown {
+    width: 16px;
+    height: 16px;
+    margin-right: 6px;
+    vertical-align: middle;
+}
+
+#dukasImportModal .modal-footer {
+    display: flex;
+    align-items: flex-start;
+}
+
+#dukasImportModal .modal-footer::before,
+#dukasImportModal .modal-footer::after {
+    display: none;
+}
+
+#dukasImportModal .modal-footer > a,
+#dukasImportModal .modal-footer > .btn {
+    flex: 0 0 auto;
+}
+
+#dukasImportModal .dukas-footer-note {
+    flex: 1 1 auto;
+    min-width: 0;
+    margin: 0 20px 0 0;
+    color: #777777;
+    font-size: 11px;
+    line-height: 1.45;
+    text-align: left;
+    white-space: normal;
+}
+
+#dukasImportModal .dukas-footer-note a {
+    margin: 0;
+    font-size: inherit;
+    line-height: inherit;
+    vertical-align: baseline;
+    cursor: pointer;
+}

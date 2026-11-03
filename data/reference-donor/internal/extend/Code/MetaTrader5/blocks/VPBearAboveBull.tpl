@@ -1,0 +1,1 @@
+(sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 19, <@printShift block "0" />) > sqGetIndicatorValue(${getIndyShortName(getIndicatorId(block))}, 18, <@printShift block "0" />))

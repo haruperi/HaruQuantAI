@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOT_MomentumRevBearish(${cotSymbolInput(cs)}, <@printShift block shift />, <@printParam block "#MomPeriod#" />)

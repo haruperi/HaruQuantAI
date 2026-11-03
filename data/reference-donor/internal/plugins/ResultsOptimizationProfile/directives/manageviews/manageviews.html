@@ -1,0 +1,12 @@
+<div class="toolbar">
+    <label tsq>View</label>
+    <div class="sqn-input sqn-select">
+        <span>{{selectedView}}</span>
+        <select ng-model="selectedView" data-testid="results-profile-manage-views-view" ng-options="item.name as item.name for item in views" onFocus="sqnSelectFocus(this)"
+            onBlur="sqnSelectBlur(this)" ng-change="onViewChange()"></select>
+    </div>
+
+    <button class="btn btn-normal btn-primary" ng-click="onManageViews()" data-testid="results-profile-manage-views-manage" tsq>Manage</button>
+</div>
+
+<manage-views-dialog instance="manageViewsDialog" type="OptProfile" />

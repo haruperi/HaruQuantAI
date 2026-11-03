@@ -1,0 +1,124 @@
+<span>
+    <span>
+        <label class="sqn-label" ng-show="label">{{::label}}</label>
+        <div class="sqn-input sqn-select" ng-class="{'disabled':ngDisabled}">
+            <span ng-bind="timeframe"></span>
+            <select class="sq-timeframe-select" ng-model="innerTimeframe"
+                ng-options="item for item in availableTimeframes" onFocus="sqnSelectFocus(this)"
+                onBlur="sqnSelectBlur(this)" ng-disabled="ngDisabled"></select>
+        </div>
+    </span>
+    <a class="add-timeframe" ng-if="false" ng-click="showTFPopup()"></a>
+
+    <!-- Modal window-->
+    <div class="modal centered timeframe-popup" id="{{::timeframesPopupId}}" tabindex="-1" role="dialog"
+        aria-labelledby="myModalLabel-{{::timeframesPopupId}}">
+        <div class="modal-dialog modal-smaller" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button id="buttonTimes-43a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                    <h4 class="modal-title" id="myModalLabel" tsq>Add new timeframe</h4>
+                </div>
+                <div class="modal-body">
+                    <fieldset class="sq-fieldset">
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="TFRadios" ng-model="newTF.prefix" value="S"
+                                            ng-disabled="minTFSeconds > 1" />
+                                        <tsq>Seconds</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="sqn-spinner">
+                                    <input type="text" class="sqn-input" min="0" step="1" ng-model="newTF.seconds"
+                                        onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                                        ng-disabled="newTF.prefix != 'S'" />
+                                    <div class="sqn-spinner-btns">
+                                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="TFRadios" ng-model="newTF.prefix" value="M"
+                                            ng-disabled="minTFSeconds > 60" />
+                                        <tsq>Minutes</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="sqn-spinner">
+                                    <input type="text" class="sqn-input" min="0" step="1" ng-model="newTF.minutes"
+                                        onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                                        ng-disabled="newTF.prefix != 'M'" />
+                                    <div class="sqn-spinner-btns">
+                                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="TFRadios" ng-model="newTF.prefix" value="H"
+                                            ng-disabled="minTFSeconds > 3600" />
+                                        <tsq>Hours</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="sqn-spinner">
+                                    <input type="text" class="sqn-input" min="0" step="1" ng-model="newTF.hours"
+                                        onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                                        ng-disabled="newTF.prefix != 'H'" />
+                                    <div class="sqn-spinner-btns">
+                                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="radio">
+                                    <label>
+                                        <input type="radio" name="TFRadios" ng-model="newTF.prefix" value="D"
+                                            ng-disabled="minTFSeconds > 86400" />
+                                        <tsq>Days</tsq>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="sqn-spinner">
+                                    <input type="text" class="sqn-input" min="0" step="1" ng-model="newTF.days"
+                                        onFocus="sqnSpinnerFocus(this)" onBlur="sqnSpinnerBlur(this)"
+                                        ng-disabled="newTF.prefix != 'D'" />
+                                    <div class="sqn-spinner-btns">
+                                        <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                        <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </fieldset>
+                </div>
+                <div class="modal-footer">
+                    <a data-dismiss="modal" tsq>Close</a>
+                    <button id="buttonSave-43b" class="btn btn-primary" ng-click="saveTimeframe()" data-dismiss="modal" tsq>Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</span>

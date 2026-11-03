@@ -1,0 +1,1 @@
+(COTRocBullish(<@printParam block "#CotSymbol#" />, roc><@printParam block "#ROCThreshold#" />))

@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>(iCustom(NULL, 0, "SqCOT", ${cotIdentifier(cs, "52W")}, 4, 4, <@printShift block shift />) < <@printParam block "#SmallThreshold#" />)

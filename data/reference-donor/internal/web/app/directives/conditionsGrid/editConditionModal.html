@@ -1,0 +1,94 @@
+<div class="modal editConditionModal" id="{{::editConditionsModal}}" tabindex="-1" role="dialog"
+    aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document" style="width: 400px;">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-27a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="{{::editConditionsModal}}Label">
+                    <tsq>Edit condition</tsq> : {{editConditionLabel}}
+                </h4>
+            </div>
+            <div class="modal-body" style="min-height: 330px;overflow: visible;">
+                <form name="addSymbolForm" class="form-horizontal" role="form" style="text-align: left;">
+                    <div class="row" style="margin-bottom: 10px;">
+                        <div class="col-xs-12">
+                            <items-chooser style="width: 100%" instance="editConditionChooser"
+                                placeholder="{{'Search for condition' | tsq}}"
+                                no-results-text="{{'No results matching' | tsq}}"></items-chooser>
+                        </div>
+                    </div>
+
+                    <div class="condition-modal-line"></div>
+
+                    <div style="min-height: 128px;">
+
+                        <div ng-show="conditionDetails.valueType == valueTypes.numeric">
+                            <div class="row row-smaller">
+                                <div class="col-sm-8">
+                                    <div class="sqn-label" tsq>Value</div>
+                                </div>
+                                <div class="col-sm-4" style="text-align: right;">
+                                    <div class="sqn-spinner">
+                                        <input type="text" class="sqn-input" step="{{conditionsValueStep}}"
+                                            ng-model="conditionDetails.numericValue" onFocus="sqnSpinnerFocus(this)"
+                                            onBlur="sqnSpinnerBlur(this)" />
+                                        <div class="sqn-spinner-btns">
+                                            <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                            <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div ng-show="conditionDetails.valueType == valueTypes.column">
+                            <column-settings on-change="onColumnSettingsChange" instance="columnSettings"
+                                type="conditions">
+                            </column-settings>
+                        </div>
+                    </div>
+
+                    <div class="condition-modal-line"></div>
+
+                    <div class="row" ng-show="conditionDetails.valueType != valueTypes.numeric">
+                        <div class="col-sm-12">
+                            <div class="pull-right">
+                                <div class="sqn-label" tsq>Apply percentage ratio</div>
+                                <div ng-show="conditionDetails.pctRatio" class="pct-ratio">
+                                    <div class="sqn-spinner">
+                                        <input type="text" class="sqn-input" min="1" max="1000" step="10"
+                                            ng-model="conditionDetails.pctRatioValue" onFocus="sqnSpinnerFocus(this)"
+                                            onBlur="sqnSpinnerBlur(this)" />
+                                        <div class="sqn-spinner-btns">
+                                            <div class="sqn-spinner-minus" onClick="sqnSpinnerMinus(this)"></div>
+                                            <div class="sqn-spinner-plus" onClick="sqnSpinnerPlus(this)"></div>
+                                        </div>
+                                    </div> %
+                                </div>
+
+                                <div class="sq-checkbox">
+                                    <input type="checkbox" ng-model="conditionDetails.pctRatio"
+                                        id="edit-condition-pctRatio-{{editConditionsModal}}" />
+                                    <label for="edit-condition-pctRatio-{{editConditionsModal}}">&nbsp;</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-sm-12 text-right gen-help" ng-show="conditionDetails.pctRatio">
+                            <tsq>Percentage ratio allows you to compare one value
+                                <br>to a percentage of another, for example make
+                                <br>a comparision like:
+                                <br>Net Profit (OOS) >= 60% of Net Profit (IS)</tsq>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq>Close</a>
+                <button id="buttonSave-27b" type="button" class="btn btn-primary" ng-click="onSaveCondition()" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

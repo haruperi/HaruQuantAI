@@ -1,0 +1,24 @@
+<Settings>
+  <buildTemplatesPath>C:/SQX-145/internal/web/BUILDER/templates</buildTemplatesPath>
+  <ComputePctsMetrics>false</ComputePctsMetrics>
+  <configsPath>C:/SQX-145/user/settings/Configs</configsPath>
+  <sourceCodeConstantsParams>true</sourceCodeConstantsParams>
+  <skin>Dark skin</skin>
+  <WebServerPortUsed>8080</WebServerPortUsed>
+  <language>English</language>
+  <userPath>C:/SQX-145/user</userPath>
+  <strategyTemplatesPath>C:/SQX-145/user/settings/StrategyTemplates</strategyTemplatesPath>
+  <appPath>C:/SQX-145/</appPath>
+  <gpuAccelerated>true</gpuAccelerated>
+  <BenchmarkTimePerTick>1.718794886147208E-5</BenchmarkTimePerTick>
+  <templatesPath>C:/SQX-145/user/templates</templatesPath>
+  <strategiesPath>C:/SQX-145/user/strategies</strategiesPath>
+  <dontStorePendingOrders>true</dontStorePendingOrders>
+  <ComputePipsMetrics>false</ComputePipsMetrics>
+  <testsPath>C:/SQX-145/tests</testsPath>
+  <projectsPath>C:/SQX-145/user/projects</projectsPath>
+  <BrowserToken>-1723885869</BrowserToken>
+  <dontStoreOP3DChartsData>true</dontStoreOP3DChartsData>
+  <ComputeSeparateMetrics>true</ComputeSeparateMetrics>
+  <settingsPath>C:/SQX-145/user/settings</settingsPath>
+</Settings>

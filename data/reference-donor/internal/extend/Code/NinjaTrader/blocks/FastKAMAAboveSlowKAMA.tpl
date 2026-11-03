@@ -1,0 +1,3 @@
+<#-- Fast KAMA above slow KAMA: the installed SqKAMA indicator (ER, short, long periods, as KAMA.java), not the native
+     NinjaScript KAMA, which accepts periods up to 125 only. Parity with JForex FastKAMAAboveSlowKAMA. -->
+<#global sqUsesIndicatorPackage = true><@compress_single_line>(sqRound(<@printSeriesAt block "0">SqKAMA(<@printInput block />, <@printParam block "#FastERPeriod#" />, <@printParam block "#FastShortPeriod#" />, <@printParam block "#FastLongPeriod#" />).Values[0]</@printSeriesAt>, 6) > sqRound(<@printSeriesAt block "0">SqKAMA(<@printInput block />, <@printParam block "#SlowERPeriod#" />, <@printParam block "#SlowShortPeriod#" />, <@printParam block "#SlowLongPeriod#" />).Values[0]</@printSeriesAt>, 6))</@compress_single_line>

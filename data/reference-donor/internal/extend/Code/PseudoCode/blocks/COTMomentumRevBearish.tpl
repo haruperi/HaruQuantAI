@@ -1,0 +1,1 @@
+(COTMomentumRevBearish(<@printParam block "#CotSymbol#" />))

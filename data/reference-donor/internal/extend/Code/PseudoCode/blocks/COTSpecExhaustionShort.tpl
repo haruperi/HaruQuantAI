@@ -1,0 +1,1 @@
+(COTSpecExhaustionShort(<@printParam block "#CotSymbol#" />, ext><@printParam block "#SpecExtreme#" />))

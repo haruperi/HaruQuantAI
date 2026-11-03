@@ -1,0 +1,10 @@
+<div id="{{::chooserId}}" data-testid="items-chooser">
+    <select id="{{::chooserId}}-chosen-select" data-placeholder="{{::placeholder}}" style="width: 100%; display: none;" multiple="" class="chosen-select" tabindex="-1">
+        <option value=""></option>
+        <option value="{{::option.value}}" ng-repeat="option in categories[0].options" ng-if="categories.length==1">{{::(option.name | tsq)}}</option>
+                
+        <optgroup label="{{::category.name}}" ng-repeat="category in categories" ng-if="categories.length>1">
+            <option value="{{::option.value}}" ng-repeat="option in category.options">{{::(option.name | tsq)}}</option>
+        </optgroup>
+    </select>
+</div>

@@ -1,0 +1,1 @@
+(SQ_VolumeProfile(Open, High, Low, Close, Ticks, <@printParam block "#SessionType#" "1" />, <@printParam block "#ProfileRows#" "50" />, 2, 3, <@printParam block "#ValueAreaPct#" "70" />, 0, 5, 20, 40, false, false, 3.0, 3, 1, 0.5, 50, 1.5, 14, <@printParam block "#TickSize#" "0" />, 3)<@printShift block shift />>0)

@@ -1,0 +1,28 @@
+<!-- Modal window-->
+<div class="modal centered" id="saveStrategiesProgressModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 ng-if="savingProgress.isAppExit" class="modal-title" id="myModalLabel" tsq>Saving databanks before exit</h4>
+                <h4 ng-if="!savingProgress.isAppExit" class="modal-title" id="myModalLabel" tsq>Synchronizing databank into files</h4>
+            </div>
+            <div class="modal-body">
+                <label style="margin-bottom: 20px;" ng-bind="savingProgress.info"></label>
+                <div class="progress">
+                    <div class="progress-bar progress-bar-striped active" role="progressbar" aria-valuenow="40" aria-valuemin="0" aria-valuemax="100" style="width:{{savingProgress.percent}}%" ng-if="savingProgress.percent!='infinite'"> {{savingProgress.percent}}%
+                    </div>
+                    <div class="progress-bar active progress-bar-infinite" role="progressbar" ng-if="savingProgress.percent=='infinite'"></div>
+                </div>
+
+                <div class="col col-sm-12 cancel-btn" ng-if="savingProgress.cancelCallback">
+                    <button id="buttonExitWithoutSaving-56a" ng-if="savingProgress.isAppExit" class="btn btn-primary" ng-click="savingProgress.cancelCallback()" tsq>Exit without saving</button>
+                    <button id="buttonCancelSaving-56b" ng-if="!savingProgress.isAppExit" class="btn btn-primary" ng-click="savingProgress.cancelCallback()" tsq>Cancel saving</button>
+                </div>
+                <div class="col col-sm-12 help" ng-if="savingProgress.cancelCallback">
+                    <label ng-if="savingProgress.isAppExit" tsq>Please note that if you exit without saving, all new or retested strategies will not be saved</label>
+                    <label ng-if="!savingProgress.isAppExit" tsq>Please note that if you cancel saving, all new or retested strategies will not be saved</label>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>SqCOTExtUnwindBear(${cotSymbolInput(cs)}, <@printCIShift block shift />, <@printParam block "#LookbackWeeks#" />, <@printParam block "#NormalizeThreshold#" />, <@printParam block "#CrowdedThreshold#" />)

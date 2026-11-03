@@ -1,0 +1,1 @@
+COTCpihedg(<@printParam block "#CotSymbol#" />, <@printParam block "#Period#" />)[<@printShift block shift />]

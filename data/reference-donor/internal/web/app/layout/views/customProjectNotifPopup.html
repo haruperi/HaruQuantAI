@@ -1,0 +1,25 @@
+<!-- Modal window-->
+<div class="modal" id="customProjectNotifPopup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog type-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-46a" type="button" class="close" data-dismiss="modal" aria-label="Close" ng-click="confirmDialog.onClose()" data-testid="shell-modal-custom-project-notif-close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Custom Project Notification</h4>
+            </div>
+            <div class="modal-body">
+                <div ng-if="!customProjectPaused">
+                    {{customProjectNotification}} <tsq>Project continues with the next task.</tsq>
+                </div>
+
+                <div ng-if="customProjectPaused">
+                    {{customProjectNotification}}<br>
+                    <b tsq>Project was paused and it is waiting for user action - you have to resume it to continue.</b>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" tsq data-testid="shell-modal-custom-project-notif-dismiss">Close</a>
+                <button id="buttonGoToProject-46b" type="button" class="btn btn-primary" data-dismiss="modal" ng-click="goToCustomProject()" tsq data-testid="shell-modal-custom-project-notif-goto">Go to project</button>
+            </div>
+        </div>
+    </div>
+</div>

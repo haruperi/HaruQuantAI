@@ -1,0 +1,51 @@
+<!-- Modal window-->
+<div class="modal centered editParamSetPopup" id="{{::editParamSetPopupId}}" data-testid="block-config-edit-set-popup" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog modal-medium" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button id="buttonTimes-22a" type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+                <h4 class="modal-title" id="myModalLabel" tsq>Edit parameter set</h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <form name="editSetupForm" class="form-horizontal" role="form">
+                    <label>
+                        <tsq>Block:</tsq>
+                        <span ng-bind-html="selectedBlock.name|html" />
+                    </label>
+
+                    <fieldset class="sq-fieldset">
+                        <legend tsq>Parameter set options</legend>
+                        <div class="row" style="margin-top: -10px;">
+                            <div class="col-xs-5">
+                                <label class="sqn-label">
+                                    <tsq>Set name</tsq>
+                                    <input type="text" class="sqn-input" ng-model="selectedParamSet.name" data-testid="block-config-edit-set-name" />
+                                </label>
+                            </div>
+                            <div class="col-xs-2" ng-show="selectedParamSet.action == 'Edit'">
+                                <button id="buttonDelete-22b" data-testid="block-config-edit-set-delete" class="btn btn-default" style="margin-top: 23px; margin-left: -30px;" ng-click="removeParamSet()" tsq>Delete set</button>
+                            </div>
+                        </div>
+                    </fieldset>
+
+                    <fieldset class="sq-fieldset">
+                        <legend tsq>Parameters configuration</legend>
+                        <label style="font-weight: 400; font-size: 12px; color: #999;" tsq>Double click on a parameter row to edit it</label>
+
+                        <div class="row" style="margin-top: 10px;">
+                            <div class="col-xs-12">
+                                <div id="{{::setParamsGridId}}" data-testid="block-config-edit-set-params-grid" class="gridbox_compressed" style="height: 140px;" />
+                            </div>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" data-testid="block-config-edit-set-close" tsq>Close</a>
+                <button id="buttonSave-22c" type="button" class="btn btn-primary" data-testid="block-config-edit-set-save" ng-click="onSaveParamSetConfig()" tsq>Save</button>
+            </div>
+        </div>
+    </div>
+</div>

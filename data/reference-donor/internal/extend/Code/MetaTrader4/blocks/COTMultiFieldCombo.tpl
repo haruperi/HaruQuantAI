@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign><#assign p><@printParam block "#Period#" /></#assign>SqCOT_MultiFieldCombo(${cotIdentifier(cs, p?upper_case)}, <@printParam block "#UseCpihedg#" "true" />, <@printParam block "#UseCpispec#" "true" />, <@printParam block "#UseCpismall#" "true" />, <@printParam block "#UseCtispec#" "true" />, <@printShift block shift />)

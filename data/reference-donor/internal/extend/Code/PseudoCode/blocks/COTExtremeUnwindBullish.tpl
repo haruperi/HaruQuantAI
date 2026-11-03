@@ -1,0 +1,1 @@
+(COTExtremeUnwindBullish(<@printParam block "#CotSymbol#" />, crowd><@printParam block "#CrowdedThreshold#" />))

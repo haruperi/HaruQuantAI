@@ -1,0 +1,1 @@
+(STDDEV) Standard Deviation(<@printInput block true />, <@printComputedFromParam block "#ComputedFrom#" />, <@printParam block "#TimePeriod#" />, <@printParam block "#NbDev#" />)[<@printShift block shift />]

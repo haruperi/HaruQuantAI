@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <base href="/PORTFOLIOCOMPOSER">
+    <meta charset="utf-8">
+    <title>PortfolioComposer</title>
+    <meta name="description" content="StrategyQuant PortfolioComposer">
+    <meta name="author" content="takacs@strategyquant.com">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link rel="stylesheet" href="common/Batch1/styles.css">
+    <link rel="stylesheet" href="common/Batch2/styles.css">
+    <link rel="stylesheet" href="common/Batch3/styles.css">
+    <link rel="stylesheet" href="PORTFOLIOCOMPOSER/layout/layout.css">
+
+    <script src="common/Batch1/libs.js"></script>
+    <script src="common/Batch2/libs.js"></script>
+    <script src="common/Batch3/libs.js"></script>
+    <script src="PORTFOLIOCOMPOSER/build/layout.js"></script>
+    <script src="libs/vs/loader.js"></script>
+</head>
+
+<body ng-app="app" style="font-family: {{$root.font}}'Open Sans', Arial, Helvetica, Sans-Serif; zoom: {{$root.zoom.css}};" class="{{$root.zoom.class}} {{$root.brEdition}}">
+    <preload-templates></preload-templates>
+    
+    <script>
+        window.appConfig = {
+            product: 'PORTFOLIOCOMPOSER',
+            project: 'PortfolioComposer',
+            task: {
+                type: 'PortfolioComposer',
+                name: 'PortfolioComposer',
+                default: true
+            },
+            productName: 'PortfolioComposer',
+            defaultState: 'app',
+            defaultURL: '/app',
+            gridSkin: 'dhx_web',
+            gridImagePath: '../img/dhtmlx/web/'
+        };
+    </script>
+
+    <div ui-view style="height:100%" />
+</body>
+
+</html>

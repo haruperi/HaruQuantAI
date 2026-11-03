@@ -1,0 +1,11 @@
+<div ng-include="results.templateUrl" ng-dynamic-controller="results.controller" class="sqn-dashboard-view" style="height:100%" ng-class="{'br-edition': isBrazilianEdition}"/>
+
+<sq-utils />
+
+<a id="refreshBtn" data-testid="results-reload-link" style="position:fixed; top: 40px; right: 40px;" ng-click="saveAndReload()" href="">Reload</a>
+
+<div id="results-loading-overlay" ng-show="overlay.show" />
+<span us-spinner="{radius:30, width:8, length: 16}" spinner-key="{{::spinnerKey}}" ng-show="overlay.show"></span>
+
+<apps-zoom ng-show="false" />
+<language-menu ng-show="false" />

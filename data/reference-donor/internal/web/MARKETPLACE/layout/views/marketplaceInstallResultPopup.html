@@ -1,0 +1,60 @@
+<!-- Install result - shown after an install finishes: which files were
+     installed, where they were unpacked, and any skipped files / restart note.
+     Driven by LayoutCtrl ($scope.installResult). -->
+<div class="modal fade not-resize" id="marketplaceInstallResultPopup" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content" ng-if="installResult">
+            <div class="modal-header">
+                <button type="button" class="close" ng-click="closeInstallResult()" aria-label="Close"
+                        data-testid="marketplace-install-result-close"><span aria-hidden="true">&times;</span></button>
+                <h4 class="modal-title">
+                    <i class="fa fa-check-circle marketplace-install-result-ok"></i>
+                    <span tsq>Installation complete</span>
+                </h4>
+            </div>
+            <div class="modal-body marketplace-install-result-body">
+                <div class="marketplace-install-result-msg">
+                    <strong>{{installResult.title}}</strong> <span tsq>was installed successfully.</span>
+                </div>
+
+                <div class="marketplace-install-result-loc" ng-if="installResult.installDir">
+                    <span class="marketplace-install-result-label" tsq>Unpacked into</span>
+                    <code data-testid="marketplace-install-result-dir">{{installResult.installDir}}</code>
+                </div>
+
+                <div class="marketplace-install-result-section" ng-if="installResult.installedFiles.length">
+                    <div class="marketplace-install-result-label">
+                        <span tsq>Installed files</span> <span class="marketplace-install-result-count">({{installResult.installedFiles.length}})</span>
+                    </div>
+                    <ul class="marketplace-install-result-list" data-testid="marketplace-install-result-files">
+                        <li ng-repeat="f in installResult.installedFiles track by $index">
+                            <i class="fa fa-file-o"></i> {{f}}
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="marketplace-install-result-section marketplace-install-result-skipped"
+                     ng-if="installResult.skippedFiles.length">
+                    <div class="marketplace-install-result-label">
+                        <span tsq>Skipped</span> <span class="marketplace-install-result-count">({{installResult.skippedFiles.length}})</span>
+                    </div>
+                    <ul class="marketplace-install-result-list" data-testid="marketplace-install-result-skipped">
+                        <li ng-repeat="s in installResult.skippedFiles track by $index">
+                            <i class="fa fa-ban"></i> {{s.name}}
+                            <span class="marketplace-install-result-reason" ng-if="s.reason">— {{s.reason}}</span>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="marketplace-install-result-restart" ng-if="installResult.restartRequired">
+                    <i class="fa fa-exclamation-triangle"></i>
+                    <span tsq>Restart StrategyQuant X to activate the installed plugin.</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" ng-click="closeInstallResult()"
+                        data-testid="marketplace-install-result-ok" tsq>Close</button>
+            </div>
+        </div>
+    </div>
+</div>

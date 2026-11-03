@@ -1,0 +1,50 @@
+<div class="pc-settings-tab-container">
+    <div class="pc-composition-toolbar">
+        <button type="button" class="btn btn-normal btn-default btn-rm" ng-click="load()" id="pc-action-load" data-testid="composition-load-btn" tsq>
+            Load
+        </button>
+
+        <button type="button" class="btn btn-normal btn-default btn-rm" ng-click="save()" id="pc-action-save" data-testid="composition-save-btn" tsq>
+            Save
+        </button>
+
+        <button type="button" class="btn btn-normal btn-default btn-rm" ng-click="savePortfolio()" id="pc-action-save-portfolio" data-testid="composition-save-portfolio-btn" tsq>
+            Save portfolio
+        </button>
+
+        <button type="button" class="btn btn-normal btn-default btn-rm btn-delete" ng-click="delete()" id="pc-action-delete" data-testid="composition-delete-btn" tsq>
+            Delete
+        </button>
+
+        <button type="button" class="btn btn-normal btn-default btn-rm btn-delete" ng-click="clearAll()" id="pc-action-clear-all" data-testid="composition-clear-all-btn" tsq>
+            Clear all
+        </button>
+
+        
+        <button type="button" class="btn btn-normal btn-default btn-rm btn-move-up" ng-click="moveUp()" id="pc-action-move-up" data-testid="composition-move-up-btn" tsq>
+            Move up
+        </button>
+
+        
+        <button type="button" class="btn btn-normal btn-default btn-rm" ng-click="moveDown()" id="pc-action-move-down" data-testid="composition-move-down-btn" tsq>
+            Move down
+        </button>
+
+        <button type="button" class="btn btn-normal btn-default btn-rm" ng-click="addBuyHoldStrategy()" id="pc-action-add-strategy" data-testid="composition-add-strategy-btn" tsq>
+            Add Buy and Hold strategy
+        </button>
+    </div>
+
+	<div class="databanks-records-count" data-testid="pcomposer-composition-records-count">
+		<tsq>Records</tsq>:
+		<span ng-bind="records"></span>
+		<span ng-if="selectedRecords>0"> &nbsp; (
+			<tsq>Selected</tsq>:
+			<span ng-bind="selectedRecords"></span>)
+		</span>
+	</div>
+
+    <div id="pc-composition-grid" data-testid="pcomposer-composition-grid"></div>
+</div>
+
+<div ng-include="'../../../plugins/PortfolioComposer/settings/composition/addBuyHoldStrPopup.html'"></div>

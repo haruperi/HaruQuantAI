@@ -1,0 +1,1 @@
+<#assign cs><@printParam block "#CotSymbol#" /></#assign>(SQ_COT_GetValue(${cotIdentifier(cs, "52W")}, 4, <@printShiftAsParam block shift />, "") > <@printParam block "#SmallThreshold#" />)

@@ -1,0 +1,27 @@
+<span class="simple-data-settings">
+    <label class="settings-title" tsq>Data</label>
+
+    <div class="setting-row">
+        <label class="sqn-label fixed-width" tsq>Engine</label>
+        <div class="pull-right"></div>
+        <div class="sqn-input sqn-select">
+            <span ng-bind="getEngineLabel()"></span>
+            <select ng-model="config.engine" ng-options="engine.value as (engine.name | tsq) for engine in engineTypes"
+                onFocus="sqnSelectFocus(this)" onBlur="sqnSelectBlur(this)"></select>
+        </div>
+    </div>
+
+    <div class="setting-row">
+        <label ng-show="config.engine == 'Stockpicker'" class="sqn-label fixed-width" tsq>Group</label>
+        <label ng-show="config.engine != 'Stockpicker'" class="sqn-label fixed-width" tsq>Symbol</label>
+        <div class="pull-right">
+            <sq-data-box sq-model="config.symbol" engine="config.engine"/>
+            <timeframe-picker timeframe="config.timeframe" class="timeframe" min-timeframe="config.minTimeframe" higher-tfs-disabled="config.engine == 'Stockpicker' || config.engine == 'Single-asset cloud strategy'"/>
+        </div>
+    </div>
+    <div class="setting-row">
+        <label class="sqn-label fixed-width"></label>
+        <label class="date range" ng-bind="dateRange"></label>
+        <label class="oos range" ng-bind="oosRanges"></label>
+    </div>
+</span>

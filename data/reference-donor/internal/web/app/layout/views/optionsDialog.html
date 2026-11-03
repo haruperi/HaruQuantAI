@@ -1,0 +1,23 @@
+<!-- Modal window-->
+<div class="modal" id="optionsDialog" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    <div class="modal-dialog type-warning" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel" ng-bind="optionsDialog.title | tsq"></h4>
+            </div>
+            <div class="modal-body" style="height: auto;">
+                <form class="form-horizontal" role="form">
+                    <div class="form-group">
+                        <label class="col-sm-12" style="text-align: center; font-size: 16px;">
+                            <span ng-bind-html="optionsDialog.message | tsq | html"></span>
+                        </label>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <a data-dismiss="modal" ng-hide="optionsDialog.hideClose" tsq>Close</a>
+                <button id="buttonSelectOption-52a" type="button" class="btn btn-primary" data-dismiss="modal" ng-repeat="option in optionsDialog.options" ng-click="optionsDialog.callback(option)" ng-bind="option.title"></button>
+            </div>
+        </div>
+    </div>
+</div>

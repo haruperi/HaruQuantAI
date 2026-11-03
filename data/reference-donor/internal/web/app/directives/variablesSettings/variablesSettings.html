@@ -1,0 +1,117 @@
+<div class="dropdown dropdown-parameters-settings" id="{{::menuId}}">
+    <a data-toggle="dropdown" aria-expanded="false" title="Settings" tsq>Parameter variables</a>
+    <ul class="dropdown-menu" onclick="event.stopPropagation();">
+        <strong tsq>What to parametrize</strong>
+
+        <div>
+            <div class="radio">
+                <label class="sq-wradio">
+                    <input type="radio" name="WhatToRarametrizeRadios" ng-model="config.parametrizeType" ng-value="0" data-testid="results-source-code-parametrize-recommended" />
+                    <span class="sq-mark"></span>
+                    <tsq>Recommended parameters</tsq>
+
+                    <div class="sq-data-help">
+                        <tsq>Only meaningful parameters. It is not a good idea to optimize everything</tsq><br>
+                        <tsq>Recommended params are: periods, entry + exit settings &amp; multipliers</tsq>
+                    </div>
+                </label>
+            </div>
+
+            <div class="radio">
+                <label class="sq-wradio">
+                    <input type="radio" name="WhatToRarametrizeRadios" ng-model="config.parametrizeType" ng-value="1" data-testid="results-source-code-parametrize-own" />
+                    <span class="sq-mark"></span>
+                    <tsq>Your own settings</tsq>
+
+                    <div class="sq-data-help">
+                        <tsq>Choose your own categories</tsq>
+                    </div>
+
+                    <div class="row" ng-show="config.parametrizeType==1">
+                        <div class="optimize-settings col-xs-5">
+                            <div class="sq-checkbox" ng-click="config.periodParams=!config.periodParams;onChange()">
+                                <input type="checkbox" ng-model="config.periodParams">
+                                <label>
+                                    <tsq>Periods</tsq>
+                                </label>
+                            </div>
+                            <div class="sq-checkbox"
+                                ng-click="config.constantsParams=!config.constantsParams;onChange()">
+                                <input type="checkbox" ng-model="config.constantsParams">
+                                <label>
+                                    <tsq>Constants</tsq>
+                                </label>
+                            </div>
+                            <div class="sq-checkbox" ng-click="config.shiftParams=!config.shiftParams;onChange()">
+                                <input type="checkbox" ng-model="config.shiftParams">
+                                <label>
+                                    <tsq>Shifts</tsq>
+                                </label>
+                            </div>
+                            <div class="sq-checkbox" ng-click="config.otherParams=!config.otherParams;onChange()">
+                                <input type="checkbox" ng-model="config.otherParams">
+                                <label>
+                                    <tsq>Other params</tsq>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="optimize-settings col-xs-7">
+                            <div class="sq-checkbox" ng-click="config.entryParams=!config.entryParams;onChange()">
+                                <input type="checkbox" ng-model="config.entryParams">
+                                <label>
+                                    <tsq>Entry (levels)</tsq>
+                                </label>
+                            </div>
+                            <div class="sq-checkbox" ng-click="config.entryLogic=!config.entryLogic;onChange()">
+                                <input type="checkbox" ng-model="config.entryLogic">
+                                <label>
+                                    <tsq>Entry (logic)</tsq>
+                                </label>
+                            </div>
+                            <div class="sq-checkbox" ng-click="config.exitParamsUsed=!config.exitParamsUsed;onChange()">
+                                <input type="checkbox" ng-model="config.exitParamsUsed">
+                                <label>
+                                    <tsq>Exit params (SL, PT,...) only used</tsq>
+                                </label>
+                            </div>
+                            <div class="sq-checkbox"
+                                ng-click="config.exitParamsUnused=!config.exitParamsUnused;onChange()">
+                                <input type="checkbox" ng-model="config.exitParamsUnused">
+                                <label>
+                                    <tsq>Exit params (SL, PT,...) unused</tsq>
+                                </label>
+                            </div>
+                            <div class="sq-checkbox" ng-click="config.booleanParams=!config.booleanParams;onChange()">
+                                <input type="checkbox" ng-model="config.booleanParams">
+                                <label>
+                                    <tsq>Boolean params</tsq>
+                                </label>
+                            </div>
+                        </div>
+                        <div class="optimize-settings col-xs-12">
+                            <hr />
+                            <div class="sq-checkbox"
+                                ng-click="config.symmetricVariables=!config.symmetricVariables;onChange()">
+                                <input type="checkbox" ng-model="config.symmetricVariables">
+                                <label>
+                                    <tsq>Symmetric variables for Long / Short</tsq>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </label>
+            </div>
+
+            <div class="radio">
+                <label class="sq-wradio">
+                    <input type="radio" name="WhatToRarametrizeRadios" ng-model="config.parametrizeType" ng-value="2" data-testid="results-source-code-parametrize-none" />
+                    <span class="sq-mark"></span>
+                    <tsq>Don't use parameters</tsq>
+                </label>
+            </div>
+
+            <br />
+
+        </div>
+    </ul>
+</div>
