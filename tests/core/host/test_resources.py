@@ -116,6 +116,7 @@ def test_cpu_and_memory_probes_and_fallbacks(monkeypatch):
     monkeypatch.setattr(
         resources.psutil, "cpu_count", lambda *, logical: 8 if logical else 4
     )
+    monkeypatch.setattr(resources.os, "cpu_count", lambda: 8)
     monkeypatch.setattr(
         resources.psutil, "cpu_freq", lambda: SimpleNamespace(current=2400.123)
     )
@@ -263,3 +264,149 @@ def test_benchmark_runner_completes_without_polling_sleeps(monkeypatch):
     assert runner.get_job(job.job_id).iterations_completed == 25
     assert runner.get_job("missing") is None
     assert not runner.cancel_job("missing")
+
+
+def test_get_available_processors(monkeypatch):
+    monkeypatch.setattr(
+        resources.psutil, "cpu_count", lambda *, logical: 16 if logical else 8
+    )
+    monkeypatch.setattr(resources.os, "cpu_count", lambda: 8)
+    assert resources.get_available_processors() == 16
+
+    monkeypatch.setattr(
+        resources.psutil, "cpu_count", lambda *, logical: 4 if logical else 2
+    )
+    monkeypatch.setattr(resources.os, "cpu_count", lambda: 12)
+    assert resources.get_available_processors() == 12
+
+    monkeypatch.setattr(resources.psutil, "cpu_count", lambda *, logical: None)
+    monkeypatch.setattr(resources.os, "cpu_count", lambda: None)
+    assert resources.get_available_processors() == 1
+
+
+def test_memory_protection_error_hierarchy():
+    assert issubclass(resources.MemoryProtectionError, MemoryError)
+    assert issubclass(resources.MemoryProtectionError, RuntimeError)
+    err = resources.MemoryProtectionError("memory guard triggered")
+    assert isinstance(err, MemoryError)
+    assert isinstance(err, RuntimeError)
+    assert "memory guard triggered" in str(err)
+
+
+def test_check_available_memory_thresholds():
+    normal_obs = resources.MemoryObservation(
+        total_bytes=1000,
+        available_bytes=300,
+        used_bytes=700,
+        used_pct=70.0,
+        total_mb=1.0,
+        available_mb=0.3,
+        is_available=True,
+    )
+    # Should not raise under normal conditions
+    resources.check_available_memory(
+        normal_obs,
+        over_limit_count=5,
+        one_time_limit_pct=90.0,
+        consecutive_threshold=15,
+    )
+
+    # One-time threshold breach (e.g. 91% > 90%)
+    high_obs = resources.MemoryObservation(
+        total_bytes=1000,
+        available_bytes=90,
+        used_bytes=910,
+        used_pct=91.0,
+        total_mb=1.0,
+        available_mb=0.09,
+        is_available=True,
+    )
+    with pytest.raises(
+        resources.MemoryProtectionError, match="Memory usage is too high"
+    ):
+        resources.check_available_memory(
+            high_obs,
+            over_limit_count=0,
+            one_time_limit_pct=90.0,
+            consecutive_threshold=15,
+        )
+
+    # Consecutive threshold breach (count 16 > 15) even at 85%
+    with pytest.raises(
+        resources.MemoryProtectionError, match="Memory usage is too high"
+    ):
+        resources.check_available_memory(
+            normal_obs,
+            over_limit_count=16,
+            one_time_limit_pct=90.0,
+            consecutive_threshold=15,
+        )
+
+
+def test_watchdog_over_limit_consecutive_tracking():
+    def low_ram_probe():
+        return resources.MemoryObservation(
+            total_bytes=1000,
+            available_bytes=100,
+            used_bytes=900,
+            used_pct=90.0,
+            total_mb=1.0,
+            available_mb=0.1,
+            is_available=True,
+        )
+
+    def healthy_ram_probe():
+        return resources.MemoryObservation(
+            total_bytes=1000,
+            available_bytes=600,
+            used_bytes=400,
+            used_pct=40.0,
+            total_mb=1.0,
+            available_mb=0.6,
+            is_available=True,
+        )
+
+    watchdog = resources.MemoryWatchdog(min_available_pct=15.0, probe_fn=low_ram_probe)
+    assert watchdog.over_limit_count == 0
+
+    # First pressured check increments over_limit_count
+    st1 = watchdog.check()
+    assert st1.is_pressured
+    assert watchdog.over_limit_count == 1
+
+    # Second pressured check increments over_limit_count
+    st2 = watchdog.check()
+    assert st2.is_pressured
+    assert watchdog.over_limit_count == 2
+
+    # Recovery resets over_limit_count to 0
+    watchdog._probe_fn = healthy_ram_probe
+    st3 = watchdog.check()
+    assert not st3.is_pressured
+    assert watchdog.over_limit_count == 0
+
+    # check_available_memory on watchdog raises when over limit
+    watchdog._probe_fn = low_ram_probe
+    watchdog.check()
+    with pytest.raises(resources.MemoryProtectionError):
+        watchdog.check_available_memory(
+            one_time_limit_pct=85.0, consecutive_threshold=15
+        )
+
+
+def test_resource_monitor_check_available_memory():
+    def high_usage_probe():
+        return resources.MemoryObservation(
+            total_bytes=1000,
+            available_bytes=50,
+            used_bytes=950,
+            used_pct=95.0,
+            total_mb=1.0,
+            available_mb=0.05,
+            is_available=True,
+        )
+
+    monitor = resources.ResourceMonitor(probe_memory_fn=high_usage_probe)
+    monitor.check_memory_headroom()
+    with pytest.raises(resources.MemoryProtectionError):
+        monitor.check_available_memory(one_time_limit_pct=90.0)

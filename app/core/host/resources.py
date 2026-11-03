@@ -1,12 +1,10 @@
 """System diagnostics, hardware inspection, memory watchdog, and resource governance.
 
 Description:
-    Provides the unified host resource custody and system diagnostics authority
-    for the HaruQuantAI workstation. Consolidates read-only SQLite database probes,
-    workspace directory readiness checks, filesystem writability probes, psutil
-    hardware telemetry, worker concurrency allocation (workers = max(1, cpu_cores - 2)),
-    CPU core affinity, GPU qualification, deterministic CPU benchmarks, active 15%
-    RAM Memory Watchdog, DataFrame guards, and isolated per-job scratch sandboxes.
+    Provides host resource custody and diagnostics: read-only SQLite probes,
+    workspace readiness, filesystem writability, hardware telemetry, worker
+    allocation (max(1, cpu_cores - 2)), CPU affinity, GPU qualification, CPU
+    benchmarks, 15% RAM Memory Watchdog, DataFrame guards, and scratch sandboxes.
 
 Purpose:
     FEAT-HOST-RESOURCES: Host system diagnostics, hardware inspection, memory
@@ -33,8 +31,7 @@ Python API Usage:
     ```python
     from app.core.host.resources import calculate_worker_allocation, probe_hardware
 
-    hw = probe_hardware()
-    workers = calculate_worker_allocation(hw.cpu_count_logical)
+    workers = calculate_worker_allocation(probe_hardware().cpu_count_logical)
     ```
 
 CLI Usage:
@@ -55,7 +52,7 @@ import time
 import uuid
 from collections.abc import Callable, Generator
 from contextlib import contextmanager
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -66,23 +63,30 @@ from app.core.host.logging import get_logger
 from app.core.host.persistence import HostPersistence
 from app.core.host.settings import settings as host_settings
 
-__all__ = [
+__all__ = (
+    "DEFAULT_MEMORY_OVER_LIMIT_COUNT",
+    "DEFAULT_ONE_TIME_MEMORY_LIMIT_PCT",
+    "MemoryProtectionError",
     "MemoryWatchdog",
     "ResourceMonitor",
     "allocate_job_scratch",
     "apply_cpu_affinity",
     "calculate_worker_allocation",
+    "check_available_memory",
     "check_memory_headroom",
     "cleanup_job_scratch",
     "evaluate_dataframe_guard",
+    "get_available_processors",
     "get_worker_capacity",
     "inspect_resources",
     "inspect_workspace_directories",
     "job_scratch_sandbox",
+    "probe_cpu",
     "probe_hardware",
+    "probe_memory",
     "resource_manager",
     "run_cpu_benchmark",
-]
+)
 
 logger = get_logger(__name__)
 
@@ -94,20 +98,25 @@ PROBE_DISK_FR = "FR-HOST-RESOURCES-PROBE-DISK"
 PROBE_PROCESS_FR = "FR-HOST-RESOURCES-PROBE-PROCESS"
 PROBE_STORAGE_FR = "FR-HOST-RESOURCES-PROBE-STORAGE"
 PROBE_HARDWARE_FR = "FR-HOST-RESOURCES-PROBE-HARDWARE"
-PROBE_HEALTH_FR = "FR-HOST-RESOURCES-PROBE-HEALTH"
-DIAGNOSTICS_FR = PROBE_HEALTH_FR
-WORKER_ALLOCATION_FR = "FR-HOST-RESOURCES-WORKER-ALLOCATION"
-WORKER_CAPACITY_FR = WORKER_ALLOCATION_FR
+PROBE_HEALTH_FR = DIAGNOSTICS_FR = "FR-HOST-RESOURCES-PROBE-HEALTH"
+WORKER_ALLOCATION_FR = WORKER_CAPACITY_FR = "FR-HOST-RESOURCES-WORKER-ALLOCATION"
 CORE_AFFINITY_FR = "FR-HOST-RESOURCES-CORE-AFFINITY"
 GPU_ACCELERATION_FR = "FR-HOST-RESOURCES-GPU-ACCELERATION"
 BENCHMARK_FR = "FR-HOST-RESOURCES-BENCHMARK"
 MEMORY_WATCHDOG_FR = "FR-HOST-RESOURCES-MEMORY-WATCHDOG"
 SCRATCH_SANDBOX_FR = "FR-HOST-RESOURCES-SCRATCH-SANDBOX"
 
+DEFAULT_ONE_TIME_MEMORY_LIMIT_PCT: float = 90.0
+DEFAULT_MEMORY_OVER_LIMIT_COUNT: int = 15
 MIN_FREE_DISK_PCT: float = 2.0
 MIN_AVAILABLE_RAM_PCT: float = 15.0
 DEFAULT_SCRATCH_ROOT: Path = Path("data/scratch")
 BENCHMARK_CHECK_INTERVAL: int = 10_000
+
+
+class MemoryProtectionError(MemoryError, RuntimeError):
+    """Raised when memory consumption exceeds limits (SQMemoryProtectionError)."""
+
 
 type PathLike = Path | str | None
 
@@ -254,14 +263,14 @@ class BenchmarkJob:
     job_id: str
     state: str
     progress_pct: float
-    started_at: str | None
-    completed_at: str | None
-    duration_seconds: float | None
-    iterations_completed: int
-    throughput_ops_per_sec: float | None
-    results: BenchmarkResults | None
-    error_message: str | None
-    metadata: dict[str, Any]
+    started_at: str | None = None
+    completed_at: str | None = None
+    duration_seconds: float | None = None
+    iterations_completed: int = 0
+    throughput_ops_per_sec: float | None = None
+    results: BenchmarkResults | None = None
+    error_message: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -285,19 +294,14 @@ type ProbeFn = Callable[[], MemoryObservation] | None
 
 def _extract_workspace_paths(settings: Any = None) -> dict[str, str]:
     """Resolve directory paths mapping from host settings or defaults."""
-    eff = settings if settings is not None else host_settings
-    ws_node = getattr(eff, "workspace_paths", None) if eff is not None else None
-    if ws_node is not None:
-        if hasattr(ws_node, "as_dict"):
-            return dict(ws_node.as_dict())
-        if isinstance(ws_node, dict):
-            return dict(ws_node)
-    return {
-        "configs_dir": "data/presets",
-        "data_dir": "data/market",
-        "projects_dir": "data/projects",
-        "strategies_dir": "data/strategies",
-    }
+    eff = settings or host_settings
+    ws = getattr(eff, "workspace_paths", None) if eff else None
+    if ws and hasattr(ws, "as_dict"):
+        return dict(ws.as_dict())
+    if isinstance(ws, dict):
+        return dict(ws)
+    d = {"configs_dir": "data/presets", "data_dir": "data/market"}
+    return {**d, "projects_dir": "data/projects", "strategies_dir": "data/strategies"}
 
 
 def inspect_workspace_directories(settings: Any = None) -> dict[str, bool]:
@@ -308,10 +312,12 @@ def inspect_workspace_directories(settings: Any = None) -> dict[str, bool]:
         ok = p.exists() and p.is_dir()
         results[name] = ok
         sp = normalize_path(str(p))
-        lvl = "info" if ok else "warning"
-        verb, st = ("available", "AVAILABLE") if ok else ("absent", "ABSENT")
-        msg = f"workspace directory '{name}' is {verb} at {sp}"
-        _log(lvl, WORKSPACE_DIRS_FR, msg, directory=name, path=sp, status=st)
+        verb = "available" if ok else "absent"
+        _log(
+            "info" if ok else "warning",
+            WORKSPACE_DIRS_FR,
+            f"dir '{name}' {verb} at {sp}",
+        )
     return results
 
 
@@ -320,44 +326,45 @@ def probe_database(
 ) -> DatabaseProbe:
     """Perform read-only diagnostic inspection on active database."""
     _ = settings
-    gateway = persistence if persistence is not None else HostPersistence()
-    target = gateway.database_path
-    p_str = normalize_path(str(target))
-    if not target.exists():
+    gw = persistence or HostPersistence()
+    p_str = normalize_path(str(gw.database_path))
+    if not gw.database_path.exists():
         _log("warning", PROBE_DATABASE_FR, f"database not found at {p_str}", path=p_str)
-        return DatabaseProbe(
-            p_str, False, 0, False, 0, 0, "Database file does not exist"
-        )
+        return DatabaseProbe(p_str, False, 0, False, 0, 0, "Database file missing")
 
-    wal = target.with_name(f"{target.name}-wal")
-    sz, wal_ok = target.stat().st_size, wal.exists()
-    wal_sz = wal.stat().st_size if wal_ok else 0
-    # The CRUD gateway does not expose schema totals. Do not invent a table count.
-    t_cnt, err_msg = None, None
+    wal = gw.database_path.with_name(f"{gw.database_path.name}-wal")
+    wal_sz = wal.stat().st_size if wal.exists() else 0
+    err_msg: str | None = None
     try:
-        response = gateway.read_records("host_settings", limit=1)
-        if not response["success"]:
+        if not gw.read_records("host_settings", limit=1)["success"]:
             err_msg = "Database readiness probe failed"
             _log("warning", PROBE_DATABASE_FR, err_msg)
     except Exception as err:  # noqa: BLE001
         err_msg = str(err)
         _log("exception", PROBE_DATABASE_FR, f"database read failed on {p_str}")
 
-    msg = f"probed database at {p_str} (tables={t_cnt}, size={sz})"
-    _log("debug", PROBE_DATABASE_FR, msg, table_count=t_cnt)
-    return DatabaseProbe(p_str, True, sz, wal_ok, wal_sz, t_cnt, err_msg)
+    _log("debug", PROBE_DATABASE_FR, f"probed database at {p_str}", table_count=None)
+    sz = gw.database_path.stat().st_size
+    return DatabaseProbe(p_str, True, sz, wal.exists(), wal_sz, None, err_msg)
+
+
+def get_available_processors() -> int:
+    """Detect available logical core count (donor CpuInfo.getAvailableProcessors)."""
+    sys_cores = psutil.cpu_count(logical=True)
+    rt_cores = os.cpu_count()
+    cores = max(sys_cores or 0, rt_cores or 0, 1)
+    _log("debug", PROBE_CPU_FR, f"cores detected: {cores}")
+    return cores
 
 
 def probe_cpu() -> CpuObservation:
     """Probe host CPU topology, frequency, and current load."""
     try:
-        logical = psutil.cpu_count(logical=True) or 1
+        logical = get_available_processors()
         physical = psutil.cpu_count(logical=False)
-        freq = psutil.cpu_freq()
-        f_val = round(float(freq.current), 2) if freq else None
+        f_val = round(float(f.current), 2) if (f := psutil.cpu_freq()) else None
         u_val = round(max(0.0, min(100.0, float(psutil.cpu_percent(interval=None)))), 2)
-        msg = f"CPU probe succeeded (cores={logical}, util={u_val:.1f}%)"
-        _log("debug", PROBE_CPU_FR, msg, cores=logical, util=u_val)
+        _log("debug", PROBE_CPU_FR, f"CPU probe ok: cores={logical}, util={u_val:.1f}%")
         return CpuObservation(logical, physical, f_val, u_val, True)
     except (psutil.Error, OSError, ValueError, TypeError) as exc:
         _log("warning", PROBE_CPU_FR, f"CPU telemetry probe failed: {exc}")
@@ -369,10 +376,8 @@ def probe_memory() -> MemoryObservation:
     try:
         m = psutil.virtual_memory()
         u_pct = round(max(0.0, min(100.0, float(m.percent))), 2)
-        t_mb = round(m.total / (1024 * 1024), 2)
-        a_mb = round(m.available / (1024 * 1024), 2)
-        msg = f"memory probe succeeded (total={t_mb:.0f}MB, avail={a_mb:.0f}MB)"
-        _log("debug", PROBE_MEMORY_FR, msg, total_mb=t_mb)
+        t_mb, a_mb = round(m.total / 1048576, 2), round(m.available / 1048576, 2)
+        _log("debug", PROBE_MEMORY_FR, f"RAM ok: {a_mb:.0f}MB avail / {t_mb:.0f}MB")
         return MemoryObservation(m.total, m.available, m.used, u_pct, t_mb, a_mb, True)
     except (psutil.Error, OSError, ValueError, TypeError) as exc:
         _log("warning", PROBE_MEMORY_FR, f"memory telemetry probe failed: {exc}")
@@ -387,8 +392,7 @@ def probe_disk(target_path: Path | str = ".") -> DiskObservation:
         d = psutil.disk_usage(str(p_obj))
         raw_pct = (d.free / d.total) * 100.0 if d.total > 0 else 0.0
         f_pct = round(max(0.0, min(100.0, raw_pct)), 2)
-        msg = f"disk probe succeeded (mount={mnt}, free_pct={f_pct:.1f}%)"
-        _log("debug", PROBE_DISK_FR, msg, free_pct=f_pct)
+        _log("debug", PROBE_DISK_FR, f"disk ok: {mnt} ({f_pct:.1f}% free)")
         return DiskObservation(mnt, d.total, d.free, d.used, f_pct, True)
     except (psutil.Error, OSError, ValueError, TypeError) as exc:
         _log("warning", PROBE_DISK_FR, f"disk telemetry probe failed: {exc}")
@@ -399,8 +403,7 @@ def probe_process() -> ProcessObservation:
     """Probe current host Python process health, memory, and threads."""
     try:
         p = psutil.Process()
-        pid = p.pid
-        cpu_v = round(max(0.0, float(p.cpu_percent(interval=None))), 2)
+        pid, cpu_v = p.pid, round(max(0.0, float(p.cpu_percent(interval=None))), 2)
         rss_b = p.memory_info().rss
         rss_mb = round(rss_b / (1024 * 1024), 2)
         open_f: int | None = None
@@ -408,11 +411,9 @@ def probe_process() -> ProcessObservation:
             open_f = len(p.open_files())
         except psutil.AccessDenied, OSError:
             open_f = None
-        up = max(0.0, round(time.time() - p.create_time(), 2))
-        _log("debug", PROBE_PROCESS_FR, f"process probe succeeded (pid={pid})")
-        a1 = (pid, cpu_v, rss_b, rss_mb)
-        a2 = (p.num_threads(), open_f, up, True)
-        return ProcessObservation(*a1, *a2)
+        th, up = p.num_threads(), max(0.0, round(time.time() - p.create_time(), 2))
+        _log("debug", PROBE_PROCESS_FR, f"process probe ok (pid={pid})")
+        return ProcessObservation(pid, cpu_v, rss_b, rss_mb, th, open_f, up, True)
     except (psutil.Error, OSError, ValueError, TypeError) as exc:
         _log("warning", PROBE_PROCESS_FR, f"process telemetry probe failed: {exc}")
         return ProcessObservation(os.getpid(), None, 0, 0.0, 1, None, 0.0, False)
@@ -432,33 +433,31 @@ def _check_dir_writable(target_dir: Path) -> bool:
 
 def probe_storage(root_path: PathLike = None, settings: Any = None) -> StorageProbe:
     """Check filesystem write permissions and disk space capacity."""
-    if root_path is not None:
-        root = Path(root_path).resolve()
-        data_dir = root / "data"
-    elif settings is not None and settings.get("workspace_paths", "data_dir"):
+    if root_path:
+        root, data_dir = Path(root_path).resolve(), Path(root_path).resolve() / "data"
+    elif settings and settings.get("workspace_paths", "data_dir"):
         data_dir = Path(settings.get("workspace_paths", "data_dir")).resolve()
         is_data = data_dir.name == "data"
         root = data_dir.parent.resolve() if is_data else Path.cwd().resolve()
     else:
-        root = Path.cwd().resolve()
-        data_dir = root / "data"
+        root, data_dir = Path.cwd().resolve(), Path.cwd().resolve() / "data"
 
     l_ok = _check_dir_writable(data_dir / "logs")
     db_ok = _check_dir_writable(data_dir / "database")
     u = shutil.disk_usage(root)
-    f_pct = (u.free / u.total * 100.0) if u.total > 0 else 0.0
+    f_pct = round((u.free / u.total * 100.0) if u.total > 0 else 0.0, 2)
     n_root = normalize_path(str(root))
-    info = f"logs_ok={l_ok}, db_ok={db_ok}, free_pct={f_pct:.1f}"
-    _log("debug", PROBE_STORAGE_FR, f"probed storage at {n_root} ({info})")
-    return StorageProbe(n_root, l_ok, db_ok, u.free, u.total, round(f_pct, 2))
+    _log("debug", PROBE_STORAGE_FR, f"probed storage at {n_root} ({f_pct:.1f}% free)")
+    return StorageProbe(n_root, l_ok, db_ok, u.free, u.total, f_pct)
 
 
 def probe_hardware() -> HardwareProbe:
     """Gather machine hardware metrics via psutil."""
     c, m = probe_cpu(), probe_memory()
     u_pct = c.utilization_pct or 0.0
-    msg = f"probed hardware (cpus={c.logical_cores}, ram_pct={m.used_pct:.1f})"
-    _log("debug", PROBE_HARDWARE_FR, msg, cpu_percent=u_pct)
+    _log(
+        "debug", PROBE_HARDWARE_FR, f"hw: cpu={c.logical_cores}, ram={m.used_pct:.1f}%"
+    )
     a1 = (c.logical_cores, c.physical_cores, u_pct)
     a2 = (m.total_bytes, m.available_bytes, m.used_pct)
     return HardwareProbe(*a1, *a2)
@@ -471,20 +470,11 @@ def inspect_resources(
     db = probe_database(settings=settings)
     st = probe_storage(root_path, settings=settings)
     hw = probe_hardware()
-    ok = (
-        db.exists
-        and db.error is None
-        and st.logs_dir_writable
-        and st.database_dir_writable
-        and st.free_pct > MIN_FREE_DISK_PCT
-    )
+    c1 = db.exists and not db.error and st.logs_dir_writable
+    ok = bool(c1 and st.database_dir_writable and st.free_pct > MIN_FREE_DISK_PCT)
     status = "HEALTHY" if ok else "DEGRADED"
-    if ok:
-        det = f"tables={db.table_count}, free_gb={st.free_bytes / (1024**3):.1f}"
-        _log("info", PROBE_HEALTH_FR, f"host health status is {status} ({det})")
-    else:
-        det = f"db_err={db.error}, logs_ok={st.logs_dir_writable}"
-        _log("warning", PROBE_HEALTH_FR, f"host health status is {status} ({det})")
+    det = f"tables={db.table_count}" if ok else f"db_err={db.error}"
+    _log("info" if ok else "warning", PROBE_HEALTH_FR, f"host health: {status} ({det})")
     return HostHealthReport(status, db, st, hw, datetime.now(UTC).isoformat())
 
 
@@ -494,19 +484,12 @@ def calculate_worker_allocation(
     """Derive worker pool allocation from total logical cores and selected mode."""
     sc = max(1, total_cores)
     nm = mode.strip().lower().replace("_", "-")
-    if nm in ("single", "1"):
-        alloc = 1
-    elif nm in ("maximum", "all"):
-        alloc = sc
-    elif nm in ("reserve-one", "all-except-one"):
-        alloc = max(1, sc - 1)
-    elif nm == "custom":
-        alloc = min(max(1, custom_cores), sc)
-    else:
-        alloc = max(1, sc - 2)
+    modes = {"single": 1, "1": 1, "maximum": sc, "all": sc}
+    modes.update({"reserve-one": max(1, sc - 1), "all-except-one": max(1, sc - 1)})
+    fallback = min(max(1, custom_cores), sc) if nm == "custom" else max(1, sc - 2)
+    alloc = modes.get(nm, fallback)
 
-    det = f"cores={sc}, mode='{mode}', custom={custom_cores} -> {alloc}"
-    _log("info", WORKER_ALLOCATION_FR, f"derived worker allocation ({det})")
+    _log("info", WORKER_ALLOCATION_FR, f"workers (mode={nm}) -> {alloc}")
     return alloc
 
 
@@ -514,46 +497,37 @@ def get_worker_capacity(
     settings: Any = None, mode: str | None = None, custom_cores: int | None = None
 ) -> WorkerCapacity:
     """Derive consolidated worker capacity, CPU core affinity, and GPU status."""
-    eff = settings if settings is not None else host_settings
-    eff_mode, eff_custom = mode, custom_cores
-    cfg_cpu = getattr(eff, "config_cpu", None) if eff is not None else None
-    if cfg_cpu is not None:
-        if eff_mode is None and hasattr(cfg_cpu, "core_usage"):
-            eff_mode = str(cfg_cpu.core_usage)
-        if eff_custom is None and hasattr(cfg_cpu, "custom_cores"):
-            eff_custom = int(cfg_cpu.custom_cores)
-
-    eff_mode = eff_mode or "reserve-two"
-    eff_custom = 1 if eff_custom is None else eff_custom
-    tc = probe_cpu().logical_cores
+    eff = settings or host_settings
+    cfg = getattr(eff, "config_cpu", None) if eff else None
+    eff_mode = mode or (
+        str(cfg.core_usage) if cfg and hasattr(cfg, "core_usage") else "reserve-two"
+    )
+    eff_custom = (
+        custom_cores
+        if custom_cores is not None
+        else (int(cfg.custom_cores) if cfg and hasattr(cfg, "custom_cores") else 1)
+    )
+    tc = get_available_processors()
     alloc = calculate_worker_allocation(tc, eff_mode, eff_custom)
     aff_sup, aff_cur = inspect_cpu_affinity()
     gpu_ok = inspect_gpu_qualification()
-    det = f"workers={alloc}/{tc}, mode='{eff_mode}', gpu={gpu_ok}"
-    _log("info", WORKER_CAPACITY_FR, f"worker capacity resolved ({det})")
+    _log("info", WORKER_CAPACITY_FR, f"worker capacity resolved: {alloc}/{tc} workers")
     c_val = eff_custom if eff_mode.lower().replace("_", "-") == "custom" else None
-    aff_act = aff_sup and aff_cur is not None
-    return WorkerCapacity(tc, alloc, eff_mode, c_val, aff_sup, aff_act, gpu_ok)
+    has_aff = aff_sup and aff_cur is not None
+    return WorkerCapacity(tc, alloc, eff_mode, c_val, aff_sup, has_aff, gpu_ok)
 
 
 def inspect_cpu_affinity() -> tuple[bool, list[int] | None]:
     """Inspect if CPU core affinity is supported on current OS."""
     try:
-        p = psutil.Process()
-        if hasattr(p, "cpu_affinity"):
+        if hasattr(p := psutil.Process(), "cpu_affinity"):
             cur = list(p.cpu_affinity())
-            msg = f"CPU affinity supported on process (current={cur!r})"
-            _log("debug", CORE_AFFINITY_FR, msg, affinity=cur)
+            _log("debug", CORE_AFFINITY_FR, "CPU affinity supported", affinity=cur)
             return True, cur
-        _log(
-            "debug",
-            CORE_AFFINITY_FR,
-            f"CPU affinity unsupported on {platform.system()}",
-        )
-        return False, None
+        _log("debug", CORE_AFFINITY_FR, f"affinity unsupported: {platform.system()}")
     except (AttributeError, OSError, psutil.AccessDenied) as exc:
         _log("debug", CORE_AFFINITY_FR, f"CPU affinity inspection exception: {exc}")
-        return False, None
+    return False, None
 
 
 def apply_cpu_affinity(cores: list[int]) -> bool:
@@ -567,11 +541,7 @@ def apply_cpu_affinity(cores: list[int]) -> bool:
             p.cpu_affinity(cores)
             _log("info", CORE_AFFINITY_FR, f"applied CPU core affinity to {cores!r}")
             return True
-        _log(
-            "warning",
-            CORE_AFFINITY_FR,
-            f"CPU affinity unsupported on {platform.system()}",
-        )
+        _log("warning", CORE_AFFINITY_FR, f"affinity unsupported: {platform.system()}")
         return False
     except (psutil.Error, OSError, ValueError) as exc:
         _log("warning", CORE_AFFINITY_FR, f"failed applying CPU affinity: {exc}")
@@ -581,11 +551,8 @@ def apply_cpu_affinity(cores: list[int]) -> bool:
 def inspect_gpu_qualification() -> bool:
     """Safely inspect if qualified GPU acceleration is available."""
     cv = os.environ.get("CUDA_VISIBLE_DEVICES", "").strip()
-    ok = bool(
-        (cv and cv not in ("-1", "none", "NONE"))
-        or os.environ.get("CUDA_PATH")
-        or os.environ.get("NVIDIA_VISIBLE_DEVICES")
-    )
+    cuda_env = os.environ.get("CUDA_PATH") or os.environ.get("NVIDIA_VISIBLE_DEVICES")
+    ok = bool((cv and cv not in ("-1", "none", "NONE")) or cuda_env)
     _log("debug", GPU_ACCELERATION_FR, f"GPU detection inspected: available={ok}")
     return ok
 
@@ -599,27 +566,37 @@ def check_memory_headroom(
     """Evaluate available system RAM against the 15% memory watchdog threshold."""
     obs = memory_obs if memory_obs is not None else probe_memory()
     thresh = max(0.0, min(100.0, float(min_available_pct)))
-    if obs.is_available and obs.total_bytes > 0:
-        raw_a = (obs.available_bytes / obs.total_bytes) * 100.0
-        a_pct = round(max(0.0, min(100.0, raw_a)), 2)
-    elif obs.is_available:
-        a_pct = round(max(0.0, min(100.0, 100.0 - obs.used_pct)), 2)
+    if obs.is_available:
+        tot = obs.total_bytes
+        ratio = (
+            (obs.available_bytes / tot * 100.0) if tot > 0 else (100.0 - obs.used_pct)
+        )
+        a_pct = round(max(0.0, min(100.0, ratio)), 2)
     else:
         a_pct = 100.0
-
     pressured = obs.is_available and a_pct < thresh
-    p_act = "PAUSE" if policy.strip().lower() == "pause" else "REJECT"
-    act = p_act if pressured else "ALLOW"
-    kw = {"available_pct": a_pct, "threshold_pct": thresh, "action": act}
-    if pressured:
-        det = f"available={a_pct:.1f}% < {thresh:.1f}%"
-        _log("warning", MEMORY_WATCHDOG_FR, f"RAM headroom low ({det}) -> {act}", **kw)
-    else:
-        det = f"available={a_pct:.1f}% >= {thresh:.1f}%"
-        _log("debug", MEMORY_WATCHDOG_FR, f"RAM headroom healthy ({det})", **kw)
+    pol = policy.strip().lower()
+    act = ("PAUSE" if pol == "pause" else "REJECT") if pressured else "ALLOW"
+    lvl = "warning" if pressured else "debug"
+    _log(lvl, MEMORY_WATCHDOG_FR, f"RAM: {a_pct:.1f}% -> {act}", available_pct=a_pct)
     a1 = (a_pct, obs.used_pct, obs.available_bytes, obs.total_bytes)
     a2 = (thresh, pressured, act, datetime.now(UTC).isoformat())
     return MemoryWatchdogStatus(*a1, *a2)
+
+
+def check_available_memory(
+    memory_obs: MemoryObservation | None = None,
+    over_limit_count: int = 0,
+    one_time_limit_pct: float = DEFAULT_ONE_TIME_MEMORY_LIMIT_PCT,
+    consecutive_threshold: int = DEFAULT_MEMORY_OVER_LIMIT_COUNT,
+) -> None:
+    """Evaluate memory usage against donor safety limits and raise if exceeded."""
+    obs = memory_obs if memory_obs is not None else probe_memory()
+    cur = obs.used_pct
+    if over_limit_count > consecutive_threshold or cur > one_time_limit_pct:
+        msg = f"Memory usage is too high ({int(cur)}%). Please increase memory."
+        _log("error", MEMORY_WATCHDOG_FR, f"Memory usage limit reached: {cur:.1f}%")
+        raise MemoryProtectionError(msg)
 
 
 def evaluate_dataframe_guard(
@@ -628,26 +605,25 @@ def evaluate_dataframe_guard(
     """Evaluate data-frame size against configured warn/stop/off guard policy."""
     nm = mode.strip().lower()
     if nm == "off" or row_count <= max_rows:
-        msg = f"dataframe guard passed (rows={row_count}, max={max_rows}, mode={nm})"
-        _log("debug", MEMORY_WATCHDOG_FR, msg, rows=row_count)
+        _log("debug", MEMORY_WATCHDOG_FR, f"dataframe guard passed (rows={row_count})")
         return "ALLOW"
     if nm == "stop":
-        msg = f"dataframe guard stopped execution (rows={row_count} > max={max_rows})"
-        _log("error", MEMORY_WATCHDOG_FR, msg, rows=row_count)
-        raise MemoryError(
-            f"DataFrame row count ({row_count}) exceeds stop limit ({max_rows})."
-        )
-    msg = f"dataframe guard warning (rows={row_count} > max={max_rows})"
-    _log("warning", MEMORY_WATCHDOG_FR, msg, rows=row_count)
+        _log("error", MEMORY_WATCHDOG_FR, f"dataframe guard stopped (rows={row_count})")
+        raise MemoryError(f"Rows ({row_count}) exceeds stop limit ({max_rows}).")
+    _log("warning", MEMORY_WATCHDOG_FR, f"dataframe guard warning (rows={row_count})")
     return "WARN"
 
 
 def run_memory_cleanup() -> int:
     """Execute explicit garbage collection and log reclaimed object count."""
-    reclaimed = gc.collect()
-    msg = f"executed memory cleanup (reclaimed_objects={reclaimed})"
-    _log("info", MEMORY_WATCHDOG_FR, msg, reclaimed_objects=reclaimed)
-    return reclaimed
+    rec = gc.collect()
+    _log(
+        "info",
+        MEMORY_WATCHDOG_FR,
+        f"memory cleanup: reclaimed={rec}",
+        reclaimed_objects=rec,
+    )
+    return rec
 
 
 class MemoryWatchdog:
@@ -671,6 +647,7 @@ class MemoryWatchdog:
         self._last_status: MemoryWatchdogStatus | None = None
         self._pressure_callbacks: list[Callable[[MemoryWatchdogStatus], None]] = []
         self._recovery_callbacks: list[Callable[[MemoryWatchdogStatus], None]] = []
+        self._over_limit_count: int = 0
 
     @property
     def min_available_pct(self) -> float:
@@ -681,6 +658,12 @@ class MemoryWatchdog:
     def policy(self) -> str:
         """Return configured enforcement policy ('reject' or 'pause')."""
         return self._policy
+
+    @property
+    def over_limit_count(self) -> int:
+        """Return count of consecutive samples exceeding memory usage limit."""
+        with self._lock:
+            return self._over_limit_count
 
     def register_callbacks(
         self, *, on_pressure: StatusCb = None, on_recovery: StatusCb = None
@@ -700,8 +683,19 @@ class MemoryWatchdog:
         )
         with self._lock:
             prev, self._last_status = self._last_status, status
-            p_cbs = list(self._pressure_callbacks)
-            r_cbs = list(self._recovery_callbacks)
+            self._over_limit_count = (
+                (self._over_limit_count + 1) if status.is_pressured else 0
+            )
+            if status.is_pressured:
+                _log(
+                    "debug",
+                    MEMORY_WATCHDOG_FR,
+                    f"limit exceeded {self._over_limit_count}x",
+                )
+            p_cbs, r_cbs = (
+                list(self._pressure_callbacks),
+                list(self._recovery_callbacks),
+            )
 
         if status.is_pressured:
             for cb in p_cbs:
@@ -711,6 +705,17 @@ class MemoryWatchdog:
                 cb(status)
         return status
 
+    def check_available_memory(
+        self,
+        one_time_limit_pct: float = DEFAULT_ONE_TIME_MEMORY_LIMIT_PCT,
+        consecutive_threshold: int = DEFAULT_MEMORY_OVER_LIMIT_COUNT,
+    ) -> None:
+        """Evaluate memory usage against consecutive and one-time limit thresholds."""
+        with self._lock:
+            st, cnt = self._last_status, self._over_limit_count
+        obs = MemoryObservation(0, 0, 0, st.used_pct, 0.0, 0.0, True) if st else None
+        check_available_memory(obs, cnt, one_time_limit_pct, consecutive_threshold)
+
     def start(self) -> None:
         """Start background daemon thread monitoring system RAM headroom."""
         with self._lock:
@@ -718,11 +723,10 @@ class MemoryWatchdog:
                 return
             self._stop_event.clear()
             self._thread = threading.Thread(
-                target=self._monitor_loop, name="HostMemoryWatchdog", daemon=True
+                target=self._monitor_loop, name="HostMemWatchdog", daemon=True
             )
             self._thread.start()
-        det = f"threshold={self._min_available_pct:.1f}%, policy={self._policy}"
-        _log("info", MEMORY_WATCHDOG_FR, f"started memory watchdog ({det})")
+        _log("info", MEMORY_WATCHDOG_FR, f"started watchdog (policy={self._policy})")
 
     def stop(self) -> None:
         """Stop background memory watchdog monitor thread."""
@@ -763,23 +767,23 @@ def allocate_job_scratch(job_id: str, base_dir: PathLike = None) -> Path:
     """Allocate an isolated temporary scratch directory for a job."""
     safe_id, root, target = _resolve_scratch_target(job_id, base_dir)
     if root not in target.parents:
-        msg = f"scratch path escaped root containment for job {safe_id}"
-        _log("error", SCRATCH_SANDBOX_FR, msg, job_id=safe_id)
+        _log("error", SCRATCH_SANDBOX_FR, f"scratch path escaped root for {safe_id}")
         raise ValueError(f"Scratch path escaped containment for job '{safe_id}'")
     target.mkdir(parents=True, exist_ok=True)
-    t_str = normalize_path(str(target))
-    _log("info", SCRATCH_SANDBOX_FR, f"allocated scratch for {safe_id} at {t_str}")
+    _log("info", SCRATCH_SANDBOX_FR, f"allocated scratch for {safe_id}")
     return target
 
 
 def cleanup_job_scratch(job_id: str, base_dir: PathLike = None) -> bool:
     """Remove the isolated temporary scratch directory for a completed/cancelled job."""
     safe_id, root, target = _resolve_scratch_target(job_id, base_dir)
-    if root not in target.parents or not target.exists():
-        return False
-    shutil.rmtree(target, ignore_errors=True)
-    _log("info", SCRATCH_SANDBOX_FR, f"cleaned up scratch sandbox for job {safe_id}")
-    return True
+    if root in target.parents and target.exists():
+        shutil.rmtree(target, ignore_errors=True)
+        _log(
+            "info", SCRATCH_SANDBOX_FR, f"cleaned up scratch sandbox for job {safe_id}"
+        )
+        return True
+    return False
 
 
 @contextmanager
@@ -810,14 +814,11 @@ def run_cpu_benchmark(
         accumulator += (math.sin(factor) * math.cos(factor)) + math.sqrt(factor)
 
     _ = accumulator
-    elapsed = max(1e-6, time.perf_counter() - start_perf)
-    tput = round(n / elapsed, 2)
-    t_ms = round((elapsed * 1000.0) / n, 5)
-    avg_st = round(elapsed / 100.0, 4)
+    el = max(1e-6, time.perf_counter() - start_perf)
+    tput, avg_st = round(n / el, 2), round(el / 100.0, 4)
     avg_sh = round(3600.0 / avg_st) if avg_st > 0 else 0
-    msg = f"benchmark finished: duration={elapsed:.4f}s, throughput={tput:.0f} ops/s"
-    _log("info", BENCHMARK_FR, msg, duration=elapsed, throughput=tput)
-    return BenchmarkResults(round(elapsed, 4), n, avg_sh, t_ms, tput)
+    _log("info", BENCHMARK_FR, f"benchmark finished: duration={el:.4f}s")
+    return BenchmarkResults(round(el, 4), n, avg_sh, round((el * 1000.0) / n, 5), tput)
 
 
 class BenchmarkRunner:
@@ -830,22 +831,20 @@ class BenchmarkRunner:
 
     def start_job(self, iterations: int = 100_000) -> BenchmarkJob:
         """Start a new benchmark job in a background worker thread."""
-        job_id = f"bench-{uuid.uuid4().hex[:8]}"
-        cancel_evt = threading.Event()
-        now = datetime.now(UTC).isoformat()
+        job_id, evt = f"bench-{uuid.uuid4().hex[:8]}", threading.Event()
         meta = {"requested_iterations": iterations}
-        job = BenchmarkJob(
-            job_id, "running", 0.0, now, None, None, 0, None, None, None, meta
-        )
+        now = datetime.now(UTC).isoformat()
+        job = BenchmarkJob(job_id, "running", 0.0, now, metadata=meta)
         with self._lock:
-            self._jobs[job_id] = job
-            self._cancel_events[job_id] = cancel_evt
-        threading.Thread(
+            self._jobs[job_id], self._cancel_events[job_id] = job, evt
+        t_args = (job_id, iterations, evt)
+        t = threading.Thread(
             target=self._execute_worker,
-            args=(job_id, iterations, cancel_evt),
-            name=f"BenchmarkWorker-{job_id}",
+            args=t_args,
             daemon=True,
-        ).start()
+            name=f"bench-{job_id}",
+        )
+        t.start()
         return job
 
     def _finish_job(
@@ -854,44 +853,52 @@ class BenchmarkRunner:
         state: str,
         duration: float,
         *,
-        progress_pct: float = 0.0,
-        completed: int = 0,
         results: BenchmarkResults | None = None,
         error_msg: str | None = None,
+        completed: int = 0,
     ) -> None:
         """Update BenchmarkJob state under lock."""
+        pct = 100.0 if state == "completed" else 0.0
         with self._lock:
-            curr = self._jobs.get(job_id)
-            st_at = curr.started_at if curr else None
-            meta = curr.metadata if curr else {}
-            tput = results.throughput_ops_per_sec if results else None
+            c = self._jobs.get(job_id)
+            tp = results.throughput_ops_per_sec if results else None
+            meta = c.metadata if c else {}
+            st = c.started_at if c else None
             now = datetime.now(UTC).isoformat()
-            a1 = (job_id, state, progress_pct, st_at, now, duration)
-            a2 = (completed, tput, results, error_msg, meta)
-            self._jobs[job_id] = BenchmarkJob(*a1, *a2)
+            self._jobs[job_id] = BenchmarkJob(
+                job_id,
+                state,
+                pct,
+                st,
+                now,
+                duration,
+                completed,
+                tp,
+                results,
+                error_msg,
+                meta,
+            )
 
     def _execute_worker(
         self, job_id: str, iterations: int, cancel_evt: threading.Event
     ) -> None:
         """Worker thread executing the benchmark computation."""
-        start_perf = time.perf_counter()
+        t0 = time.perf_counter()
         try:
             res = run_cpu_benchmark(iterations=iterations, cancel_event=cancel_evt)
             self._finish_job(
                 job_id,
                 "completed",
                 res.duration_seconds,
-                progress_pct=100.0,
-                completed=iterations,
                 results=res,
+                completed=iterations,
             )
-        except InterruptedError:
-            el = round(time.perf_counter() - start_perf, 4)
-            err = "Benchmark cancelled by user request"
-            self._finish_job(job_id, "cancelled", el, error_msg=err)
-        except Exception as exc:  # noqa: BLE001
-            el = round(time.perf_counter() - start_perf, 4)
-            self._finish_job(job_id, "failed", el, error_msg=str(exc))
+        except (InterruptedError, Exception) as exc:  # noqa: BLE001
+            el = round(time.perf_counter() - t0, 4)
+            is_cancel = isinstance(exc, InterruptedError)
+            st = "cancelled" if is_cancel else "failed"
+            msg = "Benchmark cancelled" if is_cancel else str(exc)
+            self._finish_job(job_id, st, el, error_msg=msg)
 
     def get_job(self, job_id: str) -> BenchmarkJob | None:
         """Retrieve status of an existing benchmark job."""
@@ -902,11 +909,10 @@ class BenchmarkRunner:
         """Signal cooperative cancellation to a running benchmark job."""
         with self._lock:
             evt = self._cancel_events.get(job_id)
-            if evt is not None:
-                evt.set()
-                _log("info", BENCHMARK_FR, f"signaled cancellation for {job_id}")
-                return True
-            return False
+        if evt:
+            evt.set()
+            _log("info", BENCHMARK_FR, f"signaled cancellation for {job_id}")
+        return evt is not None
 
 
 class ResourceMonitor:
@@ -920,9 +926,7 @@ class ResourceMonitor:
         scratch_root: PathLike = None,
         probe_memory_fn: ProbeFn = None,
     ) -> None:
-        self._scratch_root = (
-            Path(scratch_root) if scratch_root is not None else DEFAULT_SCRATCH_ROOT
-        )
+        self._scratch_root = Path(scratch_root or DEFAULT_SCRATCH_ROOT)
         self._watchdog = MemoryWatchdog(
             min_available_pct=min_available_ram_pct,
             policy=watchdog_policy,
@@ -940,24 +944,28 @@ class ResourceMonitor:
         return self._scratch_root
 
     def inspect_resources(
-        self, root_path: PathLike = None, settings: Any = None
+        self, root: PathLike = None, s: Any = None
     ) -> HostHealthReport:
         """Return complete host health report."""
-        return inspect_resources(root_path=root_path, settings=settings)
+        return inspect_resources(root_path=root, settings=s)
 
-    def get_worker_allocation(
-        self, mode: str = "reserve-two", custom_cores: int = 1
-    ) -> int:
+    def get_worker_allocation(self, mode: str = "reserve-two", custom: int = 1) -> int:
         """Calculate worker count via workers = max(1, cpu_cores - 2) default policy."""
-        return calculate_worker_allocation(
-            probe_cpu().logical_cores, mode=mode, custom_cores=custom_cores
-        )
+        return calculate_worker_allocation(probe_cpu().logical_cores, mode, custom)
 
     def check_memory_headroom(
         self, *, policy: str | None = None
     ) -> MemoryWatchdogStatus:
         """Evaluate available system RAM headroom via the memory watchdog."""
         return self._watchdog.check(policy=policy)
+
+    def check_available_memory(
+        self,
+        one_time_limit_pct: float = DEFAULT_ONE_TIME_MEMORY_LIMIT_PCT,
+        consecutive_threshold: int = DEFAULT_MEMORY_OVER_LIMIT_COUNT,
+    ) -> None:
+        """Evaluate memory usage against donor memory guard thresholds."""
+        self._watchdog.check_available_memory(one_time_limit_pct, consecutive_threshold)
 
     def allocate_scratch(self, job_id: str) -> Path:
         """Allocate isolated temporary scratch directory for a job."""
@@ -979,18 +987,12 @@ resource_manager = ResourceMonitor()
 
 def main() -> None:
     """Demonstrate probes, worker limits, watchdog, sandbox, and benchmark."""
-    inspect_workspace_directories()
-    probe_cpu()
-    probe_memory()
-    probe_disk()
-    probe_process()
-    get_worker_capacity()
+    inspect_workspace_directories(), probe_cpu(), probe_memory()
+    probe_disk(), probe_process(), get_worker_capacity()
     resource_manager.check_memory_headroom()
-    with resource_manager.scratch_sandbox("demo-job-001") as sandbox_dir:
-        (sandbox_dir / "task.txt").write_text("sandbox active", encoding="utf-8")
-    run_memory_cleanup()
-    run_cpu_benchmark(iterations=2_000)
-    inspect_resources()
+    with resource_manager.scratch_sandbox("demo-job-001") as sbox:
+        (sbox / "task.txt").write_text("sandbox active", encoding="utf-8")
+    run_memory_cleanup(), run_cpu_benchmark(iterations=2_000), inspect_resources()
 
 
 if __name__ == "__main__":
