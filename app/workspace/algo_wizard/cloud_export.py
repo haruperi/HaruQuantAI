@@ -1,39 +1,21 @@
-"""ServletAlgoCloud strategy import and multi-target export service.
+"""Strategy import and source export coordination across donor service boundaries.
 
 Description:
-    Implements CloudExportService (ServletAlgoCloud equivalent), supporting
-    strategy import from the visual editor, saved workspace files, databanks,
-    and backtest results (/algocloud/import), export target platform discovery
-    (/algocloud/targets), and multi-platform source code generation from the
-    canonical HSL 1.0 AST (/algocloud/export) across Python, MQL4, MQL5,
-    EasyLanguage, NinjaTrader, JForex, Pseudocode, and canonical HSL JSON.
-
+    Resolve editor, file, databank, or backtest documents. Coordinate core HSL
+    validation and rendering. Only Python, pseudocode, and canonical JSON are
+    currently qualified; native target descriptors remain discoverable but blocked.
+    Import corresponds to ServletAlgoCloud; rendering corresponds to the separate
+    donor source-code service. Co-location preserves existing HTTP contracts.
 Purpose:
-    FEAT-WIZARD-CLOUD-EXPORT: Gate G8 (Phase 5.8, WO-WZ-CLOUD-EXPORT /
-    I-ServletAlgoCloud) service for HSL 1.0 strategy import and multi-target
-    code generation.
-
+    FEAT-WIZARD-CLOUD-EXPORT: Validated strategy exchange and qualified exports.
 Key Capabilities:
-    - FR-wizard-cloud-import: Resolves strategies from editor, file, databank,
-      or backtest_id, upgrades legacy payloads to canonical HSL 1.0, and runs
-      3-pass StrategyValidator checks.
-    - FR-wizard-cloud-export-targets: Publishes metadata and file extensions for
-      all 8 supported export target platforms.
-    - FR-wizard-cloud-export-code: Compiles validated HSL 1.0 documents to
-      NormalizedStrategy and renders deterministic source code with SHA-256
-      content digests.
-
+    - FR-wizard-cloud-import: Validate resolved documents and log import results.
+    - FR-wizard-cloud-export-targets: Report target capability boundaries explicitly.
+    - FR-wizard-cloud-export-code: Log rendered artifact identity or reject targets.
 Python API Usage:
     from app.workspace.algo_wizard.cloud_export import CloudExportService
-    from app.workspace.algo_wizard.cloud_export_models import ExportStrategyRequest
-
-    service = CloudExportService()
-    res = service.export_strategy(
-        ExportStrategyRequest(document=hsl_doc, target_platform="python")
-    )
-
 CLI Usage:
-    uv run python -m pytest tests/workspace/algo_wizard/test_cloud_export.py --no-cov -q
+    uv run pytest tests/workspace/algo_wizard/test_cloud_export.py --no-cov
 """
 
 from __future__ import annotations
@@ -41,11 +23,24 @@ from __future__ import annotations
 import hashlib
 import json
 import re
-from typing import Any, cast
+from typing import Any
 
 from app.core.host.logging import get_logger
-from app.core.lib.errors import DomainError, JSONValue
-from app.core.lib.responses import StandardResponse
+from app.core.lib.errors import DomainError
+from app.core.lib.responses import StandardResponse, build_typed_response
+from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+from app.core.trading.strategy.hsl.documents import (
+    canonical_hsl_bytes,
+    compute_document_hash,
+    parse_hsl_document,
+    upgrade_legacy_wizard_document,
+)
+from app.core.trading.strategy.hsl.library import WizardBlockLibrary
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
+from app.core.trading.strategy.hsl.validation import (
+    StrategyValidator,
+    validation_error_details,
+)
 from app.core.wizard.template_helpers import render_jinja_template
 from app.core.wizard.transform import PYTHON_TEMPLATE
 from app.extend.code.easylanguage.descriptor import render_easylanguage
@@ -63,18 +58,8 @@ from app.workspace.algo_wizard.cloud_export_models import (
     ExportTargetPlatform,
     ListExportTargetsRequest,
 )
-from app.workspace.algo_wizard.compiler import StrategyCompiler
-from app.workspace.algo_wizard.documents import (
-    canonical_hsl_bytes,
-    compute_document_hash,
-    parse_hsl_document,
-    upgrade_legacy_wizard_document,
-)
-from app.workspace.algo_wizard.library import WizardBlockLibrary
-from app.workspace.algo_wizard.models import HSLStrategyDocument
 from app.workspace.algo_wizard.strategies import StrategyDocumentService
 from app.workspace.algo_wizard.strategies_models import StrategyIdRequest
-from app.workspace.algo_wizard.validation import StrategyValidator, ValidationReport
 from app.workspace.algo_wizard.workspace import WizardService
 
 logger = get_logger(__name__)
@@ -148,44 +133,6 @@ _TARGET_BY_PLATFORM: dict[ExportTargetPlatform, ExportTargetDescriptor] = {
 }
 
 
-def _build_typed_response[T](
-    *,
-    request_id: str,
-    data: T,
-    json_payload: Any,
-    revision: int,
-) -> StandardResponse[T]:
-    """Validate json_payload through StandardResponse and attach typed data."""
-    envelope: StandardResponse[Any] = StandardResponse(
-        request_id=request_id,
-        data=json_payload,
-        revision=revision,
-    )
-    object.__setattr__(envelope, "data", data)
-    return cast("StandardResponse[T]", envelope)
-
-
-def _validation_error_details(
-    strategy_id: str,
-    report: ValidationReport,
-) -> dict[str, JSONValue]:
-    """Format ValidationReport issues as finite JSON error details."""
-    issues_json: list[JSONValue] = [
-        {
-            "code": issue.code,
-            "message": issue.message,
-            "path": issue.path,
-            "node_id": issue.node_id,
-        }
-        for issue in report.issues
-    ]
-    return {
-        "strategy_id": strategy_id,
-        "issue_count": len(report.issues),
-        "issues": issues_json,
-    }
-
-
 class CloudExportService:
     """ServletAlgoCloud service for HSL strategy import and multi-target export."""
 
@@ -257,7 +204,7 @@ class CloudExportService:
             req.request_id,
             len(_EXPORT_TARGETS),
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=req.request_id,
             data=_EXPORT_TARGETS,
             json_payload=[item.model_dump(mode="json") for item in _EXPORT_TARGETS],
@@ -282,7 +229,7 @@ class CloudExportService:
                     f"Imported strategy '{doc.strategy.id}' failed HSL validation "
                     f"with {len(report.issues)} issue(s)"
                 ),
-                details=_validation_error_details(doc.strategy.id, report),
+                details=validation_error_details(doc.strategy.id, report),
             )
 
         doc_hash = compute_document_hash(doc)
@@ -302,7 +249,7 @@ class CloudExportService:
             doc.strategy.id,
             report.valid,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=result,
             json_payload=result.model_dump(mode="json"),
@@ -325,7 +272,7 @@ class CloudExportService:
                 message=(
                     f"Cannot export invalid strategy '{request.document.strategy.id}'"
                 ),
-                details=_validation_error_details(
+                details=validation_error_details(
                     request.document.strategy.id,
                     report,
                 ),
@@ -359,7 +306,7 @@ class CloudExportService:
             filename,
             sha256_hex,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=result,
             json_payload=result.model_dump(mode="json"),

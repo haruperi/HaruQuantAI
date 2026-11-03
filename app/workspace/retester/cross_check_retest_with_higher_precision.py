@@ -31,7 +31,7 @@ from typing import Any, Literal
 
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
-from app.workspace.algo_wizard.models import HSLStrategyDocument
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
 from app.workspace.retester.settings_cross_checks import CrossCheckCondition
 
 logger = get_logger(__name__)

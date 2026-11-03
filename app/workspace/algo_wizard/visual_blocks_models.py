@@ -37,13 +37,13 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 from app.core.host.logging import get_logger
 from app.core.trading.backtest.contracts import BacktestSettings
 from app.core.trading.blocks.composition import CompositionSpec
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.models import (
     ActionNode,
     ConditionNode,
     HSLStrategyDocument,
     ParameterSpec,
 )
-from app.workspace.algo_wizard.value_models import OperandNode
+from app.core.trading.strategy.hsl.value_models import OperandNode
 
 logger = get_logger(__name__)
 

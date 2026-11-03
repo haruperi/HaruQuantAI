@@ -36,8 +36,8 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.core.host.logging import get_logger
-from app.workspace.algo_wizard.models import HSLStrategyDocument
-from app.workspace.algo_wizard.validation import ValidationReport
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
+from app.core.trading.strategy.hsl.validation import ValidationReport
 
 logger = get_logger(__name__)
 

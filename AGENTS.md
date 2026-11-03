@@ -1,5 +1,26 @@
 # Contributor Constitution
 
+## Donor-first scope and responsibility
+
+- SQX is the behavioral and responsibility baseline until parity is verified.
+  Custom behavior requires a separate owner-approved proposal after parity.
+- Before changing business logic, map the donor file/class/method or resource
+  to one Python owner and its verification evidence. Mark partial or unknown
+  evidence explicitly; filenames and file counts do not prove parity.
+- Reuse the donor's ownership boundaries. Each behavior has one implementation;
+  workspaces coordinate shared services rather than duplicate their logic.
+- Every new function, module, or capability must serve a mapped requirement.
+  Necessary Python or host differences need a short, explicit rationale in the
+  responsibility map and implementation plan. Do not build speculative features,
+  generic frameworks, or compatibility layers for anticipated future needs.
+- Prefer consolidating duplicated code and keeping examples/configuration as
+  resources. Report file/line changes, but do not force unrelated responsibilities
+  into oversized files or count relocation alone as simplification.
+- Record existing custom behavior as a divergence. Removing it or changing a
+  public contract requires a concrete approved plan; cleanup is not implicit
+  authorization to remove functionality.
+- AlgoWizard ownership: `docs/dev/algo-wizard-donor-responsibility-map.md`.
+
 ## 1. Plan -> Execute -> Walkthrough workflow
 
 Every development task follows this sequence:

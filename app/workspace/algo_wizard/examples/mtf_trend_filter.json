@@ -1,0 +1,204 @@
+{
+  "summary": {
+    "example_id": "mtf_trend_filter",
+    "name": "Multi-Timeframe Trend Filter",
+    "category": "multi_timeframe",
+    "description": "Multi-timeframe strategy aligning H4 EMA trend direction with H1 RSI pullback entries.",
+    "tags": [
+      "mtf",
+      "ema",
+      "rsi",
+      "trend",
+      "h1",
+      "h4"
+    ]
+  },
+  "document": {
+    "schema_version": "1.0.0",
+    "strategy": {
+      "id": "example_mtf_trend_filter",
+      "name": "Multi-Timeframe Trend Filter",
+      "description": "Multi-timeframe strategy aligning H4 EMA trend direction with H1 RSI pullback entries.",
+      "enabled": true,
+      "metadata": {},
+      "universe": {
+        "mode": "explicit",
+        "symbols": [
+          "EURUSD"
+        ]
+      },
+      "timeframe": {
+        "primary": "H1",
+        "additional": [
+          "H4"
+        ]
+      },
+      "parameters": {
+        "trend_ema_period": {
+          "type": "int",
+          "default": 50,
+          "min": 10,
+          "max": 200,
+          "step": 5,
+          "optimize": false,
+          "description": "Higher-timeframe EMA period"
+        },
+        "entry_rsi_period": {
+          "type": "int",
+          "default": 14,
+          "min": 2,
+          "max": 50,
+          "step": 1,
+          "optimize": false,
+          "description": "Primary-timeframe RSI period"
+        }
+      },
+      "variables": {},
+      "money_management": {
+        "type": "fixed_size",
+        "size": {
+          "type": "value",
+          "value": 1.0,
+          "value_type": "float"
+        },
+        "amount": null,
+        "percent": null,
+        "risk_pct": null,
+        "max_lots": null
+      },
+      "risk_management": {
+        "max_open_positions": 1,
+        "max_daily_loss_pct": null,
+        "max_drawdown_pct": null,
+        "allow_opposite_signals": false,
+        "default_stop_loss": {
+          "type": "none",
+          "value": null,
+          "period": null,
+          "multiplier": null,
+          "indicator": null,
+          "expression": null
+        },
+        "default_take_profit": {
+          "type": "none",
+          "value": null,
+          "period": null,
+          "multiplier": null,
+          "multiple": null,
+          "expression": null
+        }
+      },
+      "trade_management": {
+        "breakeven": null,
+        "trailing_stop": null,
+        "time_stop_bars": null,
+        "partial_exits": []
+      },
+      "trading_options": {
+        "timezone": "UTC",
+        "exit_at_end_of_day": false,
+        "end_of_day_time": null,
+        "exit_on_friday": false,
+        "friday_exit_time": null,
+        "limit_time_range": false,
+        "time_range_start": null,
+        "time_range_end": null,
+        "max_trades_per_day": null,
+        "min_distance_from_market_pips": 0.0
+      },
+      "rules": [
+        {
+          "type": "rule",
+          "id": "mtf_long_pullback",
+          "name": "H4 Uptrend + H1 RSI Pullback Entry",
+          "priority": 10,
+          "enabled": true,
+          "event": {
+            "type": "on_bar_close",
+            "timeframe": "$current_timeframe",
+            "symbol": "$current_symbol"
+          },
+          "when": {
+            "type": "logical",
+            "operator": "and",
+            "conditions": [
+              {
+                "type": "state",
+                "state": "position.is_flat"
+              },
+              {
+                "type": "comparison",
+                "operator": "greater_than",
+                "left": {
+                  "type": "price",
+                  "field": "close",
+                  "context": {
+                    "symbol": "$current_symbol",
+                    "timeframe": "H4",
+                    "shift": 0
+                  }
+                },
+                "right": {
+                  "type": "indicator",
+                  "name": "indicator.ema",
+                  "inputs": {},
+                  "params": {
+                    "period": {
+                      "type": "parameter",
+                      "name": "trend_ema_period"
+                    }
+                  },
+                  "output": "main",
+                  "context": {
+                    "symbol": "$current_symbol",
+                    "timeframe": "H4",
+                    "shift": 0
+                  }
+                }
+              },
+              {
+                "type": "comparison",
+                "operator": "less_than",
+                "left": {
+                  "type": "indicator",
+                  "name": "indicator.rsi",
+                  "inputs": {},
+                  "params": {
+                    "period": {
+                      "type": "parameter",
+                      "name": "entry_rsi_period"
+                    }
+                  },
+                  "output": "main",
+                  "context": {
+                    "symbol": "$current_symbol",
+                    "timeframe": "$current_timeframe",
+                    "shift": 0
+                  }
+                },
+                "right": {
+                  "type": "value",
+                  "value": 35.0,
+                  "value_type": "float"
+                }
+              }
+            ]
+          },
+          "then": [
+            {
+              "type": "action",
+              "action": "enter_market",
+              "side": "long",
+              "size": null,
+              "stop_loss": null,
+              "take_profit": null,
+              "comment": "MTF Trend Pullback Buy",
+              "magic_number": null
+            }
+          ],
+          "else_then": []
+        }
+      ]
+    }
+  }
+}

@@ -1,7 +1,7 @@
 """ServletStrategy equivalent service (StrategyDocumentService) for AlgoWizard.
 
 Description:
-    Implements persistent in-memory HSL 1.0 strategy document CRUD, optimistic
+    Implements host-stored HSL 1.0 strategy document CRUD, optimistic
     revision concurrency control, 3-pass validation gating, runtime compilation
     via StrategyCompiler, and trading setup lifecycle management (add, get, list,
     start, stop, remove) wrapped in canonical StandardResponse[T] envelopes.
@@ -36,21 +36,25 @@ from __future__ import annotations
 import os
 from collections.abc import Mapping
 from datetime import UTC, datetime
-from typing import Any, cast
+from typing import Any
 
 from app.core.host.logging import get_logger
 from app.core.host.strategy_storage import HostStrategyStorage
-from app.core.lib.errors import DomainError, JSONValue
-from app.core.lib.responses import StandardResponse
+from app.core.lib.errors import DomainError
+from app.core.lib.responses import StandardResponse, build_typed_response
 from app.core.trading.strategy.contracts import StrategyDocument
-from app.core.trading.strategy.runtime import StrategyRuntime
-from app.workspace.algo_wizard.compiler import StrategyCompiler
-from app.workspace.algo_wizard.documents import (
+from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+from app.core.trading.strategy.hsl.documents import (
     compute_document_hash,
     parse_hsl_document,
     upgrade_legacy_wizard_document,
 )
-from app.workspace.algo_wizard.models import HSLStrategyDocument
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
+from app.core.trading.strategy.hsl.validation import (
+    StrategyValidator,
+    validation_error_details,
+)
+from app.core.trading.strategy.runtime import StrategyRuntime
 from app.workspace.algo_wizard.strategies_models import (
     AddStrategyRequest,
     ListStrategiesRequest,
@@ -62,7 +66,6 @@ from app.workspace.algo_wizard.strategies_models import (
     StrategyIdRequest,
     StrategyRuntimeStatus,
 )
-from app.workspace.algo_wizard.validation import StrategyValidator, ValidationReport
 
 logger = get_logger(__name__)
 
@@ -70,43 +73,6 @@ logger = get_logger(__name__)
 def _utc_now_iso() -> str:
     """Return current UTC timestamp formatted as ISO-8601 with Z suffix."""
     return datetime.now(tz=UTC).strftime("%Y-%m-%dT%H:%M:%SZ")
-
-
-def _build_typed_response[T](
-    *,
-    request_id: str,
-    data: T,
-    json_payload: Any,
-    revision: int,
-) -> StandardResponse[T]:
-    """Validate json_payload through StandardResponse and attach typed data."""
-    envelope: StandardResponse[Any] = StandardResponse(
-        request_id=request_id,
-        data=json_payload,
-        revision=revision,
-    )
-    object.__setattr__(envelope, "data", data)
-    return cast("StandardResponse[T]", envelope)
-
-
-def _validation_error_details(
-    strategy_id: str, report: ValidationReport
-) -> dict[str, JSONValue]:
-    """Format ValidationReport issues as finite JSON error details."""
-    issues_json: list[JSONValue] = [
-        {
-            "code": issue.code,
-            "message": issue.message,
-            "path": issue.path,
-            "node_id": issue.node_id,
-        }
-        for issue in report.issues
-    ]
-    return {
-        "strategy_id": strategy_id,
-        "issue_count": len(report.issues),
-        "issues": issues_json,
-    }
 
 
 class StrategyDocumentService:
@@ -244,7 +210,7 @@ class StrategyDocumentService:
             raise DomainError(
                 code="WIZARD_STRATEGY_INVALID",
                 message=f"Strategy '{strategy_id}' is invalid: {first_msg}",
-                details=_validation_error_details(strategy_id, report),
+                details=validation_error_details(strategy_id, report),
             )
 
         status: StrategyRuntimeStatus = "IDLE" if report.valid else "ERROR"
@@ -280,7 +246,7 @@ class StrategyDocumentService:
             status,
             doc_hash[:12],
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=record,
             json_payload=record.model_dump(mode="json"),
@@ -298,7 +264,7 @@ class StrategyDocumentService:
             record.revision,
             record.status,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=record,
             json_payload=record.model_dump(mode="json"),
@@ -322,7 +288,7 @@ class StrategyDocumentService:
             len(result),
             req.status,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=req.request_id,
             data=result,
             json_payload=[r.model_dump(mode="json") for r in result],
@@ -361,7 +327,7 @@ class StrategyDocumentService:
                 message=(
                     f"Cannot start invalid strategy '{record.strategy_id}': {first_msg}"
                 ),
-                details=_validation_error_details(record.strategy_id, report),
+                details=validation_error_details(record.strategy_id, report),
             )
 
         compiled_doc = self._compiler.compile_to_runtime(record.document)
@@ -384,7 +350,7 @@ class StrategyDocumentService:
             next_rev,
             len(compiled_doc.rules),
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=updated,
             json_payload=updated.model_dump(mode="json"),
@@ -412,7 +378,7 @@ class StrategyDocumentService:
             record.strategy_id,
             next_rev,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=updated,
             json_payload=updated.model_dump(mode="json"),
@@ -445,7 +411,7 @@ class StrategyDocumentService:
             record.status,
             record.revision,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=result,
             json_payload=result.model_dump(mode="json"),

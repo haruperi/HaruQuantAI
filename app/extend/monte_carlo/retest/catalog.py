@@ -33,6 +33,7 @@ from typing import Any
 from app.core.data.contracts import MarketBar
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
 from app.extend.monte_carlo.retest.base import MonteCarloRetest
 from app.extend.monte_carlo.retest.randomize_history_data import (
     RandomizeHistoryData,
@@ -57,7 +58,6 @@ from app.extend.monte_carlo.retest.randomize_strategy_parameters import (
 from app.extend.monte_carlo.retest.randomize_strategy_parameters_customizable import (
     RandomizeStrategyParametersCustomizable,
 )
-from app.workspace.algo_wizard.models import HSLStrategyDocument
 
 logger = get_logger(__name__)
 

@@ -29,12 +29,12 @@ import random
 from typing import Any, override
 
 from app.core.host.logging import get_logger
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
 from app.extend.monte_carlo.retest.base import (
     MonteCarloRetest,
     MonteCarloTestTypes,
     SettingsMap,
 )
-from app.workspace.algo_wizard.models import HSLStrategyDocument
 
 logger = get_logger(__name__)
 

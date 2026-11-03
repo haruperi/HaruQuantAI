@@ -2,7 +2,7 @@
 
 import pytest
 from app.core.lib.errors import DomainError
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.models import (
     HSLStrategyDocument,
     HSLStrategyPayload,
     TimeframeSpec,

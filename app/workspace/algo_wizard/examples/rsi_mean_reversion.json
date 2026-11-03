@@ -1,0 +1,235 @@
+{
+  "summary": {
+    "example_id": "rsi_mean_reversion",
+    "name": "RSI Mean Reversion",
+    "category": "mean_reversion",
+    "description": "Oscillator mean-reversion strategy buying oversold RSI dips and closing positions when RSI recovers into overbought territory.",
+    "tags": [
+      "rsi",
+      "mean_reversion",
+      "oscillator",
+      "h1"
+    ]
+  },
+  "document": {
+    "schema_version": "1.0.0",
+    "strategy": {
+      "id": "example_rsi_mean_reversion",
+      "name": "RSI Mean Reversion",
+      "description": "Oscillator mean-reversion strategy buying oversold RSI dips and closing positions when RSI recovers into overbought territory.",
+      "enabled": true,
+      "metadata": {},
+      "universe": {
+        "mode": "explicit",
+        "symbols": [
+          "EURUSD"
+        ]
+      },
+      "timeframe": {
+        "primary": "H1",
+        "additional": []
+      },
+      "parameters": {
+        "rsi_period": {
+          "type": "int",
+          "default": 14,
+          "min": 2,
+          "max": 100,
+          "step": 1,
+          "optimize": false,
+          "description": "RSI lookback period"
+        },
+        "oversold_level": {
+          "type": "float",
+          "default": 30.0,
+          "min": 5.0,
+          "max": 50.0,
+          "step": 1.0,
+          "optimize": false,
+          "description": "Oversold RSI entry threshold"
+        },
+        "overbought_level": {
+          "type": "float",
+          "default": 70.0,
+          "min": 50.0,
+          "max": 95.0,
+          "step": 1.0,
+          "optimize": false,
+          "description": "Overbought RSI exit threshold"
+        }
+      },
+      "variables": {},
+      "money_management": {
+        "type": "fixed_size",
+        "size": {
+          "type": "value",
+          "value": 1.0,
+          "value_type": "float"
+        },
+        "amount": null,
+        "percent": null,
+        "risk_pct": null,
+        "max_lots": null
+      },
+      "risk_management": {
+        "max_open_positions": 1,
+        "max_daily_loss_pct": null,
+        "max_drawdown_pct": null,
+        "allow_opposite_signals": false,
+        "default_stop_loss": {
+          "type": "none",
+          "value": null,
+          "period": null,
+          "multiplier": null,
+          "indicator": null,
+          "expression": null
+        },
+        "default_take_profit": {
+          "type": "none",
+          "value": null,
+          "period": null,
+          "multiplier": null,
+          "multiple": null,
+          "expression": null
+        }
+      },
+      "trade_management": {
+        "breakeven": null,
+        "trailing_stop": null,
+        "time_stop_bars": null,
+        "partial_exits": []
+      },
+      "trading_options": {
+        "timezone": "UTC",
+        "exit_at_end_of_day": false,
+        "end_of_day_time": null,
+        "exit_on_friday": false,
+        "friday_exit_time": null,
+        "limit_time_range": false,
+        "time_range_start": null,
+        "time_range_end": null,
+        "max_trades_per_day": null,
+        "min_distance_from_market_pips": 0.0
+      },
+      "rules": [
+        {
+          "type": "rule",
+          "id": "rsi_buy_oversold",
+          "name": "Buy on Oversold RSI",
+          "priority": 10,
+          "enabled": true,
+          "event": {
+            "type": "on_bar_close",
+            "timeframe": "$current_timeframe",
+            "symbol": "$current_symbol"
+          },
+          "when": {
+            "type": "logical",
+            "operator": "and",
+            "conditions": [
+              {
+                "type": "state",
+                "state": "position.is_flat"
+              },
+              {
+                "type": "comparison",
+                "operator": "less_than",
+                "left": {
+                  "type": "indicator",
+                  "name": "indicator.rsi",
+                  "inputs": {},
+                  "params": {
+                    "period": {
+                      "type": "parameter",
+                      "name": "rsi_period"
+                    }
+                  },
+                  "output": "main",
+                  "context": {
+                    "symbol": "$current_symbol",
+                    "timeframe": "$current_timeframe",
+                    "shift": 0
+                  }
+                },
+                "right": {
+                  "type": "parameter",
+                  "name": "oversold_level"
+                }
+              }
+            ]
+          },
+          "then": [
+            {
+              "type": "action",
+              "action": "enter_market",
+              "side": "long",
+              "size": null,
+              "stop_loss": null,
+              "take_profit": null,
+              "comment": "RSI Oversold Buy",
+              "magic_number": null
+            }
+          ],
+          "else_then": []
+        },
+        {
+          "type": "rule",
+          "id": "rsi_exit_overbought",
+          "name": "Close Long on Overbought RSI",
+          "priority": 20,
+          "enabled": true,
+          "event": {
+            "type": "on_bar_close",
+            "timeframe": "$current_timeframe",
+            "symbol": "$current_symbol"
+          },
+          "when": {
+            "type": "logical",
+            "operator": "and",
+            "conditions": [
+              {
+                "type": "state",
+                "state": "position.is_long"
+              },
+              {
+                "type": "comparison",
+                "operator": "greater_than",
+                "left": {
+                  "type": "indicator",
+                  "name": "indicator.rsi",
+                  "inputs": {},
+                  "params": {
+                    "period": {
+                      "type": "parameter",
+                      "name": "rsi_period"
+                    }
+                  },
+                  "output": "main",
+                  "context": {
+                    "symbol": "$current_symbol",
+                    "timeframe": "$current_timeframe",
+                    "shift": 0
+                  }
+                },
+                "right": {
+                  "type": "parameter",
+                  "name": "overbought_level"
+                }
+              }
+            ]
+          },
+          "then": [
+            {
+              "type": "action",
+              "action": "exit_position",
+              "target_side": "long",
+              "quantity_pct": 100.0,
+              "reason": "RSI Overbought Exit"
+            }
+          ],
+          "else_then": []
+        }
+      ]
+    }
+  }
+}

@@ -903,3 +903,23 @@ class StrategyValidator:
             )
 
         return ValidationReport(valid=valid, issues=issues)
+
+
+def validation_error_details(
+    strategy_id: str, report: ValidationReport
+) -> dict[str, JSONValue]:
+    """Format ValidationReport issues as finite JSON error details."""
+    issues_json: list[JSONValue] = [
+        {
+            "code": issue.code,
+            "message": issue.message,
+            "path": issue.path,
+            "node_id": issue.node_id,
+        }
+        for issue in report.issues
+    ]
+    return {
+        "strategy_id": strategy_id,
+        "issue_count": len(report.issues),
+        "issues": issues_json,
+    }

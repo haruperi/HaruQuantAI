@@ -7,6 +7,12 @@ import random
 import pytest
 from app.core.data.contracts import MarketBar
 from app.core.lib.errors import DomainError
+from app.core.trading.strategy.hsl.models import (
+    HSLStrategyDocument,
+    HSLStrategyPayload,
+    ParameterSpec,
+    TimeframeSpec,
+)
 from app.extend.monte_carlo.retest import (
     RETEST_CLASSES,
     MCRetestPerturbator,
@@ -23,12 +29,6 @@ from app.extend.monte_carlo.retest import (
     RandomizeStrategyParametersCustomizable,
     SettingsMap,
     TickEvent,
-)
-from app.workspace.algo_wizard.models import (
-    HSLStrategyDocument,
-    HSLStrategyPayload,
-    ParameterSpec,
-    TimeframeSpec,
 )
 
 

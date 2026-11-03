@@ -35,14 +35,7 @@ import json
 
 import pytest
 from app.core.lib.errors import DomainError
-from app.workspace.algo_wizard.cloud_export import CloudExportService
-from app.workspace.algo_wizard.cloud_export_models import (
-    CloudImportRequest,
-    ExportStrategyRequest,
-    ExportTargetPlatform,
-    ListExportTargetsRequest,
-)
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.models import (
     ComparisonConditionNode,
     HSLStrategyDocument,
     HSLStrategyPayload,
@@ -53,12 +46,19 @@ from app.workspace.algo_wizard.models import (
     TimeframeSpec,
     VariableSpec,
 )
-from app.workspace.algo_wizard.routes import create_wizard_router
-from app.workspace.algo_wizard.strategies_models import AddStrategyRequest
-from app.workspace.algo_wizard.value_models import (
+from app.core.trading.strategy.hsl.value_models import (
     IndicatorExpressionNode,
     ValueLiteralNode,
 )
+from app.workspace.algo_wizard.cloud_export import CloudExportService
+from app.workspace.algo_wizard.cloud_export_models import (
+    CloudImportRequest,
+    ExportStrategyRequest,
+    ExportTargetPlatform,
+    ListExportTargetsRequest,
+)
+from app.workspace.algo_wizard.routes import create_wizard_router
+from app.workspace.algo_wizard.strategies_models import AddStrategyRequest
 from app.workspace.algo_wizard.workspace import WizardService
 from app.workspace.algo_wizard.workspace_models import (
     LoadWizardExampleRequest,

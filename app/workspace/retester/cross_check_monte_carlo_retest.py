@@ -32,8 +32,8 @@ from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.host.logging import get_logger
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
 from app.extend.monte_carlo.retest.catalog import MCRetestPerturbator
-from app.workspace.algo_wizard.models import HSLStrategyDocument
 from app.workspace.retester.cross_check_monte_carlo_manipulation import (
     STANDARD_CONFIDENCE_LEVELS,
     MCConfidenceBand,

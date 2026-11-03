@@ -12,7 +12,7 @@ CLI Usage:
     uv run pytest tests/workspace/retester --no-cov
 """
 
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.models import (
     HSLStrategyDocument,
     HSLStrategyPayload,
     TimeframeSpec,

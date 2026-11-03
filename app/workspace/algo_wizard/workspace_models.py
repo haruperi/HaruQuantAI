@@ -38,7 +38,7 @@ from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.core.host.logging import get_logger
 from app.core.trading.strategy.contracts import StrategyDocument
-from app.workspace.algo_wizard.models import HSLStrategyDocument
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
 
 logger = get_logger(__name__)
 

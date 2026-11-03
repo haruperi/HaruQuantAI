@@ -22,7 +22,7 @@ Key Capabilities:
 
 Python API Usage:
     from app.workspace.algo_wizard.catalogue import WizardCatalogueService
-    from app.workspace.algo_wizard.catalogue_models import GetCatalogueRequest
+    from app.core.trading.strategy.hsl.catalogue_models import GetCatalogueRequest
 
     svc = WizardCatalogueService()
     resp = svc.get_all(GetCatalogueRequest(request_id="r1"))
@@ -33,11 +33,9 @@ CLI Usage:
 
 from __future__ import annotations
 
-from typing import Any, cast
-
 from app.core.host.logging import get_logger
-from app.core.lib.responses import StandardResponse
-from app.workspace.algo_wizard.catalogue_models import (
+from app.core.lib.responses import StandardResponse, build_typed_response
+from app.core.trading.strategy.hsl.catalogue_models import (
     CatalogueOptionItem,
     CommissionMethodDescriptor,
     GetBlockDescriptorRequest,
@@ -46,7 +44,7 @@ from app.workspace.algo_wizard.catalogue_models import (
     ListCommissionMethodsRequest,
     WizardConstantsBundle,
 )
-from app.workspace.algo_wizard.library import WizardBlockLibrary
+from app.core.trading.strategy.hsl.library import WizardBlockLibrary
 
 logger = get_logger(__name__)
 
@@ -211,23 +209,6 @@ def _parse_revision_int(revision_str: str) -> int:
         return 1
 
 
-def _build_typed_response[T](
-    *,
-    request_id: str,
-    data: T,
-    json_payload: Any,
-    revision: int,
-) -> StandardResponse[T]:
-    """Validate json_payload through StandardResponse and attach typed data."""
-    envelope: StandardResponse[Any] = StandardResponse(
-        request_id=request_id,
-        data=json_payload,
-        revision=revision,
-    )
-    object.__setattr__(envelope, "data", data)
-    return cast("StandardResponse[T]", envelope)
-
-
 class WizardCatalogueService:
     """Service providing HSL 1.0 block catalogue and ServletConstants options."""
 
@@ -269,7 +250,7 @@ class WizardCatalogueService:
             len(blocks),
             rev_str,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=req.request_id,
             data=bundle,
             json_payload=bundle.model_dump(mode="json"),
@@ -288,7 +269,7 @@ class WizardCatalogueService:
             len(_COMMISSION_METHODS),
             req.request_id,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=req.request_id,
             data=_COMMISSION_METHODS,
             json_payload=[item.model_dump(mode="json") for item in _COMMISSION_METHODS],
@@ -308,7 +289,7 @@ class WizardCatalogueService:
             request.block_id,
             entry.semantic_id,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=entry,
             json_payload=entry.model_dump(mode="json"),

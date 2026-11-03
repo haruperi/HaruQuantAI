@@ -1,0 +1,243 @@
+{
+  "summary": {
+    "example_id": "atr_breakout",
+    "name": "ATR Volatility Breakout",
+    "category": "breakout",
+    "description": "Volatility channel breakout strategy entering long when close breaks above SMA plus an ATR multiple, with ATR-based protective stops.",
+    "tags": [
+      "atr",
+      "sma",
+      "breakout",
+      "volatility",
+      "h1"
+    ]
+  },
+  "document": {
+    "schema_version": "1.0.0",
+    "strategy": {
+      "id": "example_atr_breakout",
+      "name": "ATR Volatility Breakout",
+      "description": "Volatility channel breakout strategy entering long when close breaks above SMA plus an ATR multiple, with ATR-based protective stops.",
+      "enabled": true,
+      "metadata": {},
+      "universe": {
+        "mode": "explicit",
+        "symbols": [
+          "EURUSD"
+        ]
+      },
+      "timeframe": {
+        "primary": "H1",
+        "additional": []
+      },
+      "parameters": {
+        "sma_period": {
+          "type": "int",
+          "default": 20,
+          "min": 5,
+          "max": 200,
+          "step": 1,
+          "optimize": false,
+          "description": "Baseline SMA period"
+        },
+        "atr_period": {
+          "type": "int",
+          "default": 14,
+          "min": 2,
+          "max": 100,
+          "step": 1,
+          "optimize": false,
+          "description": "ATR volatility lookback period"
+        },
+        "atr_multiplier": {
+          "type": "float",
+          "default": 1.5,
+          "min": 0.5,
+          "max": 5.0,
+          "step": 0.1,
+          "optimize": false,
+          "description": "Channel width ATR multiplier"
+        }
+      },
+      "variables": {},
+      "money_management": {
+        "type": "fixed_size",
+        "size": {
+          "type": "value",
+          "value": 1.0,
+          "value_type": "float"
+        },
+        "amount": null,
+        "percent": null,
+        "risk_pct": null,
+        "max_lots": null
+      },
+      "risk_management": {
+        "max_open_positions": 1,
+        "max_daily_loss_pct": null,
+        "max_drawdown_pct": null,
+        "allow_opposite_signals": false,
+        "default_stop_loss": {
+          "type": "none",
+          "value": null,
+          "period": null,
+          "multiplier": null,
+          "indicator": null,
+          "expression": null
+        },
+        "default_take_profit": {
+          "type": "none",
+          "value": null,
+          "period": null,
+          "multiplier": null,
+          "multiple": null,
+          "expression": null
+        }
+      },
+      "trade_management": {
+        "breakeven": null,
+        "trailing_stop": null,
+        "time_stop_bars": null,
+        "partial_exits": []
+      },
+      "trading_options": {
+        "timezone": "UTC",
+        "exit_at_end_of_day": false,
+        "end_of_day_time": null,
+        "exit_on_friday": false,
+        "friday_exit_time": null,
+        "limit_time_range": false,
+        "time_range_start": null,
+        "time_range_end": null,
+        "max_trades_per_day": null,
+        "min_distance_from_market_pips": 0.0
+      },
+      "rules": [
+        {
+          "type": "rule",
+          "id": "atr_breakout_long",
+          "name": "Breakout Above Upper Volatility Channel",
+          "priority": 10,
+          "enabled": true,
+          "event": {
+            "type": "on_bar_close",
+            "timeframe": "$current_timeframe",
+            "symbol": "$current_symbol"
+          },
+          "when": {
+            "type": "logical",
+            "operator": "and",
+            "conditions": [
+              {
+                "type": "state",
+                "state": "position.is_flat"
+              },
+              {
+                "type": "comparison",
+                "operator": "greater_than",
+                "left": {
+                  "type": "price",
+                  "field": "close",
+                  "context": {
+                    "symbol": "$current_symbol",
+                    "timeframe": "$current_timeframe",
+                    "shift": 0
+                  }
+                },
+                "right": {
+                  "type": "math",
+                  "operator": "add",
+                  "left": {
+                    "type": "indicator",
+                    "name": "indicator.sma",
+                    "inputs": {},
+                    "params": {
+                      "period": {
+                        "type": "parameter",
+                        "name": "sma_period"
+                      }
+                    },
+                    "output": "main",
+                    "context": {
+                      "symbol": "$current_symbol",
+                      "timeframe": "$current_timeframe",
+                      "shift": 0
+                    }
+                  },
+                  "right": {
+                    "type": "math",
+                    "operator": "multiply",
+                    "left": {
+                      "type": "indicator",
+                      "name": "indicator.atr",
+                      "inputs": {},
+                      "params": {
+                        "period": {
+                          "type": "parameter",
+                          "name": "atr_period"
+                        }
+                      },
+                      "output": "main",
+                      "context": {
+                        "symbol": "$current_symbol",
+                        "timeframe": "$current_timeframe",
+                        "shift": 0
+                      }
+                    },
+                    "right": {
+                      "type": "parameter",
+                      "name": "atr_multiplier"
+                    }
+                  }
+                }
+              }
+            ]
+          },
+          "then": [
+            {
+              "type": "action",
+              "action": "enter_market",
+              "side": "long",
+              "size": null,
+              "stop_loss": {
+                "type": "atr",
+                "value": null,
+                "period": {
+                  "type": "value",
+                  "value": 14,
+                  "value_type": "int"
+                },
+                "multiplier": {
+                  "type": "value",
+                  "value": 2.0,
+                  "value_type": "float"
+                },
+                "indicator": null,
+                "expression": null
+              },
+              "take_profit": {
+                "type": "atr",
+                "value": null,
+                "period": {
+                  "type": "value",
+                  "value": 14,
+                  "value_type": "int"
+                },
+                "multiplier": {
+                  "type": "value",
+                  "value": 3.0,
+                  "value_type": "float"
+                },
+                "multiple": null,
+                "expression": null
+              },
+              "comment": "ATR Channel Breakout",
+              "magic_number": null
+            }
+          ],
+          "else_then": []
+        }
+      ]
+    }
+  }
+}

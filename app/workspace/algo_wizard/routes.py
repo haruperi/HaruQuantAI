@@ -47,12 +47,12 @@ from fastapi import APIRouter, HTTPException
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError
 from app.core.lib.responses import StandardResponse
-from app.workspace.algo_wizard.catalogue import WizardCatalogueService
-from app.workspace.algo_wizard.catalogue_models import (
+from app.core.trading.strategy.hsl.catalogue_models import (
     GetBlockDescriptorRequest,
     GetCatalogueRequest,
     ListCommissionMethodsRequest,
 )
+from app.workspace.algo_wizard.catalogue import WizardCatalogueService
 from app.workspace.algo_wizard.cloud_export import CloudExportService
 from app.workspace.algo_wizard.cloud_export_models import (
     CloudImportRequest,

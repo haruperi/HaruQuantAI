@@ -37,6 +37,7 @@ from app.core.trading.blocks.metadata import (
     PortType,
 )
 from app.core.trading.blocks.registry import BlockRegistry
+from app.core.trading.strategy.hsl.value_models import BreakevenSpec
 from app.workspace.algo_wizard import (
     ComparisonConditionNode,
     EvaluationContext,
@@ -78,7 +79,6 @@ from app.workspace.algo_wizard import (
     WizardBlockLibrary,
     WizardCatalogueService,
 )
-from app.workspace.algo_wizard.value_models import BreakevenSpec
 
 
 def _build_valid_document() -> HSLStrategyDocument:

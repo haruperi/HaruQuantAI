@@ -35,22 +35,22 @@ import json
 import pytest
 from app.core.lib.errors import DomainError
 from app.core.trading.strategy.contracts import StrategyDocument
-from app.workspace.algo_wizard.catalogue import WizardCatalogueService
-from app.workspace.algo_wizard.compiler import StrategyCompiler
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+from app.core.trading.strategy.hsl.models import (
     ComparisonConditionNode,
     HSLStrategyDocument,
     HSLStrategyPayload,
     OrderMarketActionNode,
     RuleNode,
 )
-from app.workspace.algo_wizard.routes import create_wizard_router
-from app.workspace.algo_wizard.strategies import StrategyDocumentService
-from app.workspace.algo_wizard.validation import StrategyValidator
-from app.workspace.algo_wizard.value_models import (
+from app.core.trading.strategy.hsl.validation import StrategyValidator
+from app.core.trading.strategy.hsl.value_models import (
     IndicatorExpressionNode,
     ValueLiteralNode,
 )
+from app.workspace.algo_wizard.catalogue import WizardCatalogueService
+from app.workspace.algo_wizard.routes import create_wizard_router
+from app.workspace.algo_wizard.strategies import StrategyDocumentService
 from app.workspace.algo_wizard.visual_blocks import VisualBlockService
 from app.workspace.algo_wizard.workspace import WizardService
 from app.workspace.algo_wizard.workspace_models import (
@@ -508,7 +508,7 @@ def test_importing_models_does_not_populate_global_registry() -> None:
 
     code = (
         "import sys;"
-        "from app.workspace.algo_wizard.models import HSLStrategyDocument;"
+        "from app.core.trading.strategy.hsl.models import HSLStrategyDocument;"
         "from app.core.trading.blocks.registry import block_registry;"
         "sys.exit(0 if len(block_registry.snapshot()) == 0 else 1)"
     )
@@ -534,3 +534,37 @@ def test_wizard_router_lazy_cached_identity() -> None:
     from app.workspace.algo_wizard import wizard_router as router_pkg2
 
     assert router_pkg is router_pkg2
+
+
+@pytest.mark.parametrize(
+    ("example_id", "expected_hash"),
+    [
+        (
+            "ema_crossover",
+            "3fa8ae69ce438f5e22dbe7f5b1f46c295b9ec25a38a5a4bfa0d594f1e86ba822",
+        ),
+        (
+            "rsi_mean_reversion",
+            "1d4f90b180a3bbd0f490e00230d4c7cd71457715f0e137575e27091cdacbc974",
+        ),
+        (
+            "atr_breakout",
+            "520bc4dfd05ae2a84fe9cb1b276908a68040d6eecdf3cd04c0211dfac0798b29",
+        ),
+        (
+            "mtf_trend_filter",
+            "125e1725f96d11254492495539fe2d5fe4f1a40cfcd7f26704ffc3e16bc55a43",
+        ),
+    ],
+)
+def test_example_resources_preserve_original_documents(
+    example_id: str, expected_hash: str
+) -> None:
+    """Qualify shipped payloads against hashes captured from the old builders."""
+    import hashlib
+
+    from app.workspace.algo_wizard.workspace import _build_default_examples
+
+    payload = _build_default_examples()[example_id].model_dump(mode="json")
+    canonical = json.dumps(payload, sort_keys=True, separators=(",", ":")).encode()
+    assert hashlib.sha256(canonical).hexdigest() == expected_hash

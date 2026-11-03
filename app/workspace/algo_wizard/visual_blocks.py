@@ -40,32 +40,32 @@ from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
-from typing import Any, cast
+from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.enums import OrderType, Timeframe
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError, JSONValue
-from app.core.lib.responses import StandardResponse
+from app.core.lib.responses import StandardResponse, build_typed_response
 from app.core.trading.backtest.contracts import RunResult, RunSpec
 from app.core.trading.backtest.runner import BacktestRunner
-from app.core.trading.strategy.runtime import StrategyRuntime
-from app.workspace.algo_wizard import models as _hm
-from app.workspace.algo_wizard import value_models as _vm
-from app.workspace.algo_wizard import visual_blocks_models as _vbm
-from app.workspace.algo_wizard.compiler import StrategyCompiler
-from app.workspace.algo_wizard.documents import (
+from app.core.trading.strategy.hsl import models as _hm
+from app.core.trading.strategy.hsl import value_models as _vm
+from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+from app.core.trading.strategy.hsl.documents import (
     parse_hsl_document,
     upgrade_legacy_wizard_document,
 )
-from app.workspace.algo_wizard.library import WizardBlockLibrary
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.library import WizardBlockLibrary
+from app.core.trading.strategy.hsl.models import (
     ComparisonOperator,
     ConditionNode,
     HSLStrategyDocument,
     RuleNode,
 )
-from app.workspace.algo_wizard.validation import StrategyValidator, ValidationReport
+from app.core.trading.strategy.hsl.validation import StrategyValidator, ValidationReport
+from app.core.trading.strategy.runtime import StrategyRuntime
+from app.workspace.algo_wizard import visual_blocks_models as _vbm
 from app.workspace.algo_wizard.visual_blocks_models import (
     BlockGroupDefinition,
     CustomBlockDefinition,
@@ -148,23 +148,6 @@ _DEFAULT_BLOCK_GROUPS: tuple[BlockGroupDefinition, ...] = (
         enabled=True,
     ),
 )
-
-
-def _build_typed_response[T](
-    *,
-    request_id: str,
-    data: T,
-    json_payload: Any,
-    revision: int,
-) -> StandardResponse[T]:
-    """Validate json_payload through StandardResponse and attach typed data."""
-    envelope: StandardResponse[Any] = StandardResponse(
-        request_id=request_id,
-        data=json_payload,
-        revision=revision,
-    )
-    object.__setattr__(envelope, "data", data)
-    return cast("StandardResponse[T]", envelope)
 
 
 def _negate_node(node: ConditionNode, *, distribute_logical: bool) -> ConditionNode:
@@ -269,7 +252,7 @@ class VisualBlockService:
             len(groups),
             len(self._custom_blocks),
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=req.request_id,
             data=cfg,
             json_payload=cfg.model_dump(mode="json"),
@@ -289,7 +272,7 @@ class VisualBlockService:
             report.valid,
             len(report.issues),
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=report,
             json_payload=report.model_dump(mode="json"),
@@ -311,7 +294,7 @@ class VisualBlockService:
             negated.type,
             request.distribute_logical,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=negated,
             json_payload=negated.model_dump(mode="json"),
@@ -343,7 +326,7 @@ class VisualBlockService:
             len(saved),
             self._revision,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=saved,
             json_payload=[b.model_dump(mode="json") for b in saved],
@@ -367,7 +350,7 @@ class VisualBlockService:
             len(result),
             req.category,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=req.request_id,
             data=result,
             json_payload=[b.model_dump(mode="json") for b in result],
@@ -393,7 +376,7 @@ class VisualBlockService:
             len(saved),
             self._revision,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=saved,
             json_payload=[g.model_dump(mode="json") for g in saved],
@@ -417,7 +400,7 @@ class VisualBlockService:
             len(result),
             req.enabled_only,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=req.request_id,
             data=result,
             json_payload=[g.model_dump(mode="json") for g in result],
@@ -458,7 +441,7 @@ class VisualBlockService:
             updated_doc.strategy.id,
             new_tf.additional,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=updated_doc,
             json_payload=updated_doc.model_dump(mode="json"),
@@ -532,7 +515,7 @@ class VisualBlockService:
             res.ready,
             len(state.missing),
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=res,
             json_payload=res.model_dump(mode="json"),
@@ -696,7 +679,7 @@ class VisualBlockService:
             result.total_positions_closed,
             result.equity_delta,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=result,
             json_payload=result.model_dump(mode="json"),
@@ -816,7 +799,7 @@ class VisualBlockService:
             request.backtest_id,
             existing.strategy_id,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=status_payload,
             json_payload=status_payload.model_dump(mode="json"),
@@ -839,7 +822,7 @@ class VisualBlockService:
             request.backtest_id,
             existing.status,
         )
-        return _build_typed_response(
+        return build_typed_response(
             request_id=request.request_id,
             data=existing,
             json_payload=existing.model_dump(mode="json"),

@@ -1,7 +1,7 @@
 """Unit tests for CrossCheckMonteCarloRetestService."""
 
 from app.core.data.contracts import MarketBar
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.models import (
     HSLStrategyDocument,
     HSLStrategyPayload,
     ParameterSpec,

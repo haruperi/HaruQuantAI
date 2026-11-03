@@ -9,8 +9,7 @@ if TYPE_CHECKING:
 
     wizard_router: APIRouter
 
-from app.workspace.algo_wizard.catalogue import WizardCatalogueService
-from app.workspace.algo_wizard.catalogue_models import (
+from app.core.trading.strategy.hsl.catalogue_models import (
     CatalogueOptionItem,
     CatalogueParameterBounds,
     CommissionMethodDescriptor,
@@ -23,26 +22,15 @@ from app.workspace.algo_wizard.catalogue_models import (
     StaticReturnType,
     WizardConstantsBundle,
 )
-from app.workspace.algo_wizard.cloud_export import CloudExportService
-from app.workspace.algo_wizard.cloud_export_models import (
-    CloudImportRequest,
-    CloudImportResult,
-    CloudImportSource,
-    ExportStrategyRequest,
-    ExportStrategyResult,
-    ExportTargetDescriptor,
-    ExportTargetPlatform,
-    ListExportTargetsRequest,
-)
-from app.workspace.algo_wizard.compiler import BarEvent, StrategyCompiler
-from app.workspace.algo_wizard.documents import (
+from app.core.trading.strategy.hsl.compiler import BarEvent, StrategyCompiler
+from app.core.trading.strategy.hsl.documents import (
     canonical_hsl_bytes,
     compute_document_hash,
     parse_hsl_document,
     upgrade_legacy_wizard_document,
 )
-from app.workspace.algo_wizard.library import WizardBlockLibrary
-from app.workspace.algo_wizard.models import (
+from app.core.trading.strategy.hsl.library import WizardBlockLibrary
+from app.core.trading.strategy.hsl.models import (
     ActionNode,
     AlertActionNode,
     ComparisonConditionNode,
@@ -70,25 +58,12 @@ from app.workspace.algo_wizard.models import (
     VariableSetActionNode,
     VariableSpec,
 )
-from app.workspace.algo_wizard.routes import create_wizard_router
-from app.workspace.algo_wizard.strategies import StrategyDocumentService
-from app.workspace.algo_wizard.strategies_models import (
-    AddStrategyRequest,
-    ListStrategiesRequest,
-    ManagedStrategyRecord,
-    RemoveStrategyRequest,
-    RemoveStrategyResult,
-    StartStrategyRequest,
-    StopStrategyRequest,
-    StrategyIdRequest,
-    StrategyRuntimeStatus,
-)
-from app.workspace.algo_wizard.validation import (
+from app.core.trading.strategy.hsl.validation import (
     StrategyValidator,
     ValidationIssue,
     ValidationReport,
 )
-from app.workspace.algo_wizard.value_models import (
+from app.core.trading.strategy.hsl.value_models import (
     BreakevenSpec,
     EvaluationContext,
     ExpressionNode,
@@ -118,6 +93,31 @@ from app.workspace.algo_wizard.value_models import (
     ValueLiteralNode,
     ValueNode,
     VariableRefNode,
+)
+from app.workspace.algo_wizard.catalogue import WizardCatalogueService
+from app.workspace.algo_wizard.cloud_export import CloudExportService
+from app.workspace.algo_wizard.cloud_export_models import (
+    CloudImportRequest,
+    CloudImportResult,
+    CloudImportSource,
+    ExportStrategyRequest,
+    ExportStrategyResult,
+    ExportTargetDescriptor,
+    ExportTargetPlatform,
+    ListExportTargetsRequest,
+)
+from app.workspace.algo_wizard.routes import create_wizard_router
+from app.workspace.algo_wizard.strategies import StrategyDocumentService
+from app.workspace.algo_wizard.strategies_models import (
+    AddStrategyRequest,
+    ListStrategiesRequest,
+    ManagedStrategyRecord,
+    RemoveStrategyRequest,
+    RemoveStrategyResult,
+    StartStrategyRequest,
+    StopStrategyRequest,
+    StrategyIdRequest,
+    StrategyRuntimeStatus,
 )
 from app.workspace.algo_wizard.visual_blocks import VisualBlockService
 from app.workspace.algo_wizard.visual_blocks_models import (

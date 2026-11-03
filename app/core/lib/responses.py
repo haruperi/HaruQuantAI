@@ -1,7 +1,18 @@
-"""Canonical StandardResponse envelope and host response builders.
+"""Canonical response envelopes and host response builders.
 
-Combines the canonical StandardResponse[T] frozen dataclass envelope for structured
-JSON payloads with host operation error categories, metadata, and dictionary builders.
+Description:
+    Validate JSON response payloads and provide shared typed envelopes and host
+    operation responses. Consuming services own operation logging.
+Purpose:
+    FEAT-HOST-RESPONSES: Consistent response validation across host and workspaces.
+Key Capabilities:
+    - FR-response-validation: Reject invalid envelopes and non-finite JSON data;
+      consuming services log operation outcomes, verified by integration tests.
+    - FR-response-typed-envelope: Share existing typed workspace response behavior.
+Python API Usage:
+    from app.core.lib.responses import StandardResponse, build_typed_response
+CLI Usage:
+    uv run pytest tests/core/lib/test_responses.py --no-cov
 """
 
 from __future__ import annotations
@@ -12,7 +23,7 @@ from collections.abc import Mapping
 from dataclasses import dataclass, field
 from enum import StrEnum
 from types import MappingProxyType
-from typing import Any
+from typing import Any, cast
 
 from pydantic import TypeAdapter
 
@@ -235,3 +246,20 @@ def _build_response(
             "extensions": _thaw(metadata.extensions),
         },
     }
+
+
+def build_typed_response[T](
+    *,
+    request_id: str,
+    data: T,
+    json_payload: Any,
+    revision: int,
+) -> StandardResponse[T]:
+    """Validate json_payload through StandardResponse and attach typed data."""
+    envelope: StandardResponse[Any] = StandardResponse(
+        request_id=request_id,
+        data=json_payload,
+        revision=revision,
+    )
+    object.__setattr__(envelope, "data", data)
+    return cast("StandardResponse[T]", envelope)
