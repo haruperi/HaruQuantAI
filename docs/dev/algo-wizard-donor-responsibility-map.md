@@ -50,6 +50,7 @@ integration. Grouping does not make them AlgoWizard business responsibilities.
 | `AppWizard/module.js`; `WizardAppPlugin` in `AppWizard.jar` | Navigation and host registration | Existing web workspace; `workspace/algo_wizard/routes.py` wires services | Plugin registration observed; cross-framework structure differs |
 | `AlgoWizardService.initEditor`, `awActionHandler` | Host/editor coordination and action dispatch | `workspace/algo_wizard/workspace.py`; transport in `routes.py` | Workspace HTTP/acceptance tests; behavioral parity partial |
 | `AlgoWizardServlet.onLoadFile`, `onSaveFile`, `onLoadExample` | Document exchange and examples | `workspace/algo_wizard/workspace.py`; `examples/*.json` | Workspace tests; HSL JSON replaces donor SQX/XML format |
+| `AlgoWizardServlet.onLoadFile/onSaveFile`: shared loader, ZIP entry copy/write | Donor-native package read/write | `core/trading/strategy/files.py` | Copied donor examples and controlled archive tests; independent of HSL; production editor/API integration pending |
 | `AlgoWizardRecentFiles.listJSON/save` | Recent files | `WizardService._record_recent_file`; host-owned storage | Existing file/restart tests; exact donor retention parity unqualified |
 | `AlgoWizardBlocksTagCloud.listJSON/save` | Block usage preferences | No qualified current owner | Donor class observed; unimplemented parity gap, no new implementation in cleanup |
 | `AlgoWizardServlet.onGetConfig`, `onValidate`, `onNegate`, `onNegateCustomBlock` | Authoring configuration and transforms | `workspace/algo_wizard/visual_blocks.py` | Visual-block tests; validation delegates to core |
@@ -116,3 +117,55 @@ reported in the approved task's chat walkthrough, not inferred here.
 
 Further consolidation requires evidence of duplicated responsibility and an
 approved plan. Eleven files is this cleanup's target, not a universal quota.
+
+## Donor document file boundary (approved iteration 1)
+
+Baseline `3fab40fd`; owner authorized the document file boundary with
+`APPROVED: EXECUTE`. One new production module, `core/trading/strategy/files.py`,
+owns native package contents. Existing HSL modules remain unchanged; the new
+owner neither translates XML into HSL nor introduces another strategy language.
+
+- `SqxEntry` holds a name, payload bytes, and optional original ZIP metadata.
+  `SqxDocument` holds ordered entries and the archive comment. Strategy bytes
+  and optional `lastSettings.xml` are projections of those entries, not copies
+  that can drift apart. Missing settings are `None`; present empty settings are
+  `b""`. XML text, unknown elements/attributes, comments, and numeric spelling
+  survive unchanged because validated XML is never reserialized.
+- `read_sqx` corresponds to the package-loading boundary. It reads entries without
+  extraction, checks ZIP integrity and the `StrategyFile/Strategy` structure, and
+  checks nonempty last-settings XML for well-formedness. It does not invoke or
+  imitate the encrypted Loader, StrategyFixer, or legacy conversion routines.
+- `write_sqx` corresponds to the observed archive-copy branch of `onSaveFile`:
+  preserve entry order, unrelated payloads, archive comments, and original entry
+  metadata where supported by Python's ZIP writer. Zero-valued file attributes
+  are explicitly retained despite Python's default permission behavior. Save
+  uses a temporary sibling and final replacement, preserving an existing file
+  when validation or writing fails. This adds no host database schema.
+- The supported preservation guarantee is entry payload bytes and tested ZIP
+  metadata, not identical compressed archive bytes or ZIP signatures. Editing
+  strategy XML does not qualify retained results for the edited strategy. Result
+  freshness and the donor's backtested-save branch remain outside this boundary.
+- Host differences: standard-library ZIP/XML types instead of Java ZIP/JDOM;
+  atomic replacement instead of in-place archive rewrite; bounded reads of at
+  most 4,096 entries / 256 MiB uncompressed. These are file-boundary controls,
+  not new trading functionality. Encrypted entries, malformed/ambiguous packages,
+  and unsupported legacy extensions are explicitly rejected with logged errors.
+- Production UI, route registration, recent-file persistence, HSL conversion,
+  validation semantics, and runtime execution remain outside this slice.
+
+### Fixture provenance
+
+Read-only originals: `C:\SQX-145\internal\web\AlgoWizard\examples\`.
+Byte-for-byte copies are under `tests/core/trading/strategy/fixtures/`:
+
+| Example | SHA-256 |
+| --- | --- |
+| `EMACross.sqx` | `98a7ccb03937e113cbaf6a50e883d0b14b4e33bb08cc851be6d3c3e36ebc3700` |
+| `InsideBarBreakout.sqx` | `1dfb87f46b1ff52b5bd524b7b217a6f3bb783c83ab8441df87a7ac4e2420ff17` |
+
+Both contain `META-INF/MANIFEST.MF` and `strategy_Portfolio.xml`, version
+`3.9.130`, with no last-settings entry. Settings, opaque binary results, directory
+entries, unknown resources, deliberate XML edits, metadata, corruption, and
+failure preservation are qualified using controlled test packages. No user
+strategy archives are included. Full donor validation and execution parity is
+not established by these fixtures.
