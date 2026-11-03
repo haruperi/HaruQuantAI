@@ -1,19 +1,6 @@
-"""CandlestickPatterns price_action indicator strategy block.
+"""CandlestickPatterns indicator.
 
-Description:
-    Evaluates discrete Japanese candlestick patterns across OHLC price history.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Candlestick pattern detection.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.candlestick_patterns import (
-        CandlestickPatterns,
-    )
-    res = CandlestickPatterns().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Evaluates discrete Japanese candlestick patterns across OHLC price history.
 """
 
 from __future__ import annotations
@@ -28,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -53,61 +41,80 @@ RATIO_DECIMALS: int = 6
 EPSILON: float = 1e-12
 
 
-def _eval_wick_tiers(dom_wick: float, opp_wick: float, digits: int) -> bool:
-    """Evaluate 1/2, 1/3, and 1/4 dominant-to-opposing wick tiers."""
-    d2 = round(dom_wick / 2.0, digits)
-    d3 = round(dom_wick / 3.0, digits)
-    d4 = round(dom_wick / 4.0, digits)
-    return (
-        (d2 > opp_wick and d3 <= opp_wick and (d4 <= opp_wick))
-        or (d3 > opp_wick and d4 <= opp_wick)
-        or d4 > opp_wick
-    )
-
-
-def _check_cond(
-    source: IndicatorSeries | Mapping[str, IndicatorSeries],
-    key: str,
-    shift: int,
-    *,
-    negative: bool = False,
-) -> bool:
-    """Evaluate pattern threshold on an IndicatorSeries or pattern mapping."""
-    logger.info("Evaluating CandlestickPatterns.%s: shift=%d", key, shift)
-    series = source[key] if isinstance(source, Mapping) else source
-    if negative:
-        return is_lower(series, -PATTERN_THRESHOLD, shift1=shift, round_digits=8)
-    return is_greater(series, PATTERN_THRESHOLD, shift1=shift, round_digits=8)
-
-
 class CandlestickPatterns(BaseIndicator):
     """Multi-pattern causal candlestick detector."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.candlestick_patterns",
+        version="1.0.0",
         name="CandlestickPatterns",
+        description=(
+            "Evaluates discrete Japanese candlestick patterns across OHLC "
+            "price history."
+        ),
         category="price_action",
+        tags=("price_action", "candlestick-patterns"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("open", PortType.SERIES, required=True),
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "open", PortType.SERIES, required=True, description="Open input series"
+            ),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("doji", PortType.SERIES),
-            OutputPort("bullish_engulfing", PortType.SERIES),
-            OutputPort("bearish_engulfing", PortType.SERIES),
-            OutputPort("engulfing", PortType.SERIES),
-            OutputPort("hammer", PortType.SERIES),
-            OutputPort("shooting_star", PortType.SERIES),
-            OutputPort("pinbar", PortType.SERIES),
-            OutputPort("inside_bar", PortType.SERIES),
-            OutputPort("three_bar", PortType.SERIES),
-            OutputPort("dark_cloud", PortType.SERIES),
-            OutputPort("piercing_line", PortType.SERIES),
+            OutputPort("doji", PortType.SERIES, description="Doji output series"),
+            OutputPort(
+                "bullish_engulfing",
+                PortType.SERIES,
+                description="Bullish engulfing output series",
+            ),
+            OutputPort(
+                "bearish_engulfing",
+                PortType.SERIES,
+                description="Bearish engulfing output series",
+            ),
+            OutputPort(
+                "engulfing", PortType.SERIES, description="Engulfing output series"
+            ),
+            OutputPort("hammer", PortType.SERIES, description="Hammer output series"),
+            OutputPort(
+                "shooting_star",
+                PortType.SERIES,
+                description="Shooting star output series",
+            ),
+            OutputPort("pinbar", PortType.SERIES, description="Pinbar output series"),
+            OutputPort(
+                "inside_bar", PortType.SERIES, description="Inside bar output series"
+            ),
+            OutputPort(
+                "three_bar", PortType.SERIES, description="Three bar output series"
+            ),
+            OutputPort(
+                "dark_cloud", PortType.SERIES, description="Dark cloud output series"
+            ),
+            OutputPort(
+                "piercing_line",
+                PortType.SERIES,
+                description="Piercing line output series",
+            ),
         ),
         required_market_inputs=("open", "high", "low", "close"),
+        required_history_lookback=3,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "tick_size": {
                 "type": "float",
@@ -118,14 +125,35 @@ class CandlestickPatterns(BaseIndicator):
             },
             "digits": {"type": "int", "min": 0, "max": 20, "default": 5},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=3,
+        supports_incremental=False,
     )
-    doji_ratio: float | None = Field(default=None, lt=1.0, gt=0.0)
-    tick_size: float = Field(default=0.0001, gt=0.0)
-    digits: int = Field(default=5, ge=0)
 
+    # Parameters: validated user settings.
+    doji_ratio: float | None = Field(
+        default=None,
+        lt=1.0,
+        gt=0.0,
+        title="Doji ratio",
+        description="Maximum candle body fraction considered a doji",
+    )
+
+    tick_size: float = Field(
+        default=0.0001,
+        gt=0.0,
+        title="Tick size",
+        description="Minimum price increment; required for tick-based bin sizing",
+    )
+
+    digits: int = Field(
+        default=5,
+        ge=0,
+        title="Digits",
+        description="Price precision used when comparing candle patterns",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -139,15 +167,26 @@ class CandlestickPatterns(BaseIndicator):
             raise ValueError("tick_size must be positive and digits non-negative")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 3
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: CandlestickPatterns requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         open_prices = bars.open
         high = bars.high
         low = bars.low
@@ -188,6 +227,7 @@ class CandlestickPatterns(BaseIndicator):
             "piercing_line": IndicatorSeries(piercing, name="PiercingLine"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_single_bar(
         cls,
@@ -448,3 +488,35 @@ class CandlestickPatterns(BaseIndicator):
     ) -> bool:
         """Return True if bar at shift is a Piercing Line pattern."""
         return _check_cond(piercing_series, "piercing_line", shift)
+
+
+# Private helpers: used only by this indicator.
+def _eval_wick_tiers(dom_wick: float, opp_wick: float, digits: int) -> bool:
+    """Evaluate 1/2, 1/3, and 1/4 dominant-to-opposing wick tiers."""
+    d2 = round(dom_wick / 2.0, digits)
+    d3 = round(dom_wick / 3.0, digits)
+    d4 = round(dom_wick / 4.0, digits)
+    return (
+        (d2 > opp_wick and d3 <= opp_wick and (d4 <= opp_wick))
+        or (d3 > opp_wick and d4 <= opp_wick)
+        or d4 > opp_wick
+    )
+
+
+def _check_cond(
+    source: IndicatorSeries | Mapping[str, IndicatorSeries],
+    key: str,
+    shift: int,
+    *,
+    negative: bool = False,
+) -> bool:
+    """Evaluate pattern threshold on an IndicatorSeries or pattern mapping."""
+    logger.info("Evaluating CandlestickPatterns.%s: shift=%d", key, shift)
+    series = source[key] if isinstance(source, Mapping) else source
+    if negative:
+        return is_lower(series, -PATTERN_THRESHOLD, shift1=shift, round_digits=8)
+    return is_greater(series, PATTERN_THRESHOLD, shift1=shift, round_digits=8)
+
+
+# Public exports.
+__all__ = ["CandlestickPatterns"]

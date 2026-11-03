@@ -1,17 +1,6 @@
-"""BiggestRange volatility indicator strategy block.
+"""BiggestRange indicator.
 
-Description:
-    Identifies largest bar range in rolling lookback window.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility: Rolling maximum bar range calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.biggest_range import BiggestRange
-    res = BiggestRange().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Identifies largest bar range in rolling lookback window.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -39,17 +29,31 @@ logger = get_logger(__name__)
 class BiggestRange(BaseIndicator):
     """Numeric extreme of eight-decimal candle ranges over available history."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.biggest_range",
+        version="1.0.0",
         name="BiggestRange",
+        description="Identifies largest bar range in rolling lookback window.",
         category="volatility",
+        tags=("volatility", "biggest-range"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=tuple(
-            InputPort(key, PortType.SERIES, required=True) for key in ("high", "low")
+            InputPort(
+                key,
+                PortType.SERIES,
+                required=True,
+                description=f"{key} input series",
+            )
+            for key in ("high", "low")
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("high", "low"),
-        is_causal=True,
+        required_history_lookback=1,
+        dependencies=(),
         is_generation_eligible=True,
         parameter_search_space={
             "period": {
@@ -58,14 +62,39 @@ class BiggestRange(BaseIndicator):
                 "default": 14,
             }
         },
-        required_history_lookback=1,
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
     )
-    period: int = Field(default=14, ge=1)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return the existing startup requirement for this calculation."""
+        return self.spec.required_history_lookback
+
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Return values, not a predicate about the current candle."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: BiggestRange requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         ranges = bars.high - bars.low
         if not np.isfinite(ranges).all():
             raise ValueError("Candle ranges must be finite")
@@ -77,3 +106,7 @@ class BiggestRange(BaseIndicator):
             len(bars),
         )
         return {"value": IndicatorSeries(values, name="BiggestRange")}
+
+
+# Public exports.
+__all__ = ["BiggestRange"]

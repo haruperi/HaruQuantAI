@@ -1,17 +1,6 @@
-"""SRPercentRank volatility indicator strategy block.
+"""SRPercentRank indicator.
 
-Description:
-    Calculates Support/Resistance percentile ranking relative to historical envelope.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility: Support and resistance percentile rank.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.sr_percent_rank import SRPercentRank
-    res = SRPercentRank().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Support/Resistance percentile ranking relative to historical envelope.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -43,41 +33,89 @@ logger = get_logger(__name__)
 class SRPercentRank(BaseIndicator):
     """Support/Resistance Percent Rank indicator family."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.sr_percent_rank",
+        version="1.0.0",
         name="SRPercentRank",
+        description=(
+            "Calculates Support/Resistance percentile ranking relative to "
+            "historical envelope."
+        ),
         category="volatility",
+        tags=("volatility", "sr-percent-rank"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=122,
+        dependencies=("indicator.volatility.mt_atr",),
+        is_generation_eligible=True,
         parameter_search_space={
             "mode": {"type": "int", "choices": [1, 2], "default": 1},
             "length": {"type": "int", "min": 1, "max": 480, "default": 120},
             "atr_period": {"type": "int", "min": 1, "max": 48, "default": 12},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        dependencies=("indicator.volatility.mt_atr",),
-        required_history_lookback=122,
+        supports_incremental=False,
     )
-    mode: Literal[1, 2] = Field(default=1)
-    length: int = Field(default=120, ge=1)
-    atr_period: int = Field(default=12, ge=1)
 
+    # Parameters: validated user settings.
+    mode: Literal[1, 2] = Field(
+        default=1, title="Mode", description="Mode used by the indicator calculation"
+    )
+
+    length: int = Field(
+        default=120,
+        ge=1,
+        title="Length",
+        description="Number of bars in the percentile-rank window",
+    )
+
+    atr_period: int = Field(
+        default=12,
+        ge=1,
+        title="Atr period",
+        description="Number of bars in the atr window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return max(self.length + 2, self.atr_period + 1)
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: SRPercentRank requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -140,6 +178,7 @@ class SRPercentRank(BaseIndicator):
             )
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def is_above_level(
         cls, series: IndicatorSeries, level: float, shift: int = 0
@@ -217,3 +256,7 @@ class SRPercentRank(BaseIndicator):
             "FR-SERVICES-SRPERCENT-CONDITIONS is_falling shift=%d res=%s", shift, res
         )
         return res
+
+
+# Public exports.
+__all__ = ["SRPercentRank"]

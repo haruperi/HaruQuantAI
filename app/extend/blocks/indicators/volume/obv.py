@@ -1,17 +1,6 @@
-"""OBV volume indicator strategy block.
+"""OBV indicator.
 
-Description:
-    Calculates On-Balance Volume (OBV) cumulative volume flow momentum.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: On-balance volume calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.obv import OBV
-    res = OBV().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates On-Balance Volume (OBV) cumulative volume flow momentum.
 """
 
 from __future__ import annotations
@@ -24,6 +13,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -53,32 +43,63 @@ EPSILON: float = 1e-12
 class OBV(BaseIndicator):
     """On-Balance Volume cumulative volume momentum indicator."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.obv",
+        version="1.0.0",
         name="OBV",
+        description=(
+            "Calculates On-Balance Volume (OBV) cumulative volume flow momentum."
+        ),
         category="volume",
+        tags=("volume", "obv"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("volume", PortType.SERIES, required=True),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+            InputPort(
+                "volume",
+                PortType.SERIES,
+                required=True,
+                description="Volume input series",
+            ),
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("close", "volume"),
-        parameter_search_space={},
-        is_causal=True,
-        is_generation_eligible=True,
         required_history_lookback=1,
+        dependencies=(),
+        is_generation_eligible=True,
+        parameter_search_space={},
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
     )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: OBV requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         close = bars.close
         volume = bars.volume
         logger.info("OBV calculation initiated")
@@ -90,6 +111,7 @@ class OBV(BaseIndicator):
         obv_vals = self._compute_obv(c_arr, v_arr)
         return {"value": IndicatorSeries(obv_vals, name="OBV")}
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _compute_obv(
         c_arr: np.ndarray[Any, Any], v_arr: np.ndarray[Any, Any]
@@ -145,3 +167,7 @@ class OBV(BaseIndicator):
         """True if OBV is below specified level."""
         logger.info("Evaluating OBV is_below_level=%.2f at shift=%d", level, shift)
         return is_lower(obv, level, shift1=shift)
+
+
+# Public exports.
+__all__ = ["OBV"]

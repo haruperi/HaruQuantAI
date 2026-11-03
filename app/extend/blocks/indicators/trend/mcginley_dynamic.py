@@ -1,20 +1,7 @@
-"""McGinley Dynamic tracking moving average strategy block.
+"""McGinleyDynamic indicator.
 
-Description:
-    Calculates John McGinley's dynamic tracking moving average that automatically
-    adjusts its speed according to market acceleration.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-mcginley-dynamic: McGinley dynamic computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.mcginley_dynamic import (
-        McGinleyDynamic,
-    )
-    res = McGinleyDynamic().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates John McGinley's dynamic tracking moving average that automatically
+  adjusts its speed according to market acceleration.
 """
 
 from __future__ import annotations
@@ -43,6 +30,83 @@ _POWER_FACTOR: float = 4.0
 _EPSILON: float = 1e-12
 
 
+class McGinleyDynamic(BaseIndicator):
+    """McGinley Dynamic tracking moving average block."""
+
+    # Metadata: catalog identity, ports, and execution capabilities.
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.trend.mcginley_dynamic",
+        version="1.0.0",
+        name="McGinley Dynamic",
+        description="Speed-adaptive tracking moving average (John McGinley)",
+        category="trend",
+        tags=("trend", "ma", "mcginley", "adaptive"),
+        execution_kind=ExecutionKind.EXPRESSION,
+        chart_pane=ChartPane.MAIN,
+        inputs=(
+            InputPort("close", PortType.SERIES, "Close price series", required=True),
+        ),
+        outputs=(OutputPort("value", PortType.SERIES, "McGinley Dynamic"),),
+        required_market_inputs=("close",),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 14},
+            "k": {"type": "float", "min": 0.1, "max": 2.0, "default": 0.6},
+        },
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
+    )
+
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    k: float = Field(
+        default=0.6,
+        gt=0.0,
+        title="K",
+        description="K used by the indicator calculation",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return minimum history bars needed for valid calculation."""
+        return self.period
+
+    # Calculation: log, check inputs, and return named aligned outputs.
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        """Compute McGinley Dynamic values."""
+        logger.debug(
+            "FR-indicator-calculation: McGinleyDynamic requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
+        close = np.asarray(bars.close, dtype=np.float64)
+        md = mcginley_kernel(close, self.period, self.k)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-TREND: Calculated McGinley(%d, %.2f) for %d bars",
+            self.period,
+            self.k,
+            len(bars),
+        )
+        return {"value": IndicatorSeries(md, name="McGinley")}
+
+
+# Private helpers: used only by this indicator.
 def mcginley_kernel(data: np.ndarray, period: int, k: float = _K_FACTOR) -> np.ndarray:
     """Compute McGinley Dynamic over 1D series."""
     n = len(data)
@@ -62,54 +126,5 @@ def mcginley_kernel(data: np.ndarray, period: int, k: float = _K_FACTOR) -> np.n
     return out
 
 
-class McGinleyDynamic(BaseIndicator):
-    """McGinley Dynamic tracking moving average block."""
-
-    spec: ClassVar[BlockSpec] = BlockSpec(
-        id="indicator.trend.mcginley_dynamic",
-        version="1.0.0",
-        name="McGinley Dynamic",
-        description="Speed-adaptive tracking moving average (John McGinley)",
-        category="trend",
-        tags=("trend", "ma", "mcginley", "adaptive"),
-        execution_kind=ExecutionKind.EXPRESSION,
-        chart_pane=ChartPane.MAIN,
-        inputs=(
-            InputPort("close", PortType.SERIES, "Close price series", required=True),
-        ),
-        outputs=(OutputPort("value", PortType.SERIES, "McGinley Dynamic"),),
-        required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 14},
-            "k": {"type": "float", "min": 0.1, "max": 2.0, "default": 0.6},
-        },
-        is_causal=True,
-        is_generation_eligible=True,
-        is_deterministic=True,
-        supports_incremental=False,
-    )
-
-    period: int = Field(default=14, ge=1)
-    k: float = Field(default=0.6, gt=0.0)
-
-    @override
-    def required_history(self) -> int:
-        """Return minimum history bars needed for valid calculation."""
-        return self.period
-
-    @override
-    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
-        """Compute McGinley Dynamic values."""
-        bars.require_inputs(self.spec.required_market_inputs)
-        close = np.asarray(bars.close, dtype=np.float64)
-        md = mcginley_kernel(close, self.period, self.k)
-        logger.debug(
-            "FR-SERVICES-INDICATOR-TREND: Calculated McGinley(%d, %.2f) for %d bars",
-            self.period,
-            self.k,
-            len(bars),
-        )
-        return {"value": IndicatorSeries(md, name="McGinley")}
-
-
-__all__ = ["McGinleyDynamic", "mcginley_kernel"]
+# Public exports.
+__all__ = ["McGinleyDynamic"]

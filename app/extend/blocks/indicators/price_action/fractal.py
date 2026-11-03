@@ -1,17 +1,6 @@
-"""Fractal price_action indicator strategy block.
+"""Fractal indicator.
 
-Description:
-    Identifies Bill Williams 5-bar bullish and bearish swing fractals.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Swing fractal detection.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.fractal import Fractal
-    res = Fractal().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Identifies Bill Williams 5-bar bullish and bearish swing fractals.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -41,29 +31,51 @@ MIN_FRACTAL_BARS: int = 3
 class Fractal(BaseIndicator):
     """Bill Williams Fractal indicator detecting local peak and trough formations."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.fractal",
+        version="1.0.0",
         name="Fractal",
+        description=(
+            "Identifies Bill Williams 5-bar bullish and bearish swing fractals."
+        ),
         category="price_action",
+        tags=("price_action", "fractal"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
         ),
         outputs=(
-            OutputPort("up", PortType.SERIES),
-            OutputPort("down", PortType.SERIES),
+            OutputPort("up", PortType.SERIES, description="Up output series"),
+            OutputPort("down", PortType.SERIES, description="Down output series"),
         ),
         required_market_inputs=("high", "low"),
+        required_history_lookback=5,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "fractal_bars": {"type": "int", "min": 3, "max": 20, "default": 5}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=5,
+        supports_incremental=False,
     )
-    fractal_bars: int = Field(default=5, ge=MIN_FRACTAL_BARS)
 
+    # Parameters: validated user settings.
+    fractal_bars: int = Field(
+        default=5,
+        ge=MIN_FRACTAL_BARS,
+        title="Fractal bars",
+        description="Number of bars used for fractal detection",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
         """Reject inconsistent settings before calculation."""
@@ -80,15 +92,24 @@ class Fractal(BaseIndicator):
             )
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.fractal_bars
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: Fractal requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         fractal_bars = self.fractal_bars
@@ -126,6 +147,7 @@ class Fractal(BaseIndicator):
             "down": IndicatorSeries(down_vals, name=f"FractalDown({fractal_bars})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _check_fractal_at_bar(
         h_arr: np.ndarray[Any, Any],
@@ -179,3 +201,7 @@ class Fractal(BaseIndicator):
             "Evaluating is_bearish_fractal at shift=%d", shift, extra={"shift": shift}
         )
         return is_greater(fractals["up"], 0.0, shift1=shift, round_digits=8)
+
+
+# Public exports.
+__all__ = ["Fractal"]

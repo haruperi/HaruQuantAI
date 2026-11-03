@@ -1,16 +1,4 @@
-"""Indicator package module: base.py.
-
-Description:
-    Base indicator contract re-export for modular extension blocks.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-core: Base indicator abstract contract.
-Python API Usage:
-    from app.extend.blocks.indicators import *
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
-"""
+"""Base indicator contract re-export for modular extension blocks."""
 
 from __future__ import annotations
 

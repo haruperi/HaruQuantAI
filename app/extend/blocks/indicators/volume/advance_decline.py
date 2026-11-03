@@ -1,20 +1,7 @@
-"""Advance/Decline market breadth volume indicator block.
+"""AdvanceDecline indicator.
 
-Description:
-    Calculates cumulative volume breadth by accumulating volume on advancing
-    bars and subtracting volume on declining bars.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-advance-decline: Advance/Decline breadth computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.advance_decline import (
-        AdvanceDecline,
-    )
-    res = AdvanceDecline().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates cumulative volume breadth by accumulating volume on advancing bars and
+  subtracting volume on declining bars.
 """
 
 from __future__ import annotations
@@ -41,6 +28,7 @@ logger = get_logger(__name__)
 class AdvanceDecline(BaseIndicator):
     """Advance/Decline volume breadth block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.advance_decline",
         version="1.0.0",
@@ -57,22 +45,35 @@ class AdvanceDecline(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Advance/Decline Line"),),
         required_market_inputs=("open", "close", "volume"),
-        parameter_search_space={},
-        is_causal=True,
+        required_history_lookback=1,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={},
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Advance/Decline cumulative line."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: AdvanceDecline requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         open_arr = np.asarray(bars.open, dtype=np.float64)
         close_arr = np.asarray(bars.close, dtype=np.float64)
         volume = np.asarray(bars.volume, dtype=np.float64)
@@ -85,4 +86,5 @@ class AdvanceDecline(BaseIndicator):
         return {"value": IndicatorSeries(ad_line, name="AdvDec")}
 
 
+# Public exports.
 __all__ = ["AdvanceDecline"]

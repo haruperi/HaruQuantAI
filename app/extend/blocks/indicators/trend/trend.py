@@ -1,17 +1,6 @@
-"""Trend trend indicator strategy block.
+"""Trend indicator.
 
-Description:
-    Evaluates consolidated price action uptrend and downtrend condition states.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Uptrend and downtrend binary state detection.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.trend import Trend
-    res = Trend().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Evaluates consolidated price action uptrend and downtrend condition states.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -41,28 +31,61 @@ logger = get_logger(__name__)
 class Trend(BaseIndicator):
     """Trend regime classifier evaluating price position relative to baseline."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.trend",
+        version="1.0.0",
         name="Trend",
+        description=(
+            "Evaluates consolidated price action uptrend and downtrend "
+            "condition states."
+        ),
         category="trend",
+        tags=("trend", "trend"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
         outputs=(
-            OutputPort("trend", PortType.SERIES),
-            OutputPort("baseline", PortType.SERIES),
+            OutputPort("trend", PortType.SERIES, description="Trend output series"),
+            OutputPort(
+                "baseline", PortType.SERIES, description="Baseline output series"
+            ),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=200,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 1, "max": 800, "default": 200},
             "method": {"type": "str", "choices": ["sma", "ema"], "default": "sma"},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=200,
+        supports_incremental=False,
     )
-    period: int = Field(default=200, ge=1)
-    method: Literal["sma", "ema"] = Field(default="sma")
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=200,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    method: Literal["sma", "ema"] = Field(
+        default="sma",
+        title="Method",
+        description="Method used by the indicator calculation",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -70,15 +93,24 @@ class Trend(BaseIndicator):
             raise ValueError(f"Period must be >= 1, got {self.period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: Trend requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         period = self.period
         method = self.method
@@ -115,6 +147,7 @@ class Trend(BaseIndicator):
             "baseline": IndicatorSeries(baseline_vals, name=f"TrendBaseline({period})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _compute_baseline(
         p_arr: np.ndarray[Any, Any], period: int, method: str
@@ -206,3 +239,7 @@ class Trend(BaseIndicator):
             extra={"shift": shift},
         )
         return crosses_below(price, baseline, shift=shift, round_digits=8)
+
+
+# Public exports.
+__all__ = ["Trend"]

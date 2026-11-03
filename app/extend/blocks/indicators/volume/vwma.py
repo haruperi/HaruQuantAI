@@ -1,18 +1,7 @@
-"""Volume-Weighted Moving Average (VWMA) strategy block.
+"""VWMA indicator.
 
-Description:
-    Calculates Volume-Weighted Moving Average (VWMA) weighting closing prices
-    by their respective volume over a rolling window.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-vwma: VWMA computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.vwma import VWMA
-    res = VWMA().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Volume-Weighted Moving Average (VWMA) weighting closing prices by their
+  respective volume over a rolling window.
 """
 
 from __future__ import annotations
@@ -43,6 +32,7 @@ _EPSILON: float = 1e-12
 class VWMA(BaseIndicator):
     """Volume-Weighted Moving Average (VWMA) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.vwma",
         version="1.0.0",
@@ -58,26 +48,43 @@ class VWMA(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "VWMA"),),
         required_market_inputs=("close", "volume"),
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 20},
-        },
-        is_causal=True,
+        required_history_lookback=20,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 20}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=20, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=20,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute VWMA values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: VWMA requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         volume = np.asarray(bars.volume, dtype=np.float64)
         pv_sma = sma_kernel(close * volume, self.period)
@@ -94,4 +101,5 @@ class VWMA(BaseIndicator):
         return {"value": IndicatorSeries(vwma, name="VWMA")}
 
 
+# Public exports.
 __all__ = ["VWMA"]

@@ -1,18 +1,7 @@
-"""Know Sure Thing (KST) momentum oscillator strategy block.
+"""KnowSureThing indicator.
 
-Description:
-    Calculates Martin Pring's Know Sure Thing (KST) as a four-component weighted
-    sum of smoothed rate-of-change indicators with a signal line.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-know-sure-thing: KST oscillator computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.know_sure_thing import KnowSureThing
-    res = KnowSureThing().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Martin Pring's Know Sure Thing (KST) as a four-component weighted sum
+  of smoothed rate-of-change indicators with a signal line.
 """
 
 from __future__ import annotations
@@ -38,33 +27,13 @@ from app.extend.calculators.average import sma_kernel
 logger = get_logger(__name__)
 
 
-def _safe_sma(x: np.ndarray, period: int) -> np.ndarray:
-    n = len(x)
-    out = np.full(n, np.nan, dtype=np.float64)
-    valid = np.where(~np.isnan(x))[0]
-    if len(valid) >= period:
-        start = int(valid[0])
-        out[start:] = sma_kernel(x[start:], period)
-    return out
-
-
 _SCALE_100: float = 100.0
-
-
-def _roc(close: np.ndarray, period: int) -> np.ndarray:
-    n = len(close)
-    res = np.full(n, np.nan, dtype=np.float64)
-    if n > period:
-        with np.errstate(divide="ignore", invalid="ignore"):
-            res[period:] = (
-                _SCALE_100 * (close[period:] - close[:-period]) / close[:-period]
-            )
-    return res
 
 
 class KnowSureThing(BaseIndicator):
     """Know Sure Thing (KST) oscillator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.know_sure_thing",
         version="1.0.0",
@@ -82,6 +51,9 @@ class KnowSureThing(BaseIndicator):
             OutputPort("signal", PortType.SERIES, "KST Signal Line"),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=54,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "r1": {"type": "int", "min": 2, "max": 20, "default": 10},
             "r2": {"type": "int", "min": 5, "max": 30, "default": 15},
@@ -93,22 +65,82 @@ class KnowSureThing(BaseIndicator):
             "s4": {"type": "int", "min": 2, "max": 30, "default": 15},
             "signal_period": {"type": "int", "min": 2, "max": 20, "default": 9},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    r1: int = Field(default=10, ge=1)
-    r2: int = Field(default=15, ge=1)
-    r3: int = Field(default=20, ge=1)
-    r4: int = Field(default=30, ge=1)
-    s1: int = Field(default=10, ge=1)
-    s2: int = Field(default=10, ge=1)
-    s3: int = Field(default=10, ge=1)
-    s4: int = Field(default=15, ge=1)
-    signal_period: int = Field(default=9, ge=1)
+    # Parameters: validated user settings.
+    r1: int = Field(
+        default=10,
+        ge=1,
+        title="R1",
+        description="Rate-of-change lookback for component 1, in bars",
+    )
 
+    r2: int = Field(
+        default=15,
+        ge=1,
+        title="R2",
+        description="Rate-of-change lookback for component 2, in bars",
+    )
+
+    r3: int = Field(
+        default=20,
+        ge=1,
+        title="R3",
+        description="Rate-of-change lookback for component 3, in bars",
+    )
+
+    r4: int = Field(
+        default=30,
+        ge=1,
+        title="R4",
+        description="Rate-of-change lookback for component 4, in bars",
+    )
+
+    s1: int = Field(
+        default=10,
+        ge=1,
+        title="S1",
+        description="Smoothing window for component 1, in bars",
+    )
+
+    s2: int = Field(
+        default=10,
+        ge=1,
+        title="S2",
+        description="Smoothing window for component 2, in bars",
+    )
+
+    s3: int = Field(
+        default=10,
+        ge=1,
+        title="S3",
+        description="Smoothing window for component 3, in bars",
+    )
+
+    s4: int = Field(
+        default=15,
+        ge=1,
+        title="S4",
+        description="Smoothing window for component 4, in bars",
+    )
+
+    signal_period: int = Field(
+        default=9,
+        ge=1,
+        title="Signal period",
+        description="Number of bars in the signal smoothing window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
@@ -120,10 +152,14 @@ class KnowSureThing(BaseIndicator):
         )
         return max_lookback + self.signal_period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute KST line and signal line."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: KnowSureThing requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         rc1 = _safe_sma(_roc(close, self.r1), self.s1)
         rc2 = _safe_sma(_roc(close, self.r2), self.s2)
@@ -141,4 +177,27 @@ class KnowSureThing(BaseIndicator):
         }
 
 
+# Private helpers: used only by this indicator.
+def _safe_sma(x: np.ndarray, period: int) -> np.ndarray:
+    n = len(x)
+    out = np.full(n, np.nan, dtype=np.float64)
+    valid = np.where(~np.isnan(x))[0]
+    if len(valid) >= period:
+        start = int(valid[0])
+        out[start:] = sma_kernel(x[start:], period)
+    return out
+
+
+def _roc(close: np.ndarray, period: int) -> np.ndarray:
+    n = len(close)
+    res = np.full(n, np.nan, dtype=np.float64)
+    if n > period:
+        with np.errstate(divide="ignore", invalid="ignore"):
+            res[period:] = (
+                _SCALE_100 * (close[period:] - close[:-period]) / close[:-period]
+            )
+    return res
+
+
+# Public exports.
 __all__ = ["KnowSureThing"]

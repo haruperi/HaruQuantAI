@@ -1,17 +1,4 @@
-"""Momentum indicator package exports and lazy loading registry.
-
-Description:
-    Momentum indicator package exports and lazy loading registry.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: Momentum indicator exports.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum import RSI, MACD, StochRSI
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
-"""
+"""Momentum indicator package exports and lazy loading registry."""
 
 from __future__ import annotations
 

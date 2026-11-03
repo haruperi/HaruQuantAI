@@ -1,20 +1,7 @@
-"""Williams Alligator strategy block.
+"""WilliamsAlligator indicator.
 
-Description:
-    Calculates Bill Williams Alligator indicator consisting of three displaced
-    smoothed moving averages: Jaw (Blue), Teeth (Red), and Lips (Green).
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-williams-alligator: Williams Alligator computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.williams_alligator import (
-        WilliamsAlligator,
-    )
-    res = WilliamsAlligator().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Bill Williams Alligator indicator consisting of three displaced
+  smoothed moving averages: Jaw (Blue), Teeth (Red), and Lips (Green).
 """
 
 from __future__ import annotations
@@ -40,17 +27,10 @@ from app.extend.calculators.average import smma_kernel
 logger = get_logger(__name__)
 
 
-def _shift_array(arr: np.ndarray, shift: int) -> np.ndarray:
-    n = len(arr)
-    shifted = np.full(n, np.nan, dtype=np.float64)
-    if shift < n:
-        shifted[shift:] = arr[:-shift] if shift > 0 else arr
-    return shifted
-
-
 class WilliamsAlligator(BaseIndicator):
     """Williams Alligator indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.williams_alligator",
         version="1.0.0",
@@ -70,6 +50,9 @@ class WilliamsAlligator(BaseIndicator):
             OutputPort("lips", PortType.SERIES, "Alligator Lips (SMMA 5, Shift 3)"),
         ),
         required_market_inputs=("high", "low"),
+        required_history_lookback=21,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "jaw_period": {"type": "int", "min": 5, "max": 50, "default": 13},
             "jaw_shift": {"type": "int", "min": 1, "max": 20, "default": 8},
@@ -78,19 +61,61 @@ class WilliamsAlligator(BaseIndicator):
             "lips_period": {"type": "int", "min": 2, "max": 20, "default": 5},
             "lips_shift": {"type": "int", "min": 1, "max": 10, "default": 3},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    jaw_period: int = Field(default=13, ge=1)
-    jaw_shift: int = Field(default=8, ge=0)
-    teeth_period: int = Field(default=8, ge=1)
-    teeth_shift: int = Field(default=5, ge=0)
-    lips_period: int = Field(default=5, ge=1)
-    lips_shift: int = Field(default=3, ge=0)
+    # Parameters: validated user settings.
+    jaw_period: int = Field(
+        default=13,
+        ge=1,
+        title="Jaw period",
+        description="Number of bars in the jaw window",
+    )
 
+    jaw_shift: int = Field(
+        default=8,
+        ge=0,
+        title="Jaw shift",
+        description="Bar displacement of the Alligator jaw line",
+    )
+
+    teeth_period: int = Field(
+        default=8,
+        ge=1,
+        title="Teeth period",
+        description="Number of bars in the teeth window",
+    )
+
+    teeth_shift: int = Field(
+        default=5,
+        ge=0,
+        title="Teeth shift",
+        description="Bar displacement of the Alligator teeth line",
+    )
+
+    lips_period: int = Field(
+        default=5,
+        ge=1,
+        title="Lips period",
+        description="Number of bars in the lips window",
+    )
+
+    lips_shift: int = Field(
+        default=3,
+        ge=0,
+        title="Lips shift",
+        description="Bar displacement of the Alligator lips line",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
@@ -100,10 +125,14 @@ class WilliamsAlligator(BaseIndicator):
             self.lips_period + self.lips_shift,
         )
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Alligator Jaw, Teeth, and Lips lines."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: WilliamsAlligator requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = np.asarray(bars.high, dtype=np.float64)
         low = np.asarray(bars.low, dtype=np.float64)
         median = (high + low) / 2.0
@@ -124,4 +153,14 @@ class WilliamsAlligator(BaseIndicator):
         }
 
 
+# Private helpers: used only by this indicator.
+def _shift_array(arr: np.ndarray, shift: int) -> np.ndarray:
+    n = len(arr)
+    shifted = np.full(n, np.nan, dtype=np.float64)
+    if shift < n:
+        shifted[shift:] = arr[:-shift] if shift > 0 else arr
+    return shifted
+
+
+# Public exports.
 __all__ = ["WilliamsAlligator"]

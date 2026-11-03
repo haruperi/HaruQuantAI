@@ -1,19 +1,6 @@
-"""MarketRegimeResolver regime indicator strategy block.
+"""MarketRegimeResolver indicator.
 
-Description:
-    Resolves consolidated multi-dimensional market regime states and labels.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-regime: Multi-dimensional market regime resolution.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.regime.regime_resolver import (
-        MarketRegimeResolver,
-    )
-    res = MarketRegimeResolver().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Resolves consolidated multi-dimensional market regime states and labels.
 """
 
 from __future__ import annotations
@@ -27,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -63,22 +51,48 @@ TRANSITION_CONFIDENCE: float = 0.5
 class MarketRegimeResolver(BaseIndicator):
     """Multi-factor market regime resolver and confidence estimator."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.regime.regime_resolver",
+        version="1.0.0",
         name="MarketRegimeResolver",
+        description=(
+            "Resolves consolidated multi-dimensional market regime states and labels."
+        ),
         category="regime",
+        tags=("regime", "regime-resolver"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("volume", PortType.SERIES, required=False),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+            InputPort(
+                "volume",
+                PortType.SERIES,
+                required=False,
+                description="Volume input series",
+            ),
         ),
         outputs=(
-            OutputPort("regime", PortType.SERIES),
-            OutputPort("confidence", PortType.SERIES),
+            OutputPort("regime", PortType.SERIES, description="Regime output series"),
+            OutputPort(
+                "confidence", PortType.SERIES, description="Confidence output series"
+            ),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=28,
+        dependencies=("indicator.regime.choppiness", "indicator.trend.adx"),
+        is_generation_eligible=True,
         parameter_search_space={
             "adx_period": {"type": "int", "min": 1, "max": 56, "default": 14},
             "adx_threshold": {"type": "float", "min": 0, "max": 100.0, "default": 25.0},
@@ -87,18 +101,52 @@ class MarketRegimeResolver(BaseIndicator):
             "chop_upper": {"type": "float", "min": 0, "max": 247.2, "default": 61.8},
             "donchian_period": {"type": "int", "min": 1, "max": 80, "default": 20},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        dependencies=("indicator.regime.choppiness", "indicator.trend.adx"),
-        required_history_lookback=28,
+        supports_incremental=False,
     )
-    adx_period: int = Field(default=DEFAULT_ADX_PERIOD, ge=1)
-    adx_threshold: float = Field(default=DEFAULT_ADX_THRESHOLD)
-    chop_period: int = Field(default=DEFAULT_CHOP_PERIOD, ge=1)
-    chop_lower: float = Field(default=DEFAULT_CHOP_LOWER)
-    chop_upper: float = Field(default=DEFAULT_CHOP_UPPER)
-    donchian_period: int = Field(default=DEFAULT_DONCHIAN_PERIOD, ge=1)
 
+    # Parameters: validated user settings.
+    adx_period: int = Field(
+        default=DEFAULT_ADX_PERIOD,
+        ge=1,
+        title="Adx period",
+        description="Number of bars in the adx window",
+    )
+
+    adx_threshold: float = Field(
+        default=DEFAULT_ADX_THRESHOLD,
+        title="Adx threshold",
+        description="ADX level used to identify a trending market",
+    )
+
+    chop_period: int = Field(
+        default=DEFAULT_CHOP_PERIOD,
+        ge=1,
+        title="Chop period",
+        description="Number of bars in the chop window",
+    )
+
+    chop_lower: float = Field(
+        default=DEFAULT_CHOP_LOWER,
+        title="Chop lower",
+        description="Lower choppiness boundary used for regime classification",
+    )
+
+    chop_upper: float = Field(
+        default=DEFAULT_CHOP_UPPER,
+        title="Chop upper",
+        description="Upper choppiness boundary used for regime classification",
+    )
+
+    donchian_period: int = Field(
+        default=DEFAULT_DONCHIAN_PERIOD,
+        ge=1,
+        title="Donchian period",
+        description="Number of bars in the donchian window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
         """Reject inconsistent settings before calculation."""
@@ -106,15 +154,27 @@ class MarketRegimeResolver(BaseIndicator):
             raise ValueError("chop_lower must be below chop_upper")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return max(2 * self.adx_period, self.chop_period, self.donchian_period)
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: MarketRegimeResolver requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -159,6 +219,7 @@ class MarketRegimeResolver(BaseIndicator):
             "confidence": IndicatorSeries(conf_vals, name="RegimeConfidence"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _resolve_regimes(
         cls,
@@ -255,3 +316,7 @@ class MarketRegimeResolver(BaseIndicator):
         return equals(regime, REGIME_BREAKOUT_UP, shift1=shift) or equals(
             regime, REGIME_BREAKOUT_DOWN, shift1=shift
         )
+
+
+# Public exports.
+__all__ = ["MarketRegimeResolver"]

@@ -1,19 +1,6 @@
-"""HeikenAshi price_action indicator strategy block.
+"""HeikenAshi indicator.
 
-Description:
-    Calculates Heiken Ashi modified smoothed price candlesticks.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Heiken Ashi price candlestick calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.heiken_ashi import (
-        HeikenAshi,
-    )
-    res = HeikenAshi().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Heiken Ashi modified smoothed price candlesticks.
 """
 
 from __future__ import annotations
@@ -26,6 +13,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -42,39 +30,69 @@ logger = get_logger(__name__)
 class HeikenAshi(BaseIndicator):
     """Heiken Ashi smoothed candlestick generator with trend condition helpers."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.heiken_ashi",
+        version="1.0.0",
         name="HeikenAshi",
+        description="Calculates Heiken Ashi modified smoothed price candlesticks.",
         category="price_action",
+        tags=("price_action", "heiken-ashi"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("open", PortType.SERIES, required=True),
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "open", PortType.SERIES, required=True, description="Open input series"
+            ),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("open", PortType.SERIES),
-            OutputPort("high", PortType.SERIES),
-            OutputPort("low", PortType.SERIES),
-            OutputPort("close", PortType.SERIES),
+            OutputPort("open", PortType.SERIES, description="Open output series"),
+            OutputPort("high", PortType.SERIES, description="High output series"),
+            OutputPort("low", PortType.SERIES, description="Low output series"),
+            OutputPort("close", PortType.SERIES, description="Close output series"),
         ),
         required_market_inputs=("open", "high", "low", "close"),
-        parameter_search_space={},
-        is_causal=True,
-        is_generation_eligible=True,
         required_history_lookback=1,
+        dependencies=(),
+        is_generation_eligible=True,
+        parameter_search_space={},
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
     )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: HeikenAshi requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         open_prices = bars.open
         high = bars.high
         low = bars.low
@@ -116,6 +134,7 @@ class HeikenAshi(BaseIndicator):
             "close": IndicatorSeries(ha_close, name="HAClose"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def turns_bullish(cls, ha: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Check if candle turned bullish on current bar from bearish on prior bar."""
@@ -137,3 +156,7 @@ class HeikenAshi(BaseIndicator):
             ha["close"], ha["open"], shift1=shift + 1, shift2=shift + 1, round_digits=8
         )
         return curr_bear and prev_bull
+
+
+# Public exports.
+__all__ = ["HeikenAshi"]

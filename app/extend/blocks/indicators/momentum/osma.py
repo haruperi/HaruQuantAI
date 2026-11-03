@@ -1,17 +1,6 @@
-"""OSMA momentum indicator strategy block.
+"""OSMA indicator.
 
-Description:
-    Calculates Oscillator Moving Average (OSMA) histogram of MACD.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: OSMA oscillator computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.osma import OSMA
-    res = OSMA().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Oscillator Moving Average (OSMA) histogram of MACD.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -39,36 +29,81 @@ logger = get_logger(__name__)
 class OSMA(BaseIndicator):
     """Moving Average of Oscillator (OSMA) indicator family."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.osma",
+        version="1.0.0",
         name="OSMA",
+        description="Calculates Oscillator Moving Average (OSMA) histogram of MACD.",
         category="momentum",
+        tags=("momentum", "osma"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("close",),
+        required_history_lookback=34,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "fast_ema": {"type": "int", "min": 1, "max": 48, "default": 12},
             "slow_ema": {"type": "int", "min": 1, "max": 104, "default": 26},
             "signal_period": {"type": "int", "min": 1, "max": 36, "default": 9},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=34,
+        supports_incremental=False,
     )
-    fast_ema: int = Field(default=12, ge=1)
-    slow_ema: int = Field(default=26, ge=1)
-    signal_period: int = Field(default=9, ge=1)
 
+    # Parameters: validated user settings.
+    fast_ema: int = Field(
+        default=12,
+        ge=1,
+        title="Fast ema",
+        description="Number of bars in the fast exponential moving average",
+    )
+
+    slow_ema: int = Field(
+        default=26,
+        ge=1,
+        title="Slow ema",
+        description="Number of bars in the slow exponential moving average",
+    )
+
+    signal_period: int = Field(
+        default=9,
+        ge=1,
+        title="Signal period",
+        description="Number of bars in the signal smoothing window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return max(self.fast_ema, self.slow_ema) + self.signal_period - 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: OSMA requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         data = bars.close
         fast_ema = self.fast_ema
         slow_ema = self.slow_ema
@@ -103,3 +138,7 @@ class OSMA(BaseIndicator):
                 res, name=f"OSMA({fast_ema},{slow_ema},{signal_period})"
             )
         }
+
+
+# Public exports.
+__all__ = ["OSMA"]

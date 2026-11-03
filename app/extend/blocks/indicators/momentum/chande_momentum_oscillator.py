@@ -1,20 +1,7 @@
-"""Chande Momentum Oscillator strategy block.
+"""ChandeMomentumOscillator indicator.
 
-Description:
-    Calculates Tushar Chande's CMO oscillator measuring momentum on both up
-    and down days without smoothing the momentum values.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-chande-momentum-oscillator: Chande momentum oscillator.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.chande_momentum_oscillator import (
-        ChandeMomentumOscillator,
-    )
-    res = ChandeMomentumOscillator().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Tushar Chande's CMO oscillator measuring momentum on both up and down
+  days without smoothing the momentum values.
 """
 
 from __future__ import annotations
@@ -45,6 +32,7 @@ _SCALE_100: float = 100.0
 class ChandeMomentumOscillator(BaseIndicator):
     """Chande Momentum Oscillator (CMO) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.chande_momentum_oscillator",
         version="1.0.0",
@@ -59,26 +47,46 @@ class ChandeMomentumOscillator(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Chande Momentum Oscillator"),),
         required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 14},
-        },
-        is_causal=True,
+        required_history_lookback=15,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 14}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=14, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Chande Momentum Oscillator values over historical bars."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: ChandeMomentumOscillator requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         n = len(close)
         cmo = np.full(n, np.nan, dtype=np.float64)
@@ -103,4 +111,5 @@ class ChandeMomentumOscillator(BaseIndicator):
         return {"value": IndicatorSeries(cmo, name="CMO")}
 
 
+# Public exports.
 __all__ = ["ChandeMomentumOscillator"]

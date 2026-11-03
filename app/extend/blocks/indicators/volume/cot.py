@@ -1,17 +1,6 @@
-"""COT volume indicator strategy block.
+"""COT indicator.
 
-Description:
-    Calculates Commitments of Traders (COT) commercial/non-commercial positioning.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: Commitments of Traders positioning calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.cot import COT
-    res = COT().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Commitments of Traders (COT) commercial/non-commercial positioning.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -59,63 +49,80 @@ _COT_SERIES_NAMES: dict[str, str] = {
 type _SeriesInput = IndicatorSeries | Sequence[float] | np.ndarray[Any, Any]
 
 
-def _as_series(s: _SeriesInput) -> Series:
-    """Resolve a positioning series without copying an existing wrapper."""
-    return s if isinstance(s, IndicatorSeries) else IndicatorSeries(s)
-
-
-def _mom_pair(score: Series, mom_period: int, shift: int) -> tuple[float, float] | None:
-    """Resolve current and prior momentum, preserving missing-data validity."""
-    v = [
-        score.get(shift),
-        score.get(shift + mom_period),
-        score.get(shift + 1),
-        score.get(shift + 1 + mom_period),
-    ]
-    return None if any(np.isnan(x) for x in v) else (v[0] - v[1], v[2] - v[3])
-
-
-def _spread_zscore(
-    hedg52: Series, spec52: Series, period: int, shift: int
-) -> float | None:
-    """Compute a positioning spread z-score when sufficient data is available."""
-    if period <= 1:
-        return None
-    sp = [hedg52.get(shift + i) - spec52.get(shift + i) for i in range(period)]
-    if any(np.isnan(x) for x in sp):
-        return None
-    mean = sum(sp) / period
-    var = sum(x * x for x in sp) / period - mean * mean
-    return None if var <= 0.0 else (sp[0] - mean) / float(np.sqrt(var))
-
-
 class COT(BaseIndicator):
     """Commitment of Traders indicator computing CPI/CTI, scores, and conditions."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.cot",
+        version="1.0.0",
         name="COT",
+        description=(
+            "Calculates Commitments of Traders (COT) commercial/non-"
+            "commercial positioning."
+        ),
         category="volume",
+        tags=("volume", "cot"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("commercial_net", PortType.SERIES, required=True),
-            InputPort("speculator_net", PortType.SERIES, required=True),
-            InputPort("small_spec_net", PortType.SERIES, required=False),
-            InputPort("open_interest", PortType.SERIES, required=False),
+            InputPort(
+                "commercial_net",
+                PortType.SERIES,
+                required=True,
+                description="Commercial net input series",
+            ),
+            InputPort(
+                "speculator_net",
+                PortType.SERIES,
+                required=True,
+                description="Speculator net input series",
+            ),
+            InputPort(
+                "small_spec_net",
+                PortType.SERIES,
+                required=False,
+                description="Small spec net input series",
+            ),
+            InputPort(
+                "open_interest",
+                PortType.SERIES,
+                required=False,
+                description="Open interest input series",
+            ),
         ),
-        outputs=tuple(OutputPort(name, PortType.SERIES) for name in _COT_SERIES_NAMES),
+        outputs=tuple(
+            OutputPort(name, PortType.SERIES, description=f"{name} output series")
+            for name in _COT_SERIES_NAMES
+        ),
         required_market_inputs=("commercial_net", "speculator_net"),
+        required_history_lookback=156,
+        dependencies=(),
+        is_generation_eligible=False,
         parameter_search_space={
             "period_fast": {"type": "int", "min": 2, "max": 208, "default": 52},
             "period_slow": {"type": "int", "min": 2, "max": 624, "default": 156},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=False,
-        required_history_lookback=156,
+        supports_incremental=False,
     )
-    period_fast: int = Field(default=DEFAULT_FAST_PERIOD, ge=2)
-    period_slow: int = Field(default=DEFAULT_SLOW_PERIOD, ge=2)
 
+    # Parameters: validated user settings.
+    period_fast: int = Field(
+        default=DEFAULT_FAST_PERIOD,
+        ge=2,
+        title="Period fast",
+        description="Number of bars in the fast positioning window",
+    )
+    period_slow: int = Field(
+        default=DEFAULT_SLOW_PERIOD,
+        ge=2,
+        title="Period slow",
+        description="Number of bars in the slow positioning window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
         """Reject reversed windows rather than silently swapping configured periods."""
@@ -123,15 +130,24 @@ class COT(BaseIndicator):
             raise ValueError("period_fast must not exceed period_slow")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return max(self.period_fast, self.period_slow)
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: COT requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         commercial_net = bars.input("commercial_net", required=True)
         speculator_net = bars.input("speculator_net", required=True)
         small_spec_net = bars.input("small_spec_net", required=False)
@@ -200,6 +216,7 @@ class COT(BaseIndicator):
             k: IndicatorSeries(arrays[k], name=v) for k, v in _COT_SERIES_NAMES.items()
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _percent_rank_rolling(
         arr: np.ndarray[Any, Any], period: int
@@ -217,6 +234,37 @@ class COT(BaseIndicator):
                 else float(np.clip((arr[i] - w_min) / diff, 0.0, 1.0))
             )
         return out
+
+
+# Private helpers: used only by this indicator.
+def _as_series(s: _SeriesInput) -> Series:
+    """Resolve a positioning series without copying an existing wrapper."""
+    return s if isinstance(s, IndicatorSeries) else IndicatorSeries(s)
+
+
+def _mom_pair(score: Series, mom_period: int, shift: int) -> tuple[float, float] | None:
+    """Resolve current and prior momentum, preserving missing-data validity."""
+    v = [
+        score.get(shift),
+        score.get(shift + mom_period),
+        score.get(shift + 1),
+        score.get(shift + 1 + mom_period),
+    ]
+    return None if any(np.isnan(x) for x in v) else (v[0] - v[1], v[2] - v[3])
+
+
+def _spread_zscore(
+    hedg52: Series, spec52: Series, period: int, shift: int
+) -> float | None:
+    """Compute a positioning spread z-score when sufficient data is available."""
+    if period <= 1:
+        return None
+    sp = [hedg52.get(shift + i) - spec52.get(shift + i) for i in range(period)]
+    if any(np.isnan(x) for x in sp):
+        return None
+    mean = sum(sp) / period
+    var = sum(x * x for x in sp) / period - mean * mean
+    return None if var <= 0.0 else (sp[0] - mean) / float(np.sqrt(var))
 
 
 def extreme_persistence(
@@ -946,3 +994,7 @@ def vix_proxy_bearish(
     return series_is_lower(hedg, hedger_threshold, shift1=shift) and is_greater(
         spec, spec_threshold, shift1=shift
     )
+
+
+# Public exports.
+__all__ = ["COT"]

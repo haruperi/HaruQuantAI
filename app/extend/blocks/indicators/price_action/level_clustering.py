@@ -1,19 +1,6 @@
-"""LevelClustering price_action indicator strategy block.
+"""LevelClustering indicator.
 
-Description:
-    Identifies high-density price cluster zones and horizontal levels.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Price level clustering and support/resistance.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.level_clustering import (
-        LevelClustering,
-    )
-    res = LevelClustering().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Identifies high-density price cluster zones and horizontal levels.
 """
 
 from __future__ import annotations
@@ -28,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -49,22 +37,53 @@ CLUSTER_FOUND_THRESHOLD: float = 0.5
 class LevelClustering(BaseIndicator):
     """Structural swing pivot level clustering block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.level_clustering",
+        version="1.0.0",
         name="LevelClustering",
+        description=(
+            "Identifies high-density price cluster zones and horizontal levels."
+        ),
         category="price_action",
+        tags=("price_action", "level-clustering"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("cluster_price", PortType.SERIES),
-            OutputPort("cluster_weight", PortType.SERIES),
-            OutputPort("cluster_found", PortType.SERIES),
+            OutputPort(
+                "cluster_price",
+                PortType.SERIES,
+                description="Cluster price output series",
+            ),
+            OutputPort(
+                "cluster_weight",
+                PortType.SERIES,
+                description="Cluster weight output series",
+            ),
+            OutputPort(
+                "cluster_found",
+                PortType.SERIES,
+                description="Cluster found output series",
+            ),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=50,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "lookback": {"type": "int", "min": 5, "max": 200, "default": 50},
             "tolerance": {
@@ -75,15 +94,27 @@ class LevelClustering(BaseIndicator):
                 "min_exclusive": True,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=50,
+        supports_incremental=False,
     )
-    lookback: int = Field(
-        default=DEFAULT_CLUSTERING_LOOKBACK, ge=MIN_CLUSTERING_LOOKBACK
-    )
-    tolerance: float = Field(default=DEFAULT_TOLERANCE, gt=0.0)
 
+    # Parameters: validated user settings.
+    lookback: int = Field(
+        default=DEFAULT_CLUSTERING_LOOKBACK,
+        ge=MIN_CLUSTERING_LOOKBACK,
+        title="Lookback",
+        description="Number of historical bars examined for patterns or levels",
+    )
+
+    tolerance: float = Field(
+        default=DEFAULT_TOLERANCE,
+        gt=0.0,
+        title="Tolerance",
+        description="Tolerance used by the indicator calculation",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -95,15 +126,26 @@ class LevelClustering(BaseIndicator):
             raise ValueError(f"tolerance must be > 0, got {self.tolerance}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.lookback
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: LevelClustering requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -136,6 +178,7 @@ class LevelClustering(BaseIndicator):
             ),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_clusters(
         cls,
@@ -303,3 +346,7 @@ class LevelClustering(BaseIndicator):
         if np.isnan(c_val) or np.isnan(cl_val):
             return False
         return cl_val - tolerance <= c_val <= cl_val
+
+
+# Public exports.
+__all__ = ["LevelClustering"]

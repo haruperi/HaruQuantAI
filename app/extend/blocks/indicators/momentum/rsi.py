@@ -1,18 +1,7 @@
-"""RSI momentum indicator strategy block.
+"""RSI indicator.
 
-Description:
-    Calculates Relative Strength Index (RSI) momentum oscillator evaluating
-    overbought and oversold conditions.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: RSI oscillator calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.rsi import RSI
-    res = RSI().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Relative Strength Index (RSI) momentum oscillator evaluating overbought
+  and oversold conditions.
 """
 
 from __future__ import annotations
@@ -40,6 +29,7 @@ logger = get_logger(__name__)
 class RSI(BaseIndicator):
     """Relative Strength Index indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.rsi",
         version="1.0.0",
@@ -54,6 +44,8 @@ class RSI(BaseIndicator):
         inputs=(InputPort("close", PortType.SERIES, "Close price series"),),
         outputs=(OutputPort("value", PortType.SERIES, "RSI momentum series"),),
         required_market_inputs=("close",),
+        required_history_lookback=15,
+        dependencies=(),
         is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 100, "default": 14}
@@ -63,6 +55,7 @@ class RSI(BaseIndicator):
         supports_incremental=False,
     )
 
+    # Parameters: validated user settings.
     period: int = Field(
         default=14,
         ge=1,
@@ -70,11 +63,19 @@ class RSI(BaseIndicator):
         description="Smoothing lookback period in bars",
     )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for the first valid RSI calculation."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute RSI over closing prices in batch.
@@ -85,6 +86,8 @@ class RSI(BaseIndicator):
         Returns:
             Dictionary with 'value' series matching input bar length.
         """
+        logger.debug("FR-indicator-calculation: RSI requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         values = rsi_kernel(bars.close, self.period)
         logger.debug(
             "FR-SERVICES-INDICATOR-MOMENTUM: Calculated RSI(period=%d) for %d bars",
@@ -94,4 +97,5 @@ class RSI(BaseIndicator):
         return {"value": IndicatorSeries(values, name="RSI")}
 
 
+# Public exports.
 __all__ = ["RSI"]

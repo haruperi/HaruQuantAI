@@ -1,17 +1,6 @@
-"""VolumeProfile volume indicator strategy block.
+"""VolumeProfile indicator.
 
-Description:
-    Calculates session Volume Profile (POC, VAH, VAL) across trading hours.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: Volume profile price distribution calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.volume_profile import VolumeProfile
-    res = VolumeProfile().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates session Volume Profile (POC, VAH, VAL) across trading hours.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -41,18 +31,29 @@ logger = get_logger(__name__)
 class VolumeProfile(BaseIndicator):
     """Donor session profiles with validated in-class configuration."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.volume_profile",
         version="2.0.0",
         name="VolumeProfile",
+        description=(
+            "Calculates session Volume Profile (POC, VAH, VAL) across trading hours."
+        ),
         category="volume",
+        tags=("volume", "volume-profile"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=tuple(
-            InputPort(name, PortType.SERIES, required=True)
+            InputPort(
+                name,
+                PortType.SERIES,
+                required=True,
+                description=f"{name} input series",
+            )
             for name in ("open", "high", "low", "close", "volume", "timestamps")
         ),
         outputs=tuple(
-            OutputPort(name, PortType.SERIES)
+            OutputPort(name, PortType.SERIES, description=f"{name} output series")
             for name in VOLUME_OUTPUTS
             + tuple(
                 f"{session}_{key}"
@@ -61,17 +62,288 @@ class VolumeProfile(BaseIndicator):
             )
         ),
         required_market_inputs=("open", "high", "low", "close", "volume", "timestamps"),
-        is_causal=True,
-        is_generation_eligible=False,
         required_history_lookback=1,
+        dependencies=(),
+        is_generation_eligible=False,
+        parameter_search_space={},
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
     )
-    timestamp_unit: Literal["seconds", "milliseconds"] = "seconds"
-    timezone: str = "UTC"
-    bin_size_mode: Literal[1, 2] = 2
-    tick_size: float | None = Field(default=None, gt=0)
-    ticks_per_bin: int = Field(default=3, ge=1, le=1000)
-    value_area_pct: float = Field(default=70.0, ge=65, le=75)
 
+    # Parameters: validated user settings.
+    timestamp_unit: Literal["seconds", "milliseconds"] = Field(
+        default="seconds",
+        title="Timestamp unit",
+        description="Unit used by the supplied chart timestamps",
+    )
+
+    timezone: str = Field(
+        default="UTC",
+        title="Timezone",
+        description="Chart timezone used for calendar and session boundaries",
+    )
+
+    bin_size_mode: Literal[1, 2] = Field(
+        default=2,
+        title="Bin size mode",
+        description="Selector for tick-based or row-based profile bin sizing",
+    )
+
+    tick_size: float | None = Field(
+        default=None,
+        gt=0,
+        title="Tick size",
+        description="Minimum price increment for tick-based profile bins",
+    )
+
+    ticks_per_bin: int = Field(
+        default=3,
+        ge=1,
+        le=1000,
+        title="Ticks per bin",
+        description="Number of price ticks in each profile bin",
+    )
+
+    value_area_pct: float = Field(
+        default=70.0,
+        ge=65,
+        le=75,
+        title="Value area pct",
+        description="Percentage of profile activity included in the value area",
+    )
+
+    session_type: int = Field(
+        default=2,
+        ge=1,
+        le=10,
+        title="Session type",
+        description="Session calendar selector",
+    )
+
+    profile_mode: Literal["calendar", "custom", "multi"] = Field(
+        default="calendar",
+        title="Profile mode",
+        description="Calendar, custom-hour, or named-session profile selection",
+    )
+
+    profile_rows: int = Field(
+        default=50,
+        ge=10,
+        le=100,
+        title="Profile rows",
+        description="Target number of price rows in the session profile",
+    )
+
+    session_start: int = Field(
+        default=480,
+        ge=0,
+        le=1439,
+        title="Session start",
+        description="Session start in minutes after midnight",
+    )
+
+    session_end: int = Field(
+        default=960,
+        ge=0,
+        le=1439,
+        title="Session end",
+        description="Session end in minutes after midnight",
+    )
+
+    session_mode: Literal[1, 2] = Field(
+        default=1,
+        title="Session mode",
+        description="Daily session variant used for custom or named sessions",
+    )
+
+    ib_minutes: int = Field(
+        default=0,
+        ge=0,
+        le=14400,
+        title="Ib minutes",
+        description="Initial balance duration in minutes",
+    )
+
+    hvn_count: int = Field(
+        default=5,
+        ge=1,
+        le=10,
+        title="Hvn count",
+        description="Maximum number of high-volume profile nodes",
+    )
+
+    hvn_threshold_pct: int = Field(
+        default=20,
+        ge=10,
+        le=90,
+        title="Hvn threshold pct",
+        description="Relative volume threshold for high-volume nodes, in percent",
+    )
+
+    lvn_threshold_pct: int = Field(
+        default=40,
+        ge=10,
+        le=90,
+        title="Lvn threshold pct",
+        description="Relative volume threshold for low-volume nodes, in percent",
+    )
+
+    enable_lvn: bool = Field(
+        default=False,
+        title="Enable lvn",
+        description="Whether to calculate low-volume profile nodes",
+    )
+
+    enable_vcp: bool = Field(
+        default=False,
+        title="Enable vcp",
+        description="Whether to calculate volume cluster profiles",
+    )
+
+    cluster_spread: float = Field(
+        default=6.0,
+        ge=0.5,
+        le=20,
+        title="Cluster spread",
+        description="Price spread used to group profile clusters",
+    )
+
+    max_cluster_centers: int = Field(
+        default=2,
+        ge=1,
+        le=10,
+        title="Max cluster centers",
+        description="Maximum number of profile cluster centers",
+    )
+
+    pivot_method: Literal[1, 2, 3] = Field(
+        default=1,
+        title="Pivot method",
+        description="Pivot detection method selector",
+    )
+
+    pivot_pct: float = Field(
+        default=2.0,
+        ge=0.01,
+        le=10,
+        title="Pivot pct",
+        description="Percentage price movement used for pivot confirmation",
+    )
+
+    pivot_ticks: int = Field(
+        default=50,
+        ge=1,
+        le=10000,
+        title="Pivot ticks",
+        description="Number of ticks used for pivot confirmation",
+    )
+
+    pivot_atr_multiple: float = Field(
+        default=1.5,
+        ge=0.1,
+        le=10,
+        title="Pivot atr multiple",
+        description="ATR multiple used for pivot confirmation",
+    )
+
+    pivot_atr_period: int = Field(
+        default=14,
+        ge=2,
+        le=200,
+        title="Pivot atr period",
+        description="Number of bars in the pivot atr window",
+    )
+
+    enable_london: bool = Field(
+        default=True,
+        title="Enable london",
+        description="Whether to include the london session",
+    )
+
+    london_start: int = Field(
+        default=420,
+        ge=0,
+        le=1439,
+        title="London start",
+        description="London start in minutes after midnight",
+    )
+
+    london_end: int = Field(
+        default=960,
+        ge=0,
+        le=1439,
+        title="London end",
+        description="London end in minutes after midnight",
+    )
+
+    enable_new_york: bool = Field(
+        default=True,
+        title="Enable new york",
+        description="Whether to include the new york session",
+    )
+
+    new_york_start: int = Field(
+        default=780,
+        ge=0,
+        le=1439,
+        title="New york start",
+        description="New york start in minutes after midnight",
+    )
+
+    new_york_end: int = Field(
+        default=1320,
+        ge=0,
+        le=1439,
+        title="New york end",
+        description="New york end in minutes after midnight",
+    )
+
+    enable_sydney: bool = Field(
+        default=False,
+        title="Enable sydney",
+        description="Whether to include the sydney session",
+    )
+
+    sydney_start: int = Field(
+        default=1260,
+        ge=0,
+        le=1439,
+        title="Sydney start",
+        description="Sydney start in minutes after midnight",
+    )
+
+    sydney_end: int = Field(
+        default=360,
+        ge=0,
+        le=1439,
+        title="Sydney end",
+        description="Sydney end in minutes after midnight",
+    )
+
+    enable_tokyo: bool = Field(
+        default=True,
+        title="Enable tokyo",
+        description="Whether to include the tokyo session",
+    )
+
+    tokyo_start: int = Field(
+        default=0,
+        ge=0,
+        le=1439,
+        title="Tokyo start",
+        description="Tokyo start in minutes after midnight",
+    )
+
+    tokyo_end: int = Field(
+        default=540,
+        ge=0,
+        le=1439,
+        title="Tokyo end",
+        description="Tokyo end in minutes after midnight",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @field_validator("timezone")
     @classmethod
     def valid_timezone(cls, value: str) -> str:
@@ -82,41 +354,26 @@ class VolumeProfile(BaseIndicator):
             raise ValueError("Unknown chart timezone") from exc
         return value
 
-    session_type: int = Field(default=2, ge=1, le=10)
-    profile_mode: Literal["calendar", "custom", "multi"] = "calendar"
-    profile_rows: int = Field(default=50, ge=10, le=100)
-    session_start: int = Field(default=480, ge=0, le=1439)
-    session_end: int = Field(default=960, ge=0, le=1439)
-    session_mode: Literal[1, 2] = 1
-    ib_minutes: int = Field(default=0, ge=0, le=14400)
-    hvn_count: int = Field(default=5, ge=1, le=10)
-    hvn_threshold_pct: int = Field(default=20, ge=10, le=90)
-    lvn_threshold_pct: int = Field(default=40, ge=10, le=90)
-    enable_lvn: bool = False
-    enable_vcp: bool = False
-    cluster_spread: float = Field(default=6.0, ge=0.5, le=20)
-    max_cluster_centers: int = Field(default=2, ge=1, le=10)
-    pivot_method: Literal[1, 2, 3] = 1
-    pivot_pct: float = Field(default=2.0, ge=0.01, le=10)
-    pivot_ticks: int = Field(default=50, ge=1, le=10000)
-    pivot_atr_multiple: float = Field(default=1.5, ge=0.1, le=10)
-    pivot_atr_period: int = Field(default=14, ge=2, le=200)
-    enable_london: bool = True
-    london_start: int = Field(default=420, ge=0, le=1439)
-    london_end: int = Field(default=960, ge=0, le=1439)
-    enable_new_york: bool = True
-    new_york_start: int = Field(default=780, ge=0, le=1439)
-    new_york_end: int = Field(default=1320, ge=0, le=1439)
-    enable_sydney: bool = False
-    sydney_start: int = Field(default=1260, ge=0, le=1439)
-    sydney_end: int = Field(default=360, ge=0, le=1439)
-    enable_tokyo: bool = True
-    tokyo_start: int = Field(default=0, ge=0, le=1439)
-    tokyo_end: int = Field(default=540, ge=0, le=1439)
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
 
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return the existing startup requirement for this calculation."""
+        return self.spec.required_history_lookback
+
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Calculate calendar, custom-hour or independent named session profiles."""
+        logger.debug(
+            "FR-indicator-calculation: VolumeProfile requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         config = self.model_dump()
         if self.profile_mode == "calendar":
             result = calculate_sessions(bars, config)
@@ -154,6 +411,7 @@ class VolumeProfile(BaseIndicator):
         )
         return result
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def price_inside_va(
         close: IndicatorSeries,
@@ -562,3 +820,7 @@ class VolumeProfile(BaseIndicator):
             not (np.isnan(cur_vah) or np.isnan(prior_val))
             and cur_vah < prior_val - min_gap
         )
+
+
+# Public exports.
+__all__ = ["VolumeProfile"]

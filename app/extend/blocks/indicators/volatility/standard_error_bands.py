@@ -1,20 +1,7 @@
-"""Standard Error Bands volatility strategy block.
+"""StandardErrorBands indicator.
 
-Description:
-    Calculates Standard Error Bands around a Linear Regression curve with
-    specified standard error envelope multipliers.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-standard-error-bands: Standard error bands computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.standard_error_bands import (
-        StandardErrorBands,
-    )
-    res = StandardErrorBands().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Standard Error Bands around a Linear Regression curve with specified
+  standard error envelope multipliers.
 """
 
 from __future__ import annotations
@@ -46,6 +33,7 @@ logger = get_logger(__name__)
 class StandardErrorBands(BaseIndicator):
     """Standard Error Bands block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.standard_error_bands",
         version="1.0.0",
@@ -64,28 +52,53 @@ class StandardErrorBands(BaseIndicator):
             OutputPort("lower", PortType.SERIES, "Lower Standard Error Band"),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 3, "max": 100, "default": 20},
             "multiplier": {"type": "float", "min": 0.5, "max": 5.0, "default": 2.0},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=20, ge=3)
-    multiplier: float = Field(default=2.0, gt=0.0)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=20,
+        ge=3,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    multiplier: float = Field(
+        default=2.0,
+        gt=0.0,
+        title="Multiplier",
+        description="Multiplier used by the indicator calculation",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Standard Error Bands."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: StandardErrorBands requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         middle = LinReg(period=self.period).calculate(bars)["lin_reg"].values
         se = standard_error_kernel(close, self.period)
@@ -104,4 +117,5 @@ class StandardErrorBands(BaseIndicator):
         }
 
 
+# Public exports.
 __all__ = ["StandardErrorBands"]

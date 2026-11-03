@@ -1,18 +1,7 @@
-"""Moving Average Envelopes strategy block.
+"""Envelopes indicator.
 
-Description:
-    Calculates Moving Average Envelopes defining upper and lower percentage
-    bands around a central moving average.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-envelopes: Envelopes band computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.envelopes import Envelopes
-    res = Envelopes().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Moving Average Envelopes defining upper and lower percentage bands
+  around a central moving average.
 """
 
 from __future__ import annotations
@@ -43,6 +32,7 @@ _SCALE_100: float = 100.0
 class Envelopes(BaseIndicator):
     """Moving Average Envelopes block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.envelopes",
         version="1.0.0",
@@ -61,30 +51,58 @@ class Envelopes(BaseIndicator):
             OutputPort("lower", PortType.SERIES, "Lower Envelope"),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 100, "default": 20},
             "percent": {"type": "float", "min": 0.1, "max": 20.0, "default": 5.0},
             "exponential": {"type": "bool", "default": False},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=20, ge=1)
-    percent: float = Field(default=5.0, gt=0.0)
-    exponential: bool = Field(default=False)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=20,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    percent: float = Field(
+        default=5.0,
+        gt=0.0,
+        title="Percent",
+        description="Envelope distance from the moving average, in percent",
+    )
+
+    exponential: bool = Field(
+        default=False,
+        title="Exponential",
+        description="Whether to use an exponential moving average",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Upper, Middle, and Lower Envelopes."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: Envelopes requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         if self.exponential:
             mid = ema_kernel(close, self.period)
@@ -107,4 +125,5 @@ class Envelopes(BaseIndicator):
         }
 
 
+# Public exports.
 __all__ = ["Envelopes"]

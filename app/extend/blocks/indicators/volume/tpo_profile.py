@@ -1,17 +1,6 @@
-"""TPOProfile volume indicator strategy block.
+"""TPOProfile indicator.
 
-Description:
-    Calculates Time Price Opportunity (TPO) Market Profile distributions.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: Time Price Opportunity profile calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.tpo_profile import TPOProfile
-    res = TPOProfile().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Time Price Opportunity (TPO) Market Profile distributions.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -41,29 +31,154 @@ logger = get_logger(__name__)
 class TPOProfile(BaseIndicator):
     """Donor session profiles with validated in-class configuration."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.tpo_profile",
         version="2.0.0",
         name="TPOProfile",
+        description=(
+            "Calculates Time Price Opportunity (TPO) Market Profile distributions."
+        ),
         category="volume",
+        tags=("volume", "tpo-profile"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=tuple(
-            InputPort(name, PortType.SERIES, required=True)
+            InputPort(
+                name,
+                PortType.SERIES,
+                required=True,
+                description=f"{name} input series",
+            )
             for name in ("open", "high", "low", "close", "volume", "timestamps")
         ),
-        outputs=tuple(OutputPort(name, PortType.SERIES) for name in TPO_OUTPUTS),
+        outputs=tuple(
+            OutputPort(name, PortType.SERIES, description=f"{name} output series")
+            for name in TPO_OUTPUTS
+        ),
         required_market_inputs=("open", "high", "low", "close", "volume", "timestamps"),
-        is_causal=True,
-        is_generation_eligible=False,
         required_history_lookback=1,
+        dependencies=(),
+        is_generation_eligible=False,
+        parameter_search_space={},
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
     )
-    timestamp_unit: Literal["seconds", "milliseconds"] = "seconds"
-    timezone: str = "UTC"
-    bin_size_mode: Literal[1, 2] = 2
-    tick_size: float | None = Field(default=None, gt=0)
-    ticks_per_bin: int = Field(default=1, ge=1, le=1000)
-    value_area_pct: float = Field(default=70.0, ge=30, le=95)
 
+    # Parameters: validated user settings.
+    timestamp_unit: Literal["seconds", "milliseconds"] = Field(
+        default="seconds",
+        title="Timestamp unit",
+        description="Unit used by the supplied chart timestamps",
+    )
+
+    timezone: str = Field(
+        default="UTC",
+        title="Timezone",
+        description="Chart timezone used for calendar and session boundaries",
+    )
+
+    bin_size_mode: Literal[1, 2] = Field(
+        default=2,
+        title="Bin size mode",
+        description="Selector for tick-based or row-based profile bin sizing",
+    )
+
+    tick_size: float | None = Field(
+        default=None,
+        gt=0,
+        title="Tick size",
+        description="Minimum price increment for tick-based profile bins",
+    )
+
+    ticks_per_bin: int = Field(
+        default=1,
+        ge=1,
+        le=1000,
+        title="Ticks per bin",
+        description="Number of price ticks in each profile bin",
+    )
+
+    value_area_pct: float = Field(
+        default=70.0,
+        ge=30,
+        le=95,
+        title="Value area pct",
+        description="Percentage of profile activity included in the value area",
+    )
+
+    session_type: int = Field(
+        default=1,
+        ge=1,
+        le=8,
+        title="Session type",
+        description="Session calendar selector",
+    )
+
+    profile_rows: int = Field(
+        default=150,
+        ge=10,
+        le=500,
+        title="Profile rows",
+        description="Target number of price rows in the session profile",
+    )
+
+    use_custom_hours: bool = Field(
+        default=False,
+        title="Use custom hours",
+        description="Whether to restrict daily profiles to custom hours",
+    )
+
+    session_start: int = Field(
+        default=0,
+        ge=0,
+        le=1439,
+        title="Session start",
+        description="Session start in minutes after midnight",
+    )
+
+    session_end: int = Field(
+        default=1439,
+        ge=0,
+        le=1439,
+        title="Session end",
+        description="Session end in minutes after midnight",
+    )
+
+    bracket_min_daily: int = Field(
+        default=30,
+        ge=1,
+        le=120,
+        title="Bracket min daily",
+        description="Bracket min daily used by the indicator calculation",
+    )
+
+    bracket_min_weekly: int = Field(
+        default=240,
+        ge=1,
+        le=10000,
+        title="Bracket min weekly",
+        description="Bracket min weekly used by the indicator calculation",
+    )
+
+    bracket_min_monthly: int = Field(
+        default=720,
+        ge=1,
+        le=10000,
+        title="Bracket min monthly",
+        description="Bracket min monthly used by the indicator calculation",
+    )
+
+    bracket_min_yearly: int = Field(
+        default=720,
+        ge=1,
+        le=10000,
+        title="Bracket min yearly",
+        description="Bracket min yearly used by the indicator calculation",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @field_validator("timezone")
     @classmethod
     def valid_timezone(cls, value: str) -> str:
@@ -74,16 +189,6 @@ class TPOProfile(BaseIndicator):
             raise ValueError("Unknown chart timezone") from exc
         return value
 
-    session_type: int = Field(default=1, ge=1, le=8)
-    profile_rows: int = Field(default=150, ge=10, le=500)
-    use_custom_hours: bool = False
-    session_start: int = Field(default=0, ge=0, le=1439)
-    session_end: int = Field(default=1439, ge=0, le=1439)
-    bracket_min_daily: int = Field(default=30, ge=1, le=120)
-    bracket_min_weekly: int = Field(default=240, ge=1, le=10000)
-    bracket_min_monthly: int = Field(default=720, ge=1, le=10000)
-    bracket_min_yearly: int = Field(default=720, ge=1, le=10000)
-
     @model_validator(mode="after")
     def custom_daily_only(self) -> TPOProfile:
         """Reject custom-hour settings when a non-daily calendar is selected."""
@@ -91,9 +196,26 @@ class TPOProfile(BaseIndicator):
             raise ValueError("Custom hours require a daily TPO session")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return the existing startup requirement for this calculation."""
+        return self.spec.required_history_lookback
+
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Count distinct time brackets at each price within the selected session."""
+        logger.debug(
+            "FR-indicator-calculation: TPOProfile requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         custom = (
             (self.session_start, self.session_end) if self.use_custom_hours else None
         )
@@ -103,6 +225,7 @@ class TPOProfile(BaseIndicator):
         )
         return calculate_sessions(bars, self.model_dump(), tpo=True, custom=custom)
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def price_inside_va(
         cls,
@@ -134,3 +257,7 @@ class TPOProfile(BaseIndicator):
         if np.isnan(c) or np.isnan(upper) or np.isnan(lower):
             return False
         return c > upper or c < lower
+
+
+# Public exports.
+__all__ = ["TPOProfile"]

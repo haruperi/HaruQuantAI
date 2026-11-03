@@ -1,17 +1,6 @@
-"""TrueRange volatility indicator strategy block.
+"""TrueRange indicator.
 
-Description:
-    Calculates single-bar True Range considering prior bar close gap.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility: True range volatility calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.true_range import TrueRange
-    res = TrueRange().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates single-bar True Range considering prior bar close gap.
 """
 
 from __future__ import annotations
@@ -24,6 +13,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -41,34 +31,61 @@ logger = get_logger(__name__)
 class TrueRange(BaseIndicator):
     """True Range indicator family."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.true_range",
+        version="1.0.0",
         name="TrueRange",
+        description="Calculates single-bar True Range considering prior bar close gap.",
         category="volatility",
+        tags=("volatility", "true-range"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("high", "low", "close"),
-        parameter_search_space={},
-        is_causal=True,
-        is_generation_eligible=True,
-        dependencies=("indicator.volatility.atr",),
         required_history_lookback=1,
+        dependencies=("indicator.volatility.atr",),
+        is_generation_eligible=True,
+        parameter_search_space={},
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
     )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: TrueRange requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -82,6 +99,7 @@ class TrueRange(BaseIndicator):
         )
         return {"value": IndicatorSeries(res, name="TrueRange")}
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def is_lower(
         cls,
@@ -94,3 +112,7 @@ class TrueRange(BaseIndicator):
         if level is not None:
             return is_lower(series, level, shift=shift)
         return is_lower(series, series, shift1=shift, shift2=shift + lookback)
+
+
+# Public exports.
+__all__ = ["TrueRange"]

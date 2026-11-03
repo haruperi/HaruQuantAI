@@ -1,17 +1,6 @@
-"""PriceGap price_action indicator strategy block.
+"""PriceGap indicator.
 
-Description:
-    Detects opening, runaway, and exhaustion price gaps in time series.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Price gap detection.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.price_gap import PriceGap
-    res = PriceGap().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Detects opening, runaway, and exhaustion price gaps in time series.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -43,40 +33,80 @@ EPSILON: float = 1e-12
 class PriceGap(BaseIndicator):
     """Price Gap detection and fill tracking block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.price_gap",
+        version="1.0.0",
         name="PriceGap",
+        description=(
+            "Detects opening, runaway, and exhaustion price gaps in time series."
+        ),
         category="price_action",
+        tags=("price_action", "price-gap"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("open", PortType.SERIES, required=True),
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "open", PortType.SERIES, required=True, description="Open input series"
+            ),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("gap_size", PortType.SERIES),
-            OutputPort("gap_filled", PortType.SERIES),
+            OutputPort(
+                "gap_size", PortType.SERIES, description="Gap size output series"
+            ),
+            OutputPort(
+                "gap_filled", PortType.SERIES, description="Gap filled output series"
+            ),
         ),
         required_market_inputs=("open", "high", "low", "close"),
+        required_history_lookback=2,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "full_gap": {"type": "bool", "choices": [False, True], "default": True}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=2,
+        supports_incremental=False,
     )
-    full_gap: bool = Field(default=True)
 
+    # Parameters: validated user settings.
+    full_gap: bool = Field(
+        default=True,
+        title="Full gap",
+        description="Full gap used by the indicator calculation",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 2
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: PriceGap requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         open_prices = bars.open
         high = bars.high
         low = bars.low
@@ -102,6 +132,7 @@ class PriceGap(BaseIndicator):
             ),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_gaps(
         cls,
@@ -162,3 +193,7 @@ class PriceGap(BaseIndicator):
         return is_greater(
             gap_filled_series, DEFAULT_GAP_THRESHOLD, shift1=shift, round_digits=8
         )
+
+
+# Public exports.
+__all__ = ["PriceGap"]

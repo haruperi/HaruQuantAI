@@ -1,17 +1,4 @@
-"""Market regime indicator package exports and lazy loading registry.
-
-Description:
-    Market regime indicator package exports and lazy loading registry.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative market regime indicator library.
-Key Capabilities:
-    - FR-indicator-regime: Regime indicator exports.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.regime import ChoppinessIndex, HurstExponent
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
-"""
+"""Market regime indicator package exports and lazy loading registry."""
 
 from __future__ import annotations
 

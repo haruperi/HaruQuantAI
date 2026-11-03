@@ -1,20 +1,7 @@
-"""Volatility Index historical volatility model strategy block.
+"""VolatilityIndex indicator.
 
-Description:
-    Calculates a standardized percentage Volatility Index based on rolling
-    annualized log-return standard deviation (historical VIX model).
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility-index: Volatility index computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.volatility_index import (
-        VolatilityIndex,
-    )
-    res = VolatilityIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates a standardized percentage Volatility Index based on rolling annualized
+  log-return standard deviation (historical VIX model).
 """
 
 from __future__ import annotations
@@ -46,6 +33,7 @@ _MIN_BARS: int = 2
 class VolatilityIndex(BaseIndicator):
     """Volatility Index historical model block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.volatility_index",
         version="1.0.0",
@@ -60,28 +48,53 @@ class VolatilityIndex(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Volatility Index"),),
         required_market_inputs=("close",),
+        required_history_lookback=31,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 100, "default": 30},
             "annual_days": {"type": "int", "min": 1, "max": 365, "default": 252},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=30, ge=2)
-    annual_days: int = Field(default=252, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=30,
+        ge=2,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    annual_days: int = Field(
+        default=252,
+        ge=1,
+        title="Annual days",
+        description="Number of trading days used for annualization",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Volatility Index values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: VolatilityIndex requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         n = len(close)
         out = np.full(n, np.nan, dtype=np.float64)
@@ -101,4 +114,5 @@ class VolatilityIndex(BaseIndicator):
         return {"value": IndicatorSeries(out, name="VolIndex")}
 
 
+# Public exports.
 __all__ = ["VolatilityIndex"]

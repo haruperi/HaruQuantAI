@@ -1,20 +1,7 @@
-"""Relative Volatility Index (RVI) strategy block.
+"""RelativeVolatilityIndex indicator.
 
-Description:
-    Calculates Donald Dorsey's Relative Volatility Index applying standard
-    RSI mechanics to standard deviation rather than daily price change.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-relative-volatility-index: RVI volatility index computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.relative_volatility_index import (
-        RelativeVolatilityIndex,
-    )
-    res = RelativeVolatilityIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Donald Dorsey's Relative Volatility Index applying standard RSI
+  mechanics to standard deviation rather than daily price change.
 """
 
 from __future__ import annotations
@@ -48,6 +35,7 @@ _MIN_BARS: int = 2
 class RelativeVolatilityIndex(BaseIndicator):
     """Relative Volatility Index (RVI) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.relative_volatility_index",
         version="1.0.0",
@@ -62,28 +50,54 @@ class RelativeVolatilityIndex(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Relative Volatility Index"),),
         required_market_inputs=("close",),
+        required_history_lookback=25,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "std_period": {"type": "int", "min": 2, "max": 50, "default": 10},
             "smooth_period": {"type": "int", "min": 2, "max": 50, "default": 14},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    std_period: int = Field(default=10, ge=1)
-    smooth_period: int = Field(default=14, ge=1)
+    # Parameters: validated user settings.
+    std_period: int = Field(
+        default=10,
+        ge=1,
+        title="Std period",
+        description="Number of bars in the std window",
+    )
 
+    smooth_period: int = Field(
+        default=14,
+        ge=1,
+        title="Smooth period",
+        description="Number of bars in the smooth window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.std_period + self.smooth_period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Relative Volatility Index values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: RelativeVolatilityIndex requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         n = len(close)
         sd = std_dev_kernel(close, self.std_period)
@@ -110,4 +124,5 @@ class RelativeVolatilityIndex(BaseIndicator):
         return {"value": IndicatorSeries(rvi, name="RVI_Vol")}
 
 
+# Public exports.
 __all__ = ["RelativeVolatilityIndex"]

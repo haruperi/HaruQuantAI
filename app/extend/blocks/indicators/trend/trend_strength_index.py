@@ -1,20 +1,7 @@
-"""Trend Strength Index (TSI) strategy block.
+"""TrendStrengthIndex indicator.
 
-Description:
-    Calculates the Trend Strength Index measuring cumulative directional price
-    displacement normalized by absolute price movement over a lookback window.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend-strength-index: Trend strength index computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.trend_strength_index import (
-        TrendStrengthIndex,
-    )
-    res = TrendStrengthIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates the Trend Strength Index measuring cumulative directional price
+  displacement normalized by absolute price movement over a lookback window.
 """
 
 from __future__ import annotations
@@ -45,6 +32,7 @@ _SCALE_100: float = 100.0
 class TrendStrengthIndex(BaseIndicator):
     """Trend Strength Index block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.trend_strength_index",
         version="1.0.0",
@@ -59,26 +47,45 @@ class TrendStrengthIndex(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Trend Strength Index"),),
         required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 20},
-        },
-        is_causal=True,
+        required_history_lookback=21,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 20}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=20, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=20,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Trend Strength Index values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: TrendStrengthIndex requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         n = len(close)
         tsi = np.full(n, np.nan, dtype=np.float64)
@@ -103,4 +110,5 @@ class TrendStrengthIndex(BaseIndicator):
         return {"value": IndicatorSeries(tsi, name="TSI_Trend")}
 
 
+# Public exports.
 __all__ = ["TrendStrengthIndex"]

@@ -1,17 +1,6 @@
-"""AnchoredVWAP volume indicator strategy block.
+"""AnchoredVWAP indicator.
 
-Description:
-    Calculates Anchored Volume Weighted Average Price (AVWAP) from specific event.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: Anchored VWAP volume weighted price.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.anchored_vwap import AnchoredVWAP
-    res = AnchoredVWAP().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Anchored Volume Weighted Average Price (AVWAP) from specific event.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -44,24 +34,54 @@ MS_TIMESTAMP_THRESHOLD: float = 100000000000.0
 class AnchoredVWAP(BaseIndicator):
     """Anchored VWAP indicator with volume-weighted standard deviation bands."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.anchored_vwap",
+        version="1.0.0",
         name="AnchoredVWAP",
+        description=(
+            "Calculates Anchored Volume Weighted Average Price (AVWAP) from "
+            "specific event."
+        ),
         category="volume",
+        tags=("volume", "anchored-vwap"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("volume", PortType.SERIES, required=True),
-            InputPort("timestamps", PortType.SERIES, required=False),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+            InputPort(
+                "volume",
+                PortType.SERIES,
+                required=True,
+                description="Volume input series",
+            ),
+            InputPort(
+                "timestamps",
+                PortType.SERIES,
+                required=False,
+                description="Timestamps input series",
+            ),
         ),
         outputs=(
-            OutputPort("vwap", PortType.SERIES),
-            OutputPort("upper", PortType.SERIES),
-            OutputPort("lower", PortType.SERIES),
+            OutputPort("vwap", PortType.SERIES, description="Vwap output series"),
+            OutputPort("upper", PortType.SERIES, description="Upper output series"),
+            OutputPort("lower", PortType.SERIES, description="Lower output series"),
         ),
         required_market_inputs=("high", "low", "close", "volume"),
+        required_history_lookback=1,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "session_type": {"type": "int", "choices": [1, 2, 3], "default": 1},
             "std_dev_mult": {
@@ -73,30 +93,65 @@ class AnchoredVWAP(BaseIndicator):
             },
             "anchor_period": {"type": "int", "min": 0, "max": 4, "default": 0},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=1,
+        supports_incremental=False,
     )
-    session_type: Literal[1, 2, 3] = Field(default=1)
-    std_dev_mult: float = Field(default=DEFAULT_STD_DEV_MULT, gt=0.0)
-    anchor_period: int = Field(default=0, ge=0)
-    anchor_indices: tuple[Annotated[int, Field(ge=0)], ...] | None = Field(default=None)
 
+    # Parameters: validated user settings.
+    session_type: Literal[1, 2, 3] = Field(
+        default=1,
+        title="Session type",
+        description="Session calendar selector",
+    )
+
+    std_dev_mult: float = Field(
+        default=DEFAULT_STD_DEV_MULT,
+        gt=0.0,
+        title="Std dev mult",
+        description="Standard-deviation multiplier for the VWAP bands",
+    )
+
+    anchor_period: int = Field(
+        default=0,
+        ge=0,
+        title="Anchor period",
+        description="Number of bars in the anchor window",
+    )
+
+    anchor_indices: tuple[Annotated[int, Field(ge=0)], ...] | None = Field(
+        default=None,
+        title="Anchor indices",
+        description="Explicit bar indices that reset the anchored calculation",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @field_validator("anchor_indices", mode="before")
     @classmethod
     def freeze_anchor_indices(cls, value: Any) -> Any:
         """Accept JSON arrays while keeping validated configuration immutable."""
         return tuple(value) if isinstance(value, list) else value
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: AnchoredVWAP requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -164,6 +219,7 @@ class AnchoredVWAP(BaseIndicator):
             "lower": IndicatorSeries(lower_out, name="AVWAP_Lower"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _detect_timestamp_resets(
         cls, *, ts_arr: np.ndarray[Any, Any], session_type: int, n: int
@@ -219,3 +275,7 @@ class AnchoredVWAP(BaseIndicator):
             for i in range(anchor_period, n, anchor_period):
                 is_reset[i] = True
         return is_reset
+
+
+# Public exports.
+__all__ = ["AnchoredVWAP"]

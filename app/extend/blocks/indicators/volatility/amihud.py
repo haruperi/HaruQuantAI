@@ -1,17 +1,6 @@
-"""AmihudIlliquidity volatility indicator strategy block.
+"""AmihudIlliquidity indicator.
 
-Description:
-    Calculates Amihud Illiquidity ratio measuring price impact per dollar volume.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility: Amihud illiquidity calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.amihud import AmihudIlliquidity
-    res = AmihudIlliquidity().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Amihud Illiquidity ratio measuring price impact per dollar volume.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -51,17 +41,40 @@ EPSILON: float = 1e-12
 class AmihudIlliquidity(BaseIndicator):
     """Amihud illiquidity price impact ratio indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.amihud",
+        version="1.0.0",
         name="AmihudIlliquidity",
+        description=(
+            "Calculates Amihud Illiquidity ratio measuring price impact per "
+            "dollar volume."
+        ),
         category="volatility",
+        tags=("volatility", "amihud"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("volume", PortType.SERIES, required=True),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+            InputPort(
+                "volume",
+                PortType.SERIES,
+                required=True,
+                description="Volume input series",
+            ),
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("close", "volume"),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 1, "max": 80, "default": 20},
             "multiplier": {
@@ -72,13 +85,27 @@ class AmihudIlliquidity(BaseIndicator):
                 "min_exclusive": True,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=20,
+        supports_incremental=False,
     )
-    period: int = Field(default=DEFAULT_AMIHUD_PERIOD, ge=MIN_AMIHUD_PERIOD)
-    multiplier: float = Field(default=DEFAULT_AMIHUD_MULTIPLIER, gt=0.0)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=DEFAULT_AMIHUD_PERIOD,
+        ge=MIN_AMIHUD_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    multiplier: float = Field(
+        default=DEFAULT_AMIHUD_MULTIPLIER,
+        gt=0.0,
+        title="Multiplier",
+        description="Multiplier used by the indicator calculation",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -90,15 +117,26 @@ class AmihudIlliquidity(BaseIndicator):
             raise ValueError(f"multiplier must be > 0.0, got {self.multiplier}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: AmihudIlliquidity requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = bars.close
         volume = bars.volume
         period = self.period
@@ -115,6 +153,7 @@ class AmihudIlliquidity(BaseIndicator):
         logger.info("AmihudIlliquidity completed: bars=%d", n)
         return {"value": IndicatorSeries(amihud_vals, name=f"Amihud({period})")}
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_amihud(
         cls,
@@ -192,3 +231,7 @@ class AmihudIlliquidity(BaseIndicator):
         """True if Amihud ratio is falling between shift+1 and shift."""
         logger.info("Evaluating Amihud is_falling at shift=%d", shift)
         return is_falling(amihud, shift=shift)
+
+
+# Public exports.
+__all__ = ["AmihudIlliquidity"]

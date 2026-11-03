@@ -1,17 +1,6 @@
-"""WaveTrend momentum indicator strategy block.
+"""WaveTrend indicator.
 
-Description:
-    Calculates WaveTrend oscillator identifying turning points in cyclical trends.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: WaveTrend oscillator computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.wave_trend import WaveTrend
-    res = WaveTrend().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates WaveTrend oscillator identifying turning points in cyclical trends.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -51,34 +41,74 @@ EPSILON: float = 1e-12
 class WaveTrend(BaseIndicator):
     """WaveTrend oscillator block generating Main (WT1) and Signal (WT2) lines."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.wave_trend",
+        version="1.0.0",
         name="WaveTrend",
+        description=(
+            "Calculates WaveTrend oscillator identifying turning points in "
+            "cyclical trends."
+        ),
         category="momentum",
+        tags=("momentum", "wave-trend"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=False),
-            InputPort("close", PortType.SERIES, required=False),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=False, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=False,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("wt1", PortType.SERIES),
-            OutputPort("wt2", PortType.SERIES),
+            OutputPort("wt1", PortType.SERIES, description="Wt1 output series"),
+            OutputPort("wt2", PortType.SERIES, description="Wt2 output series"),
         ),
         required_market_inputs=("high",),
+        required_history_lookback=33,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "channel_length": {"type": "int", "min": 2, "max": 40, "default": 10},
             "average_length": {"type": "int", "min": 2, "max": 84, "default": 21},
             "signal_length": {"type": "int", "min": 1, "max": 16, "default": 4},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=33,
+        supports_incremental=False,
     )
-    channel_length: int = Field(default=DEFAULT_CHANNEL_LENGTH, ge=MIN_WT_PERIOD)
-    average_length: int = Field(default=DEFAULT_AVERAGE_LENGTH, ge=MIN_WT_PERIOD)
-    signal_length: int = Field(default=DEFAULT_SIGNAL_LENGTH, ge=1)
 
+    # Parameters: validated user settings.
+    channel_length: int = Field(
+        default=DEFAULT_CHANNEL_LENGTH,
+        ge=MIN_WT_PERIOD,
+        title="Channel length",
+        description="Number of bars in the oscillator channel window",
+    )
+
+    average_length: int = Field(
+        default=DEFAULT_AVERAGE_LENGTH,
+        ge=MIN_WT_PERIOD,
+        title="Average length",
+        description="Number of bars in the oscillator averaging window",
+    )
+
+    signal_length: int = Field(
+        default=DEFAULT_SIGNAL_LENGTH,
+        ge=1,
+        title="Signal length",
+        description="Number of bars in the oscillator signal window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -90,15 +120,24 @@ class WaveTrend(BaseIndicator):
             raise ValueError("Lengths must satisfy channel>=2, avg>=2, signal>=1")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.channel_length + self.average_length + self.signal_length - 2
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: WaveTrend requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low if bars.has_input("low") else None
         close = bars.close if bars.has_input("close") else None
@@ -129,6 +168,7 @@ class WaveTrend(BaseIndicator):
             "wt2": IndicatorSeries(wt2_vals, name=f"WT2({signal_length})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_typical_price(
         cls,
@@ -232,3 +272,7 @@ class WaveTrend(BaseIndicator):
         """Evaluate WaveTrendMainFalling."""
         logger.info("Evaluating WaveTrend wt1_is_falling at shift=%d", shift)
         return is_falling(wt1, shift=shift)
+
+
+# Public exports.
+__all__ = ["WaveTrend"]

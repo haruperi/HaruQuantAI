@@ -1,17 +1,4 @@
-"""Volume indicator package exports and lazy loading registry.
-
-Description:
-    Volume indicator package exports and lazy loading registry.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: Volume indicator exports.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume import VWAP, OBV, CMF, VWMA
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
-"""
+"""Volume indicator package exports and lazy loading registry."""
 
 from __future__ import annotations
 

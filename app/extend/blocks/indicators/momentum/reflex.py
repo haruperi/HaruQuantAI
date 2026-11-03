@@ -1,17 +1,6 @@
-"""Reflex momentum indicator strategy block.
+"""Reflex indicator.
 
-Description:
-    Calculates Ehlers Reflex indicator measuring cycle turns in price trend.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: Reflex cycle indicator calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.reflex import Reflex
-    res = Reflex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Ehlers Reflex indicator measuring cycle turns in price trend.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -53,27 +43,58 @@ FALLBACK_DENOM: float = 1e-06
 class Reflex(BaseIndicator):
     """John Ehlers' Reflex cycle indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.reflex",
+        version="1.0.0",
         name="Reflex",
+        description=(
+            "Calculates Ehlers Reflex indicator measuring cycle turns in price trend."
+        ),
         category="momentum",
+        tags=("momentum", "reflex"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
         outputs=(
-            OutputPort("reflex", PortType.SERIES),
-            OutputPort("fast", PortType.SERIES),
+            OutputPort("reflex", PortType.SERIES, description="Reflex output series"),
+            OutputPort("fast", PortType.SERIES, description="Fast output series"),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 80, "default": 20}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=20,
+        supports_incremental=False,
     )
-    period: int = Field(default=DEFAULT_FAST_PERIOD, ge=MIN_REFLEX_PERIOD)
-    slow_period: int | None = Field(default=None, ge=MIN_REFLEX_PERIOD)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=DEFAULT_FAST_PERIOD,
+        ge=MIN_REFLEX_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    slow_period: int | None = Field(
+        default=None,
+        ge=MIN_REFLEX_PERIOD,
+        title="Slow period",
+        description="Number of bars in the slow smoothing window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -83,15 +104,24 @@ class Reflex(BaseIndicator):
             raise ValueError(f"slow_period must be >= 2, got {self.slow_period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return max(self.period, self.slow_period or self.period)
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: Reflex requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         period = self.period
         slow_period = self.slow_period
@@ -121,6 +151,7 @@ class Reflex(BaseIndicator):
         )
         return res
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _compute_single_reflex(
         p_arr: np.ndarray[Any, Any], period: int
@@ -207,3 +238,7 @@ class Reflex(BaseIndicator):
         """Check if Reflex turned downward (v0 < v1 and v1 >= v2)."""
         logger.info("Evaluating Reflex changes_direction_down at shift=%d", shift)
         return changes_down(series, shift=shift)
+
+
+# Public exports.
+__all__ = ["Reflex"]

@@ -1,18 +1,7 @@
-"""Mass Index volatility strategy block.
+"""MassIndex indicator.
 
-Description:
-    Calculates Donald Dorsey's Mass Index examining the narrowing and widening
-    of the trading range between high and low prices to identify reversals.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-mass-index: Mass index computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.mass_index import MassIndex
-    res = MassIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Donald Dorsey's Mass Index examining the narrowing and widening of the
+  trading range between high and low prices to identify reversals.
 """
 
 from __future__ import annotations
@@ -38,32 +27,13 @@ from app.extend.calculators.average import ema_kernel
 logger = get_logger(__name__)
 
 
-def _safe_ema(x: np.ndarray, period: int) -> np.ndarray:
-    n = len(x)
-    out = np.full(n, np.nan, dtype=np.float64)
-    valid = np.where(~np.isnan(x))[0]
-    if len(valid) >= period:
-        start = int(valid[0])
-        out[start:] = ema_kernel(x[start:], period)
-    return out
-
-
 _EPSILON: float = 1e-12
-
-
-def _rolling_sum_valid(x: np.ndarray, p: int) -> np.ndarray:
-    n = len(x)
-    res = np.full(n, np.nan, dtype=np.float64)
-    for i in range(p - 1, n):
-        window = x[i - p + 1 : i + 1]
-        if not np.any(np.isnan(window)):
-            res[i] = np.sum(window)
-    return res
 
 
 class MassIndex(BaseIndicator):
     """Mass Index volatility reversal block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.mass_index",
         version="1.0.0",
@@ -79,28 +49,51 @@ class MassIndex(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Mass Index"),),
         required_market_inputs=("high", "low"),
+        required_history_lookback=43,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "ema_period": {"type": "int", "min": 2, "max": 30, "default": 9},
             "sum_period": {"type": "int", "min": 10, "max": 50, "default": 25},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    ema_period: int = Field(default=9, ge=1)
-    sum_period: int = Field(default=25, ge=1)
+    # Parameters: validated user settings.
+    ema_period: int = Field(
+        default=9,
+        ge=1,
+        title="Ema period",
+        description="Number of bars in the ema window",
+    )
 
+    sum_period: int = Field(
+        default=25,
+        ge=1,
+        title="Sum period",
+        description="Number of bars in the sum window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return (self.ema_period * 2) + self.sum_period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Mass Index values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: MassIndex requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = np.asarray(bars.high, dtype=np.float64)
         low = np.asarray(bars.low, dtype=np.float64)
         hl = high - low
@@ -118,4 +111,26 @@ class MassIndex(BaseIndicator):
         return {"value": IndicatorSeries(mi, name="MassIndex")}
 
 
+# Private helpers: used only by this indicator.
+def _safe_ema(x: np.ndarray, period: int) -> np.ndarray:
+    n = len(x)
+    out = np.full(n, np.nan, dtype=np.float64)
+    valid = np.where(~np.isnan(x))[0]
+    if len(valid) >= period:
+        start = int(valid[0])
+        out[start:] = ema_kernel(x[start:], period)
+    return out
+
+
+def _rolling_sum_valid(x: np.ndarray, p: int) -> np.ndarray:
+    n = len(x)
+    res = np.full(n, np.nan, dtype=np.float64)
+    for i in range(p - 1, n):
+        window = x[i - p + 1 : i + 1]
+        if not np.any(np.isnan(window)):
+            res[i] = np.sum(window)
+    return res
+
+
+# Public exports.
 __all__ = ["MassIndex"]

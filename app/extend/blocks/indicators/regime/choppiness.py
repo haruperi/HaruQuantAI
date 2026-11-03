@@ -1,19 +1,6 @@
-"""ChoppinessIndex regime indicator strategy block.
+"""ChoppinessIndex indicator.
 
-Description:
-    Calculates Choppiness Index differentiating trending from ranging regimes.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-regime: Choppiness index market regime classification.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.regime.choppiness import (
-        ChoppinessIndex,
-    )
-    res = ChoppinessIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Choppiness Index differentiating trending from ranging regimes.
 """
 
 from __future__ import annotations
@@ -28,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -60,21 +48,40 @@ EPSILON: float = 1e-12
 class ChoppinessIndex(BaseIndicator):
     """Choppiness Index indicator and market trend regime classifier."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.regime.choppiness",
+        version="1.0.0",
         name="ChoppinessIndex",
+        description=(
+            "Calculates Choppiness Index differentiating trending from ranging regimes."
+        ),
         category="regime",
+        tags=("regime", "choppiness"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("chop", PortType.SERIES),
-            OutputPort("regime", PortType.SERIES),
+            OutputPort("chop", PortType.SERIES, description="Chop output series"),
+            OutputPort("regime", PortType.SERIES, description="Regime output series"),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 56, "default": 14},
             "lower_threshold": {
@@ -90,14 +97,32 @@ class ChoppinessIndex(BaseIndicator):
                 "default": 61.8,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=14,
+        supports_incremental=False,
     )
-    period: int = Field(default=DEFAULT_PERIOD, ge=MIN_CHOP_PERIOD)
-    lower_threshold: float = Field(default=DEFAULT_LOWER_THRESHOLD)
-    upper_threshold: float = Field(default=DEFAULT_UPPER_THRESHOLD)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=DEFAULT_PERIOD,
+        ge=MIN_CHOP_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    lower_threshold: float = Field(
+        default=DEFAULT_LOWER_THRESHOLD,
+        title="Lower threshold",
+        description="Lower boundary used for indicator classification",
+    )
+
+    upper_threshold: float = Field(
+        default=DEFAULT_UPPER_THRESHOLD,
+        title="Upper threshold",
+        description="Upper boundary used for indicator classification",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
         """Reject inconsistent settings before calculation."""
@@ -116,15 +141,26 @@ class ChoppinessIndex(BaseIndicator):
             )
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: ChoppinessIndex requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -156,6 +192,7 @@ class ChoppinessIndex(BaseIndicator):
             "regime": IndicatorSeries(regime_vals, name=f"CHOP_Regime({period})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_chop_arrays(
         cls,
@@ -261,3 +298,7 @@ class ChoppinessIndex(BaseIndicator):
             "Evaluating CHOP crosses_below level=%.2f at shift=%d", level, shift
         )
         return crosses_below(chop, level, shift=shift)
+
+
+# Public exports.
+__all__ = ["ChoppinessIndex"]

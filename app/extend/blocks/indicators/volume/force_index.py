@@ -1,18 +1,7 @@
-"""Elder's Force Index volume strategy block.
+"""ForceIndex indicator.
 
-Description:
-    Calculates Alexander Elder's Force Index combining price movement
-    and volume to quantify bull and bear power behind price moves.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-force-index: Force Index computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.force_index import ForceIndex
-    res = ForceIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Alexander Elder's Force Index combining price movement and volume to
+  quantify bull and bear power behind price moves.
 """
 
 from __future__ import annotations
@@ -41,6 +30,7 @@ logger = get_logger(__name__)
 class ForceIndex(BaseIndicator):
     """Elder's Force Index block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.force_index",
         version="1.0.0",
@@ -56,26 +46,45 @@ class ForceIndex(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Force Index"),),
         required_market_inputs=("close", "volume"),
-        parameter_search_space={
-            "period": {"type": "int", "min": 1, "max": 50, "default": 13},
-        },
-        is_causal=True,
+        required_history_lookback=14,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 1, "max": 50, "default": 13}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=13, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=13,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Force Index values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: ForceIndex requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         volume = np.asarray(bars.volume, dtype=np.float64)
         n = len(close)
@@ -91,4 +100,5 @@ class ForceIndex(BaseIndicator):
         return {"value": IndicatorSeries(fi, name="ForceIndex")}
 
 
+# Public exports.
 __all__ = ["ForceIndex"]

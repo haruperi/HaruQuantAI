@@ -1,18 +1,7 @@
-"""KAMA trend indicator strategy block.
+"""KAMA indicator.
 
-Description:
-    Calculates Kaufman Adaptive Moving Average (KAMA) adjusting smoothing
-    to market noise.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Adaptive moving average calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.kama import KAMA
-    res = KAMA().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Kaufman Adaptive Moving Average (KAMA) adjusting smoothing to market
+  noise.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -42,37 +32,84 @@ logger = get_logger(__name__)
 class KAMA(BaseIndicator):
     """Kaufman's Adaptive Moving Average indicator family."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.kama",
+        version="1.0.0",
         name="KAMA",
+        description=(
+            "Calculates Kaufman Adaptive Moving Average (KAMA) adjusting "
+            "smoothing to market noise."
+        ),
         category="trend",
+        tags=("trend", "kama"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("close",),
+        required_history_lookback=11,
+        dependencies=("indicator.trend.kaufman_efficiency_ratio",),
+        is_generation_eligible=True,
         parameter_search_space={
             "er_period": {"type": "int", "min": 1, "max": 40, "default": 10},
             "fast_period": {"type": "int", "min": 1, "max": 8, "default": 2},
             "slow_period": {"type": "int", "min": 1, "max": 120, "default": 30},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        dependencies=("indicator.trend.kaufman_efficiency_ratio",),
-        required_history_lookback=11,
+        supports_incremental=False,
     )
-    er_period: int = Field(default=10, ge=1)
-    fast_period: int = Field(default=2, ge=1)
-    slow_period: int = Field(default=30, ge=1)
 
+    # Parameters: validated user settings.
+    er_period: int = Field(
+        default=10,
+        ge=1,
+        title="Er period",
+        description="Number of bars in the er window",
+    )
+
+    fast_period: int = Field(
+        default=2,
+        ge=1,
+        title="Fast period",
+        description="Number of bars in the fast window",
+    )
+
+    slow_period: int = Field(
+        default=30,
+        ge=1,
+        title="Slow period",
+        description="Number of bars in the slow window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.er_period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: KAMA requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         close = bars.close
         er_period = self.er_period
         fast_period = self.fast_period
@@ -121,3 +158,7 @@ class KAMA(BaseIndicator):
                 res, name=f"KAMA({er_period},{fast_period},{slow_period})"
             )
         }
+
+
+# Public exports.
+__all__ = ["KAMA"]

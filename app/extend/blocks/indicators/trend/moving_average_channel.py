@@ -1,20 +1,7 @@
-"""Moving Average Channel strategy block.
+"""MovingAverageChannel indicator.
 
-Description:
-    Calculates a price channel constructed from simple moving averages
-    applied separately to high and low prices.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-moving-average-channel: MA Channel computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.moving_average_channel import (
-        MovingAverageChannel,
-    )
-    res = MovingAverageChannel().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates a price channel constructed from simple moving averages applied
+  separately to high and low prices.
 """
 
 from __future__ import annotations
@@ -43,6 +30,7 @@ logger = get_logger(__name__)
 class MovingAverageChannel(BaseIndicator):
     """Moving Average Channel block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.moving_average_channel",
         version="1.0.0",
@@ -61,26 +49,46 @@ class MovingAverageChannel(BaseIndicator):
             OutputPort("lower", PortType.SERIES, "Lower Channel (Low MA)"),
         ),
         required_market_inputs=("high", "low"),
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 20},
-        },
-        is_causal=True,
+        required_history_lookback=20,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 20}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=20, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=20,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Upper and Lower Moving Average Channel lines."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: MovingAverageChannel requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
         high = np.asarray(bars.high, dtype=np.float64)
         low = np.asarray(bars.low, dtype=np.float64)
         upper = sma_kernel(high, self.period)
@@ -96,4 +104,5 @@ class MovingAverageChannel(BaseIndicator):
         }
 
 
+# Public exports.
 __all__ = ["MovingAverageChannel"]

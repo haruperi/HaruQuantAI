@@ -1,18 +1,7 @@
-"""AverageDailyRange volatility indicator strategy block.
+"""AverageDailyRange indicator.
 
-Description:
-    Calculates Average Daily Range (ADR) measuring average high-low spread
-    across trading days.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility: Average daily range calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.adr import AverageDailyRange
-    res = AverageDailyRange().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Average Daily Range (ADR) measuring average high-low spread across
+  trading days.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -53,29 +43,52 @@ EPSILON: float = 1e-12
 class AverageDailyRange(BaseIndicator):
     """Average Daily Range (ADR) price travel and stretch ratio block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.adr",
+        version="1.0.0",
         name="AverageDailyRange",
+        description=(
+            "Calculates Average Daily Range (ADR) measuring average high-low "
+            "spread across trading days."
+        ),
         category="volatility",
+        tags=("volatility", "adr"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
         ),
         outputs=(
-            OutputPort("adr", PortType.SERIES),
-            OutputPort("stretch", PortType.SERIES),
+            OutputPort("adr", PortType.SERIES, description="Adr output series"),
+            OutputPort("stretch", PortType.SERIES, description="Stretch output series"),
         ),
         required_market_inputs=("high", "low"),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 1, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=14,
+        supports_incremental=False,
     )
-    period: int = Field(default=DEFAULT_ADR_PERIOD, ge=MIN_ADR_PERIOD)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=DEFAULT_ADR_PERIOD,
+        ge=MIN_ADR_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -83,15 +96,26 @@ class AverageDailyRange(BaseIndicator):
             raise ValueError(f"period must be >= {MIN_ADR_PERIOD}, got {self.period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: AverageDailyRange requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         period = self.period
@@ -108,6 +132,7 @@ class AverageDailyRange(BaseIndicator):
             "stretch": IndicatorSeries(stretch_vals, name=f"ADR_Stretch({period})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_adr(
         cls,
@@ -176,3 +201,7 @@ class AverageDailyRange(BaseIndicator):
         """True if ADR is falling between shift+1 and shift."""
         logger.info("Evaluating ADR is_falling at shift=%d", shift)
         return is_falling(adr, shift=shift)
+
+
+# Public exports.
+__all__ = ["AverageDailyRange"]

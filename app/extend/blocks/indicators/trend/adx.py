@@ -1,18 +1,7 @@
-"""ADX trend indicator strategy block.
+"""ADX indicator.
 
-Description:
-    Calculates Average Directional Movement Index (ADX) and directional
-    indicators (+DI, -DI).
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: ADX trend strength and directional movement.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.adx import ADX
-    res = ADX().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Average Directional Movement Index (ADX) and directional indicators
+  (+DI, -DI).
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -40,69 +30,78 @@ logger = get_logger(__name__)
 class ADX(BaseIndicator):
     """ADX family consolidating Main ADX, +DI, -DI lines and conditions."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.adx",
+        version="1.0.0",
         name="ADX",
+        description=(
+            "Calculates Average Directional Movement Index (ADX) and "
+            "directional indicators (+DI, -DI)."
+        ),
         category="trend",
+        tags=("trend", "adx"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("main", PortType.SERIES),
-            OutputPort("di_plus", PortType.SERIES),
-            OutputPort("di_minus", PortType.SERIES),
+            OutputPort("main", PortType.SERIES, description="Main output series"),
+            OutputPort("di_plus", PortType.SERIES, description="Di plus output series"),
+            OutputPort(
+                "di_minus", PortType.SERIES, description="Di minus output series"
+            ),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=28,
+        dependencies=("indicator.volatility.atr",),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 1, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        dependencies=("indicator.volatility.atr",),
-        required_history_lookback=28,
+        supports_incremental=False,
     )
-    period: int = Field(default=14, ge=1)
 
-    @classmethod
-    def _compute_directional_moves(
-        cls, high_arr: np.ndarray, low_arr: np.ndarray, n: int
-    ) -> tuple[np.ndarray, np.ndarray]:
-        """Compute raw positive and negative directional movement."""
-        dm_plus = np.zeros(n, dtype=np.float64)
-        dm_minus = np.zeros(n, dtype=np.float64)
-        for i in range(1, n):
-            up_move = high_arr[i] - high_arr[i - 1]
-            down_move = low_arr[i - 1] - low_arr[i]
-            if up_move > down_move and up_move > 0:
-                dm_plus[i] = up_move
-            if down_move > up_move and down_move > 0:
-                dm_minus[i] = down_move
-        return (dm_plus, dm_minus)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
-    @classmethod
-    def _smooth_adx(cls, dx_arr: np.ndarray, period: int, n: int) -> np.ndarray:
-        """Compute Wilder smoothed ADX line from raw DX values."""
-        main_arr = np.full(n, np.nan, dtype=np.float64)
-        valid_dx_idx = np.where(~np.isnan(dx_arr))[0]
-        if len(valid_dx_idx) >= period:
-            start = valid_dx_idx[0] + period - 1
-            main_arr[start] = float(np.mean(dx_arr[valid_dx_idx[0] : start + 1]))
-            for i in range(start + 1, n):
-                main_arr[i] = (main_arr[i - 1] * (period - 1) + dx_arr[i]) / period
-        return main_arr
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
 
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 2 * self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: ADX requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -151,3 +150,36 @@ class ADX(BaseIndicator):
             "di_plus": IndicatorSeries(di_plus_arr, name="ADX.DIPlus"),
             "di_minus": IndicatorSeries(di_minus_arr, name="ADX.DIMinus"),
         }
+
+    # Specialized methods: indicator-specific behavior only.
+    @classmethod
+    def _compute_directional_moves(
+        cls, high_arr: np.ndarray, low_arr: np.ndarray, n: int
+    ) -> tuple[np.ndarray, np.ndarray]:
+        """Compute raw positive and negative directional movement."""
+        dm_plus = np.zeros(n, dtype=np.float64)
+        dm_minus = np.zeros(n, dtype=np.float64)
+        for i in range(1, n):
+            up_move = high_arr[i] - high_arr[i - 1]
+            down_move = low_arr[i - 1] - low_arr[i]
+            if up_move > down_move and up_move > 0:
+                dm_plus[i] = up_move
+            if down_move > up_move and down_move > 0:
+                dm_minus[i] = down_move
+        return (dm_plus, dm_minus)
+
+    @classmethod
+    def _smooth_adx(cls, dx_arr: np.ndarray, period: int, n: int) -> np.ndarray:
+        """Compute Wilder smoothed ADX line from raw DX values."""
+        main_arr = np.full(n, np.nan, dtype=np.float64)
+        valid_dx_idx = np.where(~np.isnan(dx_arr))[0]
+        if len(valid_dx_idx) >= period:
+            start = valid_dx_idx[0] + period - 1
+            main_arr[start] = float(np.mean(dx_arr[valid_dx_idx[0] : start + 1]))
+            for i in range(start + 1, n):
+                main_arr[i] = (main_arr[i - 1] * (period - 1) + dx_arr[i]) / period
+        return main_arr
+
+
+# Public exports.
+__all__ = ["ADX"]

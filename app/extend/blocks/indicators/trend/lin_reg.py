@@ -1,17 +1,6 @@
-"""LinReg trend indicator strategy block.
+"""LinReg indicator.
 
-Description:
-    Calculates Linear Regression slope, intercept, and rolling trend projection.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Linear regression trend slope and value.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.lin_reg import LinReg
-    res = LinReg().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Linear Regression slope, intercept, and rolling trend projection.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -42,27 +32,55 @@ MIN_LINREG_PERIOD: int = 2
 class LinReg(BaseIndicator):
     """Linear Regression indicator calculating least-squares regression lines."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.lin_reg",
+        version="1.0.0",
         name="LinReg",
+        description=(
+            "Calculates Linear Regression slope, intercept, and rolling trend"
+            " projection."
+        ),
         category="trend",
+        tags=("trend", "lin-reg"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
         outputs=(
-            OutputPort("lin_reg", PortType.SERIES),
-            OutputPort("slope", PortType.SERIES),
-            OutputPort("intercept", PortType.SERIES),
+            OutputPort("lin_reg", PortType.SERIES, description="Lin reg output series"),
+            OutputPort("slope", PortType.SERIES, description="Slope output series"),
+            OutputPort(
+                "intercept", PortType.SERIES, description="Intercept output series"
+            ),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=14,
+        supports_incremental=False,
     )
-    period: int = Field(default=14, ge=MIN_LINREG_PERIOD)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=MIN_LINREG_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -70,15 +88,24 @@ class LinReg(BaseIndicator):
             raise ValueError(f"Period must be >= 2, got {self.period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: LinReg requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         period = self.period
         logger.info(
@@ -120,6 +147,7 @@ class LinReg(BaseIndicator):
             ),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def bar_closes_above(
         close_prices: IndicatorSeries | np.ndarray[Any, Any],
@@ -231,3 +259,7 @@ class LinReg(BaseIndicator):
             "Evaluating LinReg is_falling at shift=%d", shift, extra={"shift": shift}
         )
         return is_falling(lin_reg, shift=shift)
+
+
+# Public exports.
+__all__ = ["LinReg"]

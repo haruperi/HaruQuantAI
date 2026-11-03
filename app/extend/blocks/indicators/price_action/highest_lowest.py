@@ -1,19 +1,6 @@
-"""HighestLowest price_action indicator strategy block.
+"""HighestLowest indicator.
 
-Description:
-    Calculates rolling highest high and lowest low price channels.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Rolling highest high and lowest low levels.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.highest_lowest import (
-        HighestLowest,
-    )
-    res = HighestLowest().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates rolling highest high and lowest low price channels.
 """
 
 from __future__ import annotations
@@ -27,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -43,31 +31,59 @@ logger = get_logger(__name__)
 class HighestLowest(BaseIndicator):
     """Highest and Lowest price extrema indicator with breakout condition evaluators."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.highest_lowest",
+        version="1.0.0",
         name="HighestLowest",
+        description="Calculates rolling highest high and lowest low price channels.",
         category="price_action",
+        tags=("price_action", "highest-lowest"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=False),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=False, description="Low input series"
+            ),
         ),
         outputs=(
-            OutputPort("highest", PortType.SERIES),
-            OutputPort("lowest", PortType.SERIES),
-            OutputPort("highest_index", PortType.SERIES),
-            OutputPort("lowest_index", PortType.SERIES),
+            OutputPort("highest", PortType.SERIES, description="Highest output series"),
+            OutputPort("lowest", PortType.SERIES, description="Lowest output series"),
+            OutputPort(
+                "highest_index",
+                PortType.SERIES,
+                description="Highest index output series",
+            ),
+            OutputPort(
+                "lowest_index",
+                PortType.SERIES,
+                description="Lowest index output series",
+            ),
         ),
         required_market_inputs=("high",),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 1, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=14,
+        supports_incremental=False,
     )
-    period: int = Field(default=14, ge=1)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -75,15 +91,26 @@ class HighestLowest(BaseIndicator):
             raise ValueError(f"Period must be >= 1, got {self.period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: HighestLowest requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low if bars.has_input("low") else None
         period = self.period
@@ -132,6 +159,7 @@ class HighestLowest(BaseIndicator):
             "lowest_index": IndicatorSeries(lowest_idx, name=f"LowestIndex({period})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def bar_opens_above_highest(
         open_prices: IndicatorSeries | np.ndarray[Any, Any],
@@ -279,3 +307,7 @@ class HighestLowest(BaseIndicator):
             return False
         month_high = float(np.max(h_arr[start_bar:end_bar]))
         return is_greater(c, month_high, shift1=shift, round_digits=8)
+
+
+# Public exports.
+__all__ = ["HighestLowest"]

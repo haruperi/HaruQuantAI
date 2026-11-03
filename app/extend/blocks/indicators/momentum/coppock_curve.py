@@ -1,18 +1,7 @@
-"""Coppock Curve momentum indicator strategy block.
+"""CoppockCurve indicator.
 
-Description:
-    Calculates E.S.C. Coppock's long-term momentum indicator as a 10-period
-    weighted moving average of the sum of 14-period and 11-period ROC.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-coppock-curve: Coppock curve computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.coppock_curve import CoppockCurve
-    res = CoppockCurve().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates E.S.C. Coppock's long-term momentum indicator as a 10-period weighted
+  moving average of the sum of 14-period and 11-period ROC.
 """
 
 from __future__ import annotations
@@ -43,6 +32,7 @@ _SCALE_100: float = 100.0
 class CoppockCurve(BaseIndicator):
     """Coppock Curve momentum indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.coppock_curve",
         version="1.0.0",
@@ -57,30 +47,61 @@ class CoppockCurve(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Coppock Curve"),),
         required_market_inputs=("close",),
+        required_history_lookback=24,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "wma_period": {"type": "int", "min": 2, "max": 50, "default": 10},
             "long_roc_period": {"type": "int", "min": 5, "max": 50, "default": 14},
             "short_roc_period": {"type": "int", "min": 5, "max": 50, "default": 11},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    wma_period: int = Field(default=10, ge=1)
-    long_roc_period: int = Field(default=14, ge=1)
-    short_roc_period: int = Field(default=11, ge=1)
+    # Parameters: validated user settings.
+    wma_period: int = Field(
+        default=10,
+        ge=1,
+        title="Wma period",
+        description="Number of bars in the wma window",
+    )
 
+    long_roc_period: int = Field(
+        default=14,
+        ge=1,
+        title="Long roc period",
+        description="Number of bars in the long roc window",
+    )
+
+    short_roc_period: int = Field(
+        default=11,
+        ge=1,
+        title="Short roc period",
+        description="Number of bars in the short roc window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return max(self.long_roc_period, self.short_roc_period) + self.wma_period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Coppock Curve values over historical bars."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: CoppockCurve requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         n = len(close)
         roc_sum = np.full(n, np.nan, dtype=np.float64)
@@ -110,4 +131,5 @@ class CoppockCurve(BaseIndicator):
         return {"value": IndicatorSeries(curve, name="Coppock")}
 
 
+# Public exports.
 __all__ = ["CoppockCurve"]

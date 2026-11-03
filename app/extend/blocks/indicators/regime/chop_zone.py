@@ -1,18 +1,7 @@
-"""Chop Zone trend and regime classification strategy block.
+"""ChopZone indicator.
 
-Description:
-    Calculates TradingView Chop Zone indicator quantifying the angle and slope
-    of a 30-period EMA to classify market state into discrete phases.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative market regime indicator library.
-Key Capabilities:
-    - FR-indicator-chop-zone: Chop zone state computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.regime.chop_zone import ChopZone
-    res = ChopZone().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates TradingView Chop Zone indicator quantifying the angle and slope of a
+  30-period EMA to classify market state into discrete phases.
 """
 
 from __future__ import annotations
@@ -45,19 +34,10 @@ _THRESH_MODERATE: float = 10.0
 _THRESH_WEAK: float = 3.0
 
 
-def _ema_angle(ema: np.ndarray) -> np.ndarray:
-    n = len(ema)
-    angle = np.full(n, np.nan, dtype=np.float64)
-    for i in range(1, n):
-        if not np.isnan(ema[i]) and not np.isnan(ema[i - 1]) and ema[i - 1] != 0.0:
-            pct_change = (ema[i] - ema[i - 1]) / ema[i - 1] * _SCALE_100
-            angle[i] = math.atan(pct_change) * _RAD_TO_DEG
-    return angle
-
-
 class ChopZone(BaseIndicator):
     """Chop Zone regime indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.regime.chop_zone",
         version="1.0.0",
@@ -75,26 +55,43 @@ class ChopZone(BaseIndicator):
             OutputPort("angle", PortType.SERIES, "EMA Angle in Degrees"),
         ),
         required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 5, "max": 100, "default": 30},
-        },
-        is_causal=True,
+        required_history_lookback=31,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 5, "max": 100, "default": 30}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=30, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=30,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Chop Zone phase (-3 to +3) and angle."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: ChopZone requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         ema = ema_kernel(close, self.period)
         angle = _ema_angle(ema)
@@ -128,4 +125,16 @@ class ChopZone(BaseIndicator):
         }
 
 
+# Private helpers: used only by this indicator.
+def _ema_angle(ema: np.ndarray) -> np.ndarray:
+    n = len(ema)
+    angle = np.full(n, np.nan, dtype=np.float64)
+    for i in range(1, n):
+        if not np.isnan(ema[i]) and not np.isnan(ema[i - 1]) and ema[i - 1] != 0.0:
+            pct_change = (ema[i] - ema[i - 1]) / ema[i - 1] * _SCALE_100
+            angle[i] = math.atan(pct_change) * _RAD_TO_DEG
+    return angle
+
+
+# Public exports.
 __all__ = ["ChopZone"]

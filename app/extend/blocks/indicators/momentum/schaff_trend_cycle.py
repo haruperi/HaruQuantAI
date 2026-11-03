@@ -1,19 +1,6 @@
-"""SchaffTrendCycle momentum indicator strategy block.
+"""SchaffTrendCycle indicator.
 
-Description:
-    Calculates Schaff Trend Cycle (STC) combining MACD and stochastic smoothing.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: Schaff trend cycle computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.schaff_trend_cycle import (
-        SchaffTrendCycle,
-    )
-    res = SchaffTrendCycle().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Schaff Trend Cycle (STC) combining MACD and stochastic smoothing.
 """
 
 from __future__ import annotations
@@ -27,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -54,14 +42,34 @@ DEFAULT_FACTOR: float = 0.5
 class SchaffTrendCycle(BaseIndicator):
     """Doug Schaff's Trend Cycle (STC) double-smoothed stochastic MACD indicator."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.schaff_trend_cycle",
+        version="1.0.0",
         name="SchaffTrendCycle",
+        description=(
+            "Calculates Schaff Trend Cycle (STC) combining MACD and "
+            "stochastic smoothing."
+        ),
         category="momentum",
+        tags=("momentum", "schaff-trend-cycle"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("close",),
+        required_history_lookback=70,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "stoch_period": {"type": "int", "min": 1, "max": 40, "default": 10},
             "fast_period": {"type": "int", "min": 1, "max": 80, "default": 20},
@@ -75,24 +83,61 @@ class SchaffTrendCycle(BaseIndicator):
                 "max_exclusive": True,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=70,
+        supports_incremental=False,
     )
-    stoch_period: int = Field(default=DEFAULT_STOCH_PERIOD, ge=1)
-    fast_period: int = Field(default=DEFAULT_FAST_PERIOD, ge=1)
-    slow_period: int = Field(default=DEFAULT_SLOW_PERIOD, ge=1)
-    factor: float = Field(default=DEFAULT_FACTOR, gt=0.0, lt=1.0)
 
+    # Parameters: validated user settings.
+    stoch_period: int = Field(
+        default=DEFAULT_STOCH_PERIOD,
+        ge=1,
+        title="Stoch period",
+        description="Number of bars in the stoch window",
+    )
+
+    fast_period: int = Field(
+        default=DEFAULT_FAST_PERIOD,
+        ge=1,
+        title="Fast period",
+        description="Number of bars in the fast smoothing window",
+    )
+
+    slow_period: int = Field(
+        default=DEFAULT_SLOW_PERIOD,
+        ge=1,
+        title="Slow period",
+        description="Number of bars in the slow smoothing window",
+    )
+
+    factor: float = Field(
+        default=DEFAULT_FACTOR,
+        gt=0.0,
+        lt=1.0,
+        title="Factor",
+        description="Factor used by the indicator calculation",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return max(self.fast_period, self.slow_period) + 2 * self.stoch_period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: SchaffTrendCycle requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         stoch_period = self.stoch_period
         fast_period = self.fast_period
@@ -123,6 +168,7 @@ class SchaffTrendCycle(BaseIndicator):
         logger.info("STC calculation complete: bars=%d", n, extra={"bars": n})
         return {"value": IndicatorSeries(stc_vals, name=f"STC({stoch_period})")}
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _validate_params(cls, stoch: int, fast: int, slow: int, factor: float) -> None:
         if stoch < MIN_STC_PERIOD:
@@ -242,3 +288,7 @@ class SchaffTrendCycle(BaseIndicator):
         """Check if STC is falling."""
         logger.info("Evaluating STC is_falling at shift=%d", shift)
         return is_falling(series, shift=shift)
+
+
+# Public exports.
+__all__ = ["SchaffTrendCycle"]

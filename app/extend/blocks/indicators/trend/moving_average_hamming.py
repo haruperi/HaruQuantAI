@@ -1,20 +1,7 @@
-"""Moving Average Hamming window filter strategy block.
+"""MovingAverageHamming indicator.
 
-Description:
-    Calculates a weighted moving average using coefficients derived from
-    a Hamming window filter for minimal spectral side-lobe leakage.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-moving-average-hamming: Hamming window moving average.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.moving_average_hamming import (
-        MovingAverageHamming,
-    )
-    res = MovingAverageHamming().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates a weighted moving average using coefficients derived from a Hamming
+  window filter for minimal spectral side-lobe leakage.
 """
 
 from __future__ import annotations
@@ -43,6 +30,75 @@ _HAMMING_A0: float = 0.54
 _HAMMING_A1: float = 0.46
 
 
+class MovingAverageHamming(BaseIndicator):
+    """Moving Average Hamming window filter block."""
+
+    # Metadata: catalog identity, ports, and execution capabilities.
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.trend.moving_average_hamming",
+        version="1.0.0",
+        name="Moving Average Hamming",
+        description="Hamming window digital filter moving average",
+        category="trend",
+        tags=("trend", "ma", "hamming", "filter"),
+        execution_kind=ExecutionKind.EXPRESSION,
+        chart_pane=ChartPane.MAIN,
+        inputs=(
+            InputPort("close", PortType.SERIES, "Close price series", required=True),
+        ),
+        outputs=(OutputPort("value", PortType.SERIES, "Hamming MA"),),
+        required_market_inputs=("close",),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 20}
+        },
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
+    )
+
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=20,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return minimum history bars needed for valid calculation."""
+        return self.period
+
+    # Calculation: log, check inputs, and return named aligned outputs.
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        """Compute Hamming moving average values."""
+        logger.debug(
+            "FR-indicator-calculation: MovingAverageHamming requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
+        close = np.asarray(bars.close, dtype=np.float64)
+        hma = hamming_kernel(close, self.period)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-TREND: Calculated HammingMA(p=%d) for %d bars",
+            self.period,
+            len(bars),
+        )
+        return {"value": IndicatorSeries(hma, name="HammingMA")}
+
+
+# Private helpers: used only by this indicator.
 def hamming_kernel(data: np.ndarray, period: int) -> np.ndarray:
     """Compute Hamming weighted moving average."""
     n = len(data)
@@ -63,51 +119,5 @@ def hamming_kernel(data: np.ndarray, period: int) -> np.ndarray:
     return out
 
 
-class MovingAverageHamming(BaseIndicator):
-    """Moving Average Hamming window filter block."""
-
-    spec: ClassVar[BlockSpec] = BlockSpec(
-        id="indicator.trend.moving_average_hamming",
-        version="1.0.0",
-        name="Moving Average Hamming",
-        description="Hamming window digital filter moving average",
-        category="trend",
-        tags=("trend", "ma", "hamming", "filter"),
-        execution_kind=ExecutionKind.EXPRESSION,
-        chart_pane=ChartPane.MAIN,
-        inputs=(
-            InputPort("close", PortType.SERIES, "Close price series", required=True),
-        ),
-        outputs=(OutputPort("value", PortType.SERIES, "Hamming MA"),),
-        required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 20},
-        },
-        is_causal=True,
-        is_generation_eligible=True,
-        is_deterministic=True,
-        supports_incremental=False,
-    )
-
-    period: int = Field(default=20, ge=1)
-
-    @override
-    def required_history(self) -> int:
-        """Return minimum history bars needed for valid calculation."""
-        return self.period
-
-    @override
-    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
-        """Compute Hamming moving average values."""
-        bars.require_inputs(self.spec.required_market_inputs)
-        close = np.asarray(bars.close, dtype=np.float64)
-        hma = hamming_kernel(close, self.period)
-        logger.debug(
-            "FR-SERVICES-INDICATOR-TREND: Calculated HammingMA(p=%d) for %d bars",
-            self.period,
-            len(bars),
-        )
-        return {"value": IndicatorSeries(hma, name="HammingMA")}
-
-
-__all__ = ["MovingAverageHamming", "hamming_kernel"]
+# Public exports.
+__all__ = ["MovingAverageHamming"]

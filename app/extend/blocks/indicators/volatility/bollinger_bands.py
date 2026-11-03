@@ -1,17 +1,6 @@
-"""BollingerBands volatility indicator strategy block.
+"""BollingerBands indicator.
 
-Description:
-    Calculates Bollinger Bands upper band, lower band, and middle moving average.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility: Bollinger Bands envelope calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.bollinger_bands import BollingerBands
-    res = BollingerBands().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Bollinger Bands upper band, lower band, and middle moving average.
 """
 
 from __future__ import annotations
@@ -34,7 +23,106 @@ from app.core.trading.blocks.series import BarData, IndicatorSeries
 from app.extend.blocks.indicators.base import BaseIndicator
 from app.extend.calculators.average import sma_kernel
 
+logger = get_logger(__name__)
 
+
+class BollingerBands(BaseIndicator):
+    """Bollinger Bands volatility indicator block."""
+
+    # Metadata: catalog identity, ports, and execution capabilities.
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.volatility.bollinger_bands",
+        version="1.0.0",
+        name="Bollinger Bands",
+        description=(
+            "Calculates volatility envelopes around a moving average using "
+            "standard deviation"
+        ),
+        category="volatility",
+        tags=("volatility", "bands", "bollinger"),
+        execution_kind=ExecutionKind.EXPRESSION,
+        chart_pane=ChartPane.MAIN,
+        inputs=(InputPort("close", PortType.SERIES, "Close price series"),),
+        outputs=(
+            OutputPort("upper", PortType.SERIES, "Upper Bollinger Band"),
+            OutputPort("middle", PortType.SERIES, "Middle Bollinger Band (SMA)"),
+            OutputPort("lower", PortType.SERIES, "Lower Bollinger Band"),
+            OutputPort("bandwidth", PortType.SERIES, "Normalized Bollinger BandWidth"),
+            OutputPort("range", PortType.SERIES, "Bollinger Band Range"),
+        ),
+        required_market_inputs=("close",),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 20},
+            "deviation": {"type": "float", "min": 0.5, "max": 5.0, "default": 2.0},
+        },
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
+    )
+
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=20,
+        ge=1,
+        title="Period",
+        description="Rolling window lookback period in bars",
+    )
+
+    deviation: float = Field(
+        default=2.0,
+        gt=0.0,
+        title="Deviation",
+        description="Standard deviation multiplier for bands",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return minimum history bars needed for the first valid BB calculation."""
+        return self.period
+
+    # Calculation: log, check inputs, and return named aligned outputs.
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        """Compute Bollinger Bands over closing prices in batch.
+
+        Args:
+            bars: Shared calculation context containing OHLCV price series.
+
+        Returns:
+            Dictionary with upper, middle, lower, bandwidth, and range series.
+        """
+        logger.debug(
+            "FR-indicator-calculation: BollingerBands requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
+        bands = _bollinger_bands_kernel(bars.close, self.period, self.deviation)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated BollingerBands("
+            "period=%d, deviation=%.2f) for %d bars",
+            self.period,
+            self.deviation,
+            len(bars),
+        )
+        return {
+            "upper": IndicatorSeries(bands["upper"], name="BB.Upper"),
+            "middle": IndicatorSeries(bands["middle"], name="BB.Middle"),
+            "lower": IndicatorSeries(bands["lower"], name="BB.Lower"),
+            "bandwidth": IndicatorSeries(bands["bandwidth"], name="BB.BandWidth"),
+            "range": IndicatorSeries(bands["range"], name="BB.Range"),
+        }
+
+
+# Private helpers: used only by this indicator.
 def _bollinger_bands_kernel(
     data: np.ndarray[Any, np.dtype[np.float64]] | list[float],
     period: int,
@@ -85,86 +173,5 @@ def _bollinger_bands_kernel(
     }
 
 
-logger = get_logger(__name__)
-
-
-class BollingerBands(BaseIndicator):
-    """Bollinger Bands volatility indicator block."""
-
-    spec: ClassVar[BlockSpec] = BlockSpec(
-        id="indicator.volatility.bollinger_bands",
-        version="1.0.0",
-        name="Bollinger Bands",
-        description=(
-            "Calculates volatility envelopes around a moving average "
-            "using standard deviation"
-        ),
-        category="volatility",
-        tags=("volatility", "bands", "bollinger"),
-        execution_kind=ExecutionKind.EXPRESSION,
-        chart_pane=ChartPane.MAIN,
-        inputs=(InputPort("close", PortType.SERIES, "Close price series"),),
-        outputs=(
-            OutputPort("upper", PortType.SERIES, "Upper Bollinger Band"),
-            OutputPort("middle", PortType.SERIES, "Middle Bollinger Band (SMA)"),
-            OutputPort("lower", PortType.SERIES, "Lower Bollinger Band"),
-            OutputPort("bandwidth", PortType.SERIES, "Normalized Bollinger BandWidth"),
-            OutputPort("range", PortType.SERIES, "Bollinger Band Range"),
-        ),
-        required_market_inputs=("close",),
-        is_generation_eligible=True,
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 20},
-            "deviation": {"type": "float", "min": 0.5, "max": 5.0, "default": 2.0},
-        },
-        is_deterministic=True,
-        is_causal=True,
-        supports_incremental=False,
-    )
-
-    period: int = Field(
-        default=20,
-        ge=1,
-        title="Period",
-        description="Rolling window lookback period in bars",
-    )
-    deviation: float = Field(
-        default=2.0,
-        gt=0.0,
-        title="Deviation",
-        description="Standard deviation multiplier for bands",
-    )
-
-    @override
-    def required_history(self) -> int:
-        """Return minimum history bars needed for the first valid BB calculation."""
-        return self.period
-
-    @override
-    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
-        """Compute Bollinger Bands over closing prices in batch.
-
-        Args:
-            bars: Shared calculation context containing OHLCV price series.
-
-        Returns:
-            Dictionary with upper, middle, lower, bandwidth, and range series.
-        """
-        bands = _bollinger_bands_kernel(bars.close, self.period, self.deviation)
-        logger.debug(
-            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated BollingerBands("
-            "period=%d, deviation=%.2f) for %d bars",
-            self.period,
-            self.deviation,
-            len(bars),
-        )
-        return {
-            "upper": IndicatorSeries(bands["upper"], name="BB.Upper"),
-            "middle": IndicatorSeries(bands["middle"], name="BB.Middle"),
-            "lower": IndicatorSeries(bands["lower"], name="BB.Lower"),
-            "bandwidth": IndicatorSeries(bands["bandwidth"], name="BB.BandWidth"),
-            "range": IndicatorSeries(bands["range"], name="BB.Range"),
-        }
-
-
+# Public exports.
 __all__ = ["BollingerBands"]

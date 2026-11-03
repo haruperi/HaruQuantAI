@@ -1,17 +1,6 @@
-"""Vortex trend indicator strategy block.
+"""Vortex indicator.
 
-Description:
-    Calculates Vortex Indicator positive and negative trend line flows.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Vortex indicator directional flow.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.vortex import Vortex
-    res = Vortex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Vortex Indicator positive and negative trend line flows.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -40,41 +30,79 @@ MIN_BARS: int = 2
 class Vortex(BaseIndicator):
     """Vortex indicator family."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.vortex",
+        version="1.0.0",
         name="Vortex",
+        description=(
+            "Calculates Vortex Indicator positive and negative trend line flows."
+        ),
         category="trend",
+        tags=("trend", "vortex"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("vi_plus", PortType.SERIES),
-            OutputPort("vi_minus", PortType.SERIES),
-            OutputPort("oscillator", PortType.SERIES),
+            OutputPort("vi_plus", PortType.SERIES, description="Vi plus output series"),
+            OutputPort(
+                "vi_minus", PortType.SERIES, description="Vi minus output series"
+            ),
+            OutputPort(
+                "oscillator", PortType.SERIES, description="Oscillator output series"
+            ),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=15,
+        dependencies=("indicator.volatility.atr",),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 1, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        dependencies=("indicator.volatility.atr",),
-        required_history_lookback=15,
+        supports_incremental=False,
     )
-    period: int = Field(default=14, ge=1)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: Vortex requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -127,3 +155,7 @@ class Vortex(BaseIndicator):
             "vi_minus": IndicatorSeries(vi_minus, name=f"VI-({period})"),
             "oscillator": IndicatorSeries(oscillator, name=f"VortexOsc({period})"),
         }
+
+
+# Public exports.
+__all__ = ["Vortex"]

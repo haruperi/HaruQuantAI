@@ -1,18 +1,7 @@
-"""SuperTrend trend indicator strategy block.
+"""SuperTrend indicator.
 
-Description:
-    Calculates SuperTrend ATR-based trend direction and trailing support
-    and resistance bands.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: SuperTrend trailing volatility stop.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.supertrend import SuperTrend
-    res = SuperTrend().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates SuperTrend ATR-based trend direction and trailing support and
+  resistance bands.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -42,23 +32,43 @@ logger = get_logger(__name__)
 class SuperTrend(BaseIndicator):
     """SuperTrend indicator family."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.supertrend",
+        version="1.0.0",
         name="SuperTrend",
+        description=(
+            "Calculates SuperTrend ATR-based trend direction and trailing "
+            "support and resistance bands."
+        ),
         category="trend",
+        tags=("trend", "supertrend"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("main", PortType.SERIES),
-            OutputPort("trend", PortType.SERIES),
-            OutputPort("upper", PortType.SERIES),
-            OutputPort("lower", PortType.SERIES),
+            OutputPort("main", PortType.SERIES, description="Main output series"),
+            OutputPort("trend", PortType.SERIES, description="Trend output series"),
+            OutputPort("upper", PortType.SERIES, description="Upper output series"),
+            OutputPort("lower", PortType.SERIES, description="Lower output series"),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=25,
+        dependencies=("indicator.volatility.atr", "indicator.volatility.mt_atr"),
+        is_generation_eligible=True,
         parameter_search_space={
             "mode": {"type": "int", "choices": [1, 2], "default": 1},
             "atr_period": {"type": "int", "min": 1, "max": 96, "default": 24},
@@ -70,24 +80,50 @@ class SuperTrend(BaseIndicator):
                 "min_exclusive": True,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        dependencies=("indicator.volatility.atr", "indicator.volatility.mt_atr"),
-        required_history_lookback=25,
+        supports_incremental=False,
     )
-    mode: Literal[1, 2] = Field(default=1)
-    atr_period: int = Field(default=24, ge=1)
-    atr_mult: float = Field(default=3.0, gt=0.0)
 
+    # Parameters: validated user settings.
+    mode: Literal[1, 2] = Field(
+        default=1, title="Mode", description="Mode used by the indicator calculation"
+    )
+
+    atr_period: int = Field(
+        default=24,
+        ge=1,
+        title="Atr period",
+        description="Number of bars in the atr window",
+    )
+
+    atr_mult: float = Field(
+        default=3.0,
+        gt=0.0,
+        title="Atr mult",
+        description="ATR multiplier used to place the trend bands",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.atr_period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: SuperTrend requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         mode = self.mode
         atr_period = self.atr_period
         atr_mult = self.atr_mult
@@ -155,6 +191,7 @@ class SuperTrend(BaseIndicator):
             ),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def is_uptrend(cls, st_dict: dict[str, IndicatorSeries], shift: int = 0) -> bool:
         """Evaluate if SuperTrend is in uptrend (rising line)."""
@@ -187,3 +224,7 @@ class SuperTrend(BaseIndicator):
             "FR-SERVICES-SUPERTREND-CONDITIONS is_in_range shift=%d res=%s", shift, res
         )
         return res
+
+
+# Public exports.
+__all__ = ["SuperTrend"]

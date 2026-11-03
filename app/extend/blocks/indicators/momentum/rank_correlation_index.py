@@ -1,20 +1,7 @@
-"""Rank Correlation Index (RCI) momentum strategy block.
+"""RankCorrelationIndex indicator.
 
-Description:
-    Calculates the Rank Correlation Index (RCI) measuring the Spearman rank
-    correlation coefficient between price rank and temporal bar index.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-rank-correlation-index: Spearman rank correlation computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.rank_correlation_index import (
-        RankCorrelationIndex,
-    )
-    res = RankCorrelationIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates the Rank Correlation Index (RCI) measuring the Spearman rank
+  correlation coefficient between price rank and temporal bar index.
 """
 
 from __future__ import annotations
@@ -41,23 +28,10 @@ logger = get_logger(__name__)
 _SCALE_100: float = 100.0
 
 
-def _spearman_rank(window: np.ndarray) -> float:
-    p = len(window)
-    order = np.argsort(-window)
-    price_ranks = np.empty(p, dtype=np.float64)
-    price_ranks[order] = np.arange(1, p + 1)
-    date_ranks = np.arange(p, 0, -1, dtype=np.float64)
-    d = date_ranks - price_ranks
-    d_sq_sum = np.sum(d**2)
-    denom = p * (p**2 - 1)
-    if denom == 0:
-        return 0.0
-    return float((1.0 - (6.0 * d_sq_sum) / denom) * _SCALE_100)
-
-
 class RankCorrelationIndex(BaseIndicator):
     """Rank Correlation Index (RCI) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.rank_correlation_index",
         version="1.0.0",
@@ -72,26 +46,46 @@ class RankCorrelationIndex(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Rank Correlation Index"),),
         required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 3, "max": 100, "default": 9},
-        },
-        is_causal=True,
+        required_history_lookback=9,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 3, "max": 100, "default": 9}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=9, ge=2)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=9,
+        ge=2,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Rank Correlation Index values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: RankCorrelationIndex requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         n = len(close)
         rci = np.full(n, np.nan, dtype=np.float64)
@@ -107,4 +101,20 @@ class RankCorrelationIndex(BaseIndicator):
         return {"value": IndicatorSeries(rci, name="RCI")}
 
 
+# Private helpers: used only by this indicator.
+def _spearman_rank(window: np.ndarray) -> float:
+    p = len(window)
+    order = np.argsort(-window)
+    price_ranks = np.empty(p, dtype=np.float64)
+    price_ranks[order] = np.arange(1, p + 1)
+    date_ranks = np.arange(p, 0, -1, dtype=np.float64)
+    d = date_ranks - price_ranks
+    d_sq_sum = np.sum(d**2)
+    denom = p * (p**2 - 1)
+    if denom == 0:
+        return 0.0
+    return float((1.0 - (6.0 * d_sq_sum) / denom) * _SCALE_100)
+
+
+# Public exports.
 __all__ = ["RankCorrelationIndex"]

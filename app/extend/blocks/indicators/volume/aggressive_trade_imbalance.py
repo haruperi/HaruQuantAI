@@ -1,19 +1,6 @@
-"""AggressiveTradeImbalance volume indicator strategy block.
+"""AggressiveTradeImbalance indicator.
 
-Description:
-    Calculates order flow aggressive buy/sell trade volume imbalance.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: Aggressive trade imbalance calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.aggressive_trade_imbalance import (
-        AggressiveTradeImbalance,
-    )
-    res = AggressiveTradeImbalance().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates order flow aggressive buy/sell trade volume imbalance.
 """
 
 from __future__ import annotations
@@ -27,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -56,29 +44,69 @@ EPSILON: float = 1e-12
 class AggressiveTradeImbalance(BaseIndicator):
     """Aggressive Trade Imbalance (ATI) normalized ratio in [-1.0, 1.0]."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.aggressive_trade_imbalance",
+        version="1.0.0",
         name="AggressiveTradeImbalance",
+        description="Calculates order flow aggressive buy/sell trade volume imbalance.",
         category="volume",
+        tags=("volume", "aggressive-trade-imbalance"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("open", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("volume", PortType.SERIES, required=True),
-            InputPort("buy_volume", PortType.SERIES, required=False),
-            InputPort("sell_volume", PortType.SERIES, required=False),
+            InputPort(
+                "open", PortType.SERIES, required=True, description="Open input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+            InputPort(
+                "volume",
+                PortType.SERIES,
+                required=True,
+                description="Volume input series",
+            ),
+            InputPort(
+                "buy_volume",
+                PortType.SERIES,
+                required=False,
+                description="Buy volume input series",
+            ),
+            InputPort(
+                "sell_volume",
+                PortType.SERIES,
+                required=False,
+                description="Sell volume input series",
+            ),
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("open", "close", "volume"),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "window": {"type": "int", "min": 1, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=14,
+        supports_incremental=False,
     )
-    window: int = Field(default=DEFAULT_ATI_WINDOW, ge=MIN_ATI_WINDOW)
 
+    # Parameters: validated user settings.
+    window: int = Field(
+        default=DEFAULT_ATI_WINDOW,
+        ge=MIN_ATI_WINDOW,
+        title="Window",
+        description="Number of bars in the rolling calculation window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -86,15 +114,27 @@ class AggressiveTradeImbalance(BaseIndicator):
             raise ValueError(f"window must be >= {MIN_ATI_WINDOW}, got {self.window}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.window
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: AggressiveTradeImbalance requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
         if bars.has_input("buy_volume") != bars.has_input("sell_volume"):
             raise ValueError("buy_volume and sell_volume must be supplied together")
         open_prices = bars.open
@@ -117,6 +157,7 @@ class AggressiveTradeImbalance(BaseIndicator):
         logger.info("AggressiveTradeImbalance calculation completed: bars=%d", n)
         return {"value": IndicatorSeries(ati_vals, name=f"ATI({window})")}
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _extract_volume_components(
         cls,
@@ -218,3 +259,7 @@ class AggressiveTradeImbalance(BaseIndicator):
         """True if ATI is falling between bar shift+1 and bar shift."""
         logger.info("Evaluating ATI is_falling at shift=%d", shift)
         return is_falling(ati, shift=shift)
+
+
+# Public exports.
+__all__ = ["AggressiveTradeImbalance"]

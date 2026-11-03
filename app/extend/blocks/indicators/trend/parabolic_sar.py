@@ -1,17 +1,6 @@
-"""ParabolicSAR trend indicator strategy block.
+"""ParabolicSAR indicator.
 
-Description:
-    Calculates Parabolic Stop and Reverse (SAR) trailing price curve.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Parabolic SAR trailing trend reversal.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.parabolic_sar import ParabolicSAR
-    res = ParabolicSAR().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Parabolic Stop and Reverse (SAR) trailing price curve.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -39,17 +29,31 @@ MIN_LOOKBACK_BARS: int = 2
 class ParabolicSAR(BaseIndicator):
     """Parabolic SAR indicator family."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.parabolic_sar",
+        version="1.0.0",
         name="ParabolicSAR",
+        description="Calculates Parabolic Stop and Reverse (SAR) trailing price curve.",
         category="trend",
+        tags=("trend", "parabolic-sar"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("high", "low"),
+        required_history_lookback=2,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "step": {
                 "type": "float",
@@ -66,65 +70,27 @@ class ParabolicSAR(BaseIndicator):
                 "min_exclusive": True,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=2,
+        supports_incremental=False,
     )
-    step: float = Field(default=0.02, gt=0.0)
-    maximum: float = Field(default=0.2, gt=0.0)
 
-    @classmethod
-    def _step_long(
-        cls,
-        prev_sar: float,
-        af: float,
-        ep: float,
-        *,
-        h_t: float,
-        l_t: float,
-        step: float,
-        maximum: float,
-        l_prev1: float,
-        l_prev2: float,
-    ) -> tuple[float, bool, float, float]:
-        """Advance one bar in long state.
+    # Parameters: validated user settings.
+    step: float = Field(
+        default=0.02,
+        gt=0.0,
+        title="Step",
+        description="Step used by the indicator calculation",
+    )
 
-        Returns (new_sar, is_long, new_af, new_ep).
-        """
-        curr_sar = prev_sar + af * (ep - prev_sar)
-        curr_sar = min(curr_sar, l_prev1, l_prev2)
-        if l_t < curr_sar:
-            return (ep, False, step, l_t)
-        new_af = min(af + step, maximum) if h_t > ep else af
-        new_ep = max(ep, h_t)
-        return (curr_sar, True, new_af, new_ep)
+    maximum: float = Field(
+        default=0.2,
+        gt=0.0,
+        title="Maximum",
+        description="Maximum used by the indicator calculation",
+    )
 
-    @classmethod
-    def _step_short(
-        cls,
-        prev_sar: float,
-        af: float,
-        ep: float,
-        *,
-        h_t: float,
-        l_t: float,
-        step: float,
-        maximum: float,
-        h_prev1: float,
-        h_prev2: float,
-    ) -> tuple[float, bool, float, float]:
-        """Advance one bar in short state.
-
-        Returns (new_sar, is_long, new_af, new_ep).
-        """
-        curr_sar = prev_sar + af * (ep - prev_sar)
-        curr_sar = max(curr_sar, h_prev1, h_prev2)
-        if h_t > curr_sar:
-            return (ep, True, step, h_t)
-        new_af = min(af + step, maximum) if l_t < ep else af
-        new_ep = min(ep, l_t)
-        return (curr_sar, False, new_af, new_ep)
-
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
         """Reject inconsistent settings before calculation."""
@@ -132,15 +98,26 @@ class ParabolicSAR(BaseIndicator):
             raise ValueError("step must not exceed maximum")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 2
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: ParabolicSAR requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         step = self.step
@@ -196,3 +173,60 @@ class ParabolicSAR(BaseIndicator):
             n,
         )
         return {"value": IndicatorSeries(sar, name=f"PSAR({step},{maximum})")}
+
+    # Specialized methods: indicator-specific behavior only.
+    @classmethod
+    def _step_long(
+        cls,
+        prev_sar: float,
+        af: float,
+        ep: float,
+        *,
+        h_t: float,
+        l_t: float,
+        step: float,
+        maximum: float,
+        l_prev1: float,
+        l_prev2: float,
+    ) -> tuple[float, bool, float, float]:
+        """Advance one bar in long state.
+
+        Returns (new_sar, is_long, new_af, new_ep).
+        """
+        curr_sar = prev_sar + af * (ep - prev_sar)
+        curr_sar = min(curr_sar, l_prev1, l_prev2)
+        if l_t < curr_sar:
+            return (ep, False, step, l_t)
+        new_af = min(af + step, maximum) if h_t > ep else af
+        new_ep = max(ep, h_t)
+        return (curr_sar, True, new_af, new_ep)
+
+    @classmethod
+    def _step_short(
+        cls,
+        prev_sar: float,
+        af: float,
+        ep: float,
+        *,
+        h_t: float,
+        l_t: float,
+        step: float,
+        maximum: float,
+        h_prev1: float,
+        h_prev2: float,
+    ) -> tuple[float, bool, float, float]:
+        """Advance one bar in short state.
+
+        Returns (new_sar, is_long, new_af, new_ep).
+        """
+        curr_sar = prev_sar + af * (ep - prev_sar)
+        curr_sar = max(curr_sar, h_prev1, h_prev2)
+        if h_t > curr_sar:
+            return (ep, True, step, h_t)
+        new_af = min(af + step, maximum) if l_t < ep else af
+        new_ep = min(ep, l_t)
+        return (curr_sar, False, new_af, new_ep)
+
+
+# Public exports.
+__all__ = ["ParabolicSAR"]

@@ -1,18 +1,7 @@
-"""QQE momentum indicator strategy block.
+"""QQE indicator.
 
-Description:
-    Calculates Quantitative Qualitative Estimation (QQE) smoothed RSI
-    and fast/slow volatility trail lines.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: QQE indicator calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.qqe import QQE
-    res = QQE().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Quantitative Qualitative Estimation (QQE) smoothed RSI and fast/slow
+  volatility trail lines.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -52,17 +42,35 @@ DEFAULT_WF: float = 4.236
 class QQE(BaseIndicator):
     """Quantitative Qualitative Estimation indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.qqe",
+        version="1.0.0",
         name="QQE",
+        description=(
+            "Calculates Quantitative Qualitative Estimation (QQE) smoothed "
+            "RSI and fast/slow volatility trail lines."
+        ),
         category="momentum",
+        tags=("momentum", "qqe"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
         outputs=(
-            OutputPort("value1", PortType.SERIES),
-            OutputPort("value2", PortType.SERIES),
+            OutputPort("value1", PortType.SERIES, description="Value1 output series"),
+            OutputPort("value2", PortType.SERIES, description="Value2 output series"),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=19,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "rsi_period": {"type": "int", "min": 2, "max": 56, "default": 14},
             "sf": {"type": "int", "min": 1, "max": 20, "default": 5},
@@ -74,14 +82,34 @@ class QQE(BaseIndicator):
                 "min_exclusive": True,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=19,
+        supports_incremental=False,
     )
-    rsi_period: int = Field(default=DEFAULT_RSI_PERIOD, ge=MIN_RSI_PERIOD)
-    sf: int = Field(default=DEFAULT_SF, ge=1)
-    wf: float = Field(default=DEFAULT_WF, gt=0.0)
 
+    # Parameters: validated user settings.
+    rsi_period: int = Field(
+        default=DEFAULT_RSI_PERIOD,
+        ge=MIN_RSI_PERIOD,
+        title="Rsi period",
+        description="Number of bars in the rsi window",
+    )
+
+    sf: int = Field(
+        default=DEFAULT_SF,
+        ge=1,
+        title="Sf",
+        description="Number of bars used to smooth the RSI series",
+    )
+
+    wf: float = Field(
+        default=DEFAULT_WF,
+        gt=0.0,
+        title="Wf",
+        description="Volatility multiplier used by the QQE trailing bands",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -93,15 +121,24 @@ class QQE(BaseIndicator):
             raise ValueError(f"wf must be > 0.0, got {self.wf}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.rsi_period + self.sf
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: QQE requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         rsi_period = self.rsi_period
         sf = self.sf
@@ -144,6 +181,7 @@ class QQE(BaseIndicator):
             "value2": IndicatorSeries(val2, name=f"QQE_Value2({rsi_period})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _calc_raw_rsi(p_arr: np.ndarray[Any, Any], period: int) -> np.ndarray[Any, Any]:
         """Compute standard Wilder's RSI."""
@@ -257,3 +295,7 @@ class QQE(BaseIndicator):
         """Evaluate QQEValue1Falling."""
         logger.info("Evaluating QQE value1_is_falling at shift=%d", shift)
         return is_falling(value1, shift=shift)
+
+
+# Public exports.
+__all__ = ["QQE"]

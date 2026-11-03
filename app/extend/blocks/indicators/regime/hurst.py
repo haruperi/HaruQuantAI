@@ -1,17 +1,6 @@
-"""HurstExponent regime indicator strategy block.
+"""HurstExponent indicator.
 
-Description:
-    Calculates Hurst Exponent evaluating persistence and mean-reversion tendencies.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-regime: Hurst exponent time-series persistence analysis.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.regime.hurst import HurstExponent
-    res = HurstExponent().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Hurst Exponent evaluating persistence and mean-reversion tendencies.
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -60,17 +50,35 @@ EPSILON: float = 1e-12
 class HurstExponent(BaseIndicator):
     """Hurst Exponent statistical persistence regime indicator."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.regime.hurst",
+        version="1.0.0",
         name="HurstExponent",
+        description=(
+            "Calculates Hurst Exponent evaluating persistence and mean-"
+            "reversion tendencies."
+        ),
         category="regime",
+        tags=("regime", "hurst"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
         outputs=(
-            OutputPort("hurst", PortType.SERIES),
-            OutputPort("regime", PortType.SERIES),
+            OutputPort("hurst", PortType.SERIES, description="Hurst output series"),
+            OutputPort("regime", PortType.SERIES, description="Regime output series"),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=100,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "window": {"type": "int", "min": 20, "max": 400, "default": 100},
             "min_scale": {"type": "int", "min": 2, "max": 32, "default": 8},
@@ -79,17 +87,53 @@ class HurstExponent(BaseIndicator):
             "lower_threshold": {"type": "float", "min": 0, "max": 4, "default": 0.45},
             "upper_threshold": {"type": "float", "min": 0, "max": 4, "default": 0.55},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=100,
+        supports_incremental=False,
     )
-    window: int = Field(default=DEFAULT_WINDOW, ge=20)
-    min_scale: int = Field(default=DEFAULT_MIN_SCALE, ge=2)
-    max_scale: int = Field(default=DEFAULT_MAX_SCALE, ge=2)
-    scale_count: int = Field(default=DEFAULT_SCALE_COUNT, ge=2)
-    lower_threshold: float = Field(default=DEFAULT_LOWER_THRESHOLD)
-    upper_threshold: float = Field(default=DEFAULT_UPPER_THRESHOLD)
 
+    # Parameters: validated user settings.
+    window: int = Field(
+        default=DEFAULT_WINDOW,
+        ge=20,
+        title="Window",
+        description="Number of bars in the rolling calculation window",
+    )
+
+    min_scale: int = Field(
+        default=DEFAULT_MIN_SCALE,
+        ge=2,
+        title="Min scale",
+        description="Smallest scale used by the Hurst estimator",
+    )
+
+    max_scale: int = Field(
+        default=DEFAULT_MAX_SCALE,
+        ge=2,
+        title="Max scale",
+        description="Largest scale used by the Hurst estimator",
+    )
+
+    scale_count: int = Field(
+        default=DEFAULT_SCALE_COUNT,
+        ge=2,
+        title="Scale count",
+        description="Number of scales sampled by the Hurst estimator",
+    )
+
+    lower_threshold: float = Field(
+        default=DEFAULT_LOWER_THRESHOLD,
+        title="Lower threshold",
+        description="Lower boundary used for indicator classification",
+    )
+
+    upper_threshold: float = Field(
+        default=DEFAULT_UPPER_THRESHOLD,
+        title="Upper threshold",
+        description="Upper boundary used for indicator classification",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_configuration(self) -> Self:
         """Reject inconsistent settings before calculation."""
@@ -101,15 +145,26 @@ class HurstExponent(BaseIndicator):
             raise ValueError("max_scale must not exceed window")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.window
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: HurstExponent requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         window = self.window
         min_scale = self.min_scale
@@ -143,6 +198,7 @@ class HurstExponent(BaseIndicator):
             "regime": IndicatorSeries(reg_vals, name=f"Hurst_Regime({window})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _validate_params(
         window: int,
@@ -274,3 +330,7 @@ class HurstExponent(BaseIndicator):
         return is_greater_or_equal(
             hurst, lower_threshold, shift1=shift, round_digits=8
         ) and is_lower_or_equal(hurst, upper_threshold, shift1=shift, round_digits=8)
+
+
+# Public exports.
+__all__ = ["HurstExponent"]

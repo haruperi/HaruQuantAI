@@ -1,17 +1,6 @@
-"""LaguerreRSI momentum indicator strategy block.
+"""LaguerreRSI indicator.
 
-Description:
-    Calculates Laguerre RSI using 4-element Laguerre filter for time warp smoothing.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: Laguerre RSI calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.laguerre_rsi import LaguerreRSI
-    res = LaguerreRSI().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Laguerre RSI using 4-element Laguerre filter for time warp smoothing.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -49,23 +39,52 @@ DEFAULT_GAMMA: float = 0.5
 class LaguerreRSI(BaseIndicator):
     """John Ehlers' 4-element Laguerre filter Relative Strength Index."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.laguerre_rsi",
+        version="1.0.0",
         name="LaguerreRSI",
+        description=(
+            "Calculates Laguerre RSI using 4-element Laguerre filter for time"
+            " warp smoothing."
+        ),
         category="momentum",
+        tags=("momentum", "laguerre-rsi"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("close",),
+        required_history_lookback=1,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "gamma": {"type": "float", "min": 0.0, "max": 1.0, "default": 0.5}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=1,
+        supports_incremental=False,
     )
-    gamma: float = Field(default=DEFAULT_GAMMA, ge=0.0, le=1.0)
 
+    # Parameters: validated user settings.
+    gamma: float = Field(
+        default=DEFAULT_GAMMA,
+        ge=0.0,
+        le=1.0,
+        title="Gamma",
+        description="Laguerre filter smoothing coefficient",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -73,15 +92,26 @@ class LaguerreRSI(BaseIndicator):
             raise ValueError(f"Gamma must be between 0.0 and 1.0, got {self.gamma}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: LaguerreRSI requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         gamma = self.gamma
         logger.info(
@@ -127,6 +157,7 @@ class LaguerreRSI(BaseIndicator):
         )
         return {"value": IndicatorSeries(lrsi_vals, name=f"LaguerreRSI({gamma:.2f})")}
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _calc_cu_cd(l0: float, l1: float, l2: float, l3: float) -> tuple[float, float]:
         """Compute cumulative up and down price changes across Laguerre filters."""
@@ -197,3 +228,7 @@ class LaguerreRSI(BaseIndicator):
         """Check if Laguerre RSI turned downward (v0 < v1 and v1 >= v2)."""
         logger.info("Evaluating LaguerreRSI changes_down at shift=%d", shift)
         return changes_down(series, shift=shift)
+
+
+# Public exports.
+__all__ = ["LaguerreRSI"]

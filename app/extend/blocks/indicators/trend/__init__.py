@@ -1,17 +1,4 @@
-"""Trend indicator package exports and lazy loading registry.
-
-Description:
-    Trend indicator package exports and lazy loading registry.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Trend indicator exports.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend import SMA, EMA, SuperTrend, ALMA
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
-"""
+"""Trend indicator package exports and lazy loading registry."""
 
 from __future__ import annotations
 

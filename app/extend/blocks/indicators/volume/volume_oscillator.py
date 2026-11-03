@@ -1,20 +1,7 @@
-"""Volume Oscillator strategy block.
+"""VolumeOscillator indicator.
 
-Description:
-    Calculates Volume Oscillator as the percentage spread between a fast
-    volume moving average and a slow volume moving average.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume-oscillator: Volume oscillator computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.volume_oscillator import (
-        VolumeOscillator,
-    )
-    res = VolumeOscillator().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Volume Oscillator as the percentage spread between a fast volume moving
+  average and a slow volume moving average.
 """
 
 from __future__ import annotations
@@ -46,6 +33,7 @@ _EPSILON: float = 1e-12
 class VolumeOscillator(BaseIndicator):
     """Volume Oscillator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.volume_oscillator",
         version="1.0.0",
@@ -58,28 +46,53 @@ class VolumeOscillator(BaseIndicator):
         inputs=(InputPort("volume", PortType.SERIES, "Volume series", required=True),),
         outputs=(OutputPort("value", PortType.SERIES, "Volume Oscillator"),),
         required_market_inputs=("volume",),
+        required_history_lookback=10,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "fast_period": {"type": "int", "min": 2, "max": 50, "default": 5},
             "slow_period": {"type": "int", "min": 5, "max": 100, "default": 10},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    fast_period: int = Field(default=5, ge=1)
-    slow_period: int = Field(default=10, ge=1)
+    # Parameters: validated user settings.
+    fast_period: int = Field(
+        default=5,
+        ge=1,
+        title="Fast period",
+        description="Number of bars in the fast window",
+    )
 
+    slow_period: int = Field(
+        default=10,
+        ge=1,
+        title="Slow period",
+        description="Number of bars in the slow window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return max(self.fast_period, self.slow_period)
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Volume Oscillator values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: VolumeOscillator requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         volume = np.asarray(bars.volume, dtype=np.float64)
         fast_sma = sma_kernel(volume, self.fast_period)
         slow_sma = sma_kernel(volume, self.slow_period)
@@ -98,4 +111,5 @@ class VolumeOscillator(BaseIndicator):
         return {"value": IndicatorSeries(vo, name="VolOsc")}
 
 
+# Public exports.
 __all__ = ["VolumeOscillator"]

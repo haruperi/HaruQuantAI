@@ -1,17 +1,6 @@
-"""Stochastic momentum indicator strategy block.
+"""Stochastic indicator.
 
-Description:
-    Calculates Stochastic Oscillator %K and %D lines relative to high/low range.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: Stochastic oscillator calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.stochastic import Stochastic
-    res = Stochastic().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Stochastic Oscillator %K and %D lines relative to high/low range.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -49,36 +39,44 @@ PRICE_LOW_HIGH: int = 0
 PRICE_CLOSE_CLOSE: int = 1
 
 
-def _apply_ma_kernel(
-    values: np.ndarray[Any, Any], period: int, ma_method: int
-) -> np.ndarray[Any, Any]:
-    """Apply selected moving average kernel to valid numerical slice."""
-    if ma_method == MA_SMA:
-        return sma_kernel(values, period)
-    if ma_method == MA_EMA:
-        return ema_kernel(values, period)
-    if ma_method == MA_SMMA:
-        return smma_kernel(values, period)
-    if ma_method == MA_LWMA:
-        return lwma_kernel(values, period)
-    raise ValueError(f"Unsupported ma_method: {ma_method}")
-
-
 class Stochastic(BaseIndicator):
     """Stochastic Oscillator family consolidating %K, %D lines and conditions."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.stochastic",
+        version="1.0.0",
         name="Stochastic",
+        description=(
+            "Calculates Stochastic Oscillator %K and %D lines relative to "
+            "high/low range."
+        ),
         category="momentum",
+        tags=("momentum", "stochastic"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=False),
-            InputPort("low", PortType.SERIES, required=False),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=False, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=False, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
-        outputs=(OutputPort("k", PortType.SERIES), OutputPort("d", PortType.SERIES)),
+        outputs=(
+            OutputPort("k", PortType.SERIES, description="K output series"),
+            OutputPort("d", PortType.SERIES, description="D output series"),
+        ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=18,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "k_period": {"type": "int", "min": 1, "max": 56, "default": 14},
             "d_period": {"type": "int", "min": 1, "max": 12, "default": 3},
@@ -86,16 +84,44 @@ class Stochastic(BaseIndicator):
             "ma_method": {"type": "int", "min": 0, "max": 3, "default": 0},
             "price_field": {"type": "int", "min": 0, "max": 1, "default": 0},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=18,
+        supports_incremental=False,
     )
-    k_period: int = Field(default=14, ge=1)
-    d_period: int = Field(default=3, ge=1)
-    slowing: int = Field(default=3, ge=1)
-    ma_method: int = Field(default=0, ge=0, le=3)
-    price_field: int = Field(default=0, ge=0, le=1)
 
+    # Parameters: validated user settings.
+    k_period: int = Field(
+        default=14, ge=1, title="K period", description="Number of bars in the k window"
+    )
+
+    d_period: int = Field(
+        default=3, ge=1, title="D period", description="Number of bars in the d window"
+    )
+
+    slowing: int = Field(
+        default=3,
+        ge=1,
+        title="Slowing",
+        description="Number of bars in the stochastic slowing window",
+    )
+
+    ma_method: int = Field(
+        default=0,
+        ge=0,
+        le=3,
+        title="Ma method",
+        description="Moving-average method selector",
+    )
+
+    price_field: int = Field(
+        default=0,
+        ge=0,
+        le=1,
+        title="Price field",
+        description="Price-field selector used by the stochastic calculation",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
     @override
     def required_inputs(self) -> tuple[str, ...]:
         """Resolve market dependencies conditioned on price_field."""
@@ -103,14 +129,19 @@ class Stochastic(BaseIndicator):
             return ("close",)
         return ("high", "low", "close")
 
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.k_period + self.slowing + self.d_period - 2
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
+        logger.debug(
+            "FR-indicator-calculation: Stochastic requested bars=%d", len(bars)
+        )
         bars.require_inputs(self.required_inputs())
         close = bars.close
         close_arr = np.asarray(close, dtype=np.float64)
@@ -177,3 +208,23 @@ class Stochastic(BaseIndicator):
             "k": IndicatorSeries(slow_k, name="Stoch.K"),
             "d": IndicatorSeries(slow_d, name="Stoch.D"),
         }
+
+
+# Private helpers: used only by this indicator.
+def _apply_ma_kernel(
+    values: np.ndarray[Any, Any], period: int, ma_method: int
+) -> np.ndarray[Any, Any]:
+    """Apply selected moving average kernel to valid numerical slice."""
+    if ma_method == MA_SMA:
+        return sma_kernel(values, period)
+    if ma_method == MA_EMA:
+        return ema_kernel(values, period)
+    if ma_method == MA_SMMA:
+        return smma_kernel(values, period)
+    if ma_method == MA_LWMA:
+        return lwma_kernel(values, period)
+    raise ValueError(f"Unsupported ma_method: {ma_method}")
+
+
+# Public exports.
+__all__ = ["Stochastic"]

@@ -1,17 +1,6 @@
-"""MFI volume indicator strategy block.
+"""MFI indicator.
 
-Description:
-    Calculates Money Flow Index (MFI) volume-weighted momentum oscillator.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-volume: Money flow index calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.mfi import MFI
-    res = MFI().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Money Flow Index (MFI) volume-weighted momentum oscillator.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -54,28 +44,62 @@ EPSILON: float = 1e-12
 class MFI(BaseIndicator):
     """Money Flow Index volume-weighted momentum oscillator."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.mfi",
+        version="1.0.0",
         name="MFI",
+        description=(
+            "Calculates Money Flow Index (MFI) volume-weighted momentum oscillator."
+        ),
         category="volume",
+        tags=("volume", "mfi"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("volume", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+            InputPort(
+                "volume",
+                PortType.SERIES,
+                required=True,
+                description="Volume input series",
+            ),
         ),
-        outputs=(OutputPort("value", PortType.SERIES),),
+        outputs=(
+            OutputPort("value", PortType.SERIES, description="Value output series"),
+        ),
         required_market_inputs=("high", "low", "close", "volume"),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=14,
+        supports_incremental=False,
     )
-    period: int = Field(default=DEFAULT_MFI_PERIOD, ge=MIN_MFI_PERIOD)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=DEFAULT_MFI_PERIOD,
+        ge=MIN_MFI_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -83,15 +107,24 @@ class MFI(BaseIndicator):
             raise ValueError(f"period must be >= {MIN_MFI_PERIOD}, got {self.period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: MFI requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -108,6 +141,7 @@ class MFI(BaseIndicator):
         mfi_vals = self._compute_mfi(h_arr, l_arr, c_arr, v_arr, period=period)
         return {"value": IndicatorSeries(mfi_vals, name=f"MFI({period})")}
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_mfi(
         cls,
@@ -201,3 +235,7 @@ class MFI(BaseIndicator):
         """True if MFI is falling between bar shift+1 and bar shift."""
         logger.info("Evaluating MFI is_falling at shift=%d", shift)
         return is_falling(mfi, shift=shift)
+
+
+# Public exports.
+__all__ = ["MFI"]

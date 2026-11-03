@@ -1,20 +1,7 @@
-"""Arnaud Legoux Moving Average (ALMA) strategy block.
+"""ArnaudLegouxMovingAverage indicator.
 
-Description:
-    Calculates Arnaud Legoux Moving Average (ALMA) using Gaussian weights to
-    provide responsiveness and noise reduction with minimal phase lag.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-alma: ALMA Gaussian moving average computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.alma import (
-        ArnaudLegouxMovingAverage,
-    )
-    res = ArnaudLegouxMovingAverage().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Arnaud Legoux Moving Average (ALMA) using Gaussian weights to provide
+  responsiveness and noise reduction with minimal phase lag.
 """
 
 from __future__ import annotations
@@ -40,6 +27,95 @@ from app.extend.blocks.indicators.base import BaseIndicator
 logger = get_logger(__name__)
 
 
+class ArnaudLegouxMovingAverage(BaseIndicator):
+    """Arnaud Legoux Moving Average (ALMA) block."""
+
+    # Metadata: catalog identity, ports, and execution capabilities.
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.trend.alma",
+        version="1.0.0",
+        name="Arnaud Legoux Moving Average",
+        description="Gaussian filter moving average with low lag and smoothness",
+        category="trend",
+        tags=("trend", "ma", "alma", "gaussian"),
+        execution_kind=ExecutionKind.EXPRESSION,
+        chart_pane=ChartPane.MAIN,
+        inputs=(
+            InputPort("close", PortType.SERIES, "Close price series", required=True),
+        ),
+        outputs=(OutputPort("value", PortType.SERIES, "ALMA"),),
+        required_market_inputs=("close",),
+        required_history_lookback=9,
+        dependencies=(),
+        is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 2, "max": 100, "default": 9},
+            "offset": {"type": "float", "min": 0.0, "max": 1.0, "default": 0.85},
+            "sigma": {"type": "float", "min": 1.0, "max": 20.0, "default": 6.0},
+        },
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
+    )
+
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=9,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    offset: float = Field(
+        default=0.85,
+        ge=0.0,
+        le=1.0,
+        title="Offset",
+        description="Offset applied by the indicator calculation",
+    )
+
+    sigma: float = Field(
+        default=6.0,
+        gt=0.0,
+        title="Sigma",
+        description="Sigma used by the indicator calculation",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return minimum history bars needed for valid calculation."""
+        return self.period
+
+    # Calculation: log, check inputs, and return named aligned outputs.
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        """Compute ALMA values over closing prices."""
+        logger.debug(
+            "FR-indicator-calculation: ArnaudLegouxMovingAverage requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
+        close = np.asarray(bars.close, dtype=np.float64)
+        alma = alma_kernel(close, self.period, self.offset, self.sigma)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-TREND: Calculated ALMA(p=%d, off=%.2f, sig=%.1f) "
+            "for %d bars",
+            self.period,
+            self.offset,
+            self.sigma,
+            len(bars),
+        )
+        return {"value": IndicatorSeries(alma, name="ALMA")}
+
+
+# Private helpers: used only by this indicator.
 def alma_kernel(
     data: np.ndarray,
     period: int,
@@ -64,58 +140,5 @@ def alma_kernel(
     return out
 
 
-class ArnaudLegouxMovingAverage(BaseIndicator):
-    """Arnaud Legoux Moving Average (ALMA) block."""
-
-    spec: ClassVar[BlockSpec] = BlockSpec(
-        id="indicator.trend.alma",
-        version="1.0.0",
-        name="Arnaud Legoux Moving Average",
-        description="Gaussian filter moving average with low lag and smoothness",
-        category="trend",
-        tags=("trend", "ma", "alma", "gaussian"),
-        execution_kind=ExecutionKind.EXPRESSION,
-        chart_pane=ChartPane.MAIN,
-        inputs=(
-            InputPort("close", PortType.SERIES, "Close price series", required=True),
-        ),
-        outputs=(OutputPort("value", PortType.SERIES, "ALMA"),),
-        required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 2, "max": 100, "default": 9},
-            "offset": {"type": "float", "min": 0.0, "max": 1.0, "default": 0.85},
-            "sigma": {"type": "float", "min": 1.0, "max": 20.0, "default": 6.0},
-        },
-        is_causal=True,
-        is_generation_eligible=True,
-        is_deterministic=True,
-        supports_incremental=False,
-    )
-
-    period: int = Field(default=9, ge=1)
-    offset: float = Field(default=0.85, ge=0.0, le=1.0)
-    sigma: float = Field(default=6.0, gt=0.0)
-
-    @override
-    def required_history(self) -> int:
-        """Return minimum history bars needed for valid calculation."""
-        return self.period
-
-    @override
-    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
-        """Compute ALMA values over closing prices."""
-        bars.require_inputs(self.spec.required_market_inputs)
-        close = np.asarray(bars.close, dtype=np.float64)
-        alma = alma_kernel(close, self.period, self.offset, self.sigma)
-        logger.debug(
-            "FR-SERVICES-INDICATOR-TREND: Calculated ALMA(p=%d, off=%.2f, sig=%.1f) "
-            "for %d bars",
-            self.period,
-            self.offset,
-            self.sigma,
-            len(bars),
-        )
-        return {"value": IndicatorSeries(alma, name="ALMA")}
-
-
-__all__ = ["ArnaudLegouxMovingAverage", "alma_kernel"]
+# Public exports.
+__all__ = ["ArnaudLegouxMovingAverage"]

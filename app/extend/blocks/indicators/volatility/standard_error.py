@@ -1,20 +1,7 @@
-"""Standard Error volatility strategy block.
+"""StandardError indicator.
 
-Description:
-    Calculates the Standard Error of a linear regression estimate measuring
-    the dispersion of prices around the linear regression trend line.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-standard-error: Standard error computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.standard_error import (
-        StandardError,
-    )
-    res = StandardError().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates the Standard Error of a linear regression estimate measuring the
+  dispersion of prices around the linear regression trend line.
 """
 
 from __future__ import annotations
@@ -42,6 +29,74 @@ logger = get_logger(__name__)
 _MIN_PERIOD: int = 3
 
 
+class StandardError(BaseIndicator):
+    """Standard Error of linear regression estimate block."""
+
+    # Metadata: catalog identity, ports, and execution capabilities.
+    spec: ClassVar[BlockSpec] = BlockSpec(
+        id="indicator.volatility.standard_error",
+        version="1.0.0",
+        name="Standard Error",
+        description="Standard error of linear regression estimate around the trendline",
+        category="volatility",
+        tags=("volatility", "statistics", "standard_error", "linreg"),
+        execution_kind=ExecutionKind.EXPRESSION,
+        chart_pane=ChartPane.SUB,
+        inputs=(
+            InputPort("close", PortType.SERIES, "Close price series", required=True),
+        ),
+        outputs=(OutputPort("value", PortType.SERIES, "Standard Error"),),
+        required_market_inputs=("close",),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 3, "max": 100, "default": 14}
+        },
+        is_deterministic=True,
+        is_causal=True,
+        supports_incremental=False,
+    )
+
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=3,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
+    @override
+    def required_history(self) -> int:
+        """Return minimum history bars needed for valid calculation."""
+        return self.period
+
+    # Calculation: log, check inputs, and return named aligned outputs.
+    @override
+    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
+        """Compute Standard Error values."""
+        logger.debug(
+            "FR-indicator-calculation: StandardError requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
+        close = np.asarray(bars.close, dtype=np.float64)
+        se = standard_error_kernel(close, self.period)
+        logger.debug(
+            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated StdErr(p=%d) for %d bars",
+            self.period,
+            len(bars),
+        )
+        return {"value": IndicatorSeries(se, name="StdErr")}
+
+
+# Private helpers: used only by this indicator.
 def standard_error_kernel(data: np.ndarray, period: int) -> np.ndarray:
     """Compute rolling Standard Error of linear regression estimate."""
     n = len(data)
@@ -63,51 +118,5 @@ def standard_error_kernel(data: np.ndarray, period: int) -> np.ndarray:
     return out
 
 
-class StandardError(BaseIndicator):
-    """Standard Error of linear regression estimate block."""
-
-    spec: ClassVar[BlockSpec] = BlockSpec(
-        id="indicator.volatility.standard_error",
-        version="1.0.0",
-        name="Standard Error",
-        description="Standard error of linear regression estimate around the trendline",
-        category="volatility",
-        tags=("volatility", "statistics", "standard_error", "linreg"),
-        execution_kind=ExecutionKind.EXPRESSION,
-        chart_pane=ChartPane.SUB,
-        inputs=(
-            InputPort("close", PortType.SERIES, "Close price series", required=True),
-        ),
-        outputs=(OutputPort("value", PortType.SERIES, "Standard Error"),),
-        required_market_inputs=("close",),
-        parameter_search_space={
-            "period": {"type": "int", "min": 3, "max": 100, "default": 14},
-        },
-        is_causal=True,
-        is_generation_eligible=True,
-        is_deterministic=True,
-        supports_incremental=False,
-    )
-
-    period: int = Field(default=14, ge=3)
-
-    @override
-    def required_history(self) -> int:
-        """Return minimum history bars needed for valid calculation."""
-        return self.period
-
-    @override
-    def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
-        """Compute Standard Error values."""
-        bars.require_inputs(self.spec.required_market_inputs)
-        close = np.asarray(bars.close, dtype=np.float64)
-        se = standard_error_kernel(close, self.period)
-        logger.debug(
-            "FR-SERVICES-INDICATOR-VOLATILITY: Calculated StdErr(p=%d) for %d bars",
-            self.period,
-            len(bars),
-        )
-        return {"value": IndicatorSeries(se, name="StdErr")}
-
-
-__all__ = ["StandardError", "standard_error_kernel"]
+# Public exports.
+__all__ = ["StandardError"]

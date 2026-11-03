@@ -1,18 +1,7 @@
-"""SMI Ergodic Indicator and Oscillator strategy block.
+"""SMIErgodic indicator.
 
-Description:
-    Calculates William Blau's SMI Ergodic indicator based on double-smoothed
-    true strength momentum with a signal oscillator line.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-smi-ergodic: SMI Ergodic indicator computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.smi_ergodic import SMIErgodic
-    res = SMIErgodic().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates William Blau's SMI Ergodic indicator based on double-smoothed true
+  strength momentum with a signal oscillator line.
 """
 
 from __future__ import annotations
@@ -38,26 +27,13 @@ from app.extend.calculators.average import ema_kernel
 logger = get_logger(__name__)
 
 
-def _safe_ema(x: np.ndarray, period: int) -> np.ndarray:
-    n = len(x)
-    out = np.full(n, np.nan, dtype=np.float64)
-    valid = np.where(~np.isnan(x))[0]
-    if len(valid) >= period:
-        start = int(valid[0])
-        out[start:] = ema_kernel(x[start:], period)
-    return out
-
-
 _EPSILON: float = 1e-12
-
-
-def _double_ema(x: np.ndarray, r: int, s: int) -> np.ndarray:
-    return _safe_ema(ema_kernel(x, r), s)
 
 
 class SMIErgodic(BaseIndicator):
     """SMI Ergodic Indicator / Oscillator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.smi_ergodic",
         version="1.0.0",
@@ -76,30 +52,61 @@ class SMIErgodic(BaseIndicator):
             OutputPort("oscillator", PortType.SERIES, "Ergodic Oscillator"),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=30,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "long_period": {"type": "int", "min": 5, "max": 50, "default": 20},
             "short_period": {"type": "int", "min": 2, "max": 20, "default": 5},
             "signal_period": {"type": "int", "min": 2, "max": 20, "default": 5},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    long_period: int = Field(default=20, ge=1)
-    short_period: int = Field(default=5, ge=1)
-    signal_period: int = Field(default=5, ge=1)
+    # Parameters: validated user settings.
+    long_period: int = Field(
+        default=20,
+        ge=1,
+        title="Long period",
+        description="Number of bars in the long window",
+    )
 
+    short_period: int = Field(
+        default=5,
+        ge=1,
+        title="Short period",
+        description="Number of bars in the short window",
+    )
+
+    signal_period: int = Field(
+        default=5,
+        ge=1,
+        title="Signal period",
+        description="Number of bars in the signal smoothing window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.long_period + self.short_period + self.signal_period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute SMI Ergodic, signal line, and oscillator."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: SMIErgodic requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         n = len(close)
         diff = np.zeros(n, dtype=np.float64)
@@ -124,4 +131,20 @@ class SMIErgodic(BaseIndicator):
         }
 
 
+# Private helpers: used only by this indicator.
+def _safe_ema(x: np.ndarray, period: int) -> np.ndarray:
+    n = len(x)
+    out = np.full(n, np.nan, dtype=np.float64)
+    valid = np.where(~np.isnan(x))[0]
+    if len(valid) >= period:
+        start = int(valid[0])
+        out[start:] = ema_kernel(x[start:], period)
+    return out
+
+
+def _double_ema(x: np.ndarray, r: int, s: int) -> np.ndarray:
+    return _safe_ema(ema_kernel(x, r), s)
+
+
+# Public exports.
 __all__ = ["SMIErgodic"]

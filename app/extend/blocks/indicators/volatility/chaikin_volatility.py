@@ -1,20 +1,7 @@
-"""Chaikin Volatility strategy block.
+"""ChaikinVolatility indicator.
 
-Description:
-    Calculates Marc Chaikin's Volatility indicator measuring the percentage
-    rate of change of the exponential moving average of the high-low spread.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-chaikin-volatility: Chaikin volatility computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility.chaikin_volatility import (
-        ChaikinVolatility,
-    )
-    res = ChaikinVolatility().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Marc Chaikin's Volatility indicator measuring the percentage rate of
+  change of the exponential moving average of the high-low spread.
 """
 
 from __future__ import annotations
@@ -46,6 +33,7 @@ _EPSILON: float = 1e-12
 class ChaikinVolatility(BaseIndicator):
     """Chaikin Volatility indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volatility.chaikin_volatility",
         version="1.0.0",
@@ -61,28 +49,53 @@ class ChaikinVolatility(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Chaikin Volatility"),),
         required_market_inputs=("high", "low"),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "ema_period": {"type": "int", "min": 2, "max": 50, "default": 10},
             "roc_period": {"type": "int", "min": 2, "max": 50, "default": 10},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    ema_period: int = Field(default=10, ge=1)
-    roc_period: int = Field(default=10, ge=1)
+    # Parameters: validated user settings.
+    ema_period: int = Field(
+        default=10,
+        ge=1,
+        title="Ema period",
+        description="Number of bars in the ema window",
+    )
 
+    roc_period: int = Field(
+        default=10,
+        ge=1,
+        title="Roc period",
+        description="Number of bars in the roc window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.ema_period + self.roc_period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Chaikin Volatility values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: ChaikinVolatility requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = np.asarray(bars.high, dtype=np.float64)
         low = np.asarray(bars.low, dtype=np.float64)
         n = len(high)
@@ -105,4 +118,5 @@ class ChaikinVolatility(BaseIndicator):
         return {"value": IndicatorSeries(cv, name="ChaikinVol")}
 
 
+# Public exports.
 __all__ = ["ChaikinVolatility"]

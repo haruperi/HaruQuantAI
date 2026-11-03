@@ -1,17 +1,6 @@
-"""DonchianChannels trend indicator strategy block.
+"""DonchianChannels indicator.
 
-Description:
-    Calculates Donchian Channel upper, lower, and middle breakout bands.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Donchian Channel envelope and breakout levels.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.donchian_channel import DonchianChannels
-    res = DonchianChannels().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Donchian Channel upper, lower, and middle breakout bands.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -49,33 +39,61 @@ EPSILON: float = 1e-12
 class DonchianChannels(BaseIndicator):
     """Donchian Channels breakout envelope and volatility width block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.donchian_channel",
+        version="1.0.0",
         name="DonchianChannels",
+        description=(
+            "Calculates Donchian Channel upper, lower, and middle breakout bands."
+        ),
         category="trend",
+        tags=("trend", "donchian-channel"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
         ),
         outputs=(
-            OutputPort("upper", PortType.SERIES),
-            OutputPort("lower", PortType.SERIES),
-            OutputPort("middle", PortType.SERIES),
-            OutputPort("width", PortType.SERIES),
+            OutputPort("upper", PortType.SERIES, description="Upper output series"),
+            OutputPort("lower", PortType.SERIES, description="Lower output series"),
+            OutputPort("middle", PortType.SERIES, description="Middle output series"),
+            OutputPort("width", PortType.SERIES, description="Width output series"),
         ),
         required_market_inputs=("high", "low"),
+        required_history_lookback=20,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 80, "default": 20},
             "offset": {"type": "int", "min": 0, "max": 4, "default": 0},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=20,
+        supports_incremental=False,
     )
-    period: int = Field(default=DEFAULT_DONCHIAN_PERIOD, ge=MIN_DONCHIAN_PERIOD)
-    offset: int = Field(default=0, ge=0)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=DEFAULT_DONCHIAN_PERIOD,
+        ge=MIN_DONCHIAN_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    offset: int = Field(
+        default=0,
+        ge=0,
+        title="Offset",
+        description="Offset applied by the indicator calculation",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -87,15 +105,26 @@ class DonchianChannels(BaseIndicator):
             raise ValueError(f"offset must be >= 0, got {self.offset}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period + self.offset
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: DonchianChannels requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         period = self.period
@@ -121,6 +150,7 @@ class DonchianChannels(BaseIndicator):
             "width": IndicatorSeries(width, name=f"DonchianWidth({period})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_channels(
         cls,
@@ -210,3 +240,7 @@ class DonchianChannels(BaseIndicator):
         """True if channel width is less than or equal to specified threshold."""
         logger.info("Evaluating Donchian is_squeezed at shift=%d", shift)
         return is_lower_or_equal(width, threshold, shift1=shift, round_digits=8)
+
+
+# Public exports.
+__all__ = ["DonchianChannels"]

@@ -1,17 +1,6 @@
-"""Fibo price_action indicator strategy block.
+"""Fibo indicator.
 
-Description:
-    Calculates Fibonacci retracement and expansion support/resistance levels.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Fibonacci retracement level calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.fibo import Fibo
-    res = Fibo().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Fibonacci retracement and expansion support/resistance levels.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -43,38 +33,86 @@ STANDARD_FIBO_LEVELS: tuple[float, ...] = (23.6, 38.2, 50.0, 61.8, 78.6, 100.0, 
 class Fibo(BaseIndicator):
     """Fibonacci Retracement and Extension indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.fibo",
+        version="1.0.0",
         name="Fibo",
+        description=(
+            "Calculates Fibonacci retracement and expansion support/resistance levels."
+        ),
         category="price_action",
+        tags=("price_action", "fibo"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
-            InputPort("open", PortType.SERIES, required=False),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+            InputPort(
+                "open", PortType.SERIES, required=False, description="Open input series"
+            ),
         ),
         outputs=(
-            OutputPort("level_23_6", PortType.SERIES),
-            OutputPort("level_38_2", PortType.SERIES),
-            OutputPort("level_50_0", PortType.SERIES),
-            OutputPort("level_61_8", PortType.SERIES),
-            OutputPort("level_78_6", PortType.SERIES),
-            OutputPort("level_100_0", PortType.SERIES),
-            OutputPort("level_161_8", PortType.SERIES),
-            OutputPort("custom", PortType.SERIES),
+            OutputPort(
+                "level_23_6", PortType.SERIES, description="Level 23 6 output series"
+            ),
+            OutputPort(
+                "level_38_2", PortType.SERIES, description="Level 38 2 output series"
+            ),
+            OutputPort(
+                "level_50_0", PortType.SERIES, description="Level 50 0 output series"
+            ),
+            OutputPort(
+                "level_61_8", PortType.SERIES, description="Level 61 8 output series"
+            ),
+            OutputPort(
+                "level_78_6", PortType.SERIES, description="Level 78 6 output series"
+            ),
+            OutputPort(
+                "level_100_0", PortType.SERIES, description="Level 100 0 output series"
+            ),
+            OutputPort(
+                "level_161_8", PortType.SERIES, description="Level 161 8 output series"
+            ),
+            OutputPort("custom", PortType.SERIES, description="Custom output series"),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=14,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 56, "default": 14}
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=14,
+        supports_incremental=False,
     )
-    period: int = Field(default=14, ge=MIN_FIBO_PERIOD)
-    custom_level: float | None = Field(default=None)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=MIN_FIBO_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    custom_level: float | None = Field(
+        default=None,
+        title="Custom level",
+        description="Custom Fibonacci projection ratio",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -82,15 +120,24 @@ class Fibo(BaseIndicator):
             raise ValueError(f"Period must be >= 2, got {self.period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: Fibo requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -145,6 +192,7 @@ class Fibo(BaseIndicator):
         )
         return result
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def is_above_level(
         price: IndicatorSeries | np.ndarray[Any, Any],
@@ -200,3 +248,7 @@ class Fibo(BaseIndicator):
         if len(price) - 1 - shift >= len(level):
             return False
         return crosses_below(price, level, shift=shift)
+
+
+# Public exports.
+__all__ = ["Fibo"]

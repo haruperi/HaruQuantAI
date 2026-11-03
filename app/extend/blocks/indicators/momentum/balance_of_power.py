@@ -1,20 +1,7 @@
-"""Balance of Power momentum indicator strategy block.
+"""BalanceOfPower indicator.
 
-Description:
-    Calculates Igor Livshin's Balance of Power (BOP) comparing buyer vs seller
-    ability to push price to extreme levels, smoothed by a moving average.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-balance-of-power: Balance of power computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.balance_of_power import (
-        BalanceOfPower,
-    )
-    res = BalanceOfPower().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Igor Livshin's Balance of Power (BOP) comparing buyer vs seller ability
+  to push price to extreme levels, smoothed by a moving average.
 """
 
 from __future__ import annotations
@@ -45,6 +32,7 @@ _EPSILON: float = 1e-12
 class BalanceOfPower(BaseIndicator):
     """Balance of Power (BOP) indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.balance_of_power",
         version="1.0.0",
@@ -62,26 +50,45 @@ class BalanceOfPower(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Balance of Power"),),
         required_market_inputs=("open", "high", "low", "close"),
-        parameter_search_space={
-            "period": {"type": "int", "min": 1, "max": 100, "default": 14},
-        },
-        is_causal=True,
+        required_history_lookback=14,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "period": {"type": "int", "min": 1, "max": 100, "default": 14}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=14, ge=1)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Balance of Power values over historical bars."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: BalanceOfPower requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         open_arr = np.asarray(bars.open, dtype=np.float64)
         high_arr = np.asarray(bars.high, dtype=np.float64)
         low_arr = np.asarray(bars.low, dtype=np.float64)
@@ -102,4 +109,5 @@ class BalanceOfPower(BaseIndicator):
         return {"value": IndicatorSeries(bop, name="BOP")}
 
 
+# Public exports.
 __all__ = ["BalanceOfPower"]

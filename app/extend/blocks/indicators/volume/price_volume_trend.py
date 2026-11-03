@@ -1,20 +1,7 @@
-"""Price Volume Trend (PVT) strategy block.
+"""PriceVolumeTrend indicator.
 
-Description:
-    Calculates Price Volume Trend (PVT) representing cumulative volume
-    adjusted by percentage changes in closing price.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-price-volume-trend: PVT cumulative computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.price_volume_trend import (
-        PriceVolumeTrend,
-    )
-    res = PriceVolumeTrend().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Price Volume Trend (PVT) representing cumulative volume adjusted by
+  percentage changes in closing price.
 """
 
 from __future__ import annotations
@@ -44,6 +31,7 @@ _MIN_BARS: int = 2
 class PriceVolumeTrend(BaseIndicator):
     """Price Volume Trend (PVT) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.price_volume_trend",
         version="1.0.0",
@@ -59,22 +47,35 @@ class PriceVolumeTrend(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Price Volume Trend"),),
         required_market_inputs=("close", "volume"),
-        parameter_search_space={},
-        is_causal=True,
+        required_history_lookback=2,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={},
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return _MIN_BARS
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Price Volume Trend values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: PriceVolumeTrend requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         close = np.asarray(bars.close, dtype=np.float64)
         volume = np.asarray(bars.volume, dtype=np.float64)
         n = len(close)
@@ -94,4 +95,5 @@ class PriceVolumeTrend(BaseIndicator):
         return {"value": IndicatorSeries(pvt, name="PVT")}
 
 
+# Public exports.
 __all__ = ["PriceVolumeTrend"]

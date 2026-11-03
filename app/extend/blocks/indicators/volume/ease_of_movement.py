@@ -1,20 +1,7 @@
-"""Ease of Movement (EOM) volume indicator strategy block.
+"""EaseOfMovement indicator.
 
-Description:
-    Calculates Richard Arms' Ease of Movement (EOM/EMV) relating price change
-    to volume to assess how easily prices move.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-ease-of-movement: EOM computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.ease_of_movement import (
-        EaseOfMovement,
-    )
-    res = EaseOfMovement().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Richard Arms' Ease of Movement (EOM/EMV) relating price change to
+  volume to assess how easily prices move.
 """
 
 from __future__ import annotations
@@ -46,6 +33,7 @@ _MIN_BARS: int = 2
 class EaseOfMovement(BaseIndicator):
     """Ease of Movement (EOM) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.ease_of_movement",
         version="1.0.0",
@@ -62,6 +50,9 @@ class EaseOfMovement(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Ease of Movement"),),
         required_market_inputs=("high", "low", "volume"),
+        required_history_lookback=15,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 2, "max": 50, "default": 14},
             "divisor": {
@@ -71,24 +62,46 @@ class EaseOfMovement(BaseIndicator):
                 "default": 10000.0,
             },
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period: int = Field(default=14, ge=1)
-    divisor: float = Field(default=10000.0, gt=0.0)
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=14,
+        ge=1,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
 
+    divisor: float = Field(
+        default=10000.0,
+        gt=0.0,
+        title="Divisor",
+        description="Scaling divisor applied to the ease-of-movement value",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return self.period + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Ease of Movement values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: EaseOfMovement requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = np.asarray(bars.high, dtype=np.float64)
         low = np.asarray(bars.low, dtype=np.float64)
         volume = np.asarray(bars.volume, dtype=np.float64)
@@ -114,4 +127,5 @@ class EaseOfMovement(BaseIndicator):
         return {"value": IndicatorSeries(eom, name="EOM")}
 
 
+# Public exports.
 __all__ = ["EaseOfMovement"]

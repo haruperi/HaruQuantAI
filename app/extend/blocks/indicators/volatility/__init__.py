@@ -1,17 +1,4 @@
-"""Volatility indicator package exports and lazy loading registry.
-
-Description:
-    Volatility indicator package exports and lazy loading registry.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volatility indicator library.
-Key Capabilities:
-    - FR-indicator-volatility: Volatility indicator exports.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volatility import ATR, BollingerBands
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
-"""
+"""Volatility indicator package exports and lazy loading registry."""
 
 from __future__ import annotations
 

@@ -1,18 +1,7 @@
-"""Ichimoku trend indicator strategy block.
+"""Ichimoku indicator.
 
-Description:
-    Calculates Ichimoku Kinko Hyo components (Tenkan-sen, Kijun-sen,
-    Senkou Spans, Chikou).
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-trend: Ichimoku cloud and equilibrium lines.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.ichimoku import Ichimoku
-    res = Ichimoku().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates Ichimoku Kinko Hyo components (Tenkan-sen, Kijun-sen, Senkou Spans,
+  Chikou).
 """
 
 from __future__ import annotations
@@ -26,6 +15,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -46,37 +36,91 @@ STRONG_SIGNAL_LEVEL: int = 2
 class Ichimoku(BaseIndicator):
     """Ichimoku Kinko Hyo indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.ichimoku",
+        version="1.0.0",
         name="Ichimoku",
+        description=(
+            "Calculates Ichimoku Kinko Hyo components (Tenkan-sen, Kijun-sen,"
+            " Senkou Spans, Chikou)."
+        ),
         category="trend",
+        tags=("trend", "ichimoku"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.MAIN,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("tenkan_sen", PortType.SERIES),
-            OutputPort("kijun_sen", PortType.SERIES),
-            OutputPort("senkou_span_a", PortType.SERIES),
-            OutputPort("senkou_span_b", PortType.SERIES),
-            OutputPort("chikou_span", PortType.SERIES),
+            OutputPort(
+                "tenkan_sen", PortType.SERIES, description="Tenkan sen output series"
+            ),
+            OutputPort(
+                "kijun_sen", PortType.SERIES, description="Kijun sen output series"
+            ),
+            OutputPort(
+                "senkou_span_a",
+                PortType.SERIES,
+                description="Senkou span a output series",
+            ),
+            OutputPort(
+                "senkou_span_b",
+                PortType.SERIES,
+                description="Senkou span b output series",
+            ),
+            OutputPort(
+                "chikou_span", PortType.SERIES, description="Chikou span output series"
+            ),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=78,
+        dependencies=(),
+        is_generation_eligible=False,
         parameter_search_space={
             "tenkan": {"type": "int", "min": 1, "max": 36, "default": 9},
             "kijun": {"type": "int", "min": 1, "max": 104, "default": 26},
             "senkou": {"type": "int", "min": 1, "max": 208, "default": 52},
         },
+        is_deterministic=True,
         is_causal=False,
-        is_generation_eligible=False,
-        required_history_lookback=78,
+        supports_incremental=False,
     )
-    tenkan: int = Field(default=DEFAULT_TENKAN, ge=1)
-    kijun: int = Field(default=DEFAULT_KIJUN, ge=1)
-    senkou: int = Field(default=DEFAULT_SENKOU, ge=1)
 
+    # Parameters: validated user settings.
+    tenkan: int = Field(
+        default=DEFAULT_TENKAN,
+        ge=1,
+        title="Tenkan",
+        description="Number of bars in the Ichimoku conversion line",
+    )
+
+    kijun: int = Field(
+        default=DEFAULT_KIJUN,
+        ge=1,
+        title="Kijun",
+        description="Number of bars in the Ichimoku base line",
+    )
+
+    senkou: int = Field(
+        default=DEFAULT_SENKOU,
+        ge=1,
+        title="Senkou",
+        description="Number of bars in the Ichimoku leading span B window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -84,15 +128,24 @@ class Ichimoku(BaseIndicator):
             raise ValueError("All lookback periods must be >= 1")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return max(self.tenkan, self.kijun, self.senkou) + self.kijun
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: Ichimoku requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -127,6 +180,7 @@ class Ichimoku(BaseIndicator):
             "chikou_span": IndicatorSeries(cs_vals, name=f"ChikouSpan({kijun})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @staticmethod
     def _calc_tenkan_kijun(
         h_arr: np.ndarray[Any, Any],
@@ -449,3 +503,7 @@ class Ichimoku(BaseIndicator):
                 float(c[curr]), sa, sb, curr, signal_strength
             )
         return True
+
+
+# Public exports.
+__all__ = ["Ichimoku"]

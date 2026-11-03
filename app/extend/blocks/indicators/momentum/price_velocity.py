@@ -1,17 +1,6 @@
-"""PriceVelocity momentum indicator strategy block.
+"""PriceVelocity indicator.
 
-Description:
-    Calculates price change velocity per bar over lookback window.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-momentum: Price velocity calculation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.price_velocity import PriceVelocity
-    res = PriceVelocity().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Calculates price change velocity per bar over lookback window.
 """
 
 from __future__ import annotations
@@ -25,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -52,28 +42,61 @@ EPSILON: float = 1e-12
 class PriceVelocity(BaseIndicator):
     """Price velocity and momentum acceleration indicator block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.price_velocity",
+        version="1.0.0",
         name="PriceVelocity",
+        description="Calculates price change velocity per bar over lookback window.",
         category="momentum",
+        tags=("momentum", "price-velocity"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
-        inputs=(InputPort("close", PortType.SERIES, required=True),),
+        inputs=(
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
+        ),
         outputs=(
-            OutputPort("velocity", PortType.SERIES),
-            OutputPort("normalized", PortType.SERIES),
+            OutputPort(
+                "velocity", PortType.SERIES, description="Velocity output series"
+            ),
+            OutputPort(
+                "normalized", PortType.SERIES, description="Normalized output series"
+            ),
         ),
         required_market_inputs=("close",),
+        required_history_lookback=11,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period": {"type": "int", "min": 1, "max": 40, "default": 10},
             "smooth_period": {"type": "int", "min": 1, "max": 4, "default": 1},
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=11,
+        supports_incremental=False,
     )
-    period: int = Field(default=DEFAULT_VELOCITY_PERIOD, ge=MIN_VELOCITY_PERIOD)
-    smooth_period: int = Field(default=DEFAULT_SMOOTH_PERIOD, ge=1)
 
+    # Parameters: validated user settings.
+    period: int = Field(
+        default=DEFAULT_VELOCITY_PERIOD,
+        ge=MIN_VELOCITY_PERIOD,
+        title="Period",
+        description="Number of bars in the calculation window",
+    )
+
+    smooth_period: int = Field(
+        default=DEFAULT_SMOOTH_PERIOD,
+        ge=1,
+        title="Smooth period",
+        description="Number of bars in the smooth window",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -85,15 +108,26 @@ class PriceVelocity(BaseIndicator):
             raise ValueError(f"smooth_period must be >= 1, got {self.smooth_period}")
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.period + self.smooth_period
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: PriceVelocity requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         price = bars.close
         period = self.period
         smooth_period = self.smooth_period
@@ -111,6 +145,7 @@ class PriceVelocity(BaseIndicator):
             "normalized": IndicatorSeries(norm, name=f"PriceVelocityNorm({period})"),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_velocity(
         cls, p_arr: np.ndarray[Any, Any], period: int, smooth_period: int, n: int
@@ -186,3 +221,7 @@ class PriceVelocity(BaseIndicator):
         """True if velocity is falling between shift+1 and shift."""
         logger.info("Evaluating PriceVelocity is_falling at shift=%d", shift)
         return is_falling(velocity, shift=shift)
+
+
+# Public exports.
+__all__ = ["PriceVelocity"]

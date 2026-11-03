@@ -1,18 +1,7 @@
-"""Net Volume strategy block.
+"""NetVolume indicator.
 
-Description:
-    Calculates Net Volume per bar as signed volume: positive on up bars,
-    negative on down bars, and zero on unchanged bars.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative volume indicator library.
-Key Capabilities:
-    - FR-indicator-net-volume: Net volume computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.volume.net_volume import NetVolume
-    res = NetVolume().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Net Volume per bar as signed volume: positive on up bars, negative on
+  down bars, and zero on unchanged bars.
 """
 
 from __future__ import annotations
@@ -39,6 +28,7 @@ logger = get_logger(__name__)
 class NetVolume(BaseIndicator):
     """Net Volume block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.volume.net_volume",
         version="1.0.0",
@@ -55,22 +45,33 @@ class NetVolume(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Net Volume"),),
         required_market_inputs=("open", "close", "volume"),
-        parameter_search_space={},
-        is_causal=True,
+        required_history_lookback=1,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={},
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Net Volume values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug("FR-indicator-calculation: NetVolume requested bars=%d", len(bars))
+        bars.require_inputs(self.required_inputs())
         open_arr = np.asarray(bars.open, dtype=np.float64)
         close_arr = np.asarray(bars.close, dtype=np.float64)
         volume = np.asarray(bars.volume, dtype=np.float64)
@@ -86,4 +87,5 @@ class NetVolume(BaseIndicator):
         return {"value": IndicatorSeries(net_vol, name="NetVolume")}
 
 
+# Public exports.
 __all__ = ["NetVolume"]

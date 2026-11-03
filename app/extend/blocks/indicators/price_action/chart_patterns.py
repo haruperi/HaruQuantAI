@@ -1,19 +1,6 @@
-"""ChartPatterns price_action indicator strategy block.
+"""ChartPatterns indicator.
 
-Description:
-    Detects geometric classical chart formations and channel breakouts.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative indicator library.
-Key Capabilities:
-    - FR-indicator-price-action: Chart pattern recognition.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.price_action.chart_patterns import (
-        ChartPatterns,
-    )
-    res = ChartPatterns().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_indicator_families.py --no-cov
+- Detects geometric classical chart formations and channel breakouts.
 """
 
 from __future__ import annotations
@@ -27,6 +14,7 @@ from app.core.host.logging import get_logger
 from app.core.trading.blocks.metadata import (
     BlockSpec,
     ChartPane,
+    ExecutionKind,
     InputPort,
     OutputPort,
     PortType,
@@ -48,21 +36,48 @@ EPSILON: float = 1e-12
 class ChartPatterns(BaseIndicator):
     """Multi-structural chart pattern recognizer."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.price_action.chart_patterns",
+        version="1.0.0",
         name="ChartPatterns",
+        description=(
+            "Detects geometric classical chart formations and channel breakouts."
+        ),
         category="price_action",
+        tags=("price_action", "chart-patterns"),
+        execution_kind=ExecutionKind.EXPRESSION,
         chart_pane=ChartPane.SUB,
         inputs=(
-            InputPort("high", PortType.SERIES, required=True),
-            InputPort("low", PortType.SERIES, required=True),
-            InputPort("close", PortType.SERIES, required=True),
+            InputPort(
+                "high", PortType.SERIES, required=True, description="High input series"
+            ),
+            InputPort(
+                "low", PortType.SERIES, required=True, description="Low input series"
+            ),
+            InputPort(
+                "close",
+                PortType.SERIES,
+                required=True,
+                description="Close input series",
+            ),
         ),
         outputs=(
-            OutputPort("double_pattern", PortType.SERIES),
-            OutputPort("breakout_retest", PortType.SERIES),
+            OutputPort(
+                "double_pattern",
+                PortType.SERIES,
+                description="Double pattern output series",
+            ),
+            OutputPort(
+                "breakout_retest",
+                PortType.SERIES,
+                description="Breakout retest output series",
+            ),
         ),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=50,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "lookback": {"type": "int", "min": 10, "max": 200, "default": 50},
             "tolerance_pct": {
@@ -74,13 +89,28 @@ class ChartPatterns(BaseIndicator):
                 "max_exclusive": True,
             },
         },
+        is_deterministic=True,
         is_causal=True,
-        is_generation_eligible=True,
-        required_history_lookback=50,
+        supports_incremental=False,
     )
-    lookback: int = Field(default=DEFAULT_CHART_LOOKBACK, ge=MIN_CHART_LOOKBACK)
-    tolerance_pct: float = Field(default=DEFAULT_TOLERANCE_PCT, lt=1.0, gt=0.0)
 
+    # Parameters: validated user settings.
+    lookback: int = Field(
+        default=DEFAULT_CHART_LOOKBACK,
+        ge=MIN_CHART_LOOKBACK,
+        title="Lookback",
+        description="Number of historical bars examined for patterns or levels",
+    )
+
+    tolerance_pct: float = Field(
+        default=DEFAULT_TOLERANCE_PCT,
+        lt=1.0,
+        gt=0.0,
+        title="Tolerance pct",
+        description="Tolerance pct used by the indicator calculation",
+    )
+
+    # Parameter validation: only relationships and custom constraints.
     @model_validator(mode="after")
     def validate_bounds(self) -> Self:
         """Validate domain-specific bounds before batch execution."""
@@ -94,15 +124,26 @@ class ChartPatterns(BaseIndicator):
             )
         return self
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return the history needed before initialized outputs can be consumed."""
         return self.lookback
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute named batch outputs from validated settings and market data."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: ChartPatterns requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = bars.high
         low = bars.low
         close = bars.close
@@ -132,6 +173,7 @@ class ChartPatterns(BaseIndicator):
             ),
         }
 
+    # Specialized methods: indicator-specific behavior only.
     @classmethod
     def _compute_chart_patterns(
         cls,
@@ -204,3 +246,7 @@ class ChartPatterns(BaseIndicator):
         return is_lower(
             breakout_series, -PATTERN_THRESHOLD, shift1=shift, round_digits=8
         )
+
+
+# Public exports.
+__all__ = ["ChartPatterns"]

@@ -1,20 +1,7 @@
-"""Accumulative Swing Index (ASI) trend indicator block.
+"""AccumulativeSwingIndex indicator.
 
-Description:
-    Calculates Welles Wilder's Accumulative Swing Index (ASI) tracking
-    cumulative breakout points across Open, High, Low, and Close prices.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative trend indicator library.
-Key Capabilities:
-    - FR-indicator-accumulative-swing-index: ASI computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.trend.accumulative_swing_index import (
-        AccumulativeSwingIndex,
-    )
-    res = AccumulativeSwingIndex().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Welles Wilder's Accumulative Swing Index (ASI) tracking cumulative
+  breakout points across Open, High, Low, and Close prices.
 """
 
 from __future__ import annotations
@@ -42,32 +29,10 @@ _SCALE_50: float = 50.0
 _MIN_BARS: int = 2
 
 
-def _wilder_si(
-    curr_ohlc: tuple[float, float, float, float],
-    prev_oc: tuple[float, float],
-    limit: float,
-) -> float:
-    open_p, high_p, low_p, close_p = curr_ohlc
-    c_prev, o_prev = prev_oc
-    k = max(high_p - c_prev, c_prev - low_p)
-    diff_hc = abs(high_p - c_prev)
-    diff_lc = abs(low_p - c_prev)
-    diff_hl = high_p - low_p
-    if diff_hc >= diff_lc and diff_hc >= diff_hl:
-        r = diff_hc - 0.5 * diff_lc + 0.25 * abs(c_prev - o_prev)
-    elif diff_lc >= diff_hc and diff_lc >= diff_hl:
-        r = diff_lc - 0.5 * diff_hc + 0.25 * abs(c_prev - o_prev)
-    else:
-        r = diff_hl + 0.25 * abs(c_prev - o_prev)
-    if r == 0.0 or limit == 0.0:
-        return 0.0
-    num = (close_p - c_prev) + 0.5 * (close_p - open_p) + 0.25 * (c_prev - o_prev)
-    return float(_SCALE_50 * (num / r) * (k / limit))
-
-
 class AccumulativeSwingIndex(BaseIndicator):
     """Accumulative Swing Index (ASI) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.trend.accumulative_swing_index",
         version="1.0.0",
@@ -85,26 +50,46 @@ class AccumulativeSwingIndex(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Accumulative Swing Index"),),
         required_market_inputs=("open", "high", "low", "close"),
-        parameter_search_space={
-            "limit_move": {"type": "float", "min": 0.1, "max": 100.0, "default": 10.0},
-        },
-        is_causal=True,
+        required_history_lookback=2,
+        dependencies=(),
         is_generation_eligible=True,
+        parameter_search_space={
+            "limit_move": {"type": "float", "min": 0.1, "max": 100.0, "default": 10.0}
+        },
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    limit_move: float = Field(default=10.0, gt=0.0)
+    # Parameters: validated user settings.
+    limit_move: float = Field(
+        default=10.0,
+        gt=0.0,
+        title="Limit move",
+        description="Limit move used by the indicator calculation",
+    )
 
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return _MIN_BARS
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Accumulative Swing Index values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: AccumulativeSwingIndex requested bars=%d",
+            len(bars),
+        )
+        bars.require_inputs(self.required_inputs())
         open_arr = np.asarray(bars.open, dtype=np.float64)
         high_arr = np.asarray(bars.high, dtype=np.float64)
         low_arr = np.asarray(bars.low, dtype=np.float64)
@@ -129,4 +114,29 @@ class AccumulativeSwingIndex(BaseIndicator):
         return {"value": IndicatorSeries(asi, name="ASI")}
 
 
+# Private helpers: used only by this indicator.
+def _wilder_si(
+    curr_ohlc: tuple[float, float, float, float],
+    prev_oc: tuple[float, float],
+    limit: float,
+) -> float:
+    open_p, high_p, low_p, close_p = curr_ohlc
+    c_prev, o_prev = prev_oc
+    k = max(high_p - c_prev, c_prev - low_p)
+    diff_hc = abs(high_p - c_prev)
+    diff_lc = abs(low_p - c_prev)
+    diff_hl = high_p - low_p
+    if diff_hc >= diff_lc and diff_hc >= diff_hl:
+        r = diff_hc - 0.5 * diff_lc + 0.25 * abs(c_prev - o_prev)
+    elif diff_lc >= diff_hc and diff_lc >= diff_hl:
+        r = diff_lc - 0.5 * diff_hc + 0.25 * abs(c_prev - o_prev)
+    else:
+        r = diff_hl + 0.25 * abs(c_prev - o_prev)
+    if r == 0.0 or limit == 0.0:
+        return 0.0
+    num = (close_p - c_prev) + 0.5 * (close_p - open_p) + 0.25 * (c_prev - o_prev)
+    return float(_SCALE_50 * (num / r) * (k / limit))
+
+
+# Public exports.
 __all__ = ["AccumulativeSwingIndex"]

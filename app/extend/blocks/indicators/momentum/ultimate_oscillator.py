@@ -1,20 +1,7 @@
-"""Ultimate Oscillator momentum strategy block.
+"""UltimateOscillator indicator.
 
-Description:
-    Calculates Larry Williams' Ultimate Oscillator combining buying pressure
-    across three distinct timeframes (7, 14, 28) with weighted coefficients.
-Purpose:
-    FEAT-INDICATORS-BLOCKS: Quantitative momentum indicator library.
-Key Capabilities:
-    - FR-indicator-ultimate-oscillator: Ultimate oscillator computation.
-    - FR-indicator-logging: Non-silent calculation diagnostics.
-Python API Usage:
-    from app.extend.blocks.indicators.momentum.ultimate_oscillator import (
-        UltimateOscillator,
-    )
-    res = UltimateOscillator().calculate(bars)
-CLI Usage:
-    uv run pytest tests/extend/blocks/test_tradingview_indicators.py --no-cov
+- Calculates Larry Williams' Ultimate Oscillator combining buying pressure across
+  three distinct timeframes (7, 14, 28) with weighted coefficients.
 """
 
 from __future__ import annotations
@@ -43,18 +30,10 @@ _SCALE_100: float = 100.0
 _MIN_BARS: int = 2
 
 
-def _rolling_sum(x: np.ndarray, p: int) -> np.ndarray:
-    n = len(x)
-    res = np.full(n, np.nan, dtype=np.float64)
-    if n >= p:
-        cs = np.insert(np.cumsum(x), 0, 0.0)
-        res[p - 1 :] = cs[p:] - cs[:-p]
-    return res
-
-
 class UltimateOscillator(BaseIndicator):
     """Ultimate Oscillator (UO) block."""
 
+    # Metadata: catalog identity, ports, and execution capabilities.
     spec: ClassVar[BlockSpec] = BlockSpec(
         id="indicator.momentum.ultimate_oscillator",
         version="1.0.0",
@@ -71,30 +50,61 @@ class UltimateOscillator(BaseIndicator):
         ),
         outputs=(OutputPort("value", PortType.SERIES, "Ultimate Oscillator"),),
         required_market_inputs=("high", "low", "close"),
+        required_history_lookback=29,
+        dependencies=(),
+        is_generation_eligible=True,
         parameter_search_space={
             "period1": {"type": "int", "min": 2, "max": 20, "default": 7},
             "period2": {"type": "int", "min": 5, "max": 40, "default": 14},
             "period3": {"type": "int", "min": 10, "max": 80, "default": 28},
         },
-        is_causal=True,
-        is_generation_eligible=True,
         is_deterministic=True,
+        is_causal=True,
         supports_incremental=False,
     )
 
-    period1: int = Field(default=7, ge=1)
-    period2: int = Field(default=14, ge=1)
-    period3: int = Field(default=28, ge=1)
+    # Parameters: validated user settings.
+    period1: int = Field(
+        default=7,
+        ge=1,
+        title="Period1",
+        description="Number of bars in the first calculation window",
+    )
 
+    period2: int = Field(
+        default=14,
+        ge=1,
+        title="Period2",
+        description="Number of bars in the second calculation window",
+    )
+
+    period3: int = Field(
+        default=28,
+        ge=1,
+        title="Period3",
+        description="Number of bars in the third calculation window",
+    )
+
+    # Required inputs: feeds needed by the selected settings.
+    @override
+    def required_inputs(self) -> tuple[str, ...]:
+        """Return the market inputs needed by the selected settings."""
+        return self.spec.required_market_inputs
+
+    # Required history: retain the calculation's startup behavior.
     @override
     def required_history(self) -> int:
         """Return minimum history bars needed for valid calculation."""
         return max(self.period1, self.period2, self.period3) + 1
 
+    # Calculation: log, check inputs, and return named aligned outputs.
     @override
     def calculate(self, bars: BarData) -> dict[str, IndicatorSeries]:
         """Compute Ultimate Oscillator values."""
-        bars.require_inputs(self.spec.required_market_inputs)
+        logger.debug(
+            "FR-indicator-calculation: UltimateOscillator requested bars=%d", len(bars)
+        )
+        bars.require_inputs(self.required_inputs())
         high = np.asarray(bars.high, dtype=np.float64)
         low = np.asarray(bars.low, dtype=np.float64)
         close = np.asarray(bars.close, dtype=np.float64)
@@ -127,4 +137,15 @@ class UltimateOscillator(BaseIndicator):
         return {"value": IndicatorSeries(uo, name="UO")}
 
 
+# Private helpers: used only by this indicator.
+def _rolling_sum(x: np.ndarray, p: int) -> np.ndarray:
+    n = len(x)
+    res = np.full(n, np.nan, dtype=np.float64)
+    if n >= p:
+        cs = np.insert(np.cumsum(x), 0, 0.0)
+        res[p - 1 :] = cs[p:] - cs[:-p]
+    return res
+
+
+# Public exports.
 __all__ = ["UltimateOscillator"]
