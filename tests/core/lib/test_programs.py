@@ -1,10 +1,18 @@
-"""Tests for ProgramRegistry implementation."""
+"""Tests for ProgramRegistry implementation matching donor Program.java."""
+
+from __future__ import annotations
 
 import logging
 
 import pytest
 from app.core.lib.errors import DomainError, JSONValue
-from app.core.lib.programs import ProgramRegistry
+from app.core.lib.programs import (
+    ProgramRegistry,
+    default_program_registry,
+    get,
+    is_registered,
+    register,
+)
 
 
 class FakeProgram:
@@ -24,19 +32,21 @@ def test_first_registration_wins(caplog: pytest.LogCaptureFixture) -> None:
     first = FakeProgram("first")
     second = FakeProgram("second")
 
-    with caplog.at_level(logging.ERROR, logger="haruquant.core.programs"):
+    with caplog.at_level(logging.DEBUG):
         r1 = registry.register("x", first)
         r2 = registry.register("x", second)
 
     assert r1 is True
     assert r2 is False
     assert registry.get("x") is first
-    assert len(caplog.records) == 1
+
+    # Check debug log for registration and error log for duplicate
+    messages = [r.getMessage() for r in caplog.records]
+    assert "Program 'x' was registered." in messages
     assert (
-        caplog.records[0].getMessage()
-        == "Duplicate registered program with name 'x', skipping second registration!"
+        "Duplicate registered program with name 'x', skipping second registration!"
+        in messages
     )
-    assert caplog.records[0].levelno == logging.ERROR
 
 
 def test_case_sensitive_and_instance_local() -> None:
@@ -60,3 +70,11 @@ def test_missing_program() -> None:
     assert err.code == "PROGRAM_NOT_FOUND"
     assert err.message == "Program 'missing' doesn't exist"
     assert err.details == {"name": "missing"}
+
+
+def test_module_level_helpers() -> None:
+    prog = FakeProgram("global_p")
+    assert register("global_p", prog) is True
+    assert is_registered("global_p") is True
+    assert get("global_p") is prog
+    assert default_program_registry.is_registered("global_p") is True

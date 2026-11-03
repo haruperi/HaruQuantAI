@@ -1,11 +1,50 @@
-"""Named program lookup and registration protocol."""
+"""Named program lookup and registration protocol matching donor Program.java.
 
-import logging
+Description:
+    Provides canonical named program registration and retrieval matching
+    StrategyQuant Program.java runtime behavior. Maintains first-registration-wins
+    semantics and explicit duplicate rejection.
+
+Purpose:
+    FEAT-CORE-LIB-PROGRAMS: Provide verified named program registry utilities.
+
+Key Capabilities:
+    - FR-core-lib-program-register: Register named program with first-wins semantics
+      and non-silent error logging for duplicates.
+    - FR-core-lib-program-lookup: Retrieve registered program or raise DomainError
+      when not found.
+
+Python API Usage:
+    ```python
+    from app.core.lib.programs import ProgramRegistry, get, register
+
+    register("my_plugin", my_instance)
+    prog = get("my_plugin")
+    ```
+
+CLI Usage:
+    ```bash
+    uv run pytest tests/core/lib/test_programs.py -q
+    ```
+"""
+
+from __future__ import annotations
+
 from typing import Protocol
 
+from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError, JSONValue
 
-logger = logging.getLogger("haruquant.core.programs")
+logger = get_logger(__name__)
+
+__all__ = [
+    "Program",
+    "ProgramRegistry",
+    "default_program_registry",
+    "get",
+    "is_registered",
+    "register",
+]
 
 
 class Program(Protocol):
@@ -51,6 +90,7 @@ class ProgramRegistry:
             )
             return False
         self._programs[name] = program
+        logger.debug("Program '%s' was registered.", name)
         return True
 
     def is_registered(self, name: str) -> bool:
@@ -83,3 +123,21 @@ class ProgramRegistry:
                 details={"name": name},
             )
         return self._programs[name]
+
+
+default_program_registry: ProgramRegistry = ProgramRegistry()
+
+
+def register(name: str, program: Program) -> bool:
+    """Register a program in the default global registry."""
+    return default_program_registry.register(name, program)
+
+
+def is_registered(name: str) -> bool:
+    """Check if a program is registered in the default global registry."""
+    return default_program_registry.is_registered(name)
+
+
+def get(name: str) -> Program:
+    """Retrieve a program from the default global registry."""
+    return default_program_registry.get(name)

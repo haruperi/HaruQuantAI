@@ -1,9 +1,11 @@
 """Tests for DomainError and JSONValue handling."""
 
+from __future__ import annotations
+
 from typing import Any
 
 import pytest
-from app.core.lib.errors import DomainError, copy_json
+from app.core.lib.errors import DomainError, SQException, copy_json
 
 
 def test_error_defaults() -> None:
@@ -12,6 +14,13 @@ def test_error_defaults() -> None:
     assert str(err) == "missing"
     assert err.code == "NOT_FOUND"
     assert err.message == "missing"
+
+
+def test_sq_exception_alias() -> None:
+    assert SQException is DomainError
+    err = SQException(code="DONOR_ERR", message="donor failure")
+    assert isinstance(err, DomainError)
+    assert err.code == "DONOR_ERR"
 
 
 def test_error_rejects_invalid_json() -> None:

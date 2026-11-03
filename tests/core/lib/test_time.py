@@ -1,22 +1,48 @@
-"""Unit tests for format_duration_seconds.
-
-Description:
-    Validates canonical duration formatting boundaries: seconds-only, minute-second,
-    hour-minute, and day-hour-minute formats.
-
-Purpose:
-    FEAT-CORE-LIB: Validate core time utilities.
-
-Key Capabilities:
-    - FR-core-lib-format-duration: Test boundary durations.
-"""
+"""Unit tests for format_duration_seconds and TimePeriod models."""
 
 from __future__ import annotations
 
 import logging
 
 import pytest
-from app.core.lib.time import format_duration_seconds
+from app.core.lib.time import (
+    DAY_MILLIS,
+    HOUR_MILLIS,
+    MINUTE_MILLIS,
+    SECOND_MILLIS,
+    TimePeriod,
+    format_duration_seconds,
+)
+
+
+def test_time_constants() -> None:
+    """Verify canonical millisecond constants matching SQTime."""
+    assert SECOND_MILLIS == 1_000
+    assert MINUTE_MILLIS == 60_000
+    assert HOUR_MILLIS == 3_600_000
+    assert DAY_MILLIS == 86_400_000
+
+
+def test_time_period_model_and_clone() -> None:
+    """Verify TimePeriod defaults, attribute storage, and independent clone."""
+    period = TimePeriod(from_ms=1000, to_ms=5000, value=42.5, name="p1", note="sample")
+    assert period.from_ms == 1000
+    assert period.to_ms == 5000
+    assert period.value == 42.5
+    assert period.name == "p1"
+    assert period.note == "sample"
+
+    cloned = period.clone()
+    assert cloned is not period
+    assert cloned.from_ms == 1000
+    assert cloned.to_ms == 5000
+    assert cloned.value == 42.5
+    assert cloned.name == "p1"
+    assert cloned.note == "sample"
+
+    # Mutating original does not alter clone
+    period.value = 99.9
+    assert cloned.value == 42.5
 
 
 def test_format_duration_boundaries() -> None:

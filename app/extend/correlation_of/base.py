@@ -29,8 +29,20 @@ from datetime import UTC, datetime, timedelta
 from typing import Literal
 
 from app.core.host.logging import get_logger
+from app.core.lib.time import TimePeriod
 
 logger = get_logger(__name__)
+
+__all__ = [
+    "DATA_TYPE_PL",
+    "DATA_TYPE_TRADES",
+    "CorrelationOrderRecord",
+    "CorrelationPeriod",
+    "CorrelationType",
+    "TimePeriod",
+    "get_period_bucket",
+    "next_period_bucket",
+]
 
 CorrelationPeriod = Literal["HOUR", "DAY", "WEEK", "MONTH", "YEAR"]
 
@@ -50,15 +62,6 @@ class CorrelationOrderRecord:
     is_canceled: bool = False
     is_open_position: bool = False
     is_long: bool = True
-
-
-@dataclass(slots=True)
-class TimePeriod:
-    """Represents a time period bucket with temporal bounds and metric value."""
-
-    from_ms: int
-    to_ms: int
-    value: float = 0.0
 
 
 def get_period_bucket(t_ms: int, period: CorrelationPeriod) -> int:

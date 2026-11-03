@@ -1,4 +1,34 @@
-"""Domain errors and finite JSON value handling."""
+"""Domain errors and finite JSON value handling matching donor SQException.
+
+Description:
+    Defines canonical domain exceptions and recursive JSON value detachment
+    utilities. Rejects non-finite floats, reference cycles, and non-string keys,
+    preserving immutability and diagnostic safety across host and workspaces.
+
+Purpose:
+    FEAT-CORE-LIB-ERRORS: Provide verified domain exception and JSON isolation
+    primitives.
+
+Key Capabilities:
+    - FR-core-lib-json-copy: Recursively validate and detach finite JSON values,
+      rejecting non-finite numbers and reference cycles.
+    - FR-core-lib-domain-error: Represent typed operational or contract failures with
+      structured, safe JSON details.
+
+Python API Usage:
+    ```python
+    from app.core.lib.errors import DomainError, SQException, copy_json
+
+    raise DomainError(code="INVALID_STATE", message="State invalid", details={"k": "v"})
+    ```
+
+CLI Usage:
+    ```bash
+    uv run pytest tests/core/lib/test_errors.py -q
+    ```
+"""
+
+from __future__ import annotations
 
 import math
 from typing import Any
@@ -6,6 +36,8 @@ from typing import Any
 type JSONValue = (
     bool | int | float | str | list[JSONValue] | dict[str, JSONValue] | None
 )
+
+__all__ = ["DomainError", "JSONValue", "SQException", "copy_json"]
 
 
 def _copy_list(items: list[Any], path_ids: set[int]) -> list[JSONValue]:
@@ -119,3 +151,6 @@ class DomainError(Exception):
             "message": self.message,
             "details": copy_json(self.details),
         }
+
+
+SQException = DomainError
