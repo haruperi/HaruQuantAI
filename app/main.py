@@ -1,21 +1,34 @@
 """Bootstrap the HaruQuantAI FastAPI backend.
 
-Run `python -m app.main` or the `haruquantai` console command to start Uvicorn
-using the stored host.host and host.port settings. ASGI servers can import
-`app.main:app`. Resources initialize during lifespan startup, not import.
-Use `python -m app.main --reload` to restart on Python source changes in app/.
-
 Description:
-    Creates the HTTP application and owns service startup and shutdown.
+    Creates the HTTP application and composition root, owning host service
+    lifespan, settings reload, diagnostic telemetry, workspace directory
+    verification, and reverse teardown on termination. Run `python -m app.main`
+    to start Uvicorn using stored host and port settings. ASGI servers can
+    import `app.main:app`. Resources initialize during lifespan startup, not
+    module import.
+
 Purpose:
-    FEAT-HOST-LIFECYCLE: Release host resources, including editor job workers.
+    FEAT-HOST-LIFECYCLE: Unified composition root, diagnostics, and graceful
+    service lifecycle.
+
 Key Capabilities:
-    - FR-host-editor-job-lifecycle: Shut down editor workers through host lifespan;
-      lifecycle tests verify completion logs and isolated resource release.
+    - FR-HOST-LIFECYCLE-STARTUP-INIT: Composition root startup (create_app -> INFO).
+    - FR-HOST-LIFECYCLE-SERVICE-ROLLBACK: Rollback on error (lifespan -> ERROR).
+    - FR-HOST-LIFECYCLE-JOB-SHUTDOWN: Worker stop (_shutdown_workspace_jobs -> INFO).
+    - FR-HOST-LIFECYCLE-REVERSE-TEARDOWN: Reverse teardown (lifespan -> INFO).
+
 Python API Usage:
+    ```python
+    from app.main import create_app
+
     application = create_app()
+    ```
+
 CLI Usage:
+    ```bash
     uv run python -m app.main
+    ```
 """
 
 from __future__ import annotations
@@ -26,14 +39,20 @@ from asyncio import to_thread
 from collections.abc import AsyncGenerator, Callable, Mapping, Sequence
 from contextlib import AbstractAsyncContextManager, asynccontextmanager
 from pathlib import Path
+from typing import Any
 
 import uvicorn
 from fastapi import FastAPI, Request, Response
 
 from app.core.data.catalog import DataCatalog
-from app.core.host.logging import get_logger, shutdown_logging
+from app.core.host.logging import (
+    configure_logging_from_settings,
+    emit_startup_diagnostics,
+    get_logger,
+    shutdown_logging,
+)
 from app.core.host.persistence import HostPersistence
-from app.core.host.resources import ResourceMonitor
+from app.core.host.resources import ResourceMonitor, inspect_workspace_directories
 from app.core.host.session import SessionManager
 from app.core.host.settings import SettingsManager
 from app.core.host.transport import CredentialTester, install_transport
@@ -195,6 +214,44 @@ def _register_routers(application: FastAPI) -> None:
     application.include_router(home_router)
 
 
+def _run_startup_diagnostics(settings: Any) -> None:
+    """Execute non-fatal logging configuration and environment diagnostics."""
+    try:
+        configure_logging_from_settings(settings)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Troubleshooting logging setup skipped: %s", exc)
+    try:
+        emit_startup_diagnostics(app_version="1.0.0", settings=settings)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Startup diagnostics emission skipped: %s", exc)
+    try:
+        inspect_workspace_directories(settings)
+    except Exception as exc:  # noqa: BLE001
+        logger.debug("Workspace directories inspection skipped: %s", exc)
+
+
+async def _teardown_services(application: FastAPI) -> None:
+    """Cleanly stop workers, close external connections, and detach state."""
+    try:
+        await _shutdown_workspace_jobs(application)
+    finally:
+        try:
+            if (mt5 := getattr(application.state, "data_mt5", None)) is not None:
+                await mt5.close()
+        finally:
+            for name in (
+                "data_mt5",
+                "home_service",
+                "data_catalog",
+                "data_logs",
+                "sessions",
+                "settings",
+                "persistence",
+            ):
+                if hasattr(application.state, name):
+                    delattr(application.state, name)
+
+
 def _create_lifespan(
     persistence: HostPersistence | None = None,
     projects_dir: Path | None = None,
@@ -213,6 +270,7 @@ def _create_lifespan(
             raise
         application.state.persistence = gateway
         application.state.settings = settings
+        _run_startup_diagnostics(settings)
         try:
             application.state.data_logs = Logs()
             job_manager = JobManager(
@@ -248,27 +306,8 @@ def _create_lifespan(
             yield
         finally:
             logger.info("Backend shutting down")
-            try:
-                await _shutdown_workspace_jobs(application)
-            finally:
-                try:
-                    if (
-                        mt5 := getattr(application.state, "data_mt5", None)
-                    ) is not None:
-                        await mt5.close()
-                finally:
-                    for name in (
-                        "data_mt5",
-                        "home_service",
-                        "data_catalog",
-                        "data_logs",
-                        "sessions",
-                        "settings",
-                        "persistence",
-                    ):
-                        if hasattr(application.state, name):
-                            delattr(application.state, name)
-                    logger.info("Backend shutdown completed")
+            await _teardown_services(application)
+            logger.info("Backend shutdown completed")
 
     return lifespan
 
@@ -335,6 +374,7 @@ def main(argv: Sequence[str] | None = None) -> None:
             or not 1 <= port <= _MAX_PORT
         ):
             raise ValueError("host.port must be an integer between 1 and 65535")
+        _run_startup_diagnostics(settings)
         logger.info(
             "Starting backend server; host=%s; port=%d; reload=%s",
             host,

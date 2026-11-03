@@ -1,13 +1,32 @@
 """Headless HaruQuantAI commands; run `uv run python -m app.cli health`.
 
-Commands use host services directly without importing the web entry point or
-starting an HTTP server. Health emits a JSON StandardResponse on stdout and
-returns exit code 0 when healthy, 1 on failure, or 2 for invalid CLI arguments.
-Central logging writes operational messages separately from command output.
-Use `login --username NAME` to prompt for a password and receive a token, then
-set HARUQUANTAI_SESSION_TOKEN in the calling shell. Health validates and refreshes
-that session when supplied; without a token it remains a public local probe.
-Use `logout` to revoke the token. CLI sessions persist with peer_id="cli".
+Description:
+    Provides headless CLI operations using host services directly without
+    importing the web entrypoint or starting an HTTP server. Emits structured
+    JSON StandardResponse outputs and logs operational messages to the central
+    logging subsystem. Supports authentication login, token revocation logout,
+    and local storage/settings health inspection.
+
+Purpose:
+    FEAT-HOST-CLI: Headless host administration, authentication, and health.
+
+Key Capabilities:
+    - FR-HOST-CLI-COMMANDS: Headless host commands (login, logout -> INFO).
+    - FR-HOST-CLI-DIAGNOSTICS: Host storage/settings probe (health -> INFO).
+
+Python API Usage:
+    ```python
+    from app.cli import health, login, logout
+
+    result = health()
+    ```
+
+CLI Usage:
+    ```bash
+    uv run python -m app.cli health
+    uv run python -m app.cli login --username admin
+    uv run python -m app.cli logout
+    ```
 """
 
 from __future__ import annotations

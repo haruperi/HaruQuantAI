@@ -183,3 +183,40 @@ def test_catalog_startup_failure_releases_workers(monkeypatch):
     jobs.shutdown.assert_called_once_with(wait=True, cancel_futures=True)
     for name in ("job_manager", "persistence", "settings", "data_catalog", "data_logs"):
         assert not hasattr(application.state, name)
+
+
+def test_lifespan_invokes_diagnostics_and_directory_inspection(monkeypatch):
+    settings = Mock()
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    mock_conf_log = Mock()
+    mock_emit_diag = Mock()
+    mock_inspect_dirs = Mock()
+    monkeypatch.setattr(backend, "configure_logging_from_settings", mock_conf_log)
+    monkeypatch.setattr(backend, "emit_startup_diagnostics", mock_emit_diag)
+    monkeypatch.setattr(backend, "inspect_workspace_directories", mock_inspect_dirs)
+    gateway = Mock()
+    gateway.read_records.return_value = {"success": True, "data": {"records": []}}
+    application = backend.create_app(gateway)
+    with TestClient(application):
+        mock_conf_log.assert_called_once_with(settings)
+        mock_emit_diag.assert_called_once_with(app_version="1.0.0", settings=settings)
+        mock_inspect_dirs.assert_called_once_with(settings)
+
+
+def test_main_invokes_startup_diagnostics(monkeypatch):
+    settings = Mock()
+    settings.get.side_effect = ["127.0.0.1", 8000]
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    mock_conf_log = Mock()
+    mock_emit_diag = Mock()
+    mock_inspect_dirs = Mock()
+    monkeypatch.setattr(backend, "configure_logging_from_settings", mock_conf_log)
+    monkeypatch.setattr(backend, "emit_startup_diagnostics", mock_emit_diag)
+    monkeypatch.setattr(backend, "inspect_workspace_directories", mock_inspect_dirs)
+    monkeypatch.setattr(backend.uvicorn, "run", Mock())
+    monkeypatch.setattr(backend, "shutdown_logging", Mock())
+
+    backend.main([])
+    mock_conf_log.assert_called_once_with(settings)
+    mock_emit_diag.assert_called_once_with(app_version="1.0.0", settings=settings)
+    mock_inspect_dirs.assert_called_once_with(settings)
