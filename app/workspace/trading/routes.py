@@ -43,7 +43,8 @@ from app.core.enums import (
 )
 from app.core.host.logging import get_logger
 from app.core.trading.connection.base import TradingClient
-from app.core.trading.strategy.contracts import StrategyDocument
+from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+from app.core.trading.strategy.hsl.models import HSLStrategyDocument
 from app.workspace.trading.brokers.registry import default_broker_registry
 from app.workspace.trading.risk_guard import RiskGuard
 from app.workspace.trading.supervisor import (
@@ -104,7 +105,9 @@ class DeployStrategyRequest(BaseModel):
     strategy_id: str = Field(description="Strategy ID")
     symbol: str = Field(description="Symbol to trade")
     connection_id: str = Field(description="Broker connection ID")
-    timeframe: str = Field(default="PERIOD_H1", description="Timeframe")
+    timeframe: str = Field(default="H1", description="Timeframe")
+    document: HSLStrategyDocument | None = None
+    allow_order_submission: bool = False
 
 
 async def broadcast_ws(event_type: str, data: dict[str, Any]) -> None:
@@ -318,12 +321,19 @@ async def deploy_strategy(req: DeployStrategyRequest) -> dict[str, Any]:
         req.strategy_id,
         req.symbol,
     )
-    doc = StrategyDocument(strategy_id=req.strategy_id, rules=())
+    if req.document is None or req.document.strategy.id != req.strategy_id:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=422, detail="A matching canonical HSL document is required"
+        )
+    doc = StrategyCompiler().compile_to_runtime(req.document)
     spec = StrategyDeploySpec(
         strategy_doc=doc,
         symbol=req.symbol,
         connection_id=req.connection_id,
-        timeframe=Timeframe.PERIOD_H1,
+        timeframe=Timeframe(req.timeframe.removeprefix("PERIOD_")),
+        allow_order_submission=req.allow_order_submission,
     )
     session = _supervisor.start_strategy(spec)
     return {

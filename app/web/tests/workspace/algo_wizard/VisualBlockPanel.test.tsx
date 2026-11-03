@@ -27,17 +27,17 @@ describe("VisualBlockPanel (Phase 5.9: I-ServletAlgoWizard)", () => {
     expect(html).toContain("Missing Symbols: GBPUSD");
     expect(html).toContain("Missing Timeframes: M5");
     expect(html).toContain("Missing Blocks: custom.missing_filter");
-    expect(html).toContain("Wizard Backtest Preview (wz-bt-001)");
-    expect(html).toContain("Net PnL: 245.50");
+    expect(html).toContain("No backtest has been run.");
+    expect(html).not.toContain("Net PnL:");
   });
 
   it("negates comparison, not, and De Morgan logical conditions deterministically", () => {
     const crossesAbove: HSLConditionNode = {
       type: "comparison",
-      operator: "comparison.crosses_above",
+      operator: "crosses_above",
     };
     const crossesBelow = negateHSLCondition(crossesAbove);
-    expect(crossesBelow.operator).toBe("comparison.crosses_below");
+    expect(crossesBelow.operator).toBe("crosses_below");
 
     const doubleNegated = negateHSLCondition({
       type: "not",
@@ -49,16 +49,16 @@ describe("VisualBlockPanel (Phase 5.9: I-ServletAlgoWizard)", () => {
       type: "logical",
       operator: "and",
       conditions: [
-        { type: "comparison", operator: "comparison.greater_than" },
-        { type: "comparison", operator: "comparison.equal" },
+        { type: "comparison", operator: "greater_than" },
+        { type: "comparison", operator: "equal" },
       ],
     };
     const distributed = negateHSLCondition(compoundAnd, true);
     expect(distributed.type).toBe("logical");
     expect(distributed.operator).toBe("or");
     expect(distributed.conditions?.map((c) => c.operator)).toEqual([
-      "comparison.less_or_equal",
-      "comparison.not_equal",
+      "less_or_equal",
+      "not_equal",
     ]);
   });
 });

@@ -42,10 +42,10 @@ const DEFAULT_CUSTOM_BLOCKS: readonly CustomBlockDefinition[] = [
     },
     condition: {
       type: "comparison",
-      operator: "comparison.less_than",
+      operator: "less_than",
       left: {
         type: "indicator",
-        indicator_id: "indicator.rsi",
+        name: "indicator.rsi",
         params: { period: { type: "value", value: 14 } },
       },
       right: { type: "parameter", name: "threshold" },
@@ -69,34 +69,13 @@ const DEFAULT_RESOURCE_CHECK: ResourceCheckResult = {
   missing_blocks: [],
 };
 
-const DEFAULT_BACKTEST_RESULT: WizardBacktestResult = {
-  run_id: "wz-bt-001",
-  strategy_id: DEFAULT_HSL_STRATEGY_DOCUMENT.strategy.id,
-  status: "COMPLETED",
-  bars_processed: 120,
-  orders_submitted: 4,
-  ending_position: 0,
-  net_pnl: 245.5,
-  ending_equity: 10245.5,
-  trade_log: [
-    {
-      bar_index: 12,
-      timestamp: "2026-01-01T12:00:00Z",
-      action: "enter_market",
-      side: "long",
-      price: 1.085,
-      quantity: 1.0,
-    },
-  ],
-};
-
 export function VisualBlockPanel({
   condition = DEFAULT_HSL_STRATEGY_DOCUMENT.strategy.rules[0].when,
   distributeLogical = false,
   customBlocks = DEFAULT_CUSTOM_BLOCKS,
   blockGroups = DEFAULT_BLOCK_GROUPS,
   resourceCheck = DEFAULT_RESOURCE_CHECK,
-  backtestResult = DEFAULT_BACKTEST_RESULT,
+  backtestResult,
   onNegateCondition,
   onSaveCustomBlocks,
   onSaveBlockGroups,
@@ -165,10 +144,7 @@ export function VisualBlockPanel({
             </li>
           ))}
         </ul>
-        <button
-          type="button"
-          onClick={() => onSaveBlockGroups?.(blockGroups)}
-        >
+        <button type="button" onClick={() => onSaveBlockGroups?.(blockGroups)}>
           Save Block Groups
         </button>
       </div>
@@ -195,46 +171,50 @@ export function VisualBlockPanel({
               </li>
             )}
             {resourceCheck.missing_blocks.length > 0 && (
-              <li>
-                Missing Blocks: {resourceCheck.missing_blocks.join(", ")}
-              </li>
+              <li>Missing Blocks: {resourceCheck.missing_blocks.join(", ")}</li>
             )}
           </ul>
         )}
       </div>
 
-      <div className="visual-backtest-preview">
-        <h4>Wizard Backtest Preview ({backtestResult.run_id})</h4>
-        <div>
-          <span>Status: {backtestResult.status}</span> |{" "}
-          <span>Bars: {backtestResult.bars_processed}</span> |{" "}
-          <span>Orders: {backtestResult.orders_submitted}</span> |{" "}
-          <span>Net PnL: {backtestResult.net_pnl.toFixed(2)}</span> |{" "}
-          <span>Ending Equity: {backtestResult.ending_equity.toFixed(2)}</span>
+      {backtestResult ? (
+        <div className="visual-backtest-preview">
+          <h4>Wizard Backtest Preview ({backtestResult.run_id})</h4>
+          <div>
+            <span>Status: {backtestResult.status}</span> |{" "}
+            <span>Bars: {backtestResult.bars_processed}</span> |{" "}
+            <span>Orders: {backtestResult.orders_submitted}</span> |{" "}
+            <span>Net PnL: {backtestResult.net_pnl.toFixed(2)}</span> |{" "}
+            <span>
+              Ending Equity: {backtestResult.ending_equity.toFixed(2)}
+            </span>
+          </div>
+          <div className="visual-backtest-actions">
+            <button type="button" onClick={() => onRunBacktest?.()}>
+              Run Wizard Backtest
+            </button>
+            <button
+              type="button"
+              onClick={() => onStopBacktest?.(backtestResult.run_id)}
+            >
+              Stop Backtest
+            </button>
+          </div>
+          {backtestResult.trade_log.length > 0 && (
+            <ul className="visual-backtest-trades">
+              {backtestResult.trade_log.map((trade, index) => (
+                <li key={`${trade.bar_index}-${index}`}>
+                  Bar #{trade.bar_index} ({trade.timestamp}):{" "}
+                  <code>{trade.action}</code> {trade.side} {trade.quantity} @{" "}
+                  {trade.price}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-        <div className="visual-backtest-actions">
-          <button type="button" onClick={() => onRunBacktest?.()}>
-            Run Wizard Backtest
-          </button>
-          <button
-            type="button"
-            onClick={() => onStopBacktest?.(backtestResult.run_id)}
-          >
-            Stop Backtest
-          </button>
-        </div>
-        {backtestResult.trade_log.length > 0 && (
-          <ul className="visual-backtest-trades">
-            {backtestResult.trade_log.map((trade, index) => (
-              <li key={`${trade.bar_index}-${index}`}>
-                Bar #{trade.bar_index} ({trade.timestamp}):{" "}
-                <code>{trade.action}</code> {trade.side} {trade.quantity} @{" "}
-                {trade.price}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
+      ) : (
+        <p>No backtest has been run. Select market data to run a backtest.</p>
+      )}
     </section>
   );
 }

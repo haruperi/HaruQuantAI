@@ -24,12 +24,14 @@ CLI Usage:
 
 from __future__ import annotations
 
+import math
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.workspace.algo_wizard.models import HSLStrategyDocument
 from app.workspace.retester.settings_cross_checks import CrossCheckCondition
 
@@ -113,6 +115,19 @@ class SequentialOptCheckResult:
 class CrossCheckSequentialOptimizationService:
     """Service evaluating coordinate-wise sequential parameter tuning."""
 
+    @staticmethod
+    def _fitness(
+        evaluator: Callable[[dict[str, float]], float], parameters: dict[str, float]
+    ) -> float:
+        """Require an actual finite result from the supplied evaluator."""
+        value = evaluator(parameters)
+        if not math.isfinite(value):
+            raise DomainError(
+                code="HSL_RETEST_EVIDENCE_INVALID",
+                message="Optimization fitness must be finite",
+            )
+        return value
+
     @classmethod
     def run(
         cls,
@@ -132,20 +147,20 @@ class CrossCheckSequentialOptimizationService:
         Returns:
             SequentialOptCheckResult with best parameters and total evaluation counts.
         """
+        if eval_fn is None:
+            raise DomainError(
+                code="HSL_RETEST_EVALUATOR_REQUIRED",
+                message="This retest requires completed real evaluation results",
+            )
         del bars
         # Initialize nominal parameters
         current_best_params: dict[str, float] = {}
         for k, p_spec in strategy.strategy.parameters.items():
             current_best_params[k] = float(p_spec.default)
 
-        # Default fitness evaluator
-        def default_eval(params: dict[str, float]) -> float:
-            # Deterministic quadratic test peak function
-            return round(100.0 - sum((v - 15.0) ** 2 for v in params.values()), 2)
+        fitness_evaluator = eval_fn
 
-        fitness_evaluator = eval_fn or default_eval
-
-        best_fitness = fitness_evaluator(current_best_params)
+        best_fitness = cls._fitness(fitness_evaluator, current_best_params)
         evaluations_per_param: dict[str, int] = {}
         total_evals = 0
 
@@ -162,7 +177,7 @@ class CrossCheckSequentialOptimizationService:
             for v in values:
                 candidate = dict(current_best_params)
                 candidate[param_range.name] = v
-                fit = fitness_evaluator(candidate)
+                fit = cls._fitness(fitness_evaluator, candidate)
                 if fit > local_best_fitness:
                     local_best_fitness = fit
                     best_val_for_param = v

@@ -1,4 +1,16 @@
-"""Tests for Live Trading REST endpoints and WebSocket streaming."""
+"""Tests for Live Trading REST endpoints and WebSocket streaming.
+
+Description:
+    Verify declared strategy behavior and explicit rejection of unavailable inputs.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Regression evidence for shared strategy execution.
+Key Capabilities:
+    - FR-hsl-regression-evidence: Assert observable results and failure boundaries.
+Python API Usage:
+    Run this module through pytest.
+CLI Usage:
+    uv run pytest tests/workspace/trading --no-cov
+"""
 
 from __future__ import annotations
 
@@ -170,6 +182,7 @@ def test_routes_strategy_deploy_and_control(client_app: TestClient) -> None:
         "symbol": "EURUSD",
         "connection_id": "test-conn",
         "timeframe": "PERIOD_H1",
+        "document": {"strategy": {"id": "strat-live-1", "name": "Live test"}},
     }
     res_deploy = client_app.post("/api/v1/trading/strategies/deploy", json=deploy_req)
     assert res_deploy.status_code == 200

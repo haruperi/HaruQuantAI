@@ -26,6 +26,7 @@ CLI Usage:
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any
@@ -132,15 +133,29 @@ class CrossCheckRetestOnAdditionalMarketsService:
                 message="At least one additional market setup required when enabled",
             )
 
+        if market_stats is None:
+            raise DomainError(
+                code="HSL_RETEST_EVALUATOR_REQUIRED",
+                message="This retest requires completed real evaluation results",
+            )
         results_map: dict[str, float] = {}
         total_profit = 0.0
 
         for setup in config.markets:
-            if market_stats and setup.result_key in market_stats:
-                p = float(market_stats[setup.result_key].get("net_profit", 0.0))
-            else:
-                # Deterministic synthetic evaluation
-                p = round(500.0 + len(setup.symbol) * 50.0, 2)
+            if (
+                setup.result_key not in market_stats
+                or "net_profit" not in market_stats[setup.result_key]
+            ):
+                raise DomainError(
+                    code="HSL_RETEST_EVIDENCE_INCOMPLETE",
+                    message="Each requested market requires an observed net profit",
+                )
+            p = float(market_stats[setup.result_key]["net_profit"])
+            if not math.isfinite(p):
+                raise DomainError(
+                    code="HSL_RETEST_EVIDENCE_INVALID",
+                    message="Market result must be finite",
+                )
             results_map[setup.result_key] = p
             total_profit += p
 

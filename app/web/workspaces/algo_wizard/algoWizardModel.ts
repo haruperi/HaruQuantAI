@@ -1,4 +1,4 @@
-/** Local UI documents only: these types are not an execution or SQX wire schema. */
+/** Local editor view models and canonical HSL transport contracts. */
 export type EditorMode =
   "Simple" | "Full" | "Stockpicker" | "Single-asset cloud";
 export type RuleKind =
@@ -298,17 +298,12 @@ export function downloadText(name: string, text: string) {
   setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
 
-
 // ============================================================================
 // HSL 1.0 Canonical AST, Catalogue, Lifecycle, Visual Block & Cloud Contracts
 // ============================================================================
 
 export type HSLNodeFamily =
-  | "VALUE"
-  | "EXPRESSION"
-  | "CONDITION"
-  | "ACTION"
-  | "RULE";
+  "VALUE" | "EXPRESSION" | "CONDITION" | "ACTION" | "RULE";
 
 export type HSLLifecycleEventType =
   | "on_start"
@@ -349,21 +344,21 @@ export interface HSLEvaluationContext {
 }
 
 export type HSLComparisonOperator =
-  | "comparison.greater_than"
-  | "comparison.greater_or_equal"
-  | "comparison.less_than"
-  | "comparison.less_or_equal"
-  | "comparison.equal"
-  | "comparison.not_equal"
-  | "comparison.crosses_above"
-  | "comparison.crosses_below";
+  | "greater_than"
+  | "greater_or_equal"
+  | "less_than"
+  | "less_or_equal"
+  | "equal"
+  | "not_equal"
+  | "crosses_above"
+  | "crosses_below";
 
 export interface HSLOperandNode {
   type:
     | "value"
     | "parameter"
     | "variable"
-    | "market_price"
+    | "price"
     | "indicator"
     | "math"
     | "function"
@@ -371,7 +366,11 @@ export interface HSLOperandNode {
   value?: number | boolean | string;
   name?: string;
   field?: string;
-  indicator_id?: string;
+  output?: string;
+  inputs?: Record<string, HSLOperandNode>;
+  left?: HSLOperandNode;
+  right?: HSLOperandNode;
+  args?: HSLOperandNode[];
   operator?: string;
   params?: Record<string, unknown>;
   context?: HSLEvaluationContext;
@@ -384,20 +383,29 @@ export interface HSLConditionNode {
   condition?: HSLConditionNode;
   left?: HSLOperandNode;
   right?: HSLOperandNode;
-  state_id?: string;
+  state?: string;
+  bars?: number;
 }
 
 export interface HSLActionNode {
   type: "action";
   action:
     | "enter_market"
-    | "enter_pending"
+    | "enter_stop"
+    | "enter_limit"
     | "exit_position"
-    | "modify_order"
-    | "cancel_order"
+    | "modify_stop_loss"
+    | "modify_take_profit"
+    | "cancel_orders"
     | "set_variable"
-    | "alert";
+    | "emit_alert";
   side?: "long" | "short";
+  target_side?: "long" | "short" | "any";
+  quantity_pct?: number;
+  entry_price?: HSLOperandNode;
+  expiration_bars?: number;
+  magic_number?: number;
+  level?: "info" | "warning" | "error";
   name?: string;
   message?: string;
   value?: HSLOperandNode;
@@ -408,19 +416,26 @@ export interface HSLRuleNode {
   name: string;
   priority: number;
   enabled: boolean;
-  event: HSLLifecycleEventType;
+  event:
+    | HSLLifecycleEventType
+    | { type: HSLLifecycleEventType; symbol?: string; timeframe?: string };
   when: HSLConditionNode;
   then: HSLActionNode[];
-  else_actions: HSLActionNode[];
+  else_then: HSLActionNode[];
 }
 
 export interface HSLStrategyPayload {
   id: string;
   name: string;
   description: string;
+  enabled?: boolean;
+  metadata?: Record<string, unknown>;
+  money_management?: Record<string, unknown>;
+  risk_management?: Record<string, unknown>;
+  trade_management?: Record<string, unknown>;
+  trading_options?: Record<string, unknown>;
   universe: {
     symbols: string[];
-    primary_symbol: string;
   };
   timeframe: {
     primary: string;
@@ -433,8 +448,6 @@ export interface HSLStrategyPayload {
 
 export interface HSLStrategyDocument {
   schema_version: "1.0.0";
-  strategy_type: "single_asset" | "multi_asset";
-  document_hash?: string | null;
   strategy: HSLStrategyPayload;
 }
 
@@ -588,6 +601,7 @@ export type ExportTargetPlatform =
   | "hsl_json";
 
 export interface ExportTargetDescriptor {
+  supported_for_hsl?: boolean;
   platform: ExportTargetPlatform;
   label: string;
   extension: string;
@@ -612,14 +626,14 @@ const COMPARISON_NEGATION_MAP: Record<
   HSLComparisonOperator,
   HSLComparisonOperator
 > = {
-  "comparison.greater_than": "comparison.less_or_equal",
-  "comparison.greater_or_equal": "comparison.less_than",
-  "comparison.less_than": "comparison.greater_or_equal",
-  "comparison.less_or_equal": "comparison.greater_than",
-  "comparison.equal": "comparison.not_equal",
-  "comparison.not_equal": "comparison.equal",
-  "comparison.crosses_above": "comparison.crosses_below",
-  "comparison.crosses_below": "comparison.crosses_above",
+  greater_than: "less_or_equal",
+  greater_or_equal: "less_than",
+  less_than: "greater_or_equal",
+  less_or_equal: "greater_than",
+  equal: "not_equal",
+  not_equal: "equal",
+  crosses_above: "crosses_below",
+  crosses_below: "crosses_above",
 };
 
 export function filterCatalogueBlocks(
@@ -817,15 +831,12 @@ export const DEFAULT_WIZARD_CONSTANTS_BUNDLE: WizardConstantsBundle = {
 
 export const DEFAULT_HSL_STRATEGY_DOCUMENT: HSLStrategyDocument = {
   schema_version: "1.0.0",
-  strategy_type: "single_asset",
-  document_hash: "hsl-sha256-default",
   strategy: {
     id: "hsl_ema_crossover_v1",
     name: "EMA Crossover Strategy",
     description: "Canonical HSL 1.0 EMA crossover with RSI filter",
     universe: {
       symbols: ["EURUSD"],
-      primary_symbol: "EURUSD",
     },
     timeframe: {
       primary: "H1",
@@ -872,10 +883,10 @@ export const DEFAULT_HSL_STRATEGY_DOCUMENT: HSLStrategyDocument = {
         event: "on_bar_open",
         when: {
           type: "comparison",
-          operator: "comparison.crosses_above",
+          operator: "crosses_above",
           left: {
             type: "indicator",
-            indicator_id: "indicator.ema",
+            name: "indicator.ema",
             params: { period: { type: "parameter", name: "fast_period" } },
             context: {
               symbol: "$current_symbol",
@@ -885,7 +896,7 @@ export const DEFAULT_HSL_STRATEGY_DOCUMENT: HSLStrategyDocument = {
           },
           right: {
             type: "indicator",
-            indicator_id: "indicator.ema",
+            name: "indicator.ema",
             params: { period: { type: "parameter", name: "slow_period" } },
             context: {
               symbol: "$current_symbol",
@@ -895,7 +906,7 @@ export const DEFAULT_HSL_STRATEGY_DOCUMENT: HSLStrategyDocument = {
           },
         },
         then: [{ type: "action", action: "enter_market", side: "long" }],
-        else_actions: [],
+        else_then: [],
       },
       {
         id: "rule_short_exit",
@@ -905,10 +916,10 @@ export const DEFAULT_HSL_STRATEGY_DOCUMENT: HSLStrategyDocument = {
         event: "on_bar_close",
         when: {
           type: "comparison",
-          operator: "comparison.greater_than",
+          operator: "greater_than",
           left: {
             type: "indicator",
-            indicator_id: "indicator.rsi",
+            name: "indicator.rsi",
             params: { period: { type: "value", value: 14 } },
             context: {
               symbol: "$current_symbol",
@@ -918,8 +929,10 @@ export const DEFAULT_HSL_STRATEGY_DOCUMENT: HSLStrategyDocument = {
           },
           right: { type: "value", value: 70 },
         },
-        then: [{ type: "action", action: "exit_position", side: "long" }],
-        else_actions: [],
+        then: [
+          { type: "action", action: "exit_position", target_side: "long" },
+        ],
+        else_then: [],
       },
     ],
   },
@@ -1007,6 +1020,35 @@ export const DEFAULT_EXPORT_TARGETS: ExportTargetDescriptor[] = [
   },
 ];
 
+interface WireConstantsBundle {
+  revision: string;
+  timeframes: Array<{ code: string; label: string; description: string }>;
+  lifecycle_events: Array<{ code: string; label: string; description: string }>;
+  commission_methods: Array<{
+    method_id: string;
+    name: string;
+    unit: string;
+    default_value: number;
+  }>;
+  blocks: Array<{
+    semantic_id: string;
+    registry_id: string;
+    name: string;
+    family: HSLNodeFamily;
+    category: string;
+    return_type: string;
+    required_inputs: string[];
+    parameters: Array<{
+      name: string;
+      param_type: string;
+      required: boolean;
+      default: number | boolean | string | null;
+      min_value?: number | null;
+      max_value?: number | null;
+    }>;
+  }>;
+}
+
 export interface AlgoWizardApiClientOptions {
   fetchFn?: typeof fetch;
   baseUrl?: string;
@@ -1024,7 +1066,18 @@ export function createAlgoWizardApiClient(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(body),
     });
-    const payload = (await response.json()) as { data: T };
+    const payload = (await response.json()) as {
+      data?: T;
+      error?: { message?: string };
+      message?: string;
+    };
+    if (!response.ok || payload.data === undefined) {
+      throw new Error(
+        payload.error?.message ??
+          payload.message ??
+          `Request failed (${response.status})`,
+      );
+    }
     return payload.data;
   }
 
@@ -1032,15 +1085,60 @@ export function createAlgoWizardApiClient(
     const response = await fetchFn(`${baseUrl}${path}`, {
       method: "GET",
     });
-    const payload = (await response.json()) as { data: T };
+    const payload = (await response.json()) as {
+      data?: T;
+      error?: { message?: string };
+      message?: string;
+    };
+    if (!response.ok || payload.data === undefined) {
+      throw new Error(
+        payload.error?.message ??
+          payload.message ??
+          `Request failed (${response.status})`,
+      );
+    }
     return payload.data;
   }
 
   return {
     getConstantsBundle(requestId = "req-constants-all") {
-      return postJson<WizardConstantsBundle>("/constants/getAll", {
+      return postJson<WireConstantsBundle>("/constants/getAll", {
         request_id: requestId,
-      });
+      }).then((bundle): WizardConstantsBundle => ({
+        schema_version: "1.0.0",
+        timeframes: bundle.timeframes.map((option) => ({
+          ...option,
+          key: option.code,
+        })),
+        lifecycle_events: bundle.lifecycle_events.map((option) => ({
+          ...option,
+          key: option.code,
+        })),
+        precisions: [
+          {
+            key: "OHLC",
+            label: "OHLC bars",
+            description: "Historical bar execution",
+          },
+        ],
+        commission_methods: bundle.commission_methods.map((method) => ({
+          ...method,
+          label: method.name,
+        })),
+        blocks: bundle.blocks.map((block) => ({
+          ...block,
+          registry_block_id: block.registry_id,
+          label: block.name,
+          allowed_children: [],
+          parameters: block.parameters.map((parameter) => ({
+            ...parameter,
+            key: parameter.name,
+            label: parameter.name,
+            value_type: parameter.param_type,
+            default_value: parameter.default,
+          })),
+        })),
+      }));
     },
     listExamples() {
       return getJson<WizardExampleSummary[]>(

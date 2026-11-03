@@ -305,6 +305,13 @@ def test_export_strategy_all_platforms(
         LoadWizardExampleRequest(example_id="ema_crossover")
     ).data.document
 
+    if platform not in ("python", "pseudo_code", "hsl_json"):
+        with pytest.raises(DomainError) as error:
+            cloud_svc.export_strategy(
+                ExportStrategyRequest(document=ema_doc, target_platform=platform)
+            )
+        assert error.value.code == "HSL_EXPORT_UNSUPPORTED"
+        return
     resp = cloud_svc.export_strategy(
         ExportStrategyRequest(
             document=ema_doc,
@@ -322,7 +329,7 @@ def test_export_strategy_rich_branches_and_invalid_document() -> None:
     cloud_svc = CloudExportService()
     rich_doc = _make_rich_document()
 
-    for plat in ("ninjatrader", "jforex", "pseudo_code"):
+    for plat in ("python", "pseudo_code", "hsl_json"):
         res = cloud_svc.export_strategy(
             ExportStrategyRequest(
                 document=rich_doc,
@@ -382,5 +389,5 @@ def test_algocloud_http_routes() -> None:
         "/algocloud/export",
         json={"document": ema_json, "target_platform": "mql5"},
     )
-    assert exp_resp.status_code == 200
-    assert exp_resp.json()["data"]["filename"] == "example_rsi_mean_reversion.mq5"
+    assert exp_resp.status_code == 400
+    assert "HSL_EXPORT_UNSUPPORTED" in exp_resp.text

@@ -1,10 +1,24 @@
-"""Tests for Phase 5.6 VisualBlockService (ServletAlgoWizard / WO-WZ-VISUAL-BLOCKS)."""
+"""Tests for Phase 5.6 VisualBlockService (ServletAlgoWizard / WO-WZ-VISUAL-BLOCKS).
+
+Description:
+    Verify declared strategy behavior and explicit rejection of unavailable inputs.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Regression evidence for shared strategy execution.
+Key Capabilities:
+    - FR-hsl-regression-evidence: Assert observable results and failure boundaries.
+Python API Usage:
+    Run this module through pytest.
+CLI Usage:
+    uv run pytest tests/workspace/algo_wizard --no-cov
+"""
 
 from __future__ import annotations
 
 import pytest
 from app.core.lib.errors import DomainError
+from app.core.trading.backtest.contracts import BacktestSettings
 from app.core.trading.blocks.composition import CompositionSpec
+from app.core.trading.strategy.contracts import InstrumentEconomics
 from app.workspace.algo_wizard import (
     AddTimeframeRequest,
     BlockGroupDefinition,
@@ -402,6 +416,11 @@ def test_run_stop_and_get_backtest_results() -> None:
             backtest_id="bt-001",
             document=doc,
             bars=bars,
+            settings=BacktestSettings(
+                economics=InstrumentEconomics(
+                    0.0001, 0.00001, 10.0, 100000.0, 0.01, 100.0, 0.01
+                )
+            ),
             negate_signals=False,
         )
     )
@@ -412,17 +431,13 @@ def test_run_stop_and_get_backtest_results() -> None:
     assert bt_resp.data.total_orders_opened >= 1
     assert len(bt_resp.data.trade_log) >= 1
 
-    # Also test default synthetic bars with negate_signals=True
-    bt_neg = svc.run_backtest(
-        WizardBacktestRequest(
-            backtest_id="bt-002",
-            document=doc,
-            bars=(),
-            negate_signals=True,
+    with pytest.raises(DomainError) as missing:
+        svc.run_backtest(
+            WizardBacktestRequest(
+                backtest_id="bt-002", document=doc, bars=(), negate_signals=True
+            )
         )
-    )
-    assert bt_neg.data.bars_evaluated == 25
-    assert bt_neg.data.status == "COMPLETED"
+    assert missing.value.code == "HSL_MISSING_FEED"
 
     # Retrieve and stop backtest
     fetched = svc.get_backtest_results(GetWizardBacktestRequest(backtest_id="bt-001"))

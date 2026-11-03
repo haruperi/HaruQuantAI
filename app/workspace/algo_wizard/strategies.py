@@ -33,11 +33,13 @@ CLI Usage:
 
 from __future__ import annotations
 
+import os
 from collections.abc import Mapping
 from datetime import UTC, datetime
 from typing import Any, cast
 
 from app.core.host.logging import get_logger
+from app.core.host.strategy_storage import HostStrategyStorage
 from app.core.lib.errors import DomainError, JSONValue
 from app.core.lib.responses import StandardResponse
 from app.core.trading.strategy.contracts import StrategyDocument
@@ -116,14 +118,39 @@ class StrategyDocumentService:
         validator: StrategyValidator | None = None,
         compiler: StrategyCompiler | None = None,
         runtime: StrategyRuntime | None = None,
+        storage: HostStrategyStorage | None = None,
     ) -> None:
         self._compiler = compiler if compiler is not None else StrategyCompiler()
         self._validator = (
             validator if validator is not None else self._compiler.validator
         )
         self._runtime = runtime if runtime is not None else StrategyRuntime()
+        storage_root = os.environ.get("HARU_STRATEGY_STORAGE_DIR")
+        self._storage = storage or (
+            HostStrategyStorage(storage_root) if storage_root else None
+        )
         self._records: dict[str, ManagedStrategyRecord] = {}
         self._compiled_plans: dict[str, StrategyDocument] = {}
+        if self._storage is not None:
+            for key, stored in self._storage.records("strategy:").items():
+                if not stored["payload"].get("removed", False):
+                    restored = ManagedStrategyRecord.model_validate(stored["payload"])
+                    if restored.status == "RUNNING":
+                        restored = restored.model_copy(update={"status": "IDLE"})
+                    self._records[key.removeprefix("strategy:")] = restored
+
+    def _persist(self, record: ManagedStrategyRecord, *, actual_revision: int) -> None:
+        """Publish the record durably before acknowledging a state transition."""
+        if self._storage is None:
+            raise DomainError(
+                code="HSL_STORAGE_UNAVAILABLE",
+                message="Configure host strategy storage before saving",
+            )
+        self._storage.save(
+            "strategy:" + record.strategy_id,
+            record.model_dump(mode="json"),
+            expected_revision=actual_revision,
+        )
 
     @property
     def validator(self) -> StrategyValidator:
@@ -244,6 +271,7 @@ class StrategyDocumentService:
             symbol=primary_symbol,
             timeframe=strat.timeframe.primary,
         )
+        self._persist(record, actual_revision=next_revision - 1)
         self._records[strategy_id] = record
         logger.info(
             "FR-wizard-strategy-crud: Stored strategy '%s' rev=%d status=%s hash=%s",
@@ -347,6 +375,7 @@ class StrategyDocumentService:
                 "updated_at": _utc_now_iso(),
             }
         )
+        self._persist(updated, actual_revision=record.revision)
         self._records[record.strategy_id] = updated
         logger.info(
             "FR-wizard-strategy-runtime-lifecycle: Started strategy '%s' rev=%d "
@@ -376,6 +405,7 @@ class StrategyDocumentService:
                 "updated_at": _utc_now_iso(),
             }
         )
+        self._persist(updated, actual_revision=record.revision)
         self._records[record.strategy_id] = updated
         logger.info(
             "FR-wizard-strategy-runtime-lifecycle: Stopped strategy '%s' rev=%d",
@@ -395,6 +425,12 @@ class StrategyDocumentService:
         """Stop if running and remove a strategy record from the service."""
         record = self._require_record(request.strategy_id)
         self._compiled_plans.pop(record.strategy_id, None)
+        if self._storage is not None:
+            self._storage.save(
+                "strategy:" + record.strategy_id,
+                {"removed": True},
+                expected_revision=record.revision,
+            )
         del self._records[record.strategy_id]
         result = RemoveStrategyResult(
             strategy_id=record.strategy_id,

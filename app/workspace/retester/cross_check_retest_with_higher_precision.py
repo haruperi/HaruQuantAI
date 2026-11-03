@@ -24,11 +24,13 @@ CLI Usage:
 
 from __future__ import annotations
 
+import math
 from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Literal
 
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.workspace.algo_wizard.models import HSLStrategyDocument
 from app.workspace.retester.settings_cross_checks import CrossCheckCondition
 
@@ -108,17 +110,30 @@ class CrossCheckRetestWithHigherPrecisionService:
         Returns:
             HigherPrecisionCheckResult with retention percentage and pass/fail state.
         """
+        if hp_stats is None:
+            raise DomainError(
+                code="HSL_RETEST_EVALUATOR_REQUIRED",
+                message="This retest requires completed real evaluation results",
+            )
         del strategy
         main_np = float(main_stats.get("net_profit", 0.0))
 
-        if hp_stats is not None:
-            hp_np = float(hp_stats.get("net_profit", 0.0))
-            hp_dd = float(hp_stats.get("drawdown_pct", 0.0))
-        else:
-            # Synthetic default model: finer precision exhibits slight slippage drag
-            hp_np = round(main_np * 0.90, 2)
-            hp_dd = round(float(main_stats.get("drawdown_pct", 10.0)) * 1.10, 2)
+        required = ("net_profit", "drawdown_pct")
+        if "net_profit" not in main_stats or any(
+            key not in hp_stats for key in required
+        ):
+            raise DomainError(
+                code="HSL_RETEST_EVIDENCE_INCOMPLETE",
+                message="Both runs require complete observed metrics",
+            )
+        hp_np = float(hp_stats["net_profit"])
+        hp_dd = float(hp_stats["drawdown_pct"])
 
+        if not all(math.isfinite(value) for value in (main_np, hp_np, hp_dd)):
+            raise DomainError(
+                code="HSL_RETEST_EVIDENCE_INVALID",
+                message="Retest metrics must be finite",
+            )
         retention_pct = round((hp_np / main_np) * 100.0, 2) if main_np > 0 else 0.0
 
         failure_reasons: list[str] = []

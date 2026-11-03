@@ -35,6 +35,7 @@ from typing import Any, Literal
 from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from app.core.host.logging import get_logger
+from app.core.trading.backtest.contracts import BacktestSettings
 from app.core.trading.blocks.composition import CompositionSpec
 from app.workspace.algo_wizard.models import (
     ActionNode,
@@ -513,6 +514,8 @@ class WizardBacktestRequest(BaseModel):
         default_factory=tuple,
         description="Chronological OHLCV bar sequence for causal evaluation",
     )
+    settings: BacktestSettings = Field(default_factory=BacktestSettings)
+
     negate_signals: bool = Field(
         default=False,
         description="When True, negate rule conditions prior to simulation",

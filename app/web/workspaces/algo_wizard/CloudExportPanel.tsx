@@ -31,21 +31,12 @@ const IMPORT_SOURCES: readonly {
   { source: "backtest_id", label: "Wizard Backtest Run ID" },
 ];
 
-const DEFAULT_EXPORT_PREVIEW: ExportStrategyResult = {
-  strategy_id: DEFAULT_HSL_STRATEGY_DOCUMENT.strategy.id,
-  target_platform: "python",
-  filename: "hsl_ema_crossover_v1.py",
-  content:
-    "# Generated from Canonical HSL 1.0 Strategy AST\nclass EMACrossoverStrategy:\n    pass\n",
-  sha256: "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
-};
-
 export function CloudExportPanel({
   document = DEFAULT_HSL_STRATEGY_DOCUMENT,
   targets = DEFAULT_EXPORT_TARGETS,
   initialImportSource = "editor",
   initialPlatform = "python",
-  exportPreview = DEFAULT_EXPORT_PREVIEW,
+  exportPreview,
   onImportStrategy,
   onExportStrategy,
   onCopyCode,
@@ -82,10 +73,7 @@ export function CloudExportPanel({
             </label>
           ))}
         </div>
-        <button
-          type="button"
-          onClick={() => onImportStrategy?.(importSource)}
-        >
+        <button type="button" onClick={() => onImportStrategy?.(importSource)}>
           Import Strategy from {importSource}
         </button>
       </div>
@@ -100,10 +88,19 @@ export function CloudExportPanel({
                   type="radio"
                   name="cloud-export-platform"
                   value={target.platform}
+                  disabled={
+                    target.supported_for_hsl === false ||
+                    !["python", "pseudo_code", "hsl_json"].includes(
+                      target.platform,
+                    )
+                  }
                   checked={targetPlatform === target.platform}
                   onChange={() => setTargetPlatform(target.platform)}
                 />
-                <strong>{target.label}</strong>{" "}
+                <strong>{target.label}</strong>
+                {!["python", "pseudo_code", "hsl_json"].includes(
+                  target.platform,
+                ) && " (unavailable for HSL)"}{" "}
                 <code>({target.platform})</code> —{" "}
                 <code>{target.extension}</code>: {target.description}
               </label>
@@ -112,40 +109,47 @@ export function CloudExportPanel({
         </ul>
         <button
           type="button"
+          disabled={
+            !["python", "pseudo_code", "hsl_json"].includes(targetPlatform)
+          }
           onClick={() => onExportStrategy?.(targetPlatform)}
         >
           Generate {targetPlatform} Export
         </button>
       </div>
 
-      <div className="cloud-export-preview">
-        <h4>
-          Generated Code Preview: <code>{exportPreview.filename}</code> (
-          {exportPreview.target_platform})
-        </h4>
-        <div>
-          <small>SHA-256: {exportPreview.sha256}</small>
+      {exportPreview ? (
+        <div className="cloud-export-preview">
+          <h4>
+            Generated Code Preview: <code>{exportPreview.filename}</code> (
+            {exportPreview.target_platform})
+          </h4>
+          <div>
+            <small>SHA-256: {exportPreview.sha256}</small>
+          </div>
+          <pre>
+            <code>{exportPreview.content}</code>
+          </pre>
+          <div className="cloud-export-actions">
+            <button
+              type="button"
+              onClick={() => onCopyCode?.(exportPreview.content)}
+            >
+              Copy Code
+            </button>
+            <button
+              type="button"
+              onClick={() =>
+                onDownloadCode?.(exportPreview.filename, exportPreview.content)
+              }
+            >
+              Download {exportPreview.filename}
+            </button>
+          </div>
         </div>
-        <pre>
-          <code>{exportPreview.content}</code>
-        </pre>
-        <div className="cloud-export-actions">
-          <button
-            type="button"
-            onClick={() => onCopyCode?.(exportPreview.content)}
-          >
-            Copy Code
-          </button>
-          <button
-            type="button"
-            onClick={() =>
-              onDownloadCode?.(exportPreview.filename, exportPreview.content)
-            }
-          >
-            Download {exportPreview.filename}
-          </button>
-        </div>
-      </div>
+      ) : (
+        <p>Generate an export to preview its code.</p>
+      )}
     </section>
   );
 }

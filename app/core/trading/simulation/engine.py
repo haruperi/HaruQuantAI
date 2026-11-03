@@ -1,4 +1,16 @@
-"""Deterministic bar matching engine with fill simulation, frictions, and MAE/MFE tracking."""
+"""Historical order matching, partial closes, and pending expiry.
+
+Description:
+    Apply strategy intentions to isolated simulation positions and trade records.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Consistent, explicit strategy execution boundaries.
+Key Capabilities:
+    - FR-shared-hsl-execution: Hosts log decisions; focused tests verify effects.
+Python API Usage:
+    Import the typed contracts and services from this module.
+CLI Usage:
+    uv run pytest tests/core/trading tests/workspace/algo_wizard --no-cov
+"""
 
 from __future__ import annotations
 
@@ -14,6 +26,7 @@ from app.core.enums import (
     PositionType,
 )
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.core.trading.backtest.contracts import (
     BacktestSettings,
     EquityPoint,
@@ -67,6 +80,7 @@ class PendingOrderState:
     tp: float = 0.0
     magic: int = 0
     comment: str = ""
+    expires_at: int = 0
 
 
 class SimulationEngine:
@@ -100,6 +114,9 @@ class SimulationEngine:
         target_symbol = symbol or self.symbol
 
         for ticket, order in list(self.pending_orders.items()):
+            if order.expires_at and order.expires_at <= bar.time:
+                del self.pending_orders[ticket]
+                continue
             if target_symbol and order.symbol and order.symbol != target_symbol:
                 continue
 
@@ -156,6 +173,9 @@ class SimulationEngine:
 
         # 1. Intra-bar pending orders (triggers within [low, high] that did not trigger at open)
         for ticket, order in list(self.pending_orders.items()):
+            if order.expires_at and order.expires_at <= bar.time:
+                del self.pending_orders[ticket]
+                continue
             if target_symbol and order.symbol and order.symbol != target_symbol:
                 continue
 
@@ -346,7 +366,33 @@ class SimulationEngine:
                 exec_price = bar_close - slippage
             else:
                 exec_price = bar_close + slippage
-            self._close_position(pos, exec_price, bar_time, reason, slippage)
+            if req.volume is not None and (
+                not math.isfinite(req.volume) or req.volume <= 0
+            ):
+                raise DomainError(
+                    code="INVALID_CLOSE_VOLUME",
+                    message="Close quantity must be finite and positive",
+                )
+            if req.volume is not None and 0 < req.volume < pos.volume:
+                from dataclasses import replace
+
+                fraction = req.volume / pos.volume
+                partial = replace(
+                    pos,
+                    volume=req.volume,
+                    commission_paid=pos.commission_paid * fraction,
+                    slippage_incurred=pos.slippage_incurred * fraction,
+                )
+                remainder = replace(
+                    pos,
+                    volume=pos.volume - req.volume,
+                    commission_paid=pos.commission_paid * (1 - fraction),
+                    slippage_incurred=pos.slippage_incurred * (1 - fraction),
+                )
+                self._close_position(partial, exec_price, bar_time, reason, slippage)
+                self.positions[pos.ticket] = remainder
+            else:
+                self._close_position(pos, exec_price, bar_time, reason, slippage)
 
     def _handle_order_modification(self, mod: OrderModification) -> None:
         try:
@@ -412,6 +458,7 @@ class SimulationEngine:
                 tp=req.tp,
                 magic=req.magic,
                 comment=req.comment,
+                expires_at=int(req.atm_rules.get("expires_at", 0)),
             )
 
     def _open_position(
@@ -608,6 +655,7 @@ class SimulationEngine:
                     tp=o.tp,
                     magic=o.magic,
                     comment=o.comment,
+                    time_expiration=o.expires_at,
                 )
             )
         return tuple(infos)

@@ -24,12 +24,14 @@ CLI Usage:
 
 from __future__ import annotations
 
+import math
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.workspace.algo_wizard.models import HSLStrategyDocument
 from app.workspace.retester.settings_cross_checks import CrossCheckCondition
 
@@ -170,6 +172,11 @@ class CrossCheckWalkForwardMatrixService:
         Returns:
             WFMatrixCheckResult with evaluated cells and cluster pass/fail status.
         """
+        if cell_override is None:
+            raise DomainError(
+                code="HSL_RETEST_EVALUATOR_REQUIRED",
+                message="This retest requires completed real evaluation results",
+            )
         del strategy, bars
         runs_vals = list(
             range(config.runs_start, config.runs_stop + 1, max(1, config.runs_step))
@@ -189,12 +196,18 @@ class CrossCheckWalkForwardMatrixService:
 
         for r_idx, r in enumerate(runs_vals):
             for o_idx, o in enumerate(oos_vals):
-                if cell_override is not None:
-                    score, profit = cell_override.get((r, o), (0.0, 0.0))
-                else:
-                    score = round(60.0 + (r * 3 + o * 2) % 35, 2)
-                    profit = round(score * 15.0, 2)
+                if (r, o) not in cell_override:
+                    raise DomainError(
+                        code="HSL_RETEST_EVIDENCE_INCOMPLETE",
+                        message="Each walk-forward cell requires observed metrics",
+                    )
+                score, profit = cell_override[(r, o)]
 
+                if not math.isfinite(score) or not math.isfinite(profit):
+                    raise DomainError(
+                        code="HSL_RETEST_EVIDENCE_INVALID",
+                        message="Walk-forward metrics must be finite",
+                    )
                 cell_metrics = {"WFScore": score, "NetProfit": profit}
                 cell_passed = True
                 for cond in config.cell_conditions:

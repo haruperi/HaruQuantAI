@@ -226,6 +226,7 @@ class SaveStrategyFileRequest(BaseModel):
         default=None,
         description="Optional existing file identifier to overwrite",
     )
+    expected_revision: int | None = Field(default=None, ge=0)
     strict: bool = Field(
         default=True,
         description="When True, require 0 validation errors before saving",

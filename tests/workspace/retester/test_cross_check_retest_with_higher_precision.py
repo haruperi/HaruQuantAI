@@ -1,4 +1,16 @@
-"""Unit tests for CrossCheckRetestWithHigherPrecisionService."""
+"""Unit tests for CrossCheckRetestWithHigherPrecisionService.
+
+Description:
+    Verify declared strategy behavior and explicit rejection of unavailable inputs.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Regression evidence for shared strategy execution.
+Key Capabilities:
+    - FR-hsl-regression-evidence: Assert observable results and failure boundaries.
+Python API Usage:
+    Run this module through pytest.
+CLI Usage:
+    uv run pytest tests/workspace/retester --no-cov
+"""
 
 from app.workspace.algo_wizard.models import (
     HSLStrategyDocument,
@@ -59,7 +71,7 @@ class TestCrossCheckRetestWithHigherPrecision:
         """Retention below threshold causes failure."""
         strat = _make_strategy()
         main_stats = {"net_profit": 1000.0}
-        hp_stats = {"net_profit": 500.0}  # 50.0% retention
+        hp_stats = {"net_profit": 500.0, "drawdown_pct": 0.0}  # 50.0% retention
 
         config = HigherPrecisionConfig(
             enabled=True,

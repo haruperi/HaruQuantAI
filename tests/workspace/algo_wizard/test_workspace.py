@@ -412,7 +412,20 @@ def test_wizard_http_routes_end_to_end() -> None:
 
     bt_resp = client.post(
         "/algowizard/backtest",
-        json={"document": ema_doc_json, "backtest_id": "bt-http-1"},
+        json={
+            "document": ema_doc_json,
+            "backtest_id": "bt-http-1",
+            "bars": [
+                {
+                    "time": 1704110400,
+                    "open": 1.1,
+                    "high": 1.101,
+                    "low": 1.099,
+                    "close": 1.1,
+                    "volume": 100,
+                }
+            ],
+        },
     )
     assert bt_resp.status_code == 200
     assert (

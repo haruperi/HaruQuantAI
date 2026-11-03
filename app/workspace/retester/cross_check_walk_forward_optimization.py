@@ -31,6 +31,7 @@ from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.workspace.algo_wizard.models import HSLStrategyDocument
 from app.workspace.retester.settings_cross_checks import CrossCheckCondition
 
@@ -134,97 +135,11 @@ class CrossCheckWalkForwardOptimizationService:
         Returns:
             WFOptimizationCheckResult with stitched metrics and condition verification.
         """
-        n_runs = max(1, config.runs_count)
-        start_ms = bars[0].time * 1000 if bars else 1600000000000
-        end_ms = bars[-1].time * 1000 if bars else 1700000000000
-        total_span = max(1, end_ms - start_ms)
-        step_span = total_span // n_runs
-
-        nominal_params: dict[str, float | int] = {
-            k: float(p.default) if isinstance(p.default, (int, float)) else 0.0
-            for k, p in strategy.strategy.parameters.items()
-        }
-
-        windows: list[WFWindowResult] = []
-        profitable_runs = 0
-        total_oos_profit = 0.0
-        total_is_profit = 0.0
-
-        for i in range(n_runs):
-            win_start = start_ms if config.anchored else start_ms + i * (step_span // 2)
-            win_end = min(end_ms, start_ms + (i + 1) * step_span)
-            span = max(1, win_end - win_start)
-
-            oos_duration = int(span * (config.oos_pct / 100.0))
-            oos_start = win_end - oos_duration
-            is_end = oos_start
-
-            if custom_window_returns and i < len(custom_window_returns):
-                oos_profit = custom_window_returns[i]
-            else:
-                # Deterministic synthetic return
-                oos_profit = round(100.0 + ((i * 7) % 11 - 3) * 25.0, 2)
-
-            is_profit = round(oos_profit * 1.4, 2)
-
-            if oos_profit > 0:
-                profitable_runs += 1
-
-            total_oos_profit += oos_profit
-            total_is_profit += is_profit
-
-            windows.append(
-                WFWindowResult(
-                    window_index=i,
-                    is_start_ms=win_start,
-                    is_end_ms=is_end,
-                    oos_start_ms=oos_start,
-                    oos_end_ms=win_end,
-                    best_params=nominal_params,
-                    is_net_profit=is_profit,
-                    oos_net_profit=oos_profit,
-                    oos_trades=max(1, 10 + i * 2),
-                )
-            )
-
-        profitable_pct = round((profitable_runs / n_runs) * 100.0, 2)
-        wf_eff = (
-            round((total_oos_profit / total_is_profit * 100.0), 2)
-            if total_is_profit > 0
-            else 0.0
+        del strategy, bars, config, custom_window_returns
+        logger.error(
+            "FR-cross-check-evidence: complete evaluation evidence is required"
         )
-        stitched_profit = round(total_oos_profit, 2)
-
-        failure_reasons: list[str] = []
-        metrics = {
-            "ProfitableRunsPct": profitable_pct,
-            "WFEfficiencyPct": wf_eff,
-            "NetProfit": stitched_profit,
-        }
-
-        for cond in config.acceptance_conditions:
-            val = metrics.get(cond.metric, 0.0)
-            if not cond.evaluate(val):
-                failure_reasons.append(
-                    f"WFO Condition '{cond.name}' failed: {cond.metric}={val} "
-                    f"{cond.operator} {cond.threshold}"
-                )
-
-        passed = len(failure_reasons) == 0
-        logger.info(
-            "FR-cross-check-wfo: %d windows, profitable=%.2f%%, wf_eff=%.2f%%, "
-            "passed=%s",
-            n_runs,
-            profitable_pct,
-            wf_eff,
-            passed,
-        )
-
-        return WFOptimizationCheckResult(
-            windows=tuple(windows),
-            stitched_oos_net_profit=stitched_profit,
-            wf_efficiency_pct=wf_eff,
-            profitable_runs_pct=profitable_pct,
-            passed=passed,
-            failure_reasons=tuple(failure_reasons),
+        raise DomainError(
+            code="HSL_RETEST_EVALUATOR_REQUIRED",
+            message="Complete run metrics are required; adapter is not qualified",
         )

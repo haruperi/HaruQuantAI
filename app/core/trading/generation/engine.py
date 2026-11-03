@@ -1,4 +1,16 @@
-"""Strategy generation primitives supporting Random and Genetic Programming engines."""
+"""Strategy generation and explicit canonical HSL compilation.
+
+Description:
+    Select eligible causal building blocks and reject unsupported mutations.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Consistent, explicit strategy execution boundaries.
+Key Capabilities:
+    - FR-shared-hsl-execution: Hosts log decisions; focused tests verify effects.
+Python API Usage:
+    Import the typed contracts and services from this module.
+CLI Usage:
+    uv run pytest tests/core/trading tests/workspace/algo_wizard --no-cov
+"""
 
 from __future__ import annotations
 
@@ -8,6 +20,7 @@ from itertools import count
 
 from app.core.enums import OrderType, Timeframe
 from app.core.generators import RandomGenerator
+from app.core.lib.errors import DomainError
 from app.core.trading.blocks.registry import block_registry
 from app.core.trading.strategy.contracts import (
     ActionKind,
@@ -126,11 +139,120 @@ class GenerationEngine:
             trading_setup=TradingSetupConfig(),
         )
 
+    def generate_hsl_strategy(self, strategy_id: str | None = None) -> StrategyDocument:
+        """Generate typed HSL and compile only eligible, causal condition blocks."""
+        from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+        from app.core.trading.strategy.hsl.models import HSLStrategyDocument
+
+        source = self.generate_random_strategy(strategy_id)
+        rules = []
+        for rule in source.rules:
+            conditions = []
+            for condition in rule.conditions:
+                if condition.composition_block_id is not None:
+                    conditions.append(
+                        {
+                            "type": "block_condition",
+                            "block_id": condition.composition_block_id,
+                            "params": dict(condition.composition_params),
+                        }
+                    )
+                else:
+                    operators = {
+                        ">": "greater_than",
+                        "<": "less_than",
+                        ">=": "greater_or_equal",
+                        "<=": "less_or_equal",
+                    }
+                    left = {"type": "price", "field": condition.left}
+                    right = (
+                        {"type": "price", "field": condition.right}
+                        if isinstance(condition.right, str)
+                        else {"type": "value", "value": condition.right}
+                    )
+                    conditions.append(
+                        {
+                            "type": "comparison",
+                            "operator": operators[condition.comparator],
+                            "left": left,
+                            "right": right,
+                        }
+                    )
+            actions = []
+            for action in rule.actions:
+                if action.kind == ActionKind.ENTER:
+                    actions.append(
+                        {
+                            "action": "enter_market",
+                            "side": "long" if action.direction == 1 else "short",
+                            "size": {"type": "value", "value": action.volume},
+                            "stop_loss": {
+                                "type": "fixed_pips",
+                                "value": action.sl_pips,
+                            },
+                            "take_profit": {
+                                "type": "fixed_pips",
+                                "value": action.tp_pips,
+                            },
+                        }
+                    )
+                else:
+                    actions.append({"action": "exit_position", "target_side": "any"})
+            rules.append(
+                {
+                    "id": rule.rule_id,
+                    "name": rule.name,
+                    "when": {
+                        "type": "logical",
+                        "operator": "and",
+                        "conditions": conditions,
+                    },
+                    "then": actions,
+                }
+            )
+        document = HSLStrategyDocument.model_validate(
+            {
+                "strategy": {
+                    "id": source.strategy_id,
+                    "name": source.strategy_id,
+                    "universe": {"symbols": [self.spec.symbol]},
+                    "timeframe": {"primary": str(self.spec.timeframe)},
+                    "rules": rules,
+                }
+            }
+        )
+        return StrategyCompiler().compile_to_runtime(document)
+
     def _generate_conditions(self, count: int) -> list[ConditionDefinition]:
         conditions: list[ConditionDefinition] = []
         registered_blocks = list(self.spec.allowed_blocks) or [
-            d.spec.id for d in block_registry.snapshot()
+            d.spec.id
+            for d in block_registry.snapshot()
+            if d.spec.is_generation_eligible
+            and d.spec.is_causal
+            and d.composition is not None
         ]
+
+        registered_blocks = [
+            identifier
+            for identifier in registered_blocks
+            if (descriptor := block_registry.get(identifier)) is not None
+            and descriptor.spec.is_generation_eligible
+            and descriptor.spec.is_causal
+            and descriptor.composition is not None
+            and all(
+                name in ("open", "high", "low", "close", "volume")
+                for name in descriptor.spec.required_market_inputs
+            )
+        ]
+
+        if self.spec.allowed_blocks and set(registered_blocks) != set(
+            self.spec.allowed_blocks
+        ):
+            raise DomainError(
+                code="HSL_GENERATION_BLOCK_UNAVAILABLE",
+                message="Generation blocks must be causal eligible compositions",
+            )
 
         for _ in range(count):
             comp = _DEFAULT_COMPARATORS[
@@ -209,6 +331,11 @@ class GenerationEngine:
         self, parent1: StrategyDocument, parent2: StrategyDocument
     ) -> tuple[StrategyDocument, StrategyDocument]:
         """Perform rule subtree crossover between two parent strategy documents."""
+        if parent1.hsl_json or parent2.hsl_json:
+            raise DomainError(
+                code="HSL_GENETIC_OPERATION_UNSUPPORTED",
+                message="Legacy crossover cannot modify a canonical HSL plan",
+            )
         sid1 = f"strat-cx-{next(self._strategy_id_gen)}"
         sid2 = f"strat-cx-{next(self._strategy_id_gen)}"
 
@@ -261,6 +388,11 @@ class GenerationEngine:
 
     def mutate(self, strategy: StrategyDocument) -> StrategyDocument:
         """Apply point mutations to strategy conditions and parameter thresholds."""
+        if strategy.hsl_json:
+            raise DomainError(
+                code="HSL_GENETIC_OPERATION_UNSUPPORTED",
+                message="Legacy mutation cannot modify a canonical HSL plan",
+            )
         mutated_rules: list[RuleDefinition] = []
 
         for rule in strategy.rules:

@@ -1,4 +1,16 @@
-"""Unit tests for CrossCheckWalkForwardMatrixService."""
+"""Unit tests for CrossCheckWalkForwardMatrixService.
+
+Description:
+    Verify declared strategy behavior and explicit rejection of unavailable inputs.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Regression evidence for shared strategy execution.
+Key Capabilities:
+    - FR-hsl-regression-evidence: Assert observable results and failure boundaries.
+Python API Usage:
+    Run this module through pytest.
+CLI Usage:
+    uv run pytest tests/workspace/retester --no-cov
+"""
 
 from app.core.data.contracts import MarketBar
 from app.workspace.algo_wizard.models import (
@@ -93,7 +105,8 @@ class TestCrossCheckWalkForwardMatrix:
             ),
         )
         # All fail except 1
-        overrides = {(5, 20): (80.0, 1000.0)}
+        overrides = {(r, o): (50.0, 500.0) for r in (5, 10, 15) for o in (20, 30, 40)}
+        overrides[(5, 20)] = (80.0, 1000.0)
         res = CrossCheckWalkForwardMatrixService.run(
             strat, bars, config, cell_override=overrides
         )

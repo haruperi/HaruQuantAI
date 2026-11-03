@@ -24,13 +24,13 @@ CLI Usage:
 
 from __future__ import annotations
 
-import statistics
 from collections.abc import Sequence
 from dataclasses import dataclass
 from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.workspace.algo_wizard.models import HSLStrategyDocument
 
 logger = get_logger(__name__)
@@ -106,57 +106,11 @@ class CrossCheckOptProfileSPPService:
         Returns:
             SPPResult with profitable ratio, median profit, and pass/fail state.
         """
-        del strategy, bars
-        if custom_runs is not None:
-            profits = list(custom_runs)
-        else:
-            n_runs = min(config.max_tests, max(1, config.steps * 4))
-            profits = [
-                round(100.0 + ((i * 17 + config.seed) % 23 - 6) * 15.0, 2)
-                for i in range(n_runs)
-            ]
-
-        total_runs = len(profits)
-        if total_runs == 0:
-            return SPPResult(
-                total_runs=0,
-                profitable_runs_pct=0.0,
-                median_net_profit=0.0,
-                median_return_dd=0.0,
-                avg_parameter_stability=0.0,
-                passed=False,
-                failure_reasons=("No parameter runs evaluated",),
-            )
-
-        profitable_count = sum(1 for p in profits if p > 0)
-        profitable_pct = round((profitable_count / total_runs) * 100.0, 2)
-        med_profit = round(float(statistics.median(profits)), 2)
-        med_rdd = round(max(0.0, med_profit / 500.0), 2)
-        stability = round(min(100.0, profitable_pct * 0.9 + 10.0), 2)
-
-        passed = profitable_pct >= config.min_profitable_runs_pct
-        failure_reasons: list[str] = []
-        if not passed:
-            failure_reasons.append(
-                f"Profitable runs {profitable_pct}% below required "
-                f"{config.min_profitable_runs_pct}%"
-            )
-
-        logger.info(
-            "FR-cross-check-spp: %d runs, profitable=%.2f%%, "
-            "median_profit=%.2f, passed=%s",
-            total_runs,
-            profitable_pct,
-            med_profit,
-            passed,
+        del strategy, bars, config, custom_runs
+        logger.error(
+            "FR-cross-check-evidence: complete evaluation evidence is required"
         )
-
-        return SPPResult(
-            total_runs=total_runs,
-            profitable_runs_pct=profitable_pct,
-            median_net_profit=med_profit,
-            median_return_dd=med_rdd,
-            avg_parameter_stability=stability,
-            passed=passed,
-            failure_reasons=tuple(failure_reasons),
+        raise DomainError(
+            code="HSL_RETEST_EVALUATOR_REQUIRED",
+            message="Complete run metrics are required; adapter is not qualified",
         )

@@ -1,4 +1,16 @@
-"""Tests for LiveStrategySupervisor session management and real-time tick ingestion."""
+"""Tests for LiveStrategySupervisor session management and real-time tick ingestion.
+
+Description:
+    Verify declared strategy behavior and explicit rejection of unavailable inputs.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Regression evidence for shared strategy execution.
+Key Capabilities:
+    - FR-hsl-regression-evidence: Assert observable results and failure boundaries.
+Python API Usage:
+    Run this module through pytest.
+CLI Usage:
+    uv run pytest tests/workspace/trading --no-cov
+"""
 
 from __future__ import annotations
 
@@ -98,6 +110,7 @@ def test_supervisor_session_lifecycle() -> None:
         strategy_doc=doc,
         symbol="EURUSD",
         connection_id="conn-1",
+        allow_order_submission=True,  # Isolated mock broker only.
     )
     session = supervisor.start_strategy(spec)
 
@@ -136,6 +149,7 @@ def test_supervisor_on_tick_dispatch() -> None:
         strategy_doc=doc,
         symbol="EURUSD",
         connection_id="conn-1",
+        allow_order_submission=True,  # Isolated mock broker only.
     )
     session = supervisor.start_strategy(spec)
 
@@ -183,6 +197,7 @@ def test_supervisor_exit_rule_dispatch() -> None:
         strategy_doc=doc,
         symbol="EURUSD",
         connection_id="conn-1",
+        allow_order_submission=True,  # Isolated mock broker only.
     )
     session = supervisor.start_strategy(spec)
     # Add open position
@@ -200,3 +215,83 @@ def test_supervisor_exit_rule_dispatch() -> None:
     assert len(results) >= 1
     assert any(r.retcode == int(TradeRetcode.DONE) for r in results)
     assert any(req.position == 5555 for req in client.sent_requests)
+
+
+def test_submission_is_disabled_by_default() -> None:
+    """Evaluating a deployed strategy does not itself authorize broker orders."""
+    registry = BrokerRegistry()
+    client = MockSupervisorClient()
+    registry.register("mock", client)
+    supervisor = LiveStrategySupervisor(broker_registry=registry)
+    supervisor.start_strategy(
+        StrategyDeploySpec(
+            strategy_doc=_sample_strategy("EURUSD"),
+            symbol="EURUSD",
+            connection_id="mock",
+        )
+    )
+    assert (
+        supervisor.on_tick(
+            MarketTick(time_msc=1700000000000, bid=1.1, ask=1.1002), "EURUSD"
+        )
+        == []
+    )
+    assert client.sent_requests == []
+
+
+def test_hsl_short_partial_close_uses_confirmed_quantity_and_side() -> None:
+    """Closing 25 percent of a two-lot short produces a half-lot BUY request."""
+    from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+    from app.core.trading.strategy.hsl.models import HSLStrategyDocument
+
+    registry = BrokerRegistry()
+    client = MockSupervisorClient()
+    client._positions.append(
+        PositionInfo(
+            ticket=123,
+            symbol="EURUSD",
+            volume=2.0,
+            position_type=1,
+            magic=1000,
+            price_open=1.2,
+        )
+    )
+    registry.register("mock", client)
+    supervisor = LiveStrategySupervisor(broker_registry=registry)
+    document = HSLStrategyDocument.model_validate(
+        {
+            "strategy": {
+                "id": "close",
+                "name": "Close",
+                "rules": [
+                    {
+                        "id": "close",
+                        "event": "on_tick",
+                        "when": {"type": "state", "state": "always_true"},
+                        "then": [
+                            {
+                                "action": "exit_position",
+                                "target_side": "short",
+                                "quantity_pct": 25.0,
+                            }
+                        ],
+                    }
+                ],
+            }
+        }
+    )
+    supervisor.start_strategy(
+        StrategyDeploySpec(
+            strategy_doc=StrategyCompiler().compile_to_runtime(document),
+            symbol="EURUSD",
+            connection_id="mock",
+            allow_order_submission=True,
+        )
+    )
+    supervisor.on_tick(
+        MarketTick(time_msc=1700000000000, bid=1.1, ask=1.1002), "EURUSD"
+    )
+    request = client.sent_requests[0]
+    assert request.position == 123
+    assert request.volume == 0.5
+    assert request.order_type == OrderType.BUY

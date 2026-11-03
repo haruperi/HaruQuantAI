@@ -1,7 +1,21 @@
-"""End-to-end Gate G10 acceptance tests for AlgoWizard and platform descriptors."""
+"""End-to-end Gate G10 acceptance tests for AlgoWizard and platform descriptors.
+
+Description:
+    Verify declared strategy behavior and explicit rejection of unavailable inputs.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Regression evidence for shared strategy execution.
+Key Capabilities:
+    - FR-hsl-regression-evidence: Assert observable results and failure boundaries.
+Python API Usage:
+    Run this module through pytest.
+CLI Usage:
+    uv run pytest tests/workspace/algo_wizard --no-cov
+"""
 
 from __future__ import annotations
 
+import pytest
+from app.core.lib.errors import DomainError
 from app.core.wizard.template_helpers import (
     format_class_identifier,
     format_parameter_value,
@@ -98,20 +112,16 @@ def test_template_helpers_and_six_platform_descriptors() -> None:
     compiler = StrategyCompiler()
     normalized = compiler.compile_to_normalized(example_doc)
 
-    el_code = render_easylanguage(normalized)
-    assert "[LegacyColorValue = TRUE];" in el_code
-
-    jf_code = render_jforex(normalized)
-    assert "implements IStrategy" in jf_code
-
-    mql4_code = render_mql4(normalized)
-    assert "#property strict" in mql4_code
-
-    mql5_code = render_mql5(normalized)
-    assert "CTrade trade;" in mql5_code
-
-    nt_code = render_ninjatrader(normalized)
-    assert "namespace NinjaTrader.NinjaScript.Strategies" in nt_code
+    for render in (
+        render_easylanguage,
+        render_jforex,
+        render_mql4,
+        render_mql5,
+        render_ninjatrader,
+    ):
+        with pytest.raises(DomainError) as error:
+            render(normalized)
+        assert error.value.code == "HSL_EXPORT_UNSUPPORTED"
 
     pseudo_code = render_pseudo_code(
         normalized,
@@ -241,6 +251,15 @@ def test_end_to_end_workspace_qualification_pipeline() -> None:
         "hsl_json",
     )
     for platform in all_platforms:
+        if platform not in ("python", "pseudo_code", "hsl_json"):
+            with pytest.raises(DomainError) as error:
+                cloud_service.export_strategy(
+                    ExportStrategyRequest(
+                        document=imported.document, target_platform=platform
+                    )
+                )
+            assert error.value.code == "HSL_EXPORT_UNSUPPORTED"
+            continue
         exported = cloud_service.export_strategy(
             ExportStrategyRequest(
                 document=imported.document,

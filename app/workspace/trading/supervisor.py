@@ -27,28 +27,35 @@ from __future__ import annotations
 
 import inspect
 import uuid
-from dataclasses import dataclass, field
+from collections.abc import Awaitable
+from dataclasses import dataclass, field, replace
+from datetime import UTC, datetime
 from typing import Literal
 
 from app.core.data.contracts import (
+    AccountInfo,
     MarketTick,
     PositionInfo,
     TradeRequest,
     TradeResult,
 )
 from app.core.enums import (
+    OrderTime,
     OrderType,
     Timeframe,
     TradeAction,
     TradeRetcode,
 )
 from app.core.host.logging import get_logger
+from app.core.lib.errors import DomainError
 from app.core.trading.connection.base import TradingClient
 from app.core.trading.strategy.contracts import (
     CloseRequest,
+    EvaluationEvent,
     OrderRequest,
     StrategyContext,
     StrategyDocument,
+    StrategyEffects,
     TickUpdateEvent,
 )
 from app.core.trading.strategy.runtime import StrategyRuntime
@@ -71,6 +78,7 @@ class LiveStrategySession:
     connection_id: str
     timeframe: Timeframe = Timeframe.PERIOD_H1
     status: Literal["RUNNING", "PAUSED", "STOPPED"] = "RUNNING"
+    allow_order_submission: bool = False
     trades_count: int = 0
     pnl: float = 0.0
     context: StrategyContext = field(default_factory=StrategyContext)
@@ -85,6 +93,8 @@ class StrategyDeploySpec:
     connection_id: str
     timeframe: Timeframe = Timeframe.PERIOD_H1
     session_id: str | None = None
+    allow_order_submission: bool = False
+    context: StrategyContext = field(default_factory=StrategyContext)
 
 
 class LiveStrategySupervisor:
@@ -109,6 +119,8 @@ class LiveStrategySupervisor:
             strategy_doc=spec.strategy_doc,
             symbol=spec.symbol,
             connection_id=spec.connection_id,
+            allow_order_submission=spec.allow_order_submission,
+            context=spec.context,
             timeframe=spec.timeframe,
             status="RUNNING",
         )
@@ -197,15 +209,29 @@ class LiveStrategySupervisor:
         """Return a list of all active strategy sessions."""
         return list(self._sessions.values())
 
+    def evaluate_event(
+        self,
+        session_id: str,
+        event: EvaluationEvent,
+        context: StrategyContext | None = None,
+    ) -> StrategyEffects:
+        """Evaluate any host event without sending orders; retain isolated state."""
+        session = self._sessions[session_id]
+        if session.status != "RUNNING" or session.symbol != event.symbol:
+            return StrategyEffects()
+        snapshot = context if context is not None else session.context
+        snapshot = replace(snapshot, state=session.context.state)
+        effects = self.runtime.evaluate(session.strategy_doc, snapshot, event)
+        session.context = replace(snapshot, state=effects.state_updates)
+        return effects
+
     def on_tick(self, tick: MarketTick, symbol: str) -> list[TradeResult]:
-        """Evaluate running strategies on the incoming tick and dispatch orders."""
-        logger.debug(
-            "FR-trading-supervisor-tick-dispatch: tick %s bid=%.5f ask=%.5f",
-            symbol,
-            tick.bid,
-            tick.ask,
-        )
-        event = TickUpdateEvent(symbol=symbol, tick=tick)
+        """Adapt quotes into the same event dispatcher used by bars and lifecycle."""
+        return self.on_event(TickUpdateEvent(symbol=symbol, tick=tick))
+
+    def on_event(self, event: EvaluationEvent) -> list[TradeResult]:
+        """Evaluate host events and submit effects only with distinct authorization."""
+        symbol = event.symbol
         results: list[TradeResult] = []
 
         for session in list(self._sessions.values()):
@@ -216,11 +242,18 @@ class LiveStrategySupervisor:
             if client is None or not client.is_connected:
                 continue
 
-            effects = self.runtime.evaluate(
-                session.strategy_doc,
-                session.context,
-                event,
-            )
+            snapshot = self._broker_snapshot(client, session.context)
+            effects = self.evaluate_event(session.session_id, event, snapshot)
+            if not session.allow_order_submission:
+                logger.info("FR-trading-supervisor-order-routing: submission disabled")
+                continue
+            if effects.orders_to_cancel or effects.orders_to_modify:
+                from app.core.lib.errors import DomainError
+
+                raise DomainError(
+                    code="HSL_LIVE_ACTION_UNAVAILABLE",
+                    message="Live cancel/modify requires a confirmed broker adapter",
+                )
 
             # Process exit requests
             for close_req in effects.positions_to_close:
@@ -228,25 +261,85 @@ class LiveStrategySupervisor:
                 if close_res is not None:
                     results.append(close_res)
 
-            # Process entry requests
-            raw_positions = client.get_positions()
-            positions: list[PositionInfo] = (
-                raw_positions if not inspect.isawaitable(raw_positions) else []
-            )
-            symbol_pos_count = sum(1 for p in positions if p.symbol == symbol)
-
-            for order_req in effects.orders_to_open:
-                if not self.risk_guard.validate_order(order_req, symbol_pos_count):
-                    continue
-
-                order_res = self._dispatch_order(client, order_req, session)
-                if order_res is not None:
-                    results.append(order_res)
-                    if order_res.retcode == int(TradeRetcode.DONE):
-                        session.trades_count += 1
-                        symbol_pos_count += 1
+            results.extend(self._dispatch_entries(client, session, effects))
 
         return results
+
+    @staticmethod
+    def _broker_snapshot(
+        client: TradingClient, previous: StrategyContext
+    ) -> StrategyContext:
+        """Require synchronous broker snapshots before evaluating live effects."""
+        methods = (client.get_positions, client.get_orders, client.get_account_info)
+        if any(inspect.iscoroutinefunction(method) for method in methods):
+            raise DomainError(
+                code="HSL_ASYNC_BROKER_UNSUPPORTED",
+                message="Synchronous dispatcher requires synchronous snapshots",
+            )
+        positions = client.get_positions()
+        orders = client.get_orders()
+        account = client.get_account_info()
+        for value in (positions, orders, account):
+            if inspect.isawaitable(value):
+                if inspect.iscoroutine(value):
+                    value.close()
+                raise DomainError(
+                    code="HSL_ASYNC_BROKER_UNSUPPORTED",
+                    message="Async broker snapshots need an async host",
+                )
+        if (
+            not isinstance(positions, list)
+            or not isinstance(orders, list)
+            or not isinstance(account, AccountInfo)
+        ):
+            raise DomainError(
+                code="HSL_INVALID_BROKER_SNAPSHOT",
+                message="Broker snapshot types do not match the host contract",
+            )
+        return replace(
+            previous,
+            positions=tuple(positions),
+            orders=tuple(orders),
+            account_balance=account.balance,
+            account_equity=account.equity,
+        )
+
+    def _dispatch_entries(
+        self,
+        client: TradingClient,
+        session: LiveStrategySession,
+        effects: StrategyEffects,
+    ) -> list[TradeResult]:
+        """Apply host entry guards and return confirmed broker results."""
+        results: list[TradeResult] = []
+
+        # Process entry requests
+        positions = session.context.positions
+        symbol_pos_count = sum(1 for p in positions if p.symbol == session.symbol)
+
+        for order_req in effects.orders_to_open:
+            if not self.risk_guard.validate_order(order_req, symbol_pos_count):
+                continue
+
+            order_res = self._dispatch_order(client, order_req, session)
+            if order_res is not None:
+                results.append(order_res)
+                if order_res.retcode == int(TradeRetcode.DONE):
+                    session.trades_count += 1
+                    symbol_pos_count += 1
+        return results
+
+    @staticmethod
+    def _confirmed_result(result: TradeResult | Awaitable[TradeResult]) -> TradeResult:
+        """Reject unconfirmed asynchronous operations in the synchronous host."""
+        if inspect.isawaitable(result):
+            if inspect.iscoroutine(result):
+                result.close()
+            raise DomainError(
+                code="HSL_ASYNC_BROKER_UNSUPPORTED",
+                message="Broker operation requires an async host",
+            )
+        return result
 
     def _dispatch_order(
         self,
@@ -261,7 +354,17 @@ class LiveStrategySupervisor:
             order_req.volume,
         )
         trade_req = TradeRequest(
-            action=TradeAction.DEAL,
+            action=TradeAction.DEAL
+            if order_req.order_type in (OrderType.BUY, OrderType.SELL)
+            else TradeAction.PENDING,
+            type_time=OrderTime.SPECIFIED
+            if order_req.atm_rules.get("expires_at")
+            else OrderTime.GTC,
+            expiration=datetime.fromtimestamp(
+                int(order_req.atm_rules["expires_at"]), UTC
+            )
+            if order_req.atm_rules.get("expires_at")
+            else None,
             symbol=order_req.symbol,
             volume=order_req.volume,
             order_type=order_req.order_type,
@@ -271,13 +374,16 @@ class LiveStrategySupervisor:
             magic=order_req.magic,
             comment=order_req.comment or f"live-strat-{session.session_id}",
         )
+        if inspect.iscoroutinefunction(client.order_send):
+            raise DomainError(
+                code="HSL_ASYNC_BROKER_UNSUPPORTED",
+                message="Synchronous dispatcher cannot submit async broker operations",
+            )
         try:
             res = client.order_send(trade_req)
-            if inspect.isawaitable(res):
-                # When client is synchronous, result is immediately returned
-                logger.warning("Async broker order_send not awaited in sync on_tick")
-                return None
-            return res
+            return self._confirmed_result(res)
+        except DomainError:
+            raise
         except Exception as exc:
             logger.exception(
                 "FR-trading-supervisor-order-routing: order execution failed"
@@ -298,20 +404,44 @@ class LiveStrategySupervisor:
             "FR-trading-supervisor-order-routing: dispatching close ticket %s",
             close_req.ticket,
         )
-        ticket = int(close_req.ticket) if str(close_req.ticket).isdigit() else 0
+        position = next(
+            (
+                position
+                for position in session.context.positions
+                if str(position.ticket) == str(close_req.ticket)
+            ),
+            None,
+        )
+        if position is None or position.symbol != session.symbol:
+            raise DomainError(
+                code="HSL_POSITION_UNAVAILABLE",
+                message="Close requires a confirmed matching position",
+            )
+        ticket = int(position.ticket)
+        volume = close_req.volume if close_req.volume is not None else position.volume
+        if not 0 < volume <= position.volume:
+            raise DomainError(
+                code="HSL_INVALID_CLOSE_VOLUME",
+                message="Close quantity exceeds the confirmed position",
+            )
         trade_req = TradeRequest(
             action=TradeAction.DEAL,
             symbol=session.symbol,
             position=ticket,
-            volume=close_req.volume or 1.0,
-            order_type=OrderType.SELL,
+            volume=volume,
+            order_type=OrderType.SELL if position.position_type == 0 else OrderType.BUY,
             comment=close_req.comment or "close position",
         )
+        if inspect.iscoroutinefunction(client.order_send):
+            raise DomainError(
+                code="HSL_ASYNC_BROKER_UNSUPPORTED",
+                message="Synchronous dispatcher cannot submit async broker operations",
+            )
         try:
             res = client.order_send(trade_req)
-            if inspect.isawaitable(res):
-                return None
-            return res
+            return self._confirmed_result(res)
+        except DomainError:
+            raise
         except Exception as exc:
             logger.exception(
                 "FR-trading-supervisor-order-routing: close execution failed"

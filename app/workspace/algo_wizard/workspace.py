@@ -1,48 +1,23 @@
-"""AppWizard workspace coordinator service (WizardService).
+"""HSL workspace examples, durable file exchange, and Retester handoff.
 
-Description:
-    Implements WizardService (AppWizard equivalent), coordinating the built-in
-    canonical HSL 1.0 strategy examples catalog (/AlgoWizard/examples/examples.json
-    and /algowizard/loadExample), strategy file import and persistence with
-    automatic legacy upgrade and 3-pass validation (/algowizard/loadFile and
-    /algowizard/saveFile), and compilation handoff to the Retester workspace
-    (/algowizard/saveToRetester).
-
-Purpose:
-    FEAT-WIZARD-WORKSPACE: Gate G7 (Phase 5.7, WO-WZ-WORKSPACE-COORDINATOR /
-    I-AppWizard) workspace coordinator for HSL 1.0 strategy authoring, file
-    exchange, and Retester handoff.
-
+Description: Coordinate validated examples, host storage, and compiled Retester bundles.
+Purpose: FEAT-WIZARD-HSL-LANGUAGE: Consistent strategy authoring and exchange.
 Key Capabilities:
-    - FR-wizard-examples-catalog: Serves and loads validated built-in HSL 1.0
-      strategy templates (EMA Crossover, RSI Mean Reversion, ATR Breakout,
-      Multi-Timeframe Trend Filter) with deterministic cloning.
-    - FR-wizard-file-exchange: Loads and persists HSL 1.0 strategy JSON files
-      with legacy document auto-upgrade, filename sanitization, SHA-256 content
-      hashing, and MRU recent-file tracking.
-    - FR-wizard-retester-handoff: Validates and compiles HSL 1.0 documents into
-      Retester-ready bundles containing both HSLStrategyDocument and runtime
-      StrategyDocument.
-
-Python API Usage:
-    from app.workspace.algo_wizard.workspace import WizardService
-    from app.workspace.algo_wizard.workspace_models import LoadWizardExampleRequest
-
-    service = WizardService()
-    resp = service.load_example(LoadWizardExampleRequest(example_id="ema_crossover"))
-
-CLI Usage:
-    uv run python -m pytest tests/workspace/algo_wizard/test_workspace.py --no-cov -q
+    - FR-shared-hsl-execution: Log decisions and verify observable effects.
+Python API Usage: Import the typed services from this module.
+CLI Usage: uv run pytest tests/workspace/algo_wizard --no-cov
 """
 
 from __future__ import annotations
 
 import json
+import os
 import re
 from pathlib import PurePath
 from typing import Any, cast
 
 from app.core.host.logging import get_logger
+from app.core.host.strategy_storage import HostStrategyStorage
 from app.core.lib.errors import DomainError, JSONValue
 from app.core.lib.responses import StandardResponse
 from app.workspace.algo_wizard.catalogue import WizardCatalogueService
@@ -570,6 +545,7 @@ class WizardService:
         catalogue_service: WizardCatalogueService | None = None,
         strategy_service: StrategyDocumentService | None = None,
         visual_block_service: VisualBlockService | None = None,
+        storage: HostStrategyStorage | None = None,
     ) -> None:
         """Initialize WizardService and its shared HSL 1.0 collaborators."""
         self._library = library if library is not None else WizardBlockLibrary()
@@ -584,14 +560,24 @@ class WizardService:
         self._strategy_service = strategy_service or StrategyDocumentService(
             validator=self._validator,
             compiler=self._compiler,
+            storage=storage,
         )
         self._visual_block_service = visual_block_service or VisualBlockService(
             library=self._library,
             validator=self._validator,
             compiler=self._compiler,
         )
+        storage_root = os.environ.get("HARU_STRATEGY_STORAGE_DIR")
+        self._storage = storage or (
+            HostStrategyStorage(storage_root) if storage_root else None
+        )
         self._examples: dict[str, WizardExamplePayload] = _build_default_examples()
         self._files: dict[str, SavedStrategyFileResult] = {}
+        if self._storage is not None:
+            for key, record in self._storage.records("file:").items():
+                self._files[key.removeprefix("file:")] = (
+                    SavedStrategyFileResult.model_validate(record["payload"])
+                )
         self._recent_files: list[str] = []
         self._retester_handoffs: dict[str, RetesterHandoffResult] = {}
         self._revision: int = 1
@@ -774,22 +760,47 @@ class WizardService:
         raw_name = request.filename or request.file_id or request.document.strategy.id
         filename = self._sanitize_filename(raw_name)
         file_id = self._sanitize_file_id(request.file_id or filename)
-        existing = self._files.get(file_id)
-        revision = existing.revision + 1 if existing is not None else 1
+        if self._storage is None:
+            raise DomainError(
+                code="HSL_STORAGE_UNAVAILABLE",
+                message="Configure host strategy storage before saving",
+            )
+        latest = self._storage.load("file:" + file_id)
+        existing = (
+            SavedStrategyFileResult.model_validate(latest["payload"])
+            if latest
+            else None
+        )
+        actual_revision = existing.revision if existing is not None else 0
+        if (
+            request.expected_revision is not None
+            and request.expected_revision != actual_revision
+        ):
+            raise DomainError(
+                code="WIZARD_REVISION_CONFLICT",
+                message="Strategy file revision changed",
+            )
+        revision = actual_revision + 1
         doc_hash = compute_document_hash(request.document)
         cloned_doc = parse_hsl_document(canonical_hsl_bytes(request.document))
 
-        self._record_recent_file(filename)
-        self._revision += 1
+        recent_files = tuple(dict.fromkeys((filename, *self._recent_files)))
         saved = SavedStrategyFileResult(
             file_id=file_id,
             filename=filename,
             strategy_id=cloned_doc.strategy.id,
             revision=revision,
             document_hash=doc_hash,
-            recent_files=tuple(self._recent_files),
+            recent_files=recent_files,
             document=cloned_doc,
         )
+        self._storage.save(
+            "file:" + file_id,
+            saved.model_dump(mode="json"),
+            expected_revision=revision - 1,
+        )
+        self._record_recent_file(filename)
+        self._revision += 1
         self._files[file_id] = saved
 
         logger.info(
@@ -865,10 +876,14 @@ class WizardService:
 
     def get_saved_file(self, file_id: str) -> SavedStrategyFileResult | None:
         """Look up a previously saved strategy file by file_id or filename."""
-        direct = self._files.get(file_id)
-        if direct is not None:
-            return direct
         normalized = self._sanitize_file_id(file_id)
+        if self._storage is not None:
+            record = self._storage.load("file:" + normalized)
+            if record is not None:
+                saved = SavedStrategyFileResult.model_validate(record["payload"])
+                self._files[normalized] = saved
+                return saved
+            return None
         return self._files.get(normalized)
 
     def list_saved_files(self) -> tuple[SavedStrategyFileResult, ...]:

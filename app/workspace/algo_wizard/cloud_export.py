@@ -84,6 +84,7 @@ _SAFE_STEM_RE = re.compile(r"[^A-Za-z0-9_-]+")
 _EXPORT_TARGETS: tuple[ExportTargetDescriptor, ...] = (
     ExportTargetDescriptor(
         platform="python",
+        supported_for_hsl=True,
         name="HaruQuant Python Strategy",
         extension=".py",
         language="Python",
@@ -126,6 +127,7 @@ _EXPORT_TARGETS: tuple[ExportTargetDescriptor, ...] = (
     ),
     ExportTargetDescriptor(
         platform="pseudo_code",
+        supported_for_hsl=True,
         name="Human-Readable Strategy Pseudocode",
         extension=".txt",
         language="Pseudocode",
@@ -133,6 +135,7 @@ _EXPORT_TARGETS: tuple[ExportTargetDescriptor, ...] = (
     ),
     ExportTargetDescriptor(
         platform="hsl_json",
+        supported_for_hsl=True,
         name="HaruQuant Strategy Language (HSL 1.0 JSON)",
         extension=".json",
         language="JSON",
@@ -499,6 +502,11 @@ class CloudExportService:
                 + "\n"
             )
 
+        if target_platform not in ("python", "pseudo_code"):
+            raise DomainError(
+                code="HSL_EXPORT_UNSUPPORTED",
+                message=f"Target '{target_platform}' has no qualified HSL mapping",
+            )
         norm_strategy = self._compiler.compile_to_normalized(document)
         renderers = {
             "python": lambda: render_jinja_template(PYTHON_TEMPLATE, norm_strategy),

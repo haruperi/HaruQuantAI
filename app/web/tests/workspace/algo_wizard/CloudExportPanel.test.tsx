@@ -35,9 +35,9 @@ describe("CloudExportPanel (Phase 5.9: I-ServletAlgoCloud)", () => {
       expect(html).toContain(platform);
     }
 
-    expect(html).toContain("hsl_ema_crossover_v1.py");
-    expect(html).toContain("Copy Code");
-    expect(html).toContain("Download hsl_ema_crossover_v1.py");
+    expect(html).toContain("Generate an export to preview its code.");
+    expect(html).toContain("unavailable for HSL");
+    expect(html).not.toContain("class EMACrossoverStrategy");
   });
 
   it("calls /algocloud/import and /algocloud/export endpoints via typed client", async () => {
@@ -78,5 +78,71 @@ describe("CloudExportPanel (Phase 5.9: I-ServletAlgoCloud)", () => {
       expect.objectContaining({ method: "POST" }),
     );
     expect(exported.filename).toBe("hsl_ema_crossover_v1.mq4");
+  });
+});
+
+describe("HSL transport boundaries", () => {
+  it("rejects backend errors instead of returning undefined success data", async () => {
+    const fetchFn = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({ error: { message: "Unsupported HSL target" } }),
+          { status: 400 },
+        ),
+    );
+    const client = createAlgoWizardApiClient({ fetchFn });
+    await expect(
+      client.exportCloudStrategy(DEFAULT_HSL_STRATEGY_DOCUMENT, "mql5"),
+    ).rejects.toThrow("Unsupported HSL target");
+  });
+  it("projects actual backend catalogue field names into display metadata", async () => {
+    const fetchFn = vi.fn(
+      async () =>
+        new Response(
+          JSON.stringify({
+            data: {
+              revision: "registry-v1",
+              timeframes: [
+                { code: "H1", label: "1 hour", description: "Hourly" },
+              ],
+              lifecycle_events: [],
+              commission_methods: [
+                {
+                  method_id: "per_lot",
+                  name: "Per lot",
+                  unit: "per_lot",
+                  default_value: 0,
+                },
+              ],
+              blocks: [
+                {
+                  semantic_id: "indicator.rsi",
+                  registry_id: "rsi",
+                  name: "RSI",
+                  family: "EXPRESSION",
+                  category: "momentum",
+                  return_type: "series",
+                  required_inputs: ["close"],
+                  parameters: [
+                    {
+                      name: "period",
+                      param_type: "int",
+                      required: false,
+                      default: 14,
+                    },
+                  ],
+                },
+              ],
+            },
+          }),
+        ),
+    );
+    const bundle = await createAlgoWizardApiClient({
+      fetchFn,
+    }).getConstantsBundle();
+    expect(bundle.timeframes[0].key).toBe("H1");
+    expect(bundle.blocks[0].label).toBe("RSI");
+    expect(bundle.blocks[0].parameters[0].default_value).toBe(14);
+    expect(bundle.commission_methods[0].label).toBe("Per lot");
   });
 });

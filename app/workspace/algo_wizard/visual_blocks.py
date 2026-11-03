@@ -43,10 +43,13 @@ from dataclasses import dataclass, field
 from typing import Any, cast
 
 from app.core.data.contracts import MarketBar
-from app.core.enums import OrderType
+from app.core.enums import OrderType, Timeframe
 from app.core.host.logging import get_logger
 from app.core.lib.errors import DomainError, JSONValue
 from app.core.lib.responses import StandardResponse
+from app.core.trading.backtest.contracts import RunResult, RunSpec
+from app.core.trading.backtest.runner import BacktestRunner
+from app.core.trading.strategy.runtime import StrategyRuntime
 from app.workspace.algo_wizard import models as _hm
 from app.workspace.algo_wizard import value_models as _vm
 from app.workspace.algo_wizard import visual_blocks_models as _vbm
@@ -663,12 +666,23 @@ class VisualBlockService:
             )
 
         market_bars = self._build_market_bars(request.bars)
-        effects_seq = self._compiler.evaluate_hsl_on_bars(doc, market_bars)
+        plan = self._compiler.compile_to_runtime(doc)
+        actual = BacktestRunner(StrategyRuntime(self._library.registry)).run(
+            RunSpec(
+                plan,
+                doc.strategy.universe.symbols[0],
+                Timeframe(doc.strategy.timeframe.primary),
+                market_bars,
+                request.settings,
+            )
+        )
+        effects_seq = actual.effects
         result = self._summarize_backtest(
             request.backtest_id,
             doc.strategy.id,
             market_bars,
             effects_seq,
+            actual,
         )
         self._backtest_results[request.backtest_id] = result
         self._revision += 1
@@ -704,18 +718,8 @@ class VisualBlockService:
                 )
                 for b in bars
             )
-        base_prices = [100.0 + (i % 7) * 1.5 - (i % 3) * 0.8 for i in range(25)]
-        return tuple(
-            MarketBar(
-                time=1_700_000_000 + i * 3600,
-                open=p - 0.25,
-                high=p + 0.75,
-                low=p - 0.75,
-                close=p,
-                tick_volume=100,
-                real_volume=100,
-            )
-            for i, p in enumerate(base_prices)
+        raise DomainError(
+            code="HSL_MISSING_FEED", message="Backtesting requires explicit market bars"
         )
 
     @staticmethod
@@ -724,13 +728,13 @@ class VisualBlockService:
         strategy_id: str,
         bars: Sequence[MarketBar],
         effects_seq: Sequence[Any],
+        actual: RunResult,
     ) -> WizardBacktestResult:
         opened = 0
         closed = 0
         modified = 0
         cancelled = 0
-        equity_delta = 0.0
-        open_entries: list[tuple[int, float, float]] = []
+        equity_delta = actual.metrics["net_profit"]
         trade_log: list[WizardTradeLogEntry] = []
 
         for idx, (bar, eff) in enumerate(zip(bars, effects_seq, strict=False)):
@@ -742,8 +746,6 @@ class VisualBlockService:
                     if req.order_type in (OrderType.BUY, OrderType.SELL)
                     else "enter_pending"
                 )
-                if act_kind == "enter_market":
-                    open_entries.append((req.direction, req.price, req.volume))
                 trade_log.append(
                     WizardTradeLogEntry(
                         bar_index=idx,
@@ -760,9 +762,6 @@ class VisualBlockService:
                 )
             for close_req in eff.positions_to_close:
                 closed += 1
-                if open_entries:
-                    d, open_p, vol = open_entries.pop(0)
-                    equity_delta += (bar.close - open_p) * float(d) * vol * 100.0
                 trade_log.append(
                     WizardTradeLogEntry(
                         bar_index=idx,
@@ -778,18 +777,13 @@ class VisualBlockService:
             modified += len(eff.orders_to_modify)
             cancelled += len(eff.orders_to_cancel)
 
-        if bars and open_entries:
-            last_close = bars[-1].close
-            for d, open_p, vol in open_entries:
-                equity_delta += (last_close - open_p) * float(d) * vol * 100.0
-
         return WizardBacktestResult(
             backtest_id=backtest_id,
             strategy_id=strategy_id,
             status="COMPLETED",
             bars_evaluated=len(bars),
             total_orders_opened=opened,
-            total_positions_closed=closed,
+            total_positions_closed=len(actual.trades),
             total_orders_modified=modified,
             total_orders_cancelled=cancelled,
             equity_delta=round(equity_delta, 4),

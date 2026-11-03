@@ -1,4 +1,16 @@
-"""Domain contracts for strategy documents and event evaluation."""
+"""Shared strategy documents, market snapshots, and execution effects.
+
+Description:
+    Define typed host boundaries for legacy and canonical HSL strategies.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Consistent, explicit strategy execution boundaries.
+Key Capabilities:
+    - FR-shared-hsl-execution: Hosts log decisions; focused tests verify effects.
+Python API Usage:
+    Import the typed contracts and services from this module.
+CLI Usage:
+    uv run pytest tests/core/trading tests/workspace/algo_wizard --no-cov
+"""
 
 from __future__ import annotations
 
@@ -56,7 +68,31 @@ class TickUpdateEvent:
     tick: MarketTick
 
 
-type EvaluationEvent = BarUpdateEvent | TickUpdateEvent
+@dataclass(frozen=True, slots=True)
+class LifecycleEvent:
+    """Explicit host lifecycle notification; time is UTC epoch seconds."""
+
+    kind: str
+    symbol: str
+    time: int
+    timeframe: str = ""
+    payload: Mapping[str, Any] = field(default_factory=dict)
+
+
+type EvaluationEvent = BarUpdateEvent | TickUpdateEvent | LifecycleEvent
+
+
+@dataclass(frozen=True, slots=True)
+class InstrumentEconomics:
+    """Explicit account-currency valuation and executable quantity grid."""
+
+    pip_size: float
+    tick_size: float
+    pip_value_per_lot: float
+    contract_size: float
+    min_volume: float
+    max_volume: float
+    volume_step: float
 
 
 @dataclass(frozen=True, slots=True)
@@ -102,6 +138,8 @@ class StrategyEffects:
     orders_to_cancel: tuple[str, ...] = ()
     orders_to_modify: tuple[OrderModification, ...] = ()
     positions_to_close: tuple[CloseRequest, ...] = ()
+    state_updates: Mapping[str, Any] = field(default_factory=dict)
+    alerts: tuple[Mapping[str, Any], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -184,6 +222,15 @@ class StrategyContext:
     orders: tuple[OrderInfo, ...] = ()
     account_balance: float = 0.0
     variables: Mapping[str, Any] = field(default_factory=dict)
+    bars_by_context: Mapping[tuple[str, str], BarData] = field(default_factory=dict)
+    bar_close_times: Mapping[tuple[str, str], tuple[int, ...]] = field(
+        default_factory=dict
+    )
+    economics: Mapping[str, InstrumentEconomics] = field(default_factory=dict)
+    account_equity: float | None = None
+    state: Mapping[str, Any] = field(default_factory=dict)
+    session_open: bool | None = None
+    entries_today: int | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -195,6 +242,8 @@ class StrategyDocument:
     variables: tuple[VariableDefinition, ...] = ()
     params: tuple[ParameterDefinition, ...] = ()
     trading_setup: TradingSetupConfig = field(default_factory=TradingSetupConfig)
+    hsl_json: str | None = None
+    block_fingerprints: Mapping[str, str] = field(default_factory=dict)
 
 
 __all__ = [
@@ -203,6 +252,8 @@ __all__ = [
     "CloseRequest",
     "ConditionDefinition",
     "EvaluationEvent",
+    "InstrumentEconomics",
+    "LifecycleEvent",
     "OrderModification",
     "OrderRequest",
     "ParameterDefinition",

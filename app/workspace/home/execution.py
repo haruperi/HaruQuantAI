@@ -281,7 +281,7 @@ class ProjectExecutor:
                 )
             )
             return tuple(
-                generator.generate_random_strategy(f"{snapshot.task_id}-{i}")
+                generator.generate_hsl_strategy(f"{snapshot.task_id}-{i}")
                 for i in range(config.candidates)
             )
         strategies = tuple(
@@ -297,14 +297,75 @@ class ProjectExecutor:
         )
         original = strategies[0]
         return tuple(
-            replace(
-                original,
-                params=tuple(
-                    replace(p, value=indexes.get_params(i).get(p.name, p.value))
-                    for p in original.params
-                ),
-            )
+            ProjectExecutor._parameter_candidate(original, indexes.get_params(i))
             for i in range(indexes.total_permutations)
+        )
+
+    @staticmethod
+    def _parameter_candidate(
+        original: StrategyDocument, values: dict[str, Any]
+    ) -> StrategyDocument:
+        """Recompile HSL parameter changes rather than editing a stale plan."""
+        if original.hsl_json:
+            from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+            from app.core.trading.strategy.hsl.documents import parse_hsl_document
+
+            document = parse_hsl_document(original.hsl_json).model_dump(mode="json")
+            for name, value in values.items():
+                parameter = document["strategy"]["parameters"][name]
+                if parameter["type"] == "int":
+                    if not float(value).is_integer():
+                        raise DomainError(
+                            code="HSL_INVALID_PARAMETER",
+                            message="Integer parameters require integral grid values",
+                        )
+                    parameter["default"] = int(value)
+                else:
+                    parameter["default"] = value
+            return StrategyCompiler().compile_to_runtime(parse_hsl_document(document))
+        return replace(
+            original,
+            params=tuple(
+                replace(parameter, value=values.get(parameter.name, parameter.value))
+                for parameter in original.params
+            ),
+        )
+
+    @staticmethod
+    def _sized_candidate(strategy: StrategyDocument, volume: float) -> StrategyDocument:
+        """Apply a project sizing override to the canonical definition."""
+        if strategy.hsl_json:
+            from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+            from app.core.trading.strategy.hsl.documents import parse_hsl_document
+
+            document = parse_hsl_document(strategy.hsl_json).model_dump(mode="json")
+            document["strategy"]["money_management"] = {
+                "type": "fixed_size",
+                "size": volume,
+            }
+            for rule in document["strategy"]["rules"]:
+                for action in (*rule["then"], *rule["else_then"]):
+                    if action["action"] in (
+                        "enter_market",
+                        "enter_limit",
+                        "enter_stop",
+                    ):
+                        action["size"] = volume
+            return StrategyCompiler().compile_to_runtime(parse_hsl_document(document))
+        return replace(
+            strategy,
+            rules=tuple(
+                replace(
+                    rule,
+                    actions=tuple(
+                        replace(action, volume=volume)
+                        if action.kind == ActionKind.ENTER
+                        else action
+                        for action in rule.actions
+                    ),
+                )
+                for rule in strategy.rules
+            ),
         )
 
     @staticmethod
@@ -324,21 +385,7 @@ class ProjectExecutor:
                 message="Rounded position size must be positive",
             )
         return tuple(
-            replace(
-                strategy,
-                rules=tuple(
-                    replace(
-                        rule,
-                        actions=tuple(
-                            replace(action, volume=volume)
-                            if action.kind == ActionKind.ENTER
-                            else action
-                            for action in rule.actions
-                        ),
-                    )
-                    for rule in strategy.rules
-                ),
-            )
+            ProjectExecutor._sized_candidate(strategy, volume)
             for strategy in candidates
         )
 

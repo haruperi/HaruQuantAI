@@ -123,25 +123,25 @@ class CrossCheckMonteCarloRetestService:
                     seed=sim_seed,
                 )
 
-            # Evaluate simulation metrics across perturbed bars
-            # Compute baseline trend profitability from perturbed bars
-            if len(curr_bars) >= MIN_BARS_FOR_TREND:
-                start_p = curr_bars[0].open
-                end_p = curr_bars[-1].close
-                avg_spread = sum(b.spread for b in curr_bars) / len(curr_bars)
-                spread_drag = avg_spread * 10.0
-                raw_return = (end_p - start_p) * 10000.0 - spread_drag
-            else:
-                raw_return = 0.0
+            from app.core.enums import Timeframe
+            from app.core.trading.backtest.contracts import BacktestSettings, RunSpec
+            from app.core.trading.backtest.runner import BacktestRunner
+            from app.core.trading.strategy.hsl.compiler import StrategyCompiler
 
-            net_profit = round(raw_return, 2)
-            dd_pct = round(min(50.0, max(5.0, 15.0 + (sim_seed % 10))), 2)
-            rdd = (
-                round(net_profit / (initial_capital * (dd_pct / 100.0)), 2)
-                if dd_pct > 0
-                else 0.0
+            plan = StrategyCompiler().compile_to_runtime(curr_strat)
+            actual = BacktestRunner().run(
+                RunSpec(
+                    plan,
+                    curr_strat.strategy.universe.symbols[0],
+                    Timeframe(curr_strat.strategy.timeframe.primary),
+                    curr_bars,
+                    BacktestSettings(initial_capital=initial_capital),
+                )
             )
-            pf = 1.5 if net_profit > 0 else 0.8
+            net_profit = actual.metrics["net_profit"]
+            dd_pct = actual.metrics["max_drawdown_pct"]
+            rdd = net_profit / (initial_capital * dd_pct / 100.0) if dd_pct else 0.0
+            pf = actual.metrics["profit_factor"]
 
             sim_profits.append(net_profit)
             sim_dds.append(dd_pct)

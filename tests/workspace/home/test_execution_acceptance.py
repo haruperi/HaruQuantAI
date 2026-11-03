@@ -110,7 +110,19 @@ def project(mode: str = "RETEST", **patch: Any) -> ProjectDocument:
         "dataset": {"symbol": "TEST", "source": "sample", "timeframe": "M1"},
         "mode": mode,
         "seed": 42,
-        "model": {"initial_capital": 100, "pip_size": 1},
+        "model": {
+            "initial_capital": 100,
+            "pip_size": 1,
+            "economics": {
+                "pip_size": 0.0001,
+                "tick_size": 0.00001,
+                "pip_value_per_lot": 0.0001,
+                "contract_size": 1,
+                "min_volume": 0.01,
+                "max_volume": 100,
+                "volume_step": 0.01,
+            },
+        },
         "strategy_result_ids": ["source"] if mode != "RANDOM" else [],
         **patch,
     }
@@ -458,3 +470,38 @@ def test_missing_stored_strategy_is_not_replaced_with_generated_data(
         executor.prepare(project(strategy_result_ids=["deleted"]), "task", 1)
     assert caught.value.code == "RESULT_NOT_FOUND"
     assert len(results.list_results("bank")) == 1
+
+
+def test_hsl_optimization_recompiles_typed_parameters_and_sizing() -> None:
+    """Grid values and sizing overrides change the canonical executable definition."""
+    from app.core.trading.strategy.hsl.compiler import StrategyCompiler
+    from app.core.trading.strategy.hsl.documents import parse_hsl_document
+    from app.core.trading.strategy.hsl.models import HSLStrategyDocument
+
+    document = HSLStrategyDocument.model_validate(
+        {
+            "strategy": {
+                "id": "grid",
+                "name": "Grid",
+                "parameters": {
+                    "period": {"type": "int", "default": 2, "min": 2, "max": 10}
+                },
+                "rules": [
+                    {
+                        "id": "entry",
+                        "when": {"type": "state", "state": "always_true"},
+                        "then": [{"action": "enter_market", "side": "long"}],
+                    }
+                ],
+            }
+        }
+    )
+    original = StrategyCompiler().compile_to_runtime(document)
+    candidate = ProjectExecutor._parameter_candidate(original, {"period": 4.0})
+    assert candidate.params[0].value == 4
+    assert isinstance(candidate.params[0].value, int)
+    assert candidate.hsl_json != original.hsl_json
+    sized = ProjectExecutor._sized_candidate(candidate, 0.25)
+    restored = parse_hsl_document(sized.hsl_json or "")
+    assert restored.strategy.money_management.size.value == 0.25
+    assert restored.strategy.rules[0].then[0].size.value == 0.25

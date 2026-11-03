@@ -1,4 +1,16 @@
-"""Pure, event-driven strategy rule evaluation and effects calculation runtime."""
+"""Shared dispatch for strategy evaluation across execution hosts.
+
+Description:
+    Evaluate canonical HSL plans or retained legacy strategy documents.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Consistent, explicit strategy execution boundaries.
+Key Capabilities:
+    - FR-shared-hsl-execution: Hosts log decisions; focused tests verify effects.
+Python API Usage:
+    Import the typed contracts and services from this module.
+CLI Usage:
+    uv run pytest tests/core/trading tests/workspace/algo_wizard --no-cov
+"""
 
 from __future__ import annotations
 
@@ -7,7 +19,7 @@ from dataclasses import dataclass, field
 from typing import Any
 
 from app.core.host.logging import get_logger
-from app.core.trading.blocks.registry import block_registry
+from app.core.trading.blocks.registry import BlockRegistry, block_registry
 from app.core.trading.blocks.series import BarData
 from app.core.trading.conditions import ConditionComparator
 from app.core.trading.strategy.contracts import (
@@ -16,6 +28,7 @@ from app.core.trading.strategy.contracts import (
     CloseRequest,
     ConditionDefinition,
     EvaluationEvent,
+    LifecycleEvent,
     OrderModification,
     OrderRequest,
     RuleAction,
@@ -35,7 +48,8 @@ def _resolve_event_field(val: str, event: EvaluationEvent) -> float | None:
     """Resolve field from incoming market event."""
     if isinstance(event, BarUpdateEvent):
         if hasattr(event.bar, val):
-            return float(getattr(event.bar, val))
+            field = getattr(event.bar, val)
+            return float(field() if callable(field) else field)
         aliases = {
             "bar_close": event.bar.close,
             "close": event.bar.close,
@@ -147,7 +161,7 @@ def _create_exit_requests(
         return [
             CloseRequest(
                 ticket=action.target_ticket,
-                volume=action.volume,
+                volume=None if action.volume == 1.0 else action.volume,
                 comment=action.comment,
             )
         ]
@@ -160,7 +174,7 @@ def _create_exit_requests(
                 requests.append(
                     CloseRequest(
                         ticket=pos.ticket,
-                        volume=action.volume,
+                        volume=None if action.volume == 1.0 else action.volume,
                         comment=action.comment,
                     )
                 )
@@ -226,6 +240,10 @@ class _EffectAccumulator:
 class StrategyRuntime:
     """Pure, event-driven strategy rule evaluation engine."""
 
+    def __init__(self, registry: BlockRegistry | None = None) -> None:
+        """Bind the registry used for compiled HSL expression execution."""
+        self.registry = registry if registry is not None else block_registry
+
     def evaluate(
         self,
         strategy: StrategyDocument,
@@ -236,6 +254,12 @@ class StrategyRuntime:
 
         Evaluation is pure: no state in strategy, context, or runtime is modified.
         """
+        if strategy.hsl_json is not None:
+            from app.core.trading.strategy.hsl.execution import evaluate
+
+            return evaluate(strategy, context, event, self.registry)
+        if isinstance(event, LifecycleEvent):
+            raise TypeError("Legacy strategies require explicit lifecycle conversion")
         symbol = event.symbol
         current_price = (
             float(event.bar.close)

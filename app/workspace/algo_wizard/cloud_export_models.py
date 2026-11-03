@@ -59,6 +59,8 @@ class ExportTargetDescriptor(BaseModel):
 
     model_config = ConfigDict(frozen=True, extra="forbid")
 
+    supported_for_hsl: bool = False
+
     platform: ExportTargetPlatform = Field(
         ...,
         description="Canonical export target platform identifier",

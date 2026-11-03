@@ -1,15 +1,32 @@
-"""Data contracts and configuration models for backtesting and historical simulation."""
+"""Historical execution contracts and instrument valuation inputs.
+
+Description:
+    Describe execution models, data feeds, equity, and returned effects.
+Purpose:
+    FEAT-WIZARD-HSL-LANGUAGE: Consistent, explicit strategy execution boundaries.
+Key Capabilities:
+    - FR-shared-hsl-execution: Hosts log decisions; focused tests verify effects.
+Python API Usage:
+    Import the typed contracts and services from this module.
+CLI Usage:
+    uv run pytest tests/core/trading tests/workspace/algo_wizard --no-cov
+"""
 
 from __future__ import annotations
 
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass, field
 from enum import StrEnum
 from typing import Any
 
 from app.core.data.contracts import MarketBar
 from app.core.enums import Timeframe
-from app.core.trading.strategy.contracts import StrategyDocument
+from app.core.trading.blocks.series import BarData
+from app.core.trading.strategy.contracts import (
+    InstrumentEconomics,
+    StrategyDocument,
+    StrategyEffects,
+)
 
 
 class PrecisionMode(StrEnum):
@@ -37,6 +54,7 @@ class BacktestSettings:
     same_bar_sl_tp_rule: SameBarExecutionRule = SameBarExecutionRule.WORST_CASE
     point_value: float = 1.0
     pip_size: float = 0.0001
+    economics: InstrumentEconomics | None = None
 
 
 @dataclass(frozen=True, slots=True)
@@ -48,6 +66,10 @@ class RunSpec:
     timeframe: Timeframe
     bars: Sequence[MarketBar]
     settings: BacktestSettings = field(default_factory=BacktestSettings)
+    additional_bars: Mapping[tuple[str, str], BarData] = field(default_factory=dict)
+    bar_close_times: Mapping[tuple[str, str], tuple[int, ...]] = field(
+        default_factory=dict
+    )
 
 
 @dataclass(frozen=True, slots=True)
@@ -150,6 +172,7 @@ class RunResult:
     equity_curve: tuple[EquityPoint, ...]
     metrics: dict[str, float]
     mae_mfe: tuple[MaeMfeRecord, ...]
+    effects: tuple[StrategyEffects, ...] = ()
 
     def to_dict(self) -> dict[str, Any]:
         """Convert backtest result to dictionary."""

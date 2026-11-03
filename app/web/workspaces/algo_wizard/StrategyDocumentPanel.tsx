@@ -65,10 +65,7 @@ export function StrategyDocumentPanel({
           >
             Stop Strategy
           </button>
-          <button
-            type="button"
-            onClick={() => onRemoveStrategy?.(strategy.id)}
-          >
+          <button type="button" onClick={() => onRemoveStrategy?.(strategy.id)}>
             Remove Strategy
           </button>
         </div>
@@ -157,10 +154,13 @@ export function StrategyDocumentPanel({
           {orderedRules.map((rule) => (
             <li key={rule.id} data-rule-id={rule.id}>
               <strong>{rule.name}</strong> <code>({rule.id})</code> — Priority:{" "}
-              <span>{rule.priority}</span> | Event: <code>{rule.event}</code> |{" "}
-              <span>{rule.enabled ? "Enabled" : "Disabled"}</span> | Condition:{" "}
-              <code>{rule.when.operator ?? rule.when.type}</code> | Actions:{" "}
-              <span>{rule.then.length}</span>
+              <span>{rule.priority}</span> | Event:{" "}
+              <code>
+                {typeof rule.event === "string" ? rule.event : rule.event.type}
+              </code>{" "}
+              | <span>{rule.enabled ? "Enabled" : "Disabled"}</span> |
+              Condition: <code>{rule.when.operator ?? rule.when.type}</code> |
+              Actions: <span>{rule.then.length}</span>
             </li>
           ))}
         </ol>
