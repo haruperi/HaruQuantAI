@@ -362,10 +362,24 @@ def main(argv: Sequence[str] | None = None) -> None:
         parser.add_argument(
             "--reload", action="store_true", help="Restart on Python source changes"
         )
+        parser.add_argument(
+            "--host", type=str, default=None, help="Bind host address override"
+        )
+        parser.add_argument(
+            "--port", type=int, default=None, help="Bind port number override"
+        )
         arguments = parser.parse_args(argv)
         settings = SettingsManager()
-        host = settings.get("host", "host")
-        port = settings.get("host", "port")
+        host = (
+            arguments.host
+            if arguments.host is not None
+            else settings.get("host", "host")
+        )
+        port = (
+            arguments.port
+            if arguments.port is not None
+            else settings.get("host", "port")
+        )
         if not isinstance(host, str) or not host.strip():
             raise ValueError("host.host must be a non-empty string")
         if (

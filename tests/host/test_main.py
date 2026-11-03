@@ -220,3 +220,148 @@ def test_main_invokes_startup_diagnostics(monkeypatch):
     mock_conf_log.assert_called_once_with(settings)
     mock_emit_diag.assert_called_once_with(app_version="1.0.0", settings=settings)
     mock_inspect_dirs.assert_called_once_with(settings)
+
+
+def test_main_cli_host_and_port_overrides(monkeypatch):
+    settings = Mock()
+    settings.get.side_effect = ["127.0.0.1", 8000]
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    mock_run = Mock()
+    monkeypatch.setattr(backend.uvicorn, "run", mock_run)
+    monkeypatch.setattr(backend, "shutdown_logging", Mock())
+    monkeypatch.setattr(backend, "_run_startup_diagnostics", Mock())
+
+    backend.main(["--host", "0.0.0.0", "--port", "9090", "--reload"])
+    mock_run.assert_called_once()
+    _, kwargs = mock_run.call_args
+    assert kwargs["host"] == "0.0.0.0"
+    assert kwargs["port"] == 9090
+    assert kwargs["reload"] is True
+
+
+def test_main_invalid_host_and_port(monkeypatch):
+    settings = Mock()
+    settings.get.side_effect = ["", 8000]
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    monkeypatch.setattr(backend, "shutdown_logging", Mock())
+
+    with pytest.raises(ValueError, match=r"host\.host must be a non-empty string"):
+        backend.main([])
+
+    settings2 = Mock()
+    settings2.get.side_effect = ["127.0.0.1", 70000]
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings2))
+    with pytest.raises(
+        ValueError, match=r"host\.port must be an integer between 1 and 65535"
+    ):
+        backend.main([])
+
+
+def test_install_web_build_and_spa_routing(monkeypatch, tmp_path):
+    dist_dir = tmp_path / "dist"
+    dist_dir.mkdir()
+    index_file = dist_dir / "index.html"
+    index_file.write_text(
+        "<!doctype html><html><body>App</body></html>", encoding="utf-8"
+    )
+    assets_dir = dist_dir / "assets"
+    assets_dir.mkdir()
+    bundle_file = assets_dir / "bundle.js"
+    bundle_file.write_text("console.log('hi');", encoding="utf-8")
+    css_file = assets_dir / "style.css"
+    css_file.write_text("body { color: red; }", encoding="utf-8")
+    other_file = dist_dir / "robots.txt"
+    other_file.write_text("User-agent: *", encoding="utf-8")
+
+    settings = Mock()
+    settings.get_scope.return_value = {"username": "admin"}
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    gateway = Mock()
+    gateway.read_records.return_value = {"success": True, "data": {"records": []}}
+    app = backend.create_app(gateway, web_build_dir=dist_dir)
+
+    with TestClient(app) as client:
+        # GET index
+        resp = client.get("/")
+        assert resp.status_code == 200
+        assert "text/html" in resp.headers["content-type"]
+        assert "App" in resp.text
+
+        # HEAD index
+        head_resp = client.head("/")
+        assert head_resp.status_code == 200
+        assert head_resp.text == ""
+
+        # GET asset JS
+        js_resp = client.get("/assets/bundle.js")
+        assert js_resp.status_code == 200
+        assert "javascript" in js_resp.headers["content-type"]
+        assert "immutable" in js_resp.headers.get("cache-control", "")
+
+        # GET asset CSS
+        css_resp = client.get("/assets/style.css")
+        assert css_resp.status_code == 200
+        assert "text/css" in css_resp.headers["content-type"]
+
+        # GET other file
+        txt_resp = client.get("/robots.txt")
+        assert txt_resp.status_code == 200
+
+        # SPA client fallback
+        spa_resp = client.get("/workspace/overview")
+        assert spa_resp.status_code == 200
+        assert "App" in spa_resp.text
+
+        # Reserved API path 404
+        api_resp = client.get("/api/v1/nonexistent")
+        assert api_resp.status_code == 404
+
+        # Missing asset 404
+        missing_asset = client.get("/assets/missing.js")
+        assert missing_asset.status_code == 404
+
+        # Directory traversal attempt
+        trav_resp = client.get("/../outside.txt")
+        assert trav_resp.status_code in (400, 404)
+
+
+def test_install_web_build_missing_index(monkeypatch, tmp_path):
+    empty_dist = tmp_path / "empty_dist"
+    empty_dist.mkdir()
+    settings = Mock()
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    gateway = Mock()
+    gateway.read_records.return_value = {"success": True, "data": {"records": []}}
+    app = backend.create_app(gateway, web_build_dir=empty_dist)
+
+    with TestClient(app) as client:
+        resp = client.get("/")
+        assert resp.status_code == 503
+        assert resp.json() == {"detail": "Web build unavailable"}
+
+
+def test_teardown_mt5_and_scopes_for(monkeypatch):
+    settings = Mock()
+    settings.get_scope.return_value = {"username": "admin"}
+    monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
+    gateway = Mock()
+    gateway.read_records.return_value = {"success": True, "data": {"records": []}}
+    application = backend.create_app(gateway)
+
+    async def mock_mt5_close():
+        pass
+
+    mt5_mock = Mock()
+    mt5_mock.close = mock_mt5_close
+
+    with TestClient(application):
+        application.state.data_mt5 = mt5_mock
+        application.state.code_editor_compilation = Mock()
+
+        # Check scope resolver
+        sessions = application.state.sessions
+        assert sessions._scope_resolver("admin") == ("*:*",)
+        assert sessions._scope_resolver("other_user") == ()
+
+    assert not hasattr(application.state, "data_mt5")
+    assert not hasattr(application.state, "code_editor_compilation")
