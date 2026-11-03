@@ -293,3 +293,88 @@ def test_legacy_text_compatibility_does_not_hide_invalid_json(gateway, raw):
     assert result["success"], result
     with pytest.raises(SettingsDataError):
         SettingsManager(gateway).reload()
+
+
+def test_membership_queries_contains_and_contains_key(gateway):
+    """SettingsManager supports 'scope in settings' and 'contains_key' queries."""
+    manager = SettingsManager(gateway)
+    assert "application" in manager
+    assert "host" in manager
+    assert "user_access" in manager
+    assert "nonexistent_scope" not in manager
+    assert manager.contains_key("host", "port")
+    assert manager.contains_key("application", "user_access")
+    assert manager.contains_key("user_access", "username")
+    assert not manager.contains_key("host", "nonexistent_key")
+    assert not manager.contains_key("nonexistent_scope", "some_key")
+
+
+def test_typed_getters_bool(gateway):
+    """get_bool safely parses bools, strings, ints, or falls back to default."""
+    manager = SettingsManager(gateway)
+    assert manager.get_bool("ui", "theme", default=False) is False
+    assert manager.get_bool("ui", "theme", default=True) is True
+
+    manager.save_settings(
+        {
+            "application": {
+                "app_general": {
+                    "is_active": True,
+                    "str_true": "true",
+                    "str_yes": "YES",
+                    "str_1": "1",
+                    "str_false": "false",
+                    "str_no": "No",
+                    "str_0": "0",
+                    "int_1": 1,
+                    "int_0": 0,
+                    "other_str": "invalid_bool",
+                }
+            }
+        },
+        expected_revision=10,
+    )
+    assert manager.get_bool("app_general", "is_active") is True
+    assert manager.get_bool("app_general", "str_true") is True
+    assert manager.get_bool("app_general", "str_yes") is True
+    assert manager.get_bool("app_general", "str_1") is True
+    assert manager.get_bool("app_general", "str_false") is False
+    assert manager.get_bool("app_general", "str_no") is False
+    assert manager.get_bool("app_general", "str_0") is False
+    assert manager.get_bool("app_general", "int_1") is True
+    assert manager.get_bool("app_general", "int_0") is False
+    assert manager.get_bool("app_general", "other_str", default=False) is False
+    assert manager.get_bool("app_general", "missing_key", default=True) is True
+
+
+def test_typed_getters_int_float_str(gateway):
+    """get_int, get_float, and get_str parse native types and strings cleanly."""
+    manager = SettingsManager(gateway)
+    # Native integers
+    assert manager.get_int("host", "port") == 8000
+    assert manager.get_int("host", "missing", default=8080) == 8080
+    assert manager.get_float("host", "port") == 8000.0
+    assert manager.get_float("host", "missing", default=80.5) == 80.5
+    assert manager.get_str("user_access", "username") == "tester"
+    assert manager.get_str("user_access", "missing", default="guest") == "guest"
+
+    # Non-number strings falling back to defaults
+    assert manager.get_int("ui", "theme", default=100) == 100
+    assert manager.get_float("ui", "theme", default=99.9) == 99.9
+
+    # Boolean values must not be coerced to integer or float
+    manager.save_settings(
+        {
+            "application": {
+                "app_general": {"flag": True, "str_num": "42", "str_float": "3.14"}
+            }
+        },
+        expected_revision=10,
+    )
+    assert manager.get_int("app_general", "flag", default=0) == 0
+    assert manager.get_float("app_general", "flag", default=0.0) == 0.0
+    assert manager.get_int("app_general", "str_num") == 42
+    assert manager.get_float("app_general", "str_float") == 3.14
+    assert manager.get_str("app_general", "str_num") == "42"
+    assert manager.get_str("app_general", "flag") == "True"
+    assert manager.get_str("app_general", "nonexistent", default="none") == "none"

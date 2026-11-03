@@ -6,6 +6,24 @@ save_settings() replaces complete stored JSON records atomically and returns the
 new revision. No defaults, schema migrations, or missing records are synthesized.
 Snapshots are internal configuration containers, including stored credentials.
 Legacy unquoted text is read as a string; new saves always encode valid JSON.
+
+Description:
+    Thread-safe lazy settings snapshot cache with optimistic, atomic SQLite writes,
+    generic membership queries, and typed accessors.
+Purpose:
+    FEAT-HOST-SETTINGS: Host and application settings repository.
+Key Capabilities:
+    - FR-host-settings-snapshot: Cached detached snapshot reading with on-demand reload.
+    - FR-host-settings-atomic-save: Optimistic concurrency revision check and atomic
+      batch writes via HostPersistence.
+    - FR-host-settings-typed-access: Generic membership queries and typed accessors
+      for boolean, integer, float, and string values.
+Python API Usage:
+    from app.core.host.settings import settings
+    port = settings.get_int("host", "port", default=8000)
+    theme = settings.get_str("app_general", "theme", default="dark")
+CLI Usage:
+    uv run python -m app.cli health
 """
 
 from __future__ import annotations
@@ -272,6 +290,81 @@ class SettingsManager:
                 return copy.deepcopy(default)
             logger.debug("Stored setting accessed")
             return _view(value)
+
+    def __contains__(self, scope: str) -> bool:
+        """Return True if scope exists as a top-level scope or application group."""
+        with self._lock:
+            self._ensure_loaded()
+            if scope in self._data:
+                return True
+            group = self._data.get("application", {}).get(scope)
+            return isinstance(group, dict)
+
+    def contains_key(self, scope: str, key: str) -> bool:
+        """Return True if scope exists and contains the specified setting key."""
+        with self._lock:
+            self._ensure_loaded()
+            try:
+                values = self._scope(scope)
+                return key in values
+            except KeyError:
+                return False
+
+    def get_bool(self, scope: str, key: str, default: bool = False) -> bool:
+        """Read a boolean setting, parsing strings or integers if needed."""
+        raw = self.get(scope, key, default=default)
+        if isinstance(raw, bool):
+            return raw
+        if isinstance(raw, int):
+            return bool(raw)
+        if isinstance(raw, str):
+            lower = raw.strip().lower()
+            if lower in ("true", "1", "yes", "on"):
+                return True
+            if lower in ("false", "0", "no", "off"):
+                return False
+        return default
+
+    def get_int(self, scope: str, key: str, default: int = 0) -> int:
+        """Read an integer setting, converting finite numbers or strings if valid."""
+        raw = self.get(scope, key, default=default)
+        if isinstance(raw, bool):
+            return default
+        if isinstance(raw, int):
+            return raw
+        if isinstance(raw, float) and math.isfinite(raw):
+            return int(raw)
+        if isinstance(raw, str):
+            try:
+                return int(raw.strip())
+            except ValueError:
+                return default
+        return default
+
+    def get_float(self, scope: str, key: str, default: float = 0.0) -> float:
+        """Read a floating point setting, converting numbers or strings if finite."""
+        raw = self.get(scope, key, default=default)
+        if isinstance(raw, bool):
+            return default
+        if isinstance(raw, (int, float)):
+            val = float(raw)
+            return val if math.isfinite(val) else default
+        if isinstance(raw, str):
+            try:
+                val = float(raw.strip())
+                return val if math.isfinite(val) else default
+            except ValueError:
+                return default
+        return default
+
+    def get_str(self, scope: str, key: str, default: str = "") -> str:
+        """Read a string setting, converting non-None values to string."""
+        raw = self.get(scope, key, default=default)
+        if isinstance(raw, str):
+            return raw
+        if raw is None:
+            return default
+        return str(raw)
 
     def __getitem__(self, scope: str) -> _SettingsNode:
         """Return a stored scope as a mapping with nested attribute access."""
