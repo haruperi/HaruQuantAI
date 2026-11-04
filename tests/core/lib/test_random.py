@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 import importlib
+import json
+import logging
 import math
 import random
+from collections.abc import Callable
+from pathlib import Path
+from typing import TypedDict
 
 import pytest
 from app.core.lib.random import (
@@ -34,7 +39,7 @@ def test_protocol_conformance() -> None:
 def test_generator_deterministic_draws_and_cloning() -> None:
     """Verify initial draw reproducibility and independent state preservation."""
     original = RandomGenerator(0)
-    assert original.next_double() == 0.8444218515250481
+    assert original.next_double() == 0.5488135008937808
 
     cloned = original.clone()
     draws_orig = [original.next_double() for _ in range(10)]
@@ -49,20 +54,20 @@ def test_generator_deterministic_draws_and_cloning() -> None:
 
 def test_explicit_clone_and_reseed() -> None:
     """Verify cloning with an explicit seed and re-seeding produces target sequence."""
-    assert RandomGenerator(7).clone(0).next_double() == 0.8444218515250481
+    assert RandomGenerator(7).clone(0).next_double() == 0.5488135008937808
 
     gen = RandomGenerator(7)
     for _ in range(10):
         gen.next_double()
-    assert gen.clone(0).next_double() == 0.8444218515250481
+    assert gen.clone(0).next_double() == 0.5488135008937808
 
     # Re-seed resets sequence
     gen.seed(0)
-    assert gen.next_double() == 0.8444218515250481
+    assert gen.next_double() == 0.5488135008937808
 
     # New instance with seed
     new_gen = gen.new_instance(0)
-    assert new_gen.next_double() == 0.8444218515250481
+    assert new_gen.next_double() == 0.5488135008937808
 
 
 def test_next_double_stepped_and_bounded() -> None:
@@ -91,9 +96,10 @@ def test_next_int_stepped_and_bounded() -> None:
     """Verify next_int single-bound, range, and stepped draws."""
     rng = RandomGenerator(999)
 
-    # Zero or negative single bound returns 0
-    assert rng.next_int(0) == 0
-    assert rng.next_int(-5) == 0
+    # Donor rejects nonpositive bounds.
+    for bound in (0, -5):
+        with pytest.raises(ValueError):
+            rng.next_int(bound)
 
     # Single bound [0, bound)
     for _ in range(50):
@@ -101,7 +107,8 @@ def test_next_int_stepped_and_bounded() -> None:
         assert 0 <= val < 10
 
     # Degenerate range min >= max
-    assert rng.next_int(15, 10) == 15
+    with pytest.raises(ValueError):
+        rng.next_int(15, 10)
     assert rng.next_int(10, 10) == 10
 
     # Range [min, max] with step=1
@@ -159,7 +166,78 @@ def test_next_bool() -> None:
 
 
 def test_get_random() -> None:
-    """Verify get_random exposes the underlying random.Random instance."""
+    """Verify the independent donor stream retains the random.Random interface."""
     rng = RandomGenerator(42)
     internal_rng = rng.get_random()
     assert isinstance(internal_rng, random.Random)
+
+
+class _Vector(TypedDict):
+    seed: int
+    op: str
+    values: list[float | int | bool]
+
+
+_VECTORS: list[_Vector] = [
+    json.loads(line)
+    for line in (Path(__file__).parent / "fixtures/stage01_random/vectors.jsonl")
+    .read_text(encoding="utf-8-sig")
+    .splitlines()
+]
+
+
+@pytest.mark.parametrize("vector", _VECTORS, ids=lambda v: f"{v['seed']}-{v['op']}")
+def test_recovered_java_vectors(vector: _Vector) -> None:
+    rng = RandomGenerator(vector["seed"])
+    operations: dict[str, Callable[[], float | int | bool]] = {
+        "double": rng.next_double,
+        "int": lambda: rng.next_int(37),
+        "power": lambda: rng.next_int(1024),
+        "reject": lambda: rng.next_int(1073741825),
+        "long": rng.next_long,
+        "gaussian": rng.next_gaussian,
+        "bool": rng.next_bool,
+        "stepped": lambda: rng.next_double(-2.0, 1.5, 0.5, 0),
+        "range": lambda: rng.next_int(-7, 14, 3),
+        "secondary": rng.get_random().random,
+    }
+    actual: list[float | int | bool] = []
+    for i in range(len(vector["values"])):
+        if vector["op"] == "probability":
+            actual.append(rng.probability((0, -0.5, 1, 1.5, 0.5, math.nan)[i % 6]))
+        else:
+            actual.append(operations[vector["op"]]())
+    if vector["op"] == "gaussian":
+        assert actual == pytest.approx(vector["values"], rel=1e-14, abs=1e-14)
+    else:
+        assert actual == vector["values"]
+
+
+def test_separate_streams_clone_cache_and_logging(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
+    rng = RandomGenerator(42)
+    untouched = RandomGenerator(42)
+    with caplog.at_level(logging.DEBUG):
+        rng.next_gaussian()
+        clone = rng.clone()
+        assert clone.next_gaussian() == rng.next_gaussian()
+        for _ in range(20):
+            rng.get_random().random()
+        assert clone.next_double() == rng.next_double()
+        assert clone.get_random().random() == untouched.get_random().random()
+        rng.seed(42)
+        assert rng.get_random().random() == RandomGenerator(42).get_random().random()
+    messages = " ".join(record.message for record in caplog.records)
+    for requirement in ("seeding", "cloning", "drawing"):
+        assert f"FR-core-lib-random-{requirement}" in messages
+
+
+def test_rounding_steps_and_invalid_ranges() -> None:
+    assert RandomGenerator(42).next_double(1.125, 1.125, 0.5, 2) == 1.13
+    assert RandomGenerator(42).next_double(-1.125, -1.125, 0.5, 2) == -1.12
+    with pytest.raises(ZeroDivisionError):
+        RandomGenerator(42).next_int(1, 3, 0)
+    with pytest.raises(ValueError):
+        RandomGenerator(42).next_int(2**31)
+    assert RandomGenerator(42).next_int(3, 3) == 3
