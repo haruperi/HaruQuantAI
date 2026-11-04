@@ -3,9 +3,9 @@
 from __future__ import annotations
 
 from app.core.data.catalog import DataBatch, DataCatalog, DatasetRef
+from app.core.data.charts import ChartDef
 from app.core.data.contracts import (
     BookInfo,
-    ChartDef,
     DataframeSeries,
     DataInfo,
     MarketBar,

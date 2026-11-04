@@ -1,4 +1,18 @@
-"""Canonical market dataset catalog service and query contracts."""
+"""Canonical market dataset catalog service and query contracts.
+
+Description:
+    Validates dataset references through shared timeframe semantics while
+    preserving stored catalog keys, then coordinates bounded partition reads.
+Purpose:
+    FEAT-DATA-TIMEFRAMES: Validate timeframe references without changing identity.
+Key Capabilities:
+    - FR-data-catalog-timeframes: Shared owner logs DEBUG validation; isolated
+      catalog tests verify unchanged keys and custom timeframe reads.
+Python API Usage:
+    DatasetRef(symbol="EURUSD", timeframe="H7")
+CLI Usage:
+    uv run pytest tests/core/data/test_catalog.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -6,7 +20,7 @@ import json
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, Literal, cast
 
 import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
@@ -15,10 +29,13 @@ import pyarrow as pa
 from app.core.data.contracts import DataInfo
 from app.core.data.io import DataIO
 from app.core.data.market_storage import catalog_paths, safe_component
+from app.core.data.timeframes import timeframe_to_seconds
 from app.core.enums import Timeframe
 from app.core.lib.errors import DomainError
 
 if TYPE_CHECKING:
+    from app.core.data.charts import ChartDef
+    from app.core.data.instruments import InstrumentInfo
     from app.core.host.persistence import HostPersistence
 
 __all__ = ["DataBatch", "DataCatalog", "DatasetRef"]
@@ -63,6 +80,7 @@ class DatasetRef:
             if isinstance(self.timeframe, Timeframe)
             else str(self.timeframe).strip().upper()
         )
+        timeframe_to_seconds(tf_str)
         object.__setattr__(self, "timeframe", tf_str)
 
     @property
@@ -116,6 +134,65 @@ class DataCatalog:
             return None
         row, _ = result
         return DataInfo.from_row(row)
+
+    def create_chart(
+        self,
+        ref: DatasetRef,
+        instrument_info: InstrumentInfo | None,
+        *,
+        session: str,
+        timezone: str,
+        bar_time_type: Literal[1, 2],
+        mode: Literal["live", "backtest"] = "backtest",
+        history_from: int = 0,
+        history_to: int = 0,
+        spread: float = 0.0,
+        backload_type: int = 0,
+        backload_number: int = 0,
+    ) -> ChartDef:
+        """Resolve donor constructor metadata once, then delegate chart semantics.
+
+        Maps ChartDef's DataManager lookup. InstrumentManager's resolved value
+        is explicit; this catalog does not introduce another instrument registry.
+        """
+        from app.core.data.charts import ChartDef
+
+        info = self.get_dataset_info(ref)
+        if info is None:
+            raise DomainError(
+                code="DATASET_NOT_FOUND", message="Chart data cannot be found"
+            )
+        if bar_time_type not in (1, 2):
+            raise ValueError("Unknown donor bar time type")
+        if info.symbol != ref.symbol or info.connection != ref.source:
+            raise DomainError(
+                code="DATASET_IDENTITY_MISMATCH",
+                message="Chart metadata does not match the requested dataset",
+            )
+        # Existing host rows do not encode donor DATATYPE. Its resolved value
+        # is explicit instead of inferred from bar timestamps or provider names.
+        info.bar_time_type = bar_time_type
+        if mode == "live":
+            return ChartDef.for_live(
+                info,
+                instrument_info,
+                timeframe=ref.timeframe,
+                backload_type=backload_type,
+                backload_number=backload_number,
+                session=session,
+            )
+        if mode != "backtest":
+            raise ValueError("Unknown chart initialization mode")
+        return ChartDef.for_backtest(
+            info,
+            instrument_info,
+            timeframe=ref.timeframe,
+            history_from=history_from,
+            history_to=history_to,
+            spread=spread,
+            session=session,
+            timezone=timezone,
+        )
 
     def _find_record(self, ref: DatasetRef) -> tuple[dict[str, Any], bool] | None:
         """Look up catalog record by exact ref or base M1 resample source."""

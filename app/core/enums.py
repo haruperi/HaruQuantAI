@@ -1,4 +1,19 @@
-"""Domain enumeration definitions and execution statuses."""
+"""Domain enumeration definitions and execution statuses.
+
+Description:
+    Defines finite broker enums and execution statuses. The retained Timeframe
+    enum delegates duration calculation to the data timeframe owner; its finite
+    broker identifiers and existing aliases remain a Python adaptation.
+Purpose:
+    FEAT-DATA-TIMEFRAMES: Preserve broker contracts with shared duration ownership.
+Key Capabilities:
+    - FR-data-timeframe-enum: Delegate duration calculation; the data owner emits
+      DEBUG conversion logs and focused tests verify values and log records.
+Python API Usage:
+    Timeframe.PERIOD_H1.to_seconds()  # 3600
+CLI Usage:
+    uv run pytest tests/core/data/test_contract_imports.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -303,17 +318,9 @@ class Timeframe(StrEnum):
 
     def to_seconds(self) -> int:
         """Convert timeframe duration to whole seconds."""
-        val = self.value
-        if val.startswith("M") and self != Timeframe.PERIOD_MN1:
-            return int(val[1:]) * 60
-        if val.startswith("H"):
-            return int(val[1:]) * 3600
-        fixed = {
-            Timeframe.PERIOD_D1: 86400,
-            Timeframe.PERIOD_W1: 604800,
-            Timeframe.PERIOD_MN1: 2419200,
-        }
-        return fixed.get(self, 0)
+        from app.core.data.timeframes import timeframe_to_seconds
+
+        return timeframe_to_seconds(self)
 
     def to_minutes(self) -> int:
         """Convert timeframe duration to whole minutes."""

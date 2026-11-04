@@ -6,7 +6,9 @@ Description:
     state and a separate MTRandom stream. Uses CPython's MT state transition,
     with Java bit extraction, signed arithmetic, and bounded rejection sampling.
     Entropy seeds, reseeding, no-argument state cloning and unstepped ranges are
-    retained Python conveniences, documented in the Stage 01 responsibility map.
+    retained Python conveniences. Seeded clone/new_instance follow donor
+    construction; no-argument clone copies both stream states. get_random exposes
+    a separate MTRandom stream through the existing Python random.Random API.
 
 Purpose:
     FEAT-CORE-LIB-RANDOM: Provide verified deterministic PRNG runtime utilities.

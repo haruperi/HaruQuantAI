@@ -1,4 +1,18 @@
-"""Canonical market data partition I/O and dynamic resampling."""
+"""Canonical market data partition I/O and dynamic resampling.
+
+Description:
+    Reads canonical partitions and resamples bars using the shared timeframe
+    owner, guarding positive source and target intervals before processing data.
+Purpose:
+    FEAT-DATA-TIMEFRAMES: Consume one timeframe duration contract.
+Key Capabilities:
+    - FR-data-io-timeframes: Shared owner emits DEBUG conversion records;
+      focused tests verify duration handling and reject unsafe intervals.
+Python API Usage:
+    DataIO.resample_bars(frame, "H7")
+CLI Usage:
+    uv run pytest tests/core/data/test_io.py --no-cov
+"""
 
 from __future__ import annotations
 
@@ -9,34 +23,14 @@ from typing import TYPE_CHECKING, Any
 
 import polars as pl
 
+from app.core.data import timeframes
 from app.core.data.market_storage import price_columns
-from app.core.enums import Timeframe
 from app.core.lib.errors import DomainError
 
 if TYPE_CHECKING:
     from datetime import datetime
 
-__all__ = ["DataIO", "timeframe_to_seconds"]
-
-
-def timeframe_to_seconds(tf: str | Timeframe) -> int:
-    """Resolve standard or custom timeframe interval to total seconds."""
-    if isinstance(tf, Timeframe):
-        return tf.to_seconds()
-    tf_str = str(tf).strip().upper()
-    if tf_str in ("TICK", "TICKS"):
-        return 0
-    try:
-        return Timeframe.from_string(tf_str).to_seconds()
-    except ValueError:
-        units = {"S": 1, "M": 60, "H": 3600, "D": 86400}
-        prefix, rest = tf_str[:1], tf_str[1:]
-        if prefix in units and rest.isdigit():
-            return int(rest) * units[prefix]
-        raise DomainError(
-            code="INVALID_TIMEFRAME",
-            message=f"Unsupported or unrecognized timeframe: {tf}",
-        ) from None
+__all__ = ["DataIO"]
 
 
 class DataIO:
@@ -124,11 +118,8 @@ class DataIO:
         source_timeframe: str = "M1",
     ) -> pl.DataFrame:
         """Resample minute-bar observations to a higher timeframe interval."""
-        if frame.is_empty():
-            return frame.clone()
-
-        source_sec = timeframe_to_seconds(source_timeframe)
-        target_sec = timeframe_to_seconds(target_timeframe)
+        source_sec = timeframes.timeframe_to_seconds(source_timeframe)
+        target_sec = timeframes.timeframe_to_seconds(target_timeframe)
 
         if source_sec <= 0 or target_sec <= 0:
             raise DomainError(
@@ -143,7 +134,7 @@ class DataIO:
             )
             raise DomainError(code="UNSUPPORTED_RESAMPLING", message=msg)
 
-        if target_sec == source_sec:
+        if frame.is_empty() or target_sec == source_sec:
             return frame.clone()
 
         interval = f"{target_sec}s"

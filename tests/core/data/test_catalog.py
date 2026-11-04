@@ -12,6 +12,8 @@ import polars as pl
 import pyarrow.parquet as pq
 import pytest
 from app.core.data.catalog import DataBatch, DataCatalog, DatasetRef
+from app.core.data.contracts import SessionWindow, TradingSession
+from app.core.data.instruments import InstrumentInfo
 from app.core.data.market_storage import encode_frame
 from app.core.enums import Timeframe
 from app.core.host.persistence import HostPersistence
@@ -47,6 +49,119 @@ def test_dataset_ref_properties_and_validation() -> None:
     # Path traversal rejected by safe_component
     with pytest.raises(ValueError, match="Use a safe alphanumeric source or symbol"):
         DatasetRef(symbol="../EURUSD")
+
+
+def test_timeframe_validation_preserves_catalog_identifiers() -> None:
+    """Alias validation must not rename persistent catalog identifiers."""
+    for value in ("W1", "MN1", "Weekly", "Monthly", "H7", "D2", "1MIN"):
+        ref = DatasetRef(symbol="EURUSD", timeframe=value)
+        assert ref.dataset_id == f"default:EURUSD:{value.upper()}"
+    with pytest.raises(DomainError) as error:
+        DatasetRef(symbol="EURUSD", timeframe="invalid")
+    assert error.value.code == "INVALID_TIMEFRAME"
+
+
+def test_catalog_chart_initialization_and_session_identity(
+    persistence_gateway: HostPersistence,
+    tmp_path: Path,
+) -> None:
+    """Use real catalog and session services through their existing owners."""
+    from app.workspace.data_manager.sessions import Sessions
+
+    path = tmp_path / "sessions.db"
+    connection = sqlite3.connect(path)
+    try:
+        connection.execute("""CREATE TABLE datamgr_sessions (
+            id INTEGER PRIMARY KEY, name TEXT NOT NULL UNIQUE,
+            description TEXT DEFAULT '', timezone TEXT DEFAULT 'UTC',
+            windows_json TEXT DEFAULT '[]', holidays_json TEXT DEFAULT '[]',
+            is_default INTEGER DEFAULT 0, broker_id INTEGER DEFAULT -1)""")
+        connection.commit()
+    finally:
+        connection.close()
+    sessions = Sessions(HostPersistence(path))
+    assert sessions.add(
+        "London",
+        windows=[
+            SessionWindow(
+                day_from="Mon",
+                start_time="09:30",
+                day_to="Fri",
+                end_time="17:00",
+            )
+        ],
+    )["success"]
+    payload = sessions.list()["data"][0]
+    snapshot = TradingSession(
+        name=payload["name"],
+        windows=[SessionWindow(**window) for window in payload["windows"]],
+    )
+    record: dict[str, str | int] = {
+        "id": "source:EURUSD:M1",
+        "source": "source",
+        "symbol": "EURUSD",
+        "underlying": "EURUSD",
+        "broker": "Default",
+        "timezone": "UTC",
+        "category": "Forex",
+        "bars": 5,
+        "timeframe": "M1",
+        "created_at": "2026-01-01",
+        "updated_at": "2026-01-01",
+        "date_from": "2026-01-01",
+        "date_to": "2026-01-02",
+        "path": str(tmp_path),
+    }
+    assert persistence_gateway.create_records("datamgr_datasets", record)["success"]
+    catalog = DataCatalog(persistence_gateway)
+    instrument = InstrumentInfo(instrument="Forex", tick_size=0.00001)
+    ref = DatasetRef("EURUSD", "H7", source="source")
+    chart = catalog.create_chart(
+        ref,
+        instrument,
+        session=snapshot.name,
+        timezone="UTC",
+        bar_time_type=2,
+        history_to=1709208000000,
+    )
+    assert chart.is_backtest_data_def
+    assert chart.history_from == -(1 << 63)
+    assert chart.data_info is not None and chart.data_info.timeframe == "M1"
+    key = chart.get_charts_hash(
+        session_name=snapshot.name, session_elements=snapshot.windows
+    )
+    assert sessions.edit("London", windows=[])["success"]
+    payload = sessions.list()["data"][0]
+    changed = TradingSession(
+        name=payload["name"],
+        windows=[SessionWindow(**window) for window in payload["windows"]],
+    )
+    assert (
+        chart.get_charts_hash(
+            session_name=changed.name, session_elements=changed.windows
+        )
+        != key
+    )
+    live = catalog.create_chart(
+        ref,
+        instrument,
+        session="London",
+        timezone="UTC",
+        bar_time_type=2,
+        mode="live",
+        backload_type=3,
+        backload_number=50,
+    )
+    assert live.chart_type == 1 and live.backload_number == 50
+    with pytest.raises(DomainError) as error:
+        catalog.create_chart(
+            DatasetRef("MISSING"),
+            None,
+            session="No Session",
+            timezone="UTC",
+            bar_time_type=2,
+        )
+    assert error.value.code == "DATASET_NOT_FOUND"
 
 
 def test_data_batch_empty_and_conversions() -> None:
@@ -326,8 +441,9 @@ def test_catalog_missing_partition_raises_corrupt_storage(
     assert exc_info.value.code == "CORRUPT_DATASET_STORAGE"
 
 
+@pytest.mark.parametrize("target", ["M5", "H7", "D2", "Weekly", "Monthly"])
 def test_catalog_dynamic_resampling_from_base_m1(
-    persistence_gateway: HostPersistence, tmp_path: Path
+    persistence_gateway: HostPersistence, tmp_path: Path, target: str
 ) -> None:
     """Concrete Fixture 5: Requesting higher timeframe M5 resamples base M1 dataset."""
     tick_size = 0.0001
@@ -384,11 +500,12 @@ def test_catalog_dynamic_resampling_from_base_m1(
 
     catalog = DataCatalog(persistence_gateway)
     # Query M5
-    ref_m5 = DatasetRef(source="resamp_src", symbol="EURUSD", timeframe="M5")
+    ref_m5 = DatasetRef(source="resamp_src", symbol="EURUSD", timeframe=target)
     batch = catalog.read(ref_m5)
     assert batch.row_count == 1
     bar = batch.frame.to_dicts()[0]
-    assert bar["DateTime"] == datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
+    # Fixed-interval grouping is retained; S19/S20 own calendar alignment.
+    assert bar["DateTime"] <= datetime(2026, 1, 1, 0, 0, tzinfo=UTC)
     assert bar["Open"] == 1.1000
     assert bar["High"] == 1.1060
     assert bar["Low"] == 1.0990

@@ -14,13 +14,13 @@ def test_canonical_storage_module_identity() -> None:
     with pytest.raises(ModuleNotFoundError):
         importlib.import_module("app.include.market_storage")
 
-    assert new_storage.encode_frame is not None
-    assert new_storage.scan_catalog is not None
+    assert new_storage.encode_frame.__module__ == "app.core.data.market_storage"
+    assert new_storage.scan_catalog.__module__ == "app.core.data.market_storage"
     assert new_storage.TICK_SCHEMA is not None
     assert new_storage.M1_SCHEMA is not None
-    assert new_storage.safe_component is not None
-    assert new_storage.price_columns is not None
-    assert new_storage.catalog_paths is not None
+    assert new_storage.safe_component.__module__ == "app.core.data.market_storage"
+    assert new_storage.price_columns.__module__ == "app.core.data.market_storage"
+    assert new_storage.catalog_paths.__module__ == "app.core.data.market_storage"
 
     # TICK_SCHEMA: DateTime: timestamp[us, UTC], Bid: int64, Ask: int64, Flags: uint16, Volume: uint64
     assert [(field.name, field.type) for field in new_storage.TICK_SCHEMA] == [

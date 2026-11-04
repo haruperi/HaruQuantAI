@@ -9,8 +9,9 @@ import pandas as pd  # type: ignore[import-untyped]
 import polars as pl
 import pyarrow.parquet as pq
 import pytest
-from app.core.data.io import DataIO, timeframe_to_seconds
+from app.core.data.io import DataIO
 from app.core.data.market_storage import encode_frame
+from app.core.data.timeframes import timeframe_to_seconds
 from app.core.enums import Timeframe
 from app.core.lib.errors import DomainError
 
@@ -170,3 +171,11 @@ def test_resample_bars_validation_errors() -> None:
     with pytest.raises(DomainError) as exc_tick:
         DataIO.resample_bars(df, target_timeframe="M1", source_timeframe="TICK")
     assert exc_tick.value.code == "UNSUPPORTED_RESAMPLING"
+
+
+@pytest.mark.parametrize("timeframe", ["S0", "M-1", "Intraday", "TICK"])
+def test_nonpositive_duration_rejected_even_for_empty_data(timeframe: str) -> None:
+    """Donor-valid metadata cannot bypass the resampling safety guard."""
+    with pytest.raises(DomainError) as error:
+        DataIO.resample_bars(DataIO.empty_frame("M1"), timeframe)
+    assert error.value.code == "UNSUPPORTED_RESAMPLING"

@@ -1,4 +1,15 @@
-"""Tests for deterministic Mersenne Twister RandomGenerator primitives."""
+"""Deterministic donor RNG primitives and executable Java reference evidence.
+
+vectors.jsonl was captured from recovered MersenneTwisterFast.java/MTRandom.java
+with Java 26.0.2.1 on 2026-11-04: six seeds, 11 operations, 640 draws each.
+SHA-256 donor sources: Fast 9f63f4e34c90f4457e359723bf99b1135cb6bb14413c1bfdf161361bf1679b8b;
+MTRandom ce3cda9949a62c23dd80fa8b50ae2b2b8e4140d6d3f937f719409027c650df93.
+Expected outputs use no Python RNG. Exact comparison covers integer/double
+streams; Gaussian comparison permits 1e-14 absolute/relative libm tolerance.
+Wrapper formulas follow MersenneTwisterRng.java; Python entropy initialization,
+state-copy cloning and unstepped ranges are retained conveniences. The capture
+harness and build files are temporary and are removed after generating evidence.
+"""
 
 from __future__ import annotations
 

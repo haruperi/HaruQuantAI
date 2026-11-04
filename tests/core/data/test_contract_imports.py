@@ -7,6 +7,7 @@ import importlib
 import app.core.data.contracts as data_contracts
 import app.core.enums as new_enums
 import pytest
+from app.core.data.charts import ChartDef
 from app.core.trading.connection.contracts import TradeRequest
 
 
@@ -18,14 +19,15 @@ def test_canonical_type_identity() -> None:
         importlib.import_module("app.include.enums")
 
     # Pure data contracts present in app.core.data.contracts
-    assert data_contracts.MarketBar is not None
-    assert data_contracts.MarketTick is not None
-    assert data_contracts.ChartDef is not None
-    assert data_contracts.DataInfo is not None
-    assert data_contracts.SymbolInfo is not None
-    assert data_contracts.TradingSession is not None
-    assert data_contracts.BookInfo is not None
-    assert data_contracts.DataframeSeries is not None
+    assert data_contracts.MarketBar.__module__ == "app.core.data.contracts"
+    assert data_contracts.MarketTick.__module__ == "app.core.data.contracts"
+    assert ChartDef.__module__ == "app.core.data.charts"
+    assert not hasattr(data_contracts, "ChartDef")
+    assert data_contracts.DataInfo.__module__ == "app.core.data.contracts"
+    assert data_contracts.SymbolInfo.__module__ == "app.core.data.contracts"
+    assert data_contracts.TradingSession.__module__ == "app.core.data.contracts"
+    assert data_contracts.BookInfo.__module__ == "app.core.data.contracts"
+    assert data_contracts.DataframeSeries.__module__ == "app.core.data.contracts"
 
     # Trading connection contracts cleanly decoupled from app.core.data.contracts
     assert not hasattr(data_contracts, "TradeRequest")
@@ -36,7 +38,7 @@ def test_canonical_type_identity() -> None:
     assert not hasattr(data_contracts, "BridgeError")
 
     # TradeRequest cleanly imported from app.core.trading.connection.contracts
-    assert TradeRequest is not None
+    assert TradeRequest.__module__ == "app.core.trading.connection.contracts"
 
     # Exact timeframe second values per WO-C06.01
     assert new_enums.Timeframe.PERIOD_M1.to_seconds() == 60

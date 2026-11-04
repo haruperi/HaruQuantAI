@@ -1,13 +1,17 @@
 """Recorded tick volumes remain exact and unknown observations remain unknown."""
 
-import pandas as pd
+from pathlib import Path
+
+import pandas as pd  # type: ignore[import-untyped]
 import pyarrow as pa
 import pytest
 from app.core.data.market_storage import encode_frame
 from app.workspace.data_manager.data.conversions import ticks_to_dataframe
 
 
-def test_uint64_volume_survives_encoding_without_float_rounding(caplog):
+def test_uint64_volume_survives_encoding_without_float_rounding(
+    caplog: pytest.LogCaptureFixture,
+) -> None:
     frame = pd.DataFrame(
         {
             "Bid": [1.1, 1.1, 1.1],
@@ -29,7 +33,7 @@ def test_uint64_volume_survives_encoding_without_float_rounding(caplog):
 
 
 @pytest.mark.parametrize("volume", [-1, 1.5, 2**64])
-def test_invalid_volume_is_rejected(volume):
+def test_invalid_volume_is_rejected(volume: float) -> None:
     frame = pd.DataFrame(
         {"Bid": [1.1], "Ask": [1.2], "Volume": [volume]},
         index=pd.to_datetime(["2025-01-01T00:00:00Z"]),
@@ -38,7 +42,7 @@ def test_invalid_volume_is_rejected(volume):
         encode_frame(frame, "TICK", 0.00001)
 
 
-def test_conversion_retains_recorded_volume_and_missing_values():
+def test_conversion_retains_recorded_volume_and_missing_values() -> None:
     frame = ticks_to_dataframe(
         [
             {"time_msc": 1700000000000, "bid": 1.1, "ask": 1.2, "volume": 2**63 + 7},
@@ -49,7 +53,9 @@ def test_conversion_retains_recorded_volume_and_missing_values():
     assert pd.isna(frame["Volume"].iloc[1])
 
 
-def test_update_normalizes_old_schema_and_preserves_known_volume(tmp_path):
+def test_update_normalizes_old_schema_and_preserves_known_volume(
+    tmp_path: Path,
+) -> None:
     import pyarrow.parquet as pq
     from app.workspace.data_manager.data.storage import _merge_partition
 

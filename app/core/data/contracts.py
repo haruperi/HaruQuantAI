@@ -3,7 +3,8 @@
 Description:
     Defines canonical market data value objects, historical OHLC bars and ticks,
     order book depth entries, symbol specifications and economics models,
-    resample ChartDef requests, and trading session calendars.
+    dataset metadata with nested InstrumentInfo, and trading session calendars.
+    ChartDef has one implementation in charts.py; no old-path reexport remains.
 
 Purpose:
     FEAT-DATA-CONTRACTS: Canonical market data and symbol specifications.
@@ -11,13 +12,14 @@ Purpose:
 Key Capabilities:
     - FR-data-market-bar-tick: MarketBar and MarketTick data contracts.
     - FR-data-symbol-info: SymbolInfo, volume, spread, and margin structures.
-    - FR-data-chart-def: ChartDef request specification and resampling.
+    - FR-data-chart-clone: DEBUG records chart/dataset cloning.
+    - FR-data-contract-xml: DEBUG records XML encoding, decoding and recovery;
+      tests verify these records, nested data and donor attribute defaults.
     - FR-data-trading-session: TradingSession and SessionWindow calendars.
 
 Python API Usage:
     ```python
     from app.core.data.contracts import (
-        ChartDef,
         DataInfo,
         MarketBar,
         MarketTick,
@@ -38,11 +40,18 @@ import json
 from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field, fields, replace
 from datetime import UTC, datetime
-from typing import Any
+from typing import TYPE_CHECKING, Any, override
+from xml.etree.ElementTree import Element
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 import numpy as np
 
+from app.core.data.instruments import (
+    InstrumentInfo,
+    _scalar_xml,
+    _xml_number,
+    _xml_values,
+)
 from app.core.enums import (
     BookType,
     SymbolCalcMode,
@@ -53,7 +62,36 @@ from app.core.enums import (
 )
 from app.core.host.logging import get_logger
 
+if TYPE_CHECKING:
+    from app.core.data.charts import ChartDef
+
 logger = get_logger(__name__)
+
+_DATA_XML = {
+    "connection": "connection",
+    "symbol": "symbol",
+    "originalSymbol": "original_symbol",
+    "id": "id",
+    "sourceDataId": "source_data_id",
+    "instrument": "instrument",
+    "timeframe": "timeframe",
+    "timezone": "timezone",
+    "filename": "filename",
+    "dateFrom": "date_from",
+    "dateTo": "date_to",
+    "rows": "rows",
+    "totalDays": "total_days",
+    "barType": "bar_time_type",
+    "decimals": "decimals",
+    "source": "source",
+    "uSymbol": "u_symbol",
+    "uSymbolName": "u_symbol_name",
+    "removeWeekends": "remove_weekends",
+    "fileHash": "file_hash",
+    "basketId": "basket_id",
+    "brokerId": "broker_id",
+}
+
 
 MAX_RECORDS: int = 1000
 MAX_POSITION: int = 2**31 - 1
@@ -334,115 +372,6 @@ class SymbolInfo:
 # --- End of SymbolInfo data structures ---
 
 
-@dataclass
-class ChartDef:
-    """Market data request specification and resample compatibility abstraction."""
-
-    symbol: str
-    timeframe: str | Timeframe = "M1"
-    instrument: str = "Forex"
-    session: str = "Default"
-    connection_name: str = ""
-    connection_hash: int = 0
-    symbol_hash: int = 0
-    history_from: int = 0
-    history_to: int = 0
-    loaded_history_from: int = 0
-    spread: float = 0.0
-    real_spread: bool = False
-    bar_time_type: int = 0
-    min_distance: float = 0.0
-    is_backtest_data_def: bool = False
-    backload_type: int = 0
-    backload_number: int = 0
-    registered: bool = False
-
-    def __post_init__(self) -> None:
-        """Normalize timeframe string and initialize deterministic hashes."""
-        if isinstance(self.timeframe, Timeframe):
-            self.timeframe = self.timeframe.value
-        if not self.connection_hash and self.connection_name:
-            self.connection_hash = abs(hash(self.connection_name))
-        if not self.symbol_hash and self.symbol:
-            self.symbol_hash = abs(hash(self.symbol))
-
-    def timeframe_seconds(self) -> int:
-        """Timeframe duration in seconds."""
-        if isinstance(self.timeframe, Timeframe):
-            return self.timeframe.to_seconds()
-        tf_str = self.timeframe.strip().upper()
-        if tf_str in ("TICK", "TICKS"):
-            return 0
-        try:
-            return Timeframe.from_string(tf_str).to_seconds()
-        except ValueError:
-            is_s = tf_str.startswith("S") and tf_str[1:].isdigit()
-            return int(tf_str[1:]) if is_s else 0
-
-    def is_symbol_recognized(self) -> bool:
-        """Check if symbol is valid/recognized."""
-        return bool(self.symbol and self.symbol.strip())
-
-    def is_smaller_than(self, other: ChartDef) -> bool:
-        """Evaluate if this chart's timeframe is strictly smaller than other's."""
-        return self.timeframe_seconds() < other.timeframe_seconds()
-
-    def can_be_computed_from(self, other: ChartDef) -> bool:
-        """Evaluate if this chart can be resampled/computed from another chart."""
-        if self.symbol.strip().upper() != other.symbol.strip().upper():
-            return False
-        if self.session not in ("", "Default") and other.session not in (
-            "",
-            "Default",
-            self.session,
-        ):
-            return False
-        o_sec, s_sec = other.timeframe_seconds(), self.timeframe_seconds()
-        if o_sec > s_sec or (o_sec > 0 and s_sec % o_sec != 0):
-            return False
-        return not (
-            0 < self.history_from < other.history_from
-            or 0 < other.history_to < self.history_to
-        )
-
-    def is_same_connection_symbol(self, other: ChartDef) -> bool:
-        """Check if both charts share identical connection name and symbol."""
-        s_sym, o_sym = self.symbol.strip().upper(), other.symbol.strip().upper()
-        s_con = self.connection_name.strip().upper()
-        o_con = other.connection_name.strip().upper()
-        return s_sym == o_sym and s_con == o_con
-
-    def get_charts_hash(self) -> str:
-        """Compute unique identifier hash string for chart."""
-        return f"{self.connection_name}_{self.symbol}_{self.timeframe}_{self.session}"
-
-    def clone(
-        self,
-        symbol: str | None = None,
-        history_from: int | None = None,
-        history_to: int | None = None,
-    ) -> ChartDef:
-        """Clone this ChartDef, optionally overriding symbol or date ranges."""
-        ov: dict[str, Any] = {}
-        if symbol is not None:
-            ov.update(symbol=symbol, symbol_hash=abs(hash(symbol)))
-        if history_from is not None:
-            ov["history_from"] = history_from
-        if history_to is not None:
-            ov["history_to"] = history_to
-        return replace(self, **ov)
-
-    def to_dict(self) -> dict[str, Any]:
-        """Serialize ChartDef to a dictionary."""
-        return asdict(self)
-
-    @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> ChartDef:
-        """Construct ChartDef from a dictionary."""
-        valid = {f.name for f in fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in valid})
-
-
 def _sync_default_pair(
     obj: Any, attr_a: str, attr_b: str, default_a: Any, default_b: Any | None = None
 ) -> None:
@@ -457,34 +386,41 @@ def _sync_default_pair(
 
 @dataclass
 class DataInfo:
-    """Historical market dataset catalog metadata record."""
+    """Own datalib/DataInfo.java getXML/setFromXML/clone/toString.
+
+    Donor fields/defaults and nested InstrumentInfo are canonical. Host catalog
+    aliases, row/dict helpers and string-valued catalog IDs remain explicit Python
+    adaptations; from_row supplies their defaults instead of changing donor
+    defaults. clone omits donor ID/display fields exactly as recovered source.
+    XMLUtil numeric recovery is logged without exposing rejected values.
+    """
 
     id: str | int = 0
-    symbol: str = ""
-    timeframe: str | Timeframe = "M1"
-    instrument: str = "Forex"
-    connection: str = ""
-    timezone: str = "UTC"
-    decimals: int = 4
+    symbol: str | None = None
+    timeframe: str | Timeframe | None = None
+    instrument: str | None = None
+    connection: str | None = None
+    timezone: str | None = None
+    decimals: int = 0
     date_from: str | int = 0
-    date_from_str: str = ""
+    date_from_str: str | None = None
     date_to: str | int = 0
-    date_to_str: str = ""
+    date_to_str: str | None = None
     rows: int = 0
     total_days: int = 0
-    filename: str = ""
+    filename: str | None = None
     file_hash: int = 0
     bar_time_type: int = 0
-    remove_weekends: bool = True
-    show: bool = True
+    remove_weekends: bool = False
+    show: bool = False
     source: str | int = 0
     source_data_id: int = 0
     basket_id: int = 0
-    broker_id: int = 0
-    original_symbol: str = ""
+    broker_id: int = -1
+    original_symbol: str | None = None
     seconds_records: int = 0
-    u_symbol: str = ""
-    u_symbol_name: str = ""
+    u_symbol: str | None = None
+    u_symbol_name: str | None = None
     underlying: str = ""
     broker: str = "Default"
     broker_name: str = "Default"
@@ -494,6 +430,7 @@ class DataInfo:
     updated_at_utc: str = ""
     path: str = ""
     data_kind: str = "bars"
+    symbol_info: InstrumentInfo | None = None
     quality_score: float = 1.0
     total_records: int = 0
     data_type: str = ""
@@ -502,38 +439,103 @@ class DataInfo:
         """Harmonize aliases, default fields, and normalized types."""
         if isinstance(self.timeframe, Timeframe):
             self.timeframe = self.timeframe.value
-        _sync_default_pair(self, "path", "filename", "")
+        if self.filename is not None:
+            _sync_default_pair(self, "path", "filename", "")
+        elif self.path:
+            self.filename = self.path
         _sync_default_pair(self, "bars", "rows", 0)
         _sync_default_pair(self, "bars", "total_records", 0)
         _sync_default_pair(self, "bars", "rows", 0)
         _sync_default_pair(self, "broker_name", "broker", "Default")
         _sync_default_pair(self, "data_type", "category", "", "Forex")
         self.data_type = self.data_type or self.category
-        self.underlying = self.underlying or self.symbol
+        self.underlying = self.underlying or self.symbol or ""
         if isinstance(self.date_from, str):
-            _sync_default_pair(self, "date_from", "date_from_str", "")
+            self.date_from_str = self.date_from_str or self.date_from
         elif not self.date_from and self.date_from_str:
             self.date_from = self.date_from_str
         if isinstance(self.date_to, str):
-            _sync_default_pair(self, "date_to", "date_to_str", "")
+            self.date_to_str = self.date_to_str or self.date_to
         elif not self.date_to and self.date_to_str:
             self.date_to = self.date_to_str
         if isinstance(self.source, str):
-            _sync_default_pair(self, "connection", "source", "")
-        elif not self.source and self.connection:
-            self.source = self.connection
+            if self.connection is None:
+                self.connection = self.source or None
+            else:
+                _sync_default_pair(self, "connection", "source", "")
+
+    @override
+    def __str__(self) -> str:
+        """Map donor toString; host dictionary APIs retain their explicit fields."""
+        values = [
+            "null" if value is None else str(value)
+            for value in (
+                self.symbol,
+                self.instrument,
+                self.timeframe,
+                self.filename,
+            )
+        ]
+        return (
+            f"DataInfo [symbol={values[0]}, instrument={values[1]}, "
+            f"timeframe={values[2]}, filename={values[3]}]"
+        )
 
     def clone(self) -> DataInfo:
-        """Clone this DataInfo record."""
-        return replace(self)
+        """Map clone's omitted ID/display fields and detached instrument child."""
+        logger.debug("FR-data-chart-clone: cloned dataset metadata")
+        return replace(
+            self,
+            id=0,
+            source_data_id=0,
+            show=False,
+            date_from_str=None,
+            date_to_str=None,
+            symbol_info=self.symbol_info.clone()
+            if self.symbol_info is not None
+            else None,
+        )
+
+    def to_xml(self) -> Element:
+        """Serialize native metadata; reject unmapped host string IDs and dates.
+
+        Existing host catalogs use provider names and string IDs. Their numeric
+        donor identities must be explicitly supplied before native XML export;
+        no migration or guessed ID translation occurs at this boundary.
+        """
+        element = _scalar_xml("DataInfo", self.to_dict(), _DATA_XML)
+        defaults = asdict(DataInfo())
+        for xml_name, name in _DATA_XML.items():
+            if isinstance(defaults[name], int) and not isinstance(defaults[name], bool):
+                bits = 64 if name in ("date_from", "date_to", "file_hash") else 32
+                _xml_number(element.get(xml_name), defaults[name], bits)
+        if self.symbol_info is not None:
+            element.append(self.symbol_info.to_xml())
+        return element
+
+    @classmethod
+    def from_xml(cls, element: Element) -> DataInfo:
+        """Read the complete donor DataInfo XML, including nested InstrumentInfo."""
+        if element.tag != "DataInfo":
+            raise ValueError("Expected DataInfo XML")
+
+        values = _xml_values(element, _DATA_XML, asdict(cls()))
+        child = element.find("InstrumentInfo")
+        values["symbol_info"] = (
+            InstrumentInfo.from_xml(child) if child is not None else None
+        )
+        return cls(**values)
 
     def to_chart_def(self) -> ChartDef:
         """Convert catalog metadata record into an operational ChartDef."""
+        from app.core.data.charts import ChartDef
+
         return ChartDef(
             symbol=self.symbol,
-            timeframe=str(self.timeframe),
+            timeframe=self.timeframe,
             instrument=self.instrument,
-            bar_time_type=self.bar_time_type,
+            data_info=self,
+            instrument_info=self.symbol_info,
             connection_name=str(self.connection or self.source or ""),
             history_from=self.date_from if isinstance(self.date_from, int) else 0,
             history_to=self.date_to if isinstance(self.date_to, int) else 0,
@@ -547,7 +549,10 @@ class DataInfo:
     def from_dict(cls, data: dict[str, Any]) -> DataInfo:
         """Construct DataInfo from a dictionary."""
         valid = {f.name for f in fields(cls)}
-        return cls(**{k: v for k, v in data.items() if k in valid})
+        values = {k: v for k, v in data.items() if k in valid}
+        if isinstance(values.get("symbol_info"), dict):
+            values["symbol_info"] = InstrumentInfo.from_dict(values["symbol_info"])
+        return cls(**values)
 
     @classmethod
     def from_row(cls, row: Mapping[str, Any]) -> DataInfo:
@@ -559,6 +564,11 @@ class DataInfo:
             underlying=str(row.get("underlying", "")),
             instrument=str(row.get("instrument", "")),
             timeframe=str(row.get("timeframe", "M1")),
+            decimals=int(row.get("decimals", 4)),
+            bar_time_type=int(row.get("bar_time_type", 0)),
+            file_hash=int(row.get("file_hash", 0)),
+            remove_weekends=bool(row.get("remove_weekends", True)),
+            show=bool(row.get("show", True)),
             broker=str(row.get("broker", "Default")),
             broker_name=str(row.get("broker_name", "Default")),
             timezone=str(row.get("timezone", "UTC")),
@@ -815,7 +825,6 @@ __all__ = [
     "SYMBOL_TRADE_MODE_DESCRIPTIONS",
     "TIMEFRAME_SECONDS",
     "BookInfo",
-    "ChartDef",
     "DataInfo",
     "DataframeSeries",
     "MarketBar",
