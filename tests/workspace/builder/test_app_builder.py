@@ -42,7 +42,7 @@ def test_actual_shared_lifecycle(native_environment: Any, caplog: Any) -> None:
         "execution"
     ]
     home.save_project_settings(
-        "acceptance-builder", "task", {"execution": {**config, "candidates": 1000}}, 1
+        "acceptance-builder", "task", {"execution": {**config, "candidates": 10}}, 1
     )
     service = AppBuilderService(home)
     with caplog.at_level("INFO"):

@@ -41,6 +41,7 @@ haruquantai = "app.main:main"
 dev = [
     "pytest>=8,<10",
     "pytest-cov>=6,<8",
+    "pytest-xdist>=3.5.0,<4",
     "ruff>=0.11,<1",
     "mypy>=1.15,<2",
     "detect-secrets>=1.5.0",

@@ -245,7 +245,7 @@ class GenerationEngine:
                 for name in descriptor.spec.required_market_inputs
             )
             and not any(
-                p.get("required") and "default" not in p
+                p.get("required")
                 for p in descriptor.composition.recipe.get("parameters", {}).values()
                 if isinstance(p, (dict, Mapping))
             )

@@ -267,7 +267,9 @@ class ProjectExecutor:
 
     @staticmethod
     def _raw_candidates(
-        snapshot: ExecutionSnapshot, config: ExecutionSettings
+        snapshot: ExecutionSnapshot,
+        config: ExecutionSettings,
+        context: JobContext | None = None,
     ) -> tuple[StrategyDocument, ...]:
         if config.mode == "RANDOM":
             generator = GenerationEngine(
@@ -280,10 +282,16 @@ class ProjectExecutor:
                     seed=config.seed,
                 )
             )
-            return tuple(
-                generator.generate_hsl_strategy(f"{snapshot.task_id}-{i}")
-                for i in range(config.candidates)
-            )
+            raw_candidates: list[StrategyDocument] = []
+            for i in range(config.candidates):
+                if context is not None:
+                    context.wait_if_paused()
+                    context.check_memory_guard()
+                    context.raise_if_cancelled()
+                raw_candidates.append(
+                    generator.generate_hsl_strategy(f"{snapshot.task_id}-{i}")
+                )
+            return tuple(raw_candidates)
         strategies = tuple(
             _STRATEGY.validate_json(raw) for raw in snapshot.strategies_json
         )
@@ -296,10 +304,16 @@ class ProjectExecutor:
             ]
         )
         original = strategies[0]
-        return tuple(
-            ProjectExecutor._parameter_candidate(original, indexes.get_params(i))
-            for i in range(indexes.total_permutations)
-        )
+        raw_candidates = []
+        for i in range(indexes.total_permutations):
+            if context is not None:
+                context.wait_if_paused()
+                context.check_memory_guard()
+                context.raise_if_cancelled()
+            raw_candidates.append(
+                ProjectExecutor._parameter_candidate(original, indexes.get_params(i))
+            )
+        return tuple(raw_candidates)
 
     @staticmethod
     def _parameter_candidate(
@@ -370,9 +384,11 @@ class ProjectExecutor:
 
     @staticmethod
     def _candidates(
-        snapshot: ExecutionSnapshot, config: ExecutionSettings
+        snapshot: ExecutionSnapshot,
+        config: ExecutionSettings,
+        context: JobContext | None = None,
     ) -> tuple[StrategyDocument, ...]:
-        candidates = ProjectExecutor._raw_candidates(snapshot, config)
+        candidates = ProjectExecutor._raw_candidates(snapshot, config, context=context)
         sizing = config.money_management
         if sizing is None:
             return candidates
@@ -384,15 +400,19 @@ class ProjectExecutor:
                 code="INVALID_POSITION_SIZE",
                 message="Rounded position size must be positive",
             )
-        return tuple(
-            ProjectExecutor._sized_candidate(strategy, volume)
-            for strategy in candidates
-        )
+        sized_candidates: list[StrategyDocument] = []
+        for strategy in candidates:
+            if context is not None:
+                context.wait_if_paused()
+                context.check_memory_guard()
+                context.raise_if_cancelled()
+            sized_candidates.append(ProjectExecutor._sized_candidate(strategy, volume))
+        return tuple(sized_candidates)
 
     def run(self, context: JobContext, snapshot: ExecutionSnapshot) -> dict[str, Any]:
         """Backtest candidates and explicitly reject non-finite results."""
         config = ExecutionSettings.model_validate_json(snapshot.config_json)
-        candidates = self._candidates(snapshot, config)
+        candidates = self._candidates(snapshot, config, context=context)
         stored_ids: list[str] = []
         rejected = 0
         best_score: float | None = None
