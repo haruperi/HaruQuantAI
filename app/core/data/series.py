@@ -17,7 +17,7 @@ CLI Usage:
 from __future__ import annotations
 
 from collections.abc import Callable
-from typing import Generic, TypeVar
+from typing import Generic, TypeVar, override
 
 _Value = TypeVar("_Value", float, int)
 ChangeListener = Callable[[int, int], None]
@@ -27,7 +27,7 @@ class SeriesBuffer(Generic[_Value]):
     """Shared primitive for donor double and long series without float casting."""
 
     def __init__(self, zero: _Value, name: str = "") -> None:
-        self._zero = zero
+        self._zero: _Value = zero
         self._values: list[_Value] = []
         self.name = name
         self.shift = 0
@@ -112,6 +112,7 @@ class DataSeries(SeriesBuffer[float]):
     def __init__(self, name: str = "") -> None:
         super().__init__(0.0, name)
 
+    @override
     def _normalize(self, value: float) -> float:
         value = float(value)
         return 0.0 if -1e-17 < value < 1e-17 else value
@@ -123,6 +124,7 @@ class TimeDataSeries(SeriesBuffer[int]):
     def __init__(self, name: str = "") -> None:
         super().__init__(0, name)
 
+    @override
     def _normalize(self, value: int) -> int:
         if not isinstance(value, int) or isinstance(value, bool):
             raise TypeError("Time series values must be integer timestamps")

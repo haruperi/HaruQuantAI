@@ -16,6 +16,7 @@ CLI Usage:
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import override
 
 
 @dataclass(slots=True)
@@ -90,6 +91,7 @@ class TickEvent:
         self.session_end_time = event.session_end_time
         self.bar_close = event.bar_close
 
+    @override
     def __str__(self) -> str:
         """Represent `ask,bid` in donor field order."""
         return f"{self.ask},{self.bid}"
