@@ -70,7 +70,7 @@ def test_launcher_uses_validated_stored_settings(monkeypatch, port, reload):
             else None,
         )
     else:
-        with pytest.raises(ValueError, match=r"host\.port"):
+        with pytest.raises(ValueError, match=r"app_general\.backend_port"):
             backend.main([])
         run.assert_not_called()
     shutdown.assert_called_once_with()
@@ -245,14 +245,17 @@ def test_main_invalid_host_and_port(monkeypatch):
     monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings))
     monkeypatch.setattr(backend, "shutdown_logging", Mock())
 
-    with pytest.raises(ValueError, match=r"host\.host must be a non-empty string"):
+    with pytest.raises(
+        ValueError, match=r"app_general\.host must be a non-empty string"
+    ):
         backend.main([])
 
     settings2 = Mock()
     settings2.get.side_effect = ["127.0.0.1", 70000]
     monkeypatch.setattr(backend, "SettingsManager", Mock(return_value=settings2))
     with pytest.raises(
-        ValueError, match=r"host\.port must be an integer between 1 and 65535"
+        ValueError,
+        match=r"app_general\.backend_port must be an integer between 1 and 65535",
     ):
         backend.main([])
 

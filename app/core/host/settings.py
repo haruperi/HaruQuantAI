@@ -20,7 +20,7 @@ Key Capabilities:
       for boolean, integer, float, and string values.
 Python API Usage:
     from app.core.host.settings import settings
-    port = settings.get_int("host", "port", default=8000)
+    port = settings.get_int("app_general", "backend_port", default=8000)
     theme = settings.get_str("app_general", "theme", default="dark")
 CLI Usage:
     uv run python -m app.cli health
@@ -371,7 +371,7 @@ class SettingsManager:
         return _SettingsNode(self.get_scope(scope))
 
     def __getattr__(self, scope: str) -> Any:
-        """Allow settings.host.port and application-group shortcuts."""
+        """Allow settings.app_general.backend_port and application-group shortcuts."""
         if scope.startswith("_"):
             raise AttributeError(scope)
         try:

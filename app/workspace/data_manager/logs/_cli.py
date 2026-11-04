@@ -80,11 +80,11 @@ def run_log_command(
         settings_cls = _get_settings_manager()
         settings = settings_cls()
         settings.reload()
-        host = str(settings.get("host", "host", "127.0.0.1"))
+        host = str(settings.get("app_general", "host", "127.0.0.1"))
         host = "127.0.0.1" if host == "0.0.0.0" else "::1" if host == "::" else host  # noqa: S104
         if ":" in host:
             host = f"[{host}]"
-        port = int(settings.get("host", "port", 8000))
+        port = int(settings.get("app_general", "backend_port", 8000))
         suffix = {"list": "", "list-active": "/active", "clear": "/clear"}[command]
         httpx_mod = _get_httpx()
         with httpx_mod.Client(timeout=10, trust_env=False) as client:

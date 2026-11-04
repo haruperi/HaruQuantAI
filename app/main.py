@@ -372,21 +372,23 @@ def main(argv: Sequence[str] | None = None) -> None:
         host = (
             arguments.host
             if arguments.host is not None
-            else settings.get("host", "host")
+            else settings.get("app_general", "host")
         )
         port = (
             arguments.port
             if arguments.port is not None
-            else settings.get("host", "port")
+            else settings.get("app_general", "backend_port")
         )
         if not isinstance(host, str) or not host.strip():
-            raise ValueError("host.host must be a non-empty string")
+            raise ValueError("app_general.host must be a non-empty string")
         if (
             isinstance(port, bool)
             or not isinstance(port, int)
             or not 1 <= port <= _MAX_PORT
         ):
-            raise ValueError("host.port must be an integer between 1 and 65535")
+            raise ValueError(
+                "app_general.backend_port must be an integer between 1 and 65535"
+            )
         _run_startup_diagnostics(settings)
         logger.info(
             "Starting backend server; host=%s; port=%d; reload=%s",
