@@ -79,12 +79,12 @@ CSV_FIELDNAMES = CSV_COLUMNS
 
 _SHORTCUTS: tuple[tuple[str, str, str, type], ...] = (
     ("default_spread", "spread", "default", float),
-    ("pip_size", "price", "tick_size", float),
+    ("pip_size", "price", "pip_size", float),
     ("pip_step", "price", "tick_step", float),
-    ("point_value", "price", "contract_size", float),
+    ("point_value", "price", "point_value", float),
     ("min_distance", "trade", "min_distance", float),
-    ("order_size_multiplier", "volume", "min", float),
-    ("order_size_step", "volume", "step", float),
+    ("order_size_multiplier", "volume", "order_size_multiplier", float),
+    ("order_size_step", "volume", "order_size_step", float),
     ("swap_long", "swap", "long", float),
     ("swap_short", "swap", "short", float),
 )
@@ -224,9 +224,6 @@ def _apply_shortcuts(
     for field_key, comp, prop, conv in _SHORTCUTS:
         if field_key in fields:
             comps[comp][prop] = conv(fields[field_key])
-    for key in ("point_value", "pip_size"):
-        if key in fields:
-            comps["price"][key] = float(fields[key])
     if ("commission" in fields or "commission_value" in fields) and not (
         isinstance(fields.get("trade"), Mapping)
         and "commission_settings" in fields["trade"]
@@ -383,14 +380,9 @@ def _build_price_dict(
         d["point_value"] = float(point_value)
     if pip_size is not None:
         d["pip_size"] = float(pip_size)
-    d["tick_size"] = (
-        float(pip_size) if pip_size is not None else d.get("tick_size", 0.0001)
-    )
-    d["contract_size"] = (
-        float(point_value)
-        if point_value is not None
-        else d.get("contract_size", 100000.0)
-    )
+    # Pip size, tick size, point value, and contract size are independent units.
+    d.setdefault("tick_size", 0.0001)
+    d.setdefault("contract_size", 100000.0)
     d["tick_step"] = (
         float(pip_step) if pip_step is not None else d.get("tick_step", 0.00001)
     )
@@ -430,12 +422,13 @@ def _build_row_dict(inst_name: str, now_utc: str, **kwargs: Any) -> dict[str, An
     elif "default" not in spread_d:
         spread_d["default"] = 1.0
     vol_d = dict(kwargs.get("volume") or {})
-    vol_min = kwargs.get("order_size_multiplier", kwargs.get("min_volume"))
-    if vol_min is not None:
-        vol_d["min"] = float(vol_min)
-    vol_step = kwargs.get("order_size_step", kwargs.get("lot_step"))
-    if vol_step is not None:
-        vol_d["step"] = float(vol_step)
+    if kwargs.get("min_volume") is not None:
+        vol_d["min"] = float(kwargs["min_volume"])
+    if kwargs.get("lot_step") is not None:
+        vol_d["step"] = float(kwargs["lot_step"])
+    for key in ("order_size_multiplier", "order_size_step"):
+        if kwargs.get(key) is not None:
+            vol_d[key] = float(kwargs[key])
     trade_d = dict(kwargs.get("trade") or {})
     if kwargs.get("min_distance") is not None:
         trade_d["min_distance"] = float(kwargs["min_distance"])
@@ -796,8 +789,8 @@ def format_symbol_table(
         if len(desc) > MAX_DESC_DISPLAY_LEN:
             desc = desc[:DESC_TRUNCATE_LEN] + ".."
         brk = str(_get(item, "broker_name") or _get(item, "broker") or "Default")
-        pt_val = _extract_field(item, "price", "contract_size", None)
-        if pt_val is None or pt_val == 0:
+        pt_val = _extract_field(item, "price", "point_value", None)
+        if pt_val is None:
             pt_val = _extract_field(item, "contract", "point_value", 0)
         if isinstance(pt_val, (int, float)) and pt_val == int(pt_val) and pt_val > 0:
             pt_str = f"{int(pt_val):,}"

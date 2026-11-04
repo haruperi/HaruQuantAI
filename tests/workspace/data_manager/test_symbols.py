@@ -440,12 +440,59 @@ def test_symbols_add_custom_screenshot_fields(temp_db) -> None:
     assert data["description"] == "British Pound vs US Dollar"
     assert data["spread"]["default"] == 2.0
     assert data["trade"]["min_distance"] == 5.0
-    assert data["volume"]["min"] == 2.0
-    assert data["volume"]["step"] == 0.1
+    assert data["volume"]["min"] == 0.01
+    assert data["volume"]["step"] == 0.01
+    assert data["volume"]["order_size_multiplier"] == 2.0
+    assert data["volume"]["order_size_step"] == 0.1
+    assert data["price"]["pip_size"] == 0.0001
+    assert data["price"]["point_value"] == 100000.0
+    assert data["price"]["tick_size"] == 0.0001
+    assert data["price"]["contract_size"] == 100000.0
     assert data["commission"] == 0.05
     assert data["swap"]["long"] == -1.5
     assert data["swap"]["short"] == 0.8
     assert data["swap"]["rollover3days"] == "Wednesday"
+
+
+
+def test_instrument_economics_are_independent_from_contract_volume(temp_db) -> None:
+    """Donor point/pip and order-size fields must not overwrite other economics."""
+    svc = Symbols()
+    created = svc.add(
+        name="ECON",
+        datasource="demo",
+        price={"tick_size": 0.25, "tick_value": 12.5, "contract_size": 100.0},
+        pip_size=0.5,
+        point_value=12.0,
+        volume={"min": 1.0, "step": 0.25},
+        order_size_multiplier=3.0,
+        order_size_step=0.5,
+    )
+    assert created["success"] is True
+    info = created["data"]
+    assert info["price"]["tick_size"] == 0.25
+    assert info["price"]["tick_value"] == 12.5
+    assert info["price"]["contract_size"] == 100.0
+    assert info["price"]["pip_size"] == 0.5
+    assert info["price"]["point_value"] == 12.0
+    assert info["volume"]["min"] == 1.0
+    assert info["volume"]["step"] == 0.25
+    assert info["volume"]["order_size_multiplier"] == 3.0
+    assert info["volume"]["order_size_step"] == 0.5
+
+    updated = svc.edit(
+        "ECON_demo",
+        point_value=13.0,
+        order_size_multiplier=4.0,
+        pip_size=0.25,
+    )
+    assert updated["success"] is True
+    item = updated["data"][0] if isinstance(updated["data"], list) else updated["data"]
+    assert item["price"]["point_value"] == 13.0
+    assert item["price"]["contract_size"] == 100.0
+    assert item["price"]["tick_size"] == 0.25
+    assert item["volume"]["order_size_multiplier"] == 4.0
+    assert item["volume"]["min"] == 1.0
 
 
 def test_symbols_edit_single(temp_db) -> None:
@@ -465,7 +512,8 @@ def test_symbols_edit_single(temp_db) -> None:
     assert len(records) == 1
     assert records[0]["description"] == "US Dollar vs Japanese Yen"
     assert records[0]["spread"]["default"] == 1.8
-    assert records[0]["price"]["tick_size"] == 0.01
+    assert records[0]["price"]["pip_size"] == 0.01
+    assert records[0]["price"]["tick_size"] == 0.0001
 
 
 def test_symbols_edit_mass(temp_db) -> None:

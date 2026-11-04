@@ -228,6 +228,8 @@ class SymbolVolume:
     max: float = 100.0
     step: float = 0.01
     limit: float = 0.0
+    order_size_multiplier: float = 1.0
+    order_size_step: float = 0.0
     current: int = 0
     high: int = 0
     low: int = 0
